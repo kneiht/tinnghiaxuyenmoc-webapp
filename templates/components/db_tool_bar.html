@@ -1,0 +1,234 @@
+
+{% if select == 'classroom' %}
+    <!-- Toolbar for classroom interactions -->
+    <div id="db-tool-bar">
+        <div id='reward-controls' class="flex flex-wrap justify-around px-10 min-[906px]:grid-cols-2 mt-2 mb-8 h-full bg-theme-200 dark:bg-theme-900 rounded-xl">
+                <!-- Left controls for select -->
+                <div id='left-controls' class="flex items-center justify-center gap-4 py-3">
+                    <!-- Button to toggle view settings -->
+                    <button id='select-all' type="button" class="btn btn-primary h-full w-fit text-nowrap">
+                        Select all
+                    </button>
+                    <button id='deselect-all' type="button" class="btn btn-secondary h-full w-fit text-nowrap">
+                        Deselect all
+                    </button>
+                    <button id='select-reverse' type="button" class="btn btn-primary h-full w-fit text-nowrap">
+                        Select reverse
+                    </button>
+                </div>
+
+
+            <!-- Middle controls for select -->
+            <div id='middle-controls' class="flex items-center justify-center gap-4">
+                <div class="flex flex-col">
+                    <div class="flex flex-row items-center justify-center rounded-lg bg-theme-200 p-4 dark:bg-theme-900">
+                        <p class="text-center text-2xl font-bold text-theme pr-2">Class score: </p>
+                        <p id="class-score" class="text-center text-2xl font-bold text-theme">0</p>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Right controls for view toggle and information display -->
+                <div id='right-controls' class="flex items-center justify-center gap-4 py-3">
+                    <!-- Button to toggle view settings -->
+                    <button id='wow' type="button" class="btn btn-success h-full w-fit text-nowrap">
+                        WOW
+                    </button>
+                    <input id="reward_points" type="number" value=0 min="0" name="reward_points" class="form-input text-2xl w-28"/>    
+                    <button id='oh-no' type="button" class="btn btn-danger h-full w-fit text-nowrap">
+                        OH NO
+                    </button>
+                </div>
+        </div>
+
+
+
+        <div id='attendance-controls' class="grid grid-cols-1 min-[906px]:grid-cols-3 mt-2 mb-8 h-full p-2 bg-theme-200 dark:bg-theme-900 rounded-xl hidden">
+            <!-- Right controls for select -->
+            <div id='left-controls' class="flex flex-col items-center justify-center gap-1 py-3">
+                <div class="flex justify-center items-center  gap-2">
+                    <span class="py-1 px-2 rounded-lg not-checked">Not Checked</span>
+                    <span class="py-1 px-2 rounded-lg present">Present</span>
+                    <span class="py-1 px-2 rounded-lg absent">Absent</span>
+                    <span class="py-1 px-2 rounded-lg late">Late</span>
+                    <span class="py-1 px-2 rounded-lg left-early">Left Early</span>
+                </div>
+                <p>Click the student card to change the attendance color </p>
+            </div>
+
+
+            <div id='mid-controls' class="flex flex-col items-center justify-center w-auto">
+                <div class="px-2 mx-16">
+                    <p class="text-center">This note will be applied to all students</p>
+                    <input type="text" name="apply_all_attendance_notes" value="" placeholder="Write your note ..." class="form-input px-2 pt-2" id="apply_all_attendance_notes" onclick="event.stopPropagation();">
+                </div>
+            </div>
+
+            <!-- Right controls for view toggle and information display -->
+            <div id='right-controls' class="flex items-center justify-center gap-1 py-3">
+                <select name="learningHours" id="learning_hours" class="form-input w-fit">
+                    <option value="1.5">1 hour 30 minutes</option>
+                    <option value="1">1 hour</option>
+                    <option value="2">2 hours</option>
+                    <option value="0.75">45 minutes</option>
+                    <option value="0.5">30 minutes</option>
+                    <option value="0.25">15 minutes</option>
+                </select>
+    
+                <!-- Attendance confirm button -->
+                <div class="flex items-center justify-start gap-1">
+                    <button id="button-confirm-attendance" class="btn btn-primary mx-3">Confirm</button>
+                    <button id="button-cancel-attendance" class="btn btn-secondary mx-3">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Toolbar for database interactions -->
+    <form
+        action="{{ request.path|slice:'?' }}"
+        up-target="#display_cards, #infor-bar:maybe, #calculation_section:maybe, #transaction-table:maybe   ">
+    <div id="db-tool-bar">
+        <div class="mt-2">
+            <!-- Separate 2 sections of controls -->
+            <div  class="flex flex-wrap justify-between gap-4">
+                <!-- Left controls for filtering and sorting -->
+                <div id='left-controls' class="flex justify-start gap-4 h-10 w-[800px]">
+
+                            <!-- Controls to manage search and filter options -->
+                    <div id="search-control" class="z-10 w-full">
+
+                        <!-- Toggle search bar in small screen -->
+                        <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
+                            <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
+                        </button>  
+
+                        <!-- Search bar and filter options -->
+                        <div id="search-bar" class="flex w-full h-10 max-sm:hidden">
+
+                            <!-- Filter dropdown to select filter type -->
+                            <select id="filter-select" class="form-input w-fit rounded-none h-full rounded-l-lg border border-theme border-opacity-50 text-theme pr-10">
+
+                                {% for field in fields %}
+                                    <option value="{{ field }}">{{ field|capfirst }}</option>
+                                {% endfor %}
+                            </select>
+
+                            
+
+                            <!-- Input field for filter values -->
+                            <input id="filter-input" name="all" type="text" placeholder="Type to search ..." class="form-input rounded-none h-full border-r-0 border-l-0 border-theme border-opacity-50 text-theme" autocomplete="off"/>
+                            <!-- Button to submit search -->
+                            <button id="search-button" type="submit" class="btn btn-outline rounded-l-none h-full shadow-none"> 
+                                <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Button to access sorting options -->
+                    <!-- Converted to comment as per instructions -->
+                    <!-- <button id="sort-button" type="button" class="hidden btn btn-outline h-full max-sm:w-11">
+                        <span class="max-sm:hidden me-3"> Sorts </span>
+                        <i class="fas fa-sort text-theme" style="font-size: 20px;"></i> Icon for filter
+                    </button> -->
+
+                    <!-- Add startdate and enddate for financial records -->
+  
+
+
+                    {% if select == 'students' or select == 'CRM' %}
+                        <select id="sort-select" name="sort" class="form-input w-fit border border-theme border-opacity-50">
+                            <option value="-pk" selected>Sort by ...</option>
+                            <option value="name">Name</option>
+                            <option value="last_saved">Last saved</option>
+                            <option value="balance_up">Balance up</option>
+                            <option value="balance_up_active">Balance up (Enrolled)</option>
+                        </select>
+                    {% endif %}
+                    </div>
+
+
+                <div id='mid-controls' class="flex flex-col items-center justify-center w-auto">
+                    <span id="count" class="px-3 py-2 border border-1 border-blue-500 rounded-2xl text-theme">Count: </span>
+                </div>
+
+                
+                <!-- Right controls for view toggle and information display -->
+                <div id='right-controls' class="flex items-center justify-end gap-4">
+                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe" type="button" class="btn btn-outline">
+                        All
+                    </a>
+                    {% if select == 'students' %}
+                        <a href="{{ request.path|slice:'?' }}?status=discontinued" up-target="#display_cards, #infor-bar:maybe" type="button" class="btn btn-outline">
+                            Discontinued
+                        </a>
+                    {% elif select == 'classes' or select == 'CRM' %}
+                        <a href="{{ request.path|slice:'?' }}?status=archived" up-target="#display_cards, #infor-bar:maybe" type="button" class="btn btn-outline">
+                            Archived
+                        </a>
+                    {% endif %}
+                    <a href="{{ request.path|slice:'?' }}" up-target="#display_cards, #infor-bar:maybe" type="button" class="btn btn-outline me-5">
+                        Others (default)
+                    </a>
+
+
+
+
+                    <!-- Button to toggle view settings -->
+                    <button id='toggle-note' type="button" class="btn btn-outline h-full w-11">
+                        <i class="fas fa-sticky-note" style="font-size: 20px;"></i>
+                    </button>
+
+                    <!-- Button to toggle information bar visibility -->
+                    <button id="toggle-infor-bar" type="button" class="max-lg:hidden btn btn-outline h-full w-11">
+                        <i class="fas fa-info-circle" style="font-size: 20px;"></i>
+                    </button>
+
+                    {% if select != 'students' %}
+                        <!-- Don't allow add new student, only convert from CRM -->
+                        <!-- Button to open a modal (for additional actions or information) -->
+                        <a href="{{ base_url }}?get=form" class="sm:hidden btn btn-primary h-full w-11"
+                                up-target="#modal" up-history="false">
+                            <i class="fas fa-plus" style="font-size: 20px;"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+
+        {% if select == 'financial_transactions' %}
+            <div class="flex w-full my-3 justify-center items-center">
+                <div class="flex mr-2 justify-cennter items-center">
+                    <label for="start_date">From:</label>
+                    <input type="date" id="start_date" name="start_date" class="form-input">
+                </div>
+                <div class="flex mr-2 justify-center items-center">
+                    <label for="end_date">To:</label>
+                    <input type="date" id="end_date" name="end_date" class="form-input">
+                </div>
+
+                {% for dropdown_name, dropdown_options in dropdown_filters.items %}
+                    <div class="flex mr-2 justify-cennter items-center">
+                        <select id="{{ dropdown_name }}" name="{{ dropdown_name }}" class="form-input">
+                            <option value="">{{ dropdown_name }}</option>
+                            {% for option_value, option_name in dropdown_options %}
+                                <option value="{{ option_value }}">{{ option_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+        {% endif %}
+
+        {% if select == 'students' or select == 'CRM' %}
+            <div>
+                <a id="also-search-in" href="" class="text-theme font-bold text-xl flex items-center justify-center my-3" target="_blank"></a>
+            </div>
+        {% else %}
+            <div class="mb-6"></div>
+        {% endif %}
+         
+    </div>
+    </form>
+{% endif %}

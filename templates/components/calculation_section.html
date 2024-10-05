@@ -1,0 +1,54 @@
+{% load custom_tags %}
+    {% if select == 'financial_transactions' %}
+    <div id="calculation_section">
+    <div class="flex justify-center">
+        <div class="flex justify-center items-center bg-gray-200 rounded-lg p-4 m-2">
+            <p class="text-center text-lg font-semibold">Tổng thu: <span class="text-green-500">{{ total_income|format_vnd }}</span></p>
+        </div>
+        <div class="flex justify-center items-center bg-gray-200 rounded-lg p-4 m-2">
+            <p class="text-center text-lg font-semibold">Tổng chi: <span class="text-red-500">{{ total_expense|format_vnd }}</span></p>
+        </div>
+        <div class="flex justify-center items-center bg-gray-200 rounded-lg p-4 m-2">
+            <p class="text-center text-lg font-semibold">Tổng dư: <span class="text-blue-500">{{ total_balance|format_vnd }}</span></p>
+        </div>
+                
+    </div>
+
+
+
+
+    <div id="transaction-table" class="hidden mb-5">
+        <h2 class="text-2xl font-bold mb-4 text-center">Transaction Summary Table</h2>
+        <div class="overflow-x-auto rounded-xl">
+            <table class="min-w-full bg-white border border-gray-300 rounded-xl">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal rounded-xl">
+                        <th class="py-3 px-6 text-left">Month</th>
+                        <th class="py-3 px-6 text-right">Month Income</th>
+                        <th class="py-3 px-6 text-right">Month Expense</th>
+                        {% for transaction_type in transaction_types %}
+                            <th class="py-3 px-6 text-right {% if "income" in transaction_type.0 %}text-green-800{% else %}text-red-800{% endif %}">{{ transaction_type.1|remove_income_expense_words }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for month, transactions in transaction_summary.items %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left whitespace-nowrap font-bold">{{ month }}</td>
+                        {% for transaction_type, amount in transactions.items %}
+                            <td class="py-3 px-6 text-right whitespace-nowrap font-semibold 
+                                
+                                {% if amount == 0 %} text-gray-500 opacity-50
+                                {% else %}{% if "income" in transaction_type %}text-green-600{% else %}text-red-600{% endif %}
+                                {% endif %}">{{ amount|format_vnd }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+
+{% endif %}
