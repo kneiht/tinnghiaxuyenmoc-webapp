@@ -84,13 +84,13 @@
                 <!-- ONLY FOR LOGIN PAGE -->
                 {% if is_log_in %}
                     <p class="mt-4 flex justify-center text-theme-950">
-                      Don't have an account? 
-                      <a href="{% url 'register' %}" class="text-blue-600 ml-3 hover:underline">Create one</a>
+                      Bạn chưa có tài khoản? 
+                      <a href="{% url 'register' %}" class="text-blue-600 ml-3 hover:underline">Tạo mới</a>
                     </p>
                 {% elif is_register %}
                     <p class="mt-4 flex justify-center">
-                      Have an account? 
-                      <a href="{% url 'login' %}" class="text-blue-600 ml-3 hover:underline">Log in</a>
+                      Bạn đã có tài khoản? 
+                      <a href="{% url 'login' %}" class="text-blue-600 ml-3 hover:underline">Đăng nhập</a>
                     </p>
                 {% endif %}
 

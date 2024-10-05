@@ -62,8 +62,7 @@ class UserLoginView(LoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_log_in'] = True
-        context['title'] = "Đăng nhập"
-        context['title'] = "Đăng nhập vào hệ thống quản lý"
+        context['title'] = "Đăng nhập vào hệ thống"
         context['button_name'] = "Đăng nhập"
         return context
 
