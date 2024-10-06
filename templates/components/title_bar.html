@@ -1,72 +1,11 @@
-{% load custom_tags %}
+
 <div id="title-bar">
     <div class="flex flex-wrap gap-4 justify-between items-center mb-6 mt-2">
         <p class="text-3xl text-center font-semibold text-theme"> {{ title }} </p>
-        {% if request.mode != 'view' %}
-            {% if select == 'classroom' %}
-            <div id='class-infor' class="hidden" class-id="{{ class.pk }}"></div>
-            <div class="flex gap-4">
-                
-
-
-                <input id="check_date" type="date" name="check_date" class="form-input">
-                <button id="attendance-button" class="btn btn-primary text-nowrap">
-
-                    <i class="fas fa-users mx-3" style="font-size: 16px;"></i>
-                    <span class="max-sm:hidden me-3"> Attendance </span>
-                </button>
-                <button id="image-switch" class="btn btn-primary text-nowrap">
-                    <i class="fas fa-image mx-3" style="font-size: 16px;"></i>
-                    <span class="max-sm:hidden me-3"> Image Switch </span>
-                </button>
-
-            </a>
-
-            </div>
-            {% elif select == 'attendance' %}
-            
-                <div>
-                    <button id="showQRcode" class="btn btn-primary">Show QR Code</button>
-                </div>
-                <div id="qrcode_modal" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center hidden">
-                    <!-- Modal Content -->
-                    <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
-                        <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">QR Code for the view only link</h3>
-                        <a class="btn btn-success mx-10" href="{{ request.path }}view/" target="_blank" rel="noopener noreferrer">Go to view only page</a>
-                        <div class="w-[500px] gap-4 px-6 py-5 flex justify-center">
-                            {% qr_from_text view_only_url %}
-                        </div>
-                        <div class="flex justify-center items-center gap-5 pt-8 pb-7">
-                            <button id='hideQRcode' type="button" class="btn btn-primary rounded-full w-36">
-                                OK
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
-                <a href="/schools/{{ school.pk }}/attendances/?get=form&student_id={{ student.pk }}" class="btn btn-primary" up-target="#modal" up-history="false">
-                    <i class="fas fa-plus" style="font-size: 16px;"></i>
-                    <span class="max-sm:hidden me-3 ms-3"> Add new </span>
-                </a>
-            {% elif select == 'students' %}
-                <!-- Don't allow add new student, only convert from CRM -->
-            {% else %}
-                {% if select == 'financial_transactions' %}
-                    <a href="/schools/all/financialtransactions/" class="max-sm:hidden btn btn-primary">
-                        <span class="max-sm:hidden me-3"> Xem cả 2 chi nhánh </span>
-                    </a>
-                    <button class="btn btn-primary" onclick="var x = document.getElementById('transaction-table'); x.classList.toggle('hidden');">
-                        Show / Hide transaction table
-                    </button>
-    
-                {% endif %}
-                <a href="?get=form" class="max-sm:hidden btn btn-primary" up-target="#modal" up-history="false">
-                    <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-                    <span class="max-sm:hidden me-3"> Add new </span>
-                </a>
-            {% endif %}
-        {% endif %}
+        <a href="?get=form" class="max-sm:hidden btn btn-primary" up-target="#modal" up-history="false">
+            <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+            <span class="max-sm:hidden me-3"> Thêm dự án mới </span>
+        </a>
 
     </div>
 </div>

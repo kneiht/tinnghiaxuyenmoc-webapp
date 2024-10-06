@@ -1,0 +1,16 @@
+
+<!-- Cards -->
+<div id="display_cards" class="display_cards opacity-0 w-full flex justify-center
+gap-6 grid">
+    {% for record in records %}
+        {% if forloop.first %}
+            {% include 'components/card.html' with is_first="true" %}
+        {% else %}
+            {% include 'components/card.html' %}
+        {% endif %}
+    {% endfor %}
+
+</div>
+
+
+

@@ -1,4 +1,54 @@
 
+from django import forms
+from datetime import datetime
+from django.shortcuts import get_object_or_404
+
+
+from django.db.models import Exists, OuterRef
+
+from .models import (Project, Job, ProjectUser, User,)
+
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['name', 'status', 'description', 'image', 'start_date', 'end_date']
+        help_texts = {
+            'name': 'Tên dự án',
+        }
+    
+        labels = {
+            'name': 'Tên dự án',
+            'status': 'Trạng thái',
+            'description': 'Mô tả',
+            'image': 'Hình ảnh',
+            'start_date': 'Thời điểm bắt đầu',
+            'end_date': 'Thời điểm kết thúc',
+        }
+    
+        widgets = {
+            'name': forms.TextInput(attrs={
+                    'placeholder': 'Nhập tên dự án',
+                    'required': 'required',
+                    'class': 'form-input'}),
+            'status': forms.Select(attrs={
+                    'class': 'form-input'}),
+            'description': forms.Textarea(attrs={
+                    'class': 'form-input', 
+                    'rows': 2}),
+            'image': forms.FileInput(attrs={
+                    'class': 'form-input-file',}),
+            'start_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+            'end_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+        }
+
+
+
 # from django import forms
 # from datetime import datetime
 # from django.shortcuts import get_object_or_404

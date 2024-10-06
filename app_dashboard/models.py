@@ -1,5 +1,4 @@
-import time    
-import re
+import time, re, io
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,7 +6,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from PIL import Image
-import io
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.fields.files import ImageFieldFile
 
@@ -126,20 +124,52 @@ class Thumbnail(models.Model):
 
 
 
+
 class Project(BaseModel):
-    moved_to_trash = models.BooleanField(default=False)
-    name = models.CharField(max_length=100)
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending'),
+        ('archived', 'Archived'),
+    )
+
+    name = models.CharField(max_length=1000, default="Dự án chưa được đặt tên")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
     description = models.TextField(blank=True, null=True, default='')
-    image = models.ImageField(upload_to='images/schools/', blank=True, null=True, default='images/default/default_school.webp')
+    image = models.ImageField(upload_to='images/projects/', blank=True, null=True, default='images/default/default_project.webp')
     users = models.ManyToManyField(User, through='ProjectUser')
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.name
 
+
 class ProjectUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    school = models.ForeignKey(Project, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255, default="Member")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
 
+class Job(models.Model):
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending'),
+        ('archived', 'Archived'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=1000, default="Công việc chưa được đặt tên")
+    category = models.CharField(max_length=1000, default="Chưa phân loại")
+    unit = models.CharField(max_length=255, default="Đơn vị")
+    quantity = models.FloatField(default=1.0)
+    description = models.TextField(blank=True, null=True, default='')
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return self.name
 
 
 
