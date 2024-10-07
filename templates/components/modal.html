@@ -1,4 +1,4 @@
-{% load custom_tags %}
+
 {% if modal == 'modal_message' %}
     {% if not message_type %}
         <div id="modal" up-hungry message-type="{{ message_type }}">
@@ -69,32 +69,15 @@
 
 
 
-{% elif modal != 'modal_message' %}  
+{% elif modal != 'modal_project' %}  
     <div id="modal" up-hungry>
         <div class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
 
             <!-- Modal Content -->
             <div class="relative top-16 mb-10 mx-4 card h-fit w-full sm:w-fit">
 
-                {% if modal == 'modal_note' %}
-                    <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">Add note to: {{ record }}</h3>
-                {% else %}
-                    {% if record_id %}
-                        <div class="absolute top-5 left-4">
-                            <a href="#" class="flex items-center gap-1">
-                                
-                                <button id='move-to-trash' type="button" class="btn btn-outline w-10 h-10 rounded-full border-0 text-theme" onclick="return confirm('Chức năng đang được phát triển');">
-                                    <i class="fas fa-trash-alt text-lg "></i>
-                                </button>
-                            </a>
-                        </div>
-                    {% endif %}
-
-                    <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">{% if record_id %} Edit Information {% else %} Create New {% endif %}</h3>
+                <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">{% if record_id %} Sửa thông tin {% else %} Tạo mới {% endif %}</h3>
                 
-                
-                
-                    {% endif %}
                 <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
                 <form enctype="multipart/form-data" method="post"
                     {% if record_id %}
@@ -105,7 +88,7 @@
                         up-target="#modal:maybe, #display_cards:before:maybe"
                     {% endif %} >
 
-                    {% if form.fields|length >= 5 or modal == 'modal_class' %}
+                    {% if form.fields|length >= 5 %}
                     <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[600px] gap-4 px-6">
                     {% else %}
                     <div class="grid grid-cols-1 w-[400px]  gap-4 px-6">
@@ -118,10 +101,8 @@
                         {% endif %}
 
                         {% csrf_token %}
-                        <input type="hidden" name="school_id" value="{{ school_id }}">
                         {% for field in form %}
                             <div class="">
-                                {% if field.name != 'students' and field.name != 'classes' and field.name != 'student_balance_increase' %}
                                     <div>
                                         <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
                                         {{ field }}    
@@ -133,180 +114,11 @@
                                             <p class="text-red-500 px-3">{{ error }}</p>
                                         {% endfor %}
                                     </div>
-                                {% endif %}
-
-
-                                {% if field.name == 'student_balance_increase' and modal == 'modal_financial_transaction' %}
-                                    <div>
-                                        <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
-                                        {{ field }}    
-                                    
-                                        {% if field.help_text %}
-                                            <p class="text-blue-500 px-3">{{ field.help_text }}</p>
-                                        {% endif %}
-                                        {% for error in field.errors %}
-                                            <p class="text-red-500 px-3">{{ error }}</p>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-
 
                             </div>
                         {% endfor %}
                     </div>
 
-                    {% if modal == 'modal_class' %}
-                        <div class="sm:w-[600px] pt-4 px-6">
-                            <label for="students" class="text-theme">Students</label>
-                            <div class="form-input flex flex-col h-52 gap-4 pt-4 pb-6 overflow-y-scroll">
-                                <div class="border-b pb-0.5 flex justify-between w-full font-semibold">
-                                    <span class="w-5/12"> ID. Name</span>
-                                    <span class="w-3/12 text-center"> Status </span>
-                                    <span class="w-2/12 text-center"> Add </span>
-                                    <span class="w-2/12 text-center"> Charge </span>
-                                </div>
-                                {% for student in form.get_students %}
-                                    <div class="border-b pb-0.5 flex justify-between w-full">
-                                        <span class="w-5/12"> {% if student.student_id %}G{{ student.secondary_id|stringformat:"03d" }}{% else %}{{ student.secondary_id|stringformat:"04d" }}{% endif %}. {{ student.name }} </span>
-                                        <span class="w-3/12 text-center {{ student.status }} text-white p-1 rounded-md">{{ student.get_status_display }}</span>
-                                        <span class="w-2/12 text-center">
-                                            <input type="checkbox" class="checkbox" name="students" value="{{ student.id }}" {% if student.in_class %} checked {% endif %}>
-                                        </span>
-                    
-                                        <span class="w-2/12 text-center">
-                                            <input type="checkbox" class="checkbox" name="payment_required" value="{{ student.id }}" {% if student.is_payment_required %} checked {% endif %}>
-                                        </span>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% elif modal == 'modal_student' %} 
-                    <div class="flex pt-4 px-6 sm:w-[600px] gap-5 items-center justify-center">
-                        <div class="modal-avatar modal-image-container w-auto">
-                            {% if record.image %}
-                                <img src="{{ record.image.url }}" alt="student avatar" class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_profile.webp" alt="no image" class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-                        <div class="modal-portrait modal-image-container w-auto">
-                            {% if record.image_portrait %}
-                                <img src="{{ record.image_portrait.url }}" alt="student portrait" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_profile.webp" alt="no image" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="sm:w-[600px] pt-4 px-6">
-                        <label for="students" class="text-theme">Classes</label>
-                        <div class="form-input flex flex-col h-52 gap-4 pt-4 pb-6 overflow-y-scroll">
-                            <div class="border-b pb-0.5 flex justify-between w-full font-semibold">
-                                <span class="w-1/6"> ID </span>
-                                <span class="w-3/6"> Name </span>
-                                <span class="w-1/6 text-center"> Add </span>
-                                <span class="w-1/6 text-center"> Paid class </span>
-                            </div>
-                            {% for class in form.get_classes %}
-                                <div class="border-b pb-0.5 flex justify-between w-full">
-                                    <span class="w-1/6"> {{ class.pk }}</span>
-                                    <span class="w-3/6"> {{ class.name }} </span>
-                                    <span class="w-1/6 text-center">
-                                        <input type="checkbox" class="checkbox" name="classes" value="{{ class.id }}" {% if class.in_class %} checked {% endif %}>
-                                    </span>
-                
-                                    <span class="w-1/6 text-center">
-                                        <input type="checkbox" class="checkbox" name="payment_required" value="{{ class.id }}" {% if class.is_payment_required %} checked {% endif %}>
-                                    </span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    {% elif modal == 'modal_financial_transaction' %} 
-                    <div class="flex pt-4 px-6 sm:w-[600px] gap-5 items-center justify-center">
-                        <div class="modal-image1 modal-image-container w-auto">
-                            {% if record.image1 %}
-                                <img src="{{ record.image1.url }}" alt="student avatar" class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_transaction.webp" alt="no image" class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-                        <div class="modal-image2 modal-image-container w-auto">
-                            {% if record.image2 %}
-                                <img src="{{ record.image2.url }}" alt="student portrait" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_transaction.webp" alt="no image" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-                        <div class="modal-image3 modal-image-container w-auto">
-                            {% if record.image3 %}
-                                <img src="{{ record.image3.url }}" alt="student portrait" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_transaction.webp" alt="no image" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-                        <div class="modal-image4 modal-image-container w-auto">
-                            {% if record.image4 %}
-                                <img src="{{ record.image4.url }}" alt="student portrait" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% else %}
-                                <img src="/media/images/default/default_transaction.webp" alt="no image" class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
-                            {% endif %}
-                        </div>
-
-                        
-                    </div>
-
-
-
-
-                    {% elif modal == 'modal_pay_tuition' or modal == 'modal_pay_tuition_old' %}
-                        <div class="flex justify-center items-center mx-10 my-5 p-2 rounded-2xl bg-green-600 dark:bg-green-700 text-lg text-white">
-                            <div>
-                            <input type="hidden" id="id_student_balance_increase" name="student_balance_increase" value="0">
-                                <span class="me-1">Balance will increase: </span>
-                                <span id="calculate-balance"> 
-                                    0 ₫
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="sm:w-[600px] px-6">
-                            <label for="tuitions" class="text-theme">Tuition payment history</label>
-                            <div class="form-input flex flex-col h-52 gap-4 pt-4 pb-6 overflow-scroll">
-                                <div class="w-[600px]">
-                                    <div class="border-b pb-0.5 flex justify-between w-full">
-                                        <span class="w-2/12"> Date </span>
-                                        <span class="w-3/12"> Amount </span>
-                                        <span class="w-2/12"> Bonus </span>
-                                        <span class="w-3/12"> Balance increase </span>
-                                        <span class="w-3/12"> Note </span>
-                                    </div>
-                                    {% for payment in form.get_payments %}
-                                        <div class="border-b pb-0.5 flex justify-between w-full">
-                                            <span class="w-2/12"> {{ payment.created_at|date:"d-m-Y" }} </span>
-                                            <span class="w-3/12"> {{ payment.amount|format_vnd }} </span>
-                                            <span class="w-2/12"> 
-                                                 {% if payment.bonus == 0 and payment.amount != payment.student_balance_increase %}
-                                                    {{ payment.student_balance_increase|calculate_bonus:payment.amount }}
-                                                {% else %}
-                                                    {{ payment.get_bonus_display }}
-                                                {% endif %}
-                                            </span>
-                                            <span class="w-3/12"> {{ payment.student_balance_increase|format_vnd }}</span>
-
-                                            <span class="w-3/12"> {{ payment.note }} </span>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-
-
-                    
                     <div class="flex justify-center items-center gap-5 pt-8 pb-7">
                         <button type="submit" class="btn btn-primary rounded-full w-36" onclick="this.form.delete.value = 'false';">
                             {% if record_id %} Update {% else %} Create {% endif %}
@@ -314,15 +126,7 @@
                         <button id='cancel' type="button" class="btn btn-secondary rounded-full w-36">
                             Cancel
                         </button>
-                        {% if record_id %} {% if modal == 'modal_financial_transaction' or modal == 'modal_attendance' %}
-                            <span class="">
-                                <input type="hidden" name="delete" value="true">
-                            </span>
-                            <button type="submit" class="btn btn-danger rounded-full w-36" onclick="this.form.delete.value = 'true';">
-                                Delete
-                            </button>
 
-                        {% endif %}{% endif %}
                     </div>
 
                 </form>

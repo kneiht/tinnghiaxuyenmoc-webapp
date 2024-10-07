@@ -1700,6 +1700,14 @@ select {
   margin-top: 1.75rem;
 }
 
+.mt-10 {
+  margin-top: 2.5rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
 .block {
   display: block;
 }
@@ -1884,6 +1892,10 @@ select {
 
 .w-full {
   width: 100%;
+}
+
+.w-1\/12 {
+  width: 8.333333%;
 }
 
 .min-w-full {

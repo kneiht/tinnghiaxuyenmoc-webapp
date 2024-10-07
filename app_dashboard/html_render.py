@@ -24,7 +24,6 @@ def html_render( component, request, **kwargs):
                 'form': kwargs.get('form'), 
                 'modal': kwargs.get('modal'),
                 'record_id': kwargs.get('record_id'),
-                'school_id': kwargs.get('school_id'),
                 'record': kwargs.get('record'),
         }
         template = 'components/modal.html'

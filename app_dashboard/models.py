@@ -127,10 +127,10 @@ class Thumbnail(models.Model):
 
 class Project(BaseModel):
     STATUS_CHOICES = (
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-        ('pending', 'Pending'),
-        ('archived', 'Archived'),
+        ('done', 'Đã hoàn thành'),
+        ('in_progress', 'Đang thực hiện'),
+        ('pending', 'Tạm hoãn'),
+        ('archived', 'Lưu trữ'),
     )
 
     name = models.CharField(max_length=1000, default="Dự án chưa được đặt tên")

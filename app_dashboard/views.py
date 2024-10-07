@@ -43,25 +43,66 @@ def is_project_user(request, project_id):
 
 
 # GENERAL PAGES ==============================================================
-def create_display(request, context):
-    return render(request, 'pages/project.html', context)
-
-
 def create_form(request, model_class, pk):
-    return "create form for "
+    # Get the instance if pk is provided, use None otherwise
+    record = model_class.objects.filter(pk=pk).first() if pk!='new' else None
+    
 
 @login_required
-def project(request):
-    model_class = Project
+def home(request):
     user = request.user
-    records = model_class.objects.filter(users=user)
+    records = Project.objects.filter(users=user)
     context = {'title': "Trang quản lý các dự án", 'records': records}
-    return create_display(request, context)
-
-    
+    return render(request, 'pages/home.html', context)
 
 
 # DATABASE MANAGEMENT VIEWS ===================================================
+class BaseViewSet(LoginRequiredMixin, View):
+    model_class = None
+    form_class = None
+    modal = None
+    card = None
+
+    def get(self, request, pk=None):
+        get_query = request.GET.get('get')
+        if get_query=='form':
+            return self.create_form(request, pk=pk)
+        else:
+            if pk:
+                record = self.model_class.objects.filter(pk=pk).first()
+                return HttpResponse(record)
+            else:
+                records = self.model_class.objects.filter(users=request.user)
+                return HttpResponse(records)
+
+    def create_form(self, request, **kwargs):
+        pk = kwargs.pop('pk', None)
+
+        # Get the instance if pk is provided, use None otherwise
+        record = self.model_class.objects.filter(pk=pk).first() if pk!='new' else None
+        
+        # Get the form
+        form = self.form_class(instance=record) if record else self.form_class()
+        record_id = record.pk if record else None
+
+
+        html_modal = html_render('form', request, form=form, 
+                                 modal=self.modal, record_id=record_id, 
+                                record = record if record else None)
+        return  HttpResponse(html_modal)
+
+
+
+
+
+
+class ProjectViewSet(BaseViewSet):
+    model_class = Project
+    form_class = ProjectForm
+    modal = None
+    card = None
+
+
 
 # def create_display(request, model):
 #     return "create display"

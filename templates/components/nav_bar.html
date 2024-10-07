@@ -9,9 +9,14 @@
         <!-- This is the center part of the navagation bar with various icons and links. It only appears when user is in dashboard-->
             <div id="nav_menu" class="flex items-center m-auto gap-5">
 
-                <a href="{% url 'project' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                <a href="{% url 'home' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-home w-8" style="font-size: 18px;"></span>
                     Dự án
+                </a>
+
+                <a href="{% url 'projects' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                    <span class="fa fa-home w-8" style="font-size: 18px;"></span>
+                    Test url
                 </a>
 
 

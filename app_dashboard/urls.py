@@ -1,14 +1,14 @@
 
 from . import views
-from .views import (
-    project
-)
-
 from django.urls import re_path, path
 
 
 urlpatterns = [
-    path('', views.project, name='project'),
+    path('', views.home, name='home'),
+    path('projects/', views.ProjectViewSet.as_view(), name='projects'),
+    path('projects/<int:pk>/', views.ProjectViewSet.as_view(), name='project_pk'),
+
+
 
     # DATABASE UPLOAD AND DOWNLOAD
     path('db-backup/', views.db_backup, name='db_backup'),
