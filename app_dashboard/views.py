@@ -52,7 +52,10 @@ def create_form(request, model_class, pk):
 def home(request):
     user = request.user
     records = Project.objects.filter(users=user)
-    context = {'title': "Trang quản lý các dự án", 'records': records}
+    context = {'title': "Trang quản lý các dự án", 
+               'create_new_button_name': 'Thêm dự án mới',
+               'create_new_form_url': 'projects/?get=form',
+               'records': records}
     return render(request, 'pages/home.html', context)
 
 
@@ -83,15 +86,52 @@ class BaseViewSet(LoginRequiredMixin, View):
         
         # Get the form
         form = self.form_class(instance=record) if record else self.form_class()
-        record_id = record.pk if record else None
 
+        if self.modal == 'modal_project':
+            modal_context_strings = {
+                'title': 'Sửa thông tin dự án' if record else 'Tạo dự án mới',
+                'submit_button_name': 'Cập nhật' if record else 'Tạo mới'
 
-        html_modal = html_render('form', request, form=form, 
-                                 modal=self.modal, record_id=record_id, 
-                                record = record if record else None)
+            }
+        html_modal = html_render('form', request, form=form, modal=self.modal, modal_context_strings=modal_context_strings)
         return  HttpResponse(html_modal)
 
+    def post(self, request, pk=None):
+        if pk:
+            instance = get_object_or_404(self.model_class, id=pk)
+            
+        result, instance, form = self.process_form(request, instance if pk else None)
+        if result=='success':
+            instance.style = 'just-updated'
+            #html_display_cards = html_render('display_cards', request, select=self.page, records=[instance], school=school)
+            html_message = html_render('message', request, message='create successfully')
+            return HttpResponse(html_message)
+        else:
+            record = instance
+            if self.modal == 'modal_project':
+                modal_context_strings = {
+                    'title': 'Sửa thông tin dự án' if record else 'Tạo dự án mới',
+                    'submit_button_name': 'Cập nhật' if record else 'Tạo mới'
 
+                }
+            html_modal = html_render('form', request, form=form, modal=self.modal, modal_context_strings=modal_context_strings)
+        
+            return HttpResponse(html_modal)
+
+    def process_form(self, request, instance=None):
+        form = self.form_class(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            instance_form = form.save(commit=False)
+            if instance is None:  # This is a new form
+                # Handle the case of the project is created and need to be assigned to a user
+                # instance_form.user = request.user
+                pass
+            instance_form.save()
+            # Save the many to many field, if any
+            # form.save_m2m()
+            return 'success', instance_form, form
+        else:
+            return 'failed', instance, form
 
 
 
@@ -99,8 +139,9 @@ class BaseViewSet(LoginRequiredMixin, View):
 class ProjectViewSet(BaseViewSet):
     model_class = Project
     form_class = ProjectForm
-    modal = None
-    card = None
+    componentContext = {}
+    modal = 'modal_project'
+    card = 'card_project'
 
 
 

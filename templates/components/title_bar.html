@@ -2,10 +2,9 @@
 <div id="title-bar">
     <div class="flex flex-wrap gap-4 justify-between items-center mb-6 mt-2">
         <p class="text-3xl text-center font-semibold text-theme"> {{ title }} </p>
-        <a href="?get=form" class="max-sm:hidden btn btn-primary" up-target="#modal" up-history="false">
+        <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-            <span class="max-sm:hidden me-3"> Thêm dự án mới </span>
+            <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
         </a>
-
     </div>
 </div>

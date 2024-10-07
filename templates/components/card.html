@@ -1,6 +1,5 @@
 {% load static %}
 
-{% load static %}
 <div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
     <a href="">
         <div class="card-image-container">
@@ -22,8 +21,6 @@
             </h3>
         </div>
 
-
-
         <div class="menu relative text-sm opacity-100">
 
             <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
@@ -37,7 +34,7 @@
             <ul id="menu-card-context" class="dropdown-menu absolute right-0 hidden">
                 <!-- Add record id by js -->
                 <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
-                    href="/projects/{{ record.pk }}/?get=form" up-target="#modal" up-history="false">
+                    hx-get="/projects/{{ record.pk }}/?get=form" hx-swap="none">
                     <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
                     Edit information
                 </a>

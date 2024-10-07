@@ -23,8 +23,7 @@ def html_render( component, request, **kwargs):
         context = {
                 'form': kwargs.get('form'), 
                 'modal': kwargs.get('modal'),
-                'record_id': kwargs.get('record_id'),
-                'record': kwargs.get('record'),
+                'modal_context_strings': kwargs.get('modal_context_strings'),
         }
         template = 'components/modal.html'
     
