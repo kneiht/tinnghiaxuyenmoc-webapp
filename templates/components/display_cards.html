@@ -1,11 +1,41 @@
 
 <!-- Cards -->
-<div id="display_cards" class="display_cards opacity-0 w-full flex justify-center
-gap-6 grid mt-8">
-    {% for record in records %}
-        {% include 'components/card.html' %}
-    {% endfor %}
-</div>
-
-
+{% if card == 'card_project' %}
+    <div id="display_cards" class="display_cards opacity-0 w-full flex justify-center
+    gap-6 grid mt-8">
+        {% for record in records %}
+            {% include 'components/card.html' %}
+        {% endfor %}
+    </div>
+{% elif card == 'card_job' %}
+    <div id="display_long_cards" class="display_long_cards overflow-x-auto mt-8">
+        <table class="table-auto w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left">Name</th>
+                    <th scope="col" class="px-6 py-3 text-left">Category</th>
+                    <th scope="col" class="px-6 py-3 text-left">Unit</th>
+                    <th scope="col" class="px-6 py-3 text-left">Quantity</th>
+                    <th scope="col" class="px-6 py-3 text-left">Description</th>
+                    <th scope="col" class="px-6 py-3 text-left">Start Date</th>
+                    <th scope="col" class="px-6 py-3 text-left">End Date</th>
+                    <th scope="col" class="px-6 py-3 text-left">Created At</th>
+                </tr>            </thead>
+            <tbody class="bg-white divide-y divide-gray-300">
+            {% for job in records %}
+                <tr>
+                    <td class="px-6 py-4">{{ job.name }}</td>
+                    <td class="px-6 py-4">{{ job.category }}</td>
+                    <td class="px-6 py-4">{{ job.unit }}</td>
+                    <td class="px-6 py-4">{{ job.quantity }}</td>
+                    <td class="px-6 py-4">{{ job.description }}</td>
+                    <td class="px-6 py-4">{{ job.start_date }}</td>
+                    <td class="px-6 py-4">{{ job.end_date }}</td>
+                    <td class="px-6 py-4">{{ job.created_at }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
 

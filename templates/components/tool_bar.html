@@ -1,5 +1,10 @@
 <!-- Toolbar for database interactions -->
-<form action="{{ request.path|slice:'?' }}">
+<form action="
+    {% if tool_bar == 'tool_bar_project' %} 
+        {% url 'projects' %} 
+    {% else %}
+        nothing
+    {% endif %}">
     <div id="db-tool-bar">
         <div class="mt-2">
             <!-- Separate 2 sections of controls -->
@@ -9,7 +14,7 @@
 
                     <!-- Controls to manage search and filter options -->
                     <div id="search-control" class="z-10 w-full">
-
+                        
                         <!-- Toggle search bar in small screen -->
                         <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
                             <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
@@ -17,21 +22,9 @@
 
                         <!-- Search bar and filter options -->
                         <div id="search-bar" class="flex w-full h-10 max-sm:hidden">
-
-                            <!-- Filter dropdown to select filter type -->
-                            <select id="filter-select"
-                                class="form-input w-fit rounded-none h-full rounded-l-lg border border-theme border-opacity-50 text-theme pr-10">
-
-                                {% for field in fields %}
-                                <option value="{{ field }}">{{ field|capfirst }}</option>
-                                {% endfor %}
-                            </select>
-
-
-
                             <!-- Input field for filter values -->
                             <input id="filter-input" name="all" type="text" placeholder="Nhập để tìm kiếm ..."
-                                class="form-input rounded-none h-full border-r-0 border-l-0 border-theme border-opacity-50 text-theme"
+                                class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme border-opacity-50 text-theme"
                                 autocomplete="off" />
                             <!-- Button to submit search -->
                             <button id="search-button" type="submit"
@@ -43,23 +36,23 @@
 
                 </div>
 
-
                 <!-- Right controls for view toggle and information display -->
-                <div id='right-controls' class="flex items-center justify-end gap-4">
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                        type="button" class="btn btn-outline">
-                        Tất cả công việc
-                    </a>
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                        type="button" class="btn btn-outline">
-                        Công việc đang trễ hạn
-                    </a>
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                        type="button" class="btn btn-outline">
-                        Công việc đã hoàn thành
-                    </a>
-
-                </div>
+                {% if tool_bar == 'tool_bar_project' %}
+                    <div id='right-controls' class="flex items-center justify-end gap-4">
+                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                            type="button" class="btn btn-outline">
+                            Tất cả dự án
+                        </a>
+                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                            type="button" class="btn btn-outline">
+                            Dự án đang trễ hạn
+                        </a>
+                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                            type="button" class="btn btn-outline">
+                            Dự án đã hoàn thành
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

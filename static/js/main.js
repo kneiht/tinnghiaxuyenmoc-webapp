@@ -68,27 +68,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
-
 // DROPDOWN MENUS =========================================
-document.addEventListener("DOMContentLoaded", function() {
+htmx.onLoad(function(elt) {
+    // Find all menus 
+    elt.querySelectorAll('.menu').forEach(function(menu) {
     // Function to show a menu
-    function showHideMenu(menu, action) {
-        var dropdownMenu = menu.querySelector('.dropdown-menu');
-        if (dropdownMenu) {
-            if (action === 'show') {
-                dropdownMenu.classList.remove('hidden');
-            }
-            else if (action === 'hide') {
-                dropdownMenu.classList.add('hidden');
-            }
-            else if (action === 'toggle') {
-                dropdownMenu.classList.toggle('hidden');
+        function showHideMenu(menu, action) {
+            var dropdownMenu = menu.querySelector('.dropdown-menu');
+            if (dropdownMenu) {
+                if (action === 'show') {
+                    dropdownMenu.classList.remove('hidden');
+                }
+                else if (action === 'hide') {
+                    dropdownMenu.classList.add('hidden');
+                }
+                else if (action === 'toggle') {
+                    dropdownMenu.classList.toggle('hidden');
+                }
             }
         }
-    }
-    // Attach click event listeners to menu buttons
-    document.querySelectorAll('.menu').forEach(menu => {
+        // Attach click event listeners to menu buttons
         menu.querySelector('.menu-button').addEventListener('click', function() {
             showHideMenu(menu, 'toggle')
             // Hide all other menus when click to a menu
@@ -105,9 +104,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 showHideMenu(menu, 'hide')
             }
         })
-    })
+    });
 });
-
 
 
 

@@ -127,14 +127,15 @@ class Thumbnail(models.Model):
 
 class Project(BaseModel):
     STATUS_CHOICES = (
-        ('done', 'Đã hoàn thành'),
+        ('not_started', 'Chưa bắt đầu'),
+        ('done', 'Hoàn thành'),
         ('in_progress', 'Đang thực hiện'),
         ('pending', 'Tạm hoãn'),
         ('archived', 'Lưu trữ'),
     )
 
     name = models.CharField(max_length=1000, default="Dự án chưa được đặt tên")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress")
     description = models.TextField(blank=True, null=True, default='')
     image = models.ImageField(upload_to='images/projects/', blank=True, null=True, default='images/default/default_project.webp')
     users = models.ManyToManyField(User, through='ProjectUser')
@@ -153,12 +154,12 @@ class ProjectUser(models.Model):
 
 class Job(models.Model):
     STATUS_CHOICES = (
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-        ('pending', 'Pending'),
-        ('archived', 'Archived'),
+        ('not_started', 'Chưa bắt đầu'),
+        ('done', 'Hoàn thành'),
+        ('in_progress', 'Đang thực hiện'),
+        ('pending', 'Tạm hoãn'),
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=1000, default="Công việc chưa được đặt tên")
     category = models.CharField(max_length=1000, default="Chưa phân loại")

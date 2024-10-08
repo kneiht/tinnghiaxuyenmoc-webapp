@@ -1,69 +1,81 @@
 {% load static %}
+{% if card == 'card_project' %}
+    <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
+        <a href="{% url 'project' record.pk %}">
+            <div class="card-image-container">
+                {% if record.image %}
+                <img src="{{ record.image.url }}" alt="{{ record.name }}"
+                    class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
+                {% else %}
+                <img src="/media/images/default/default_project.webp" alt="Default School Image"
+                    class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
+                {% endif %}
+            </div>
+        </a>
 
-<div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
-    <a href="">
-        <div class="card-image-container">
-            {% if record.image %}
-            <img src="{{ record.image.url }}" alt="{{ record.name }}"
-                class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
-            {% else %}
-            <img src="/media/images/default/default_project.webp" alt="Default School Image"
-                class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
-            {% endif %}
-        </div>
-    </a>
 
-
-    <div class="flex justify-between items-start px-2 relative">
-        <div class="w-11/12">
-            <h3 class="text-md font-semibold text-theme text-center pl-1 truncate">
-                {{ record }}
-            </h3>
-        </div>
-
-        <div class="menu relative text-sm opacity-100">
-
-            <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
-                onclick="event.stopPropagation();">
-                <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
-                <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
-                <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+        <div class="flex justify-between items-start px-2 relative">
+            <div class="w-11/12">
+                <h3 class="text-md font-semibold text-theme text-center pl-1 truncate">
+                    {{ record }}
+                </h3>
             </div>
 
-            <!-- Dropdown Context Menu For Record-->
-            <ul id="menu-card-context" class="dropdown-menu absolute right-0 hidden">
-                <!-- Add record id by js -->
+            <div class="menu relative text-sm opacity-100">
+
+                <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
+                    onclick="event.stopPropagation();">
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                </div>
+
+                <!-- Dropdown Context Menu For Record-->
+                <ul id="menu-card-context" class="dropdown-menu absolute right-0 hidden">
+                    <!-- Add record id by js -->
                 <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
-                    hx-get="/projects/{{ record.pk }}/?get=form" hx-swap="none">
-                    <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
-                    Edit information
-                </a>
+                        hx-get="{% url 'api_project_pk' record.pk %}?get=form" hx-swap="none">
+                        <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
+                        Edit information
+                    </a>
 
-            </ul>
+                </ul>
+            </div>
+
         </div>
 
+
+        <div class="flex flex-col text-cyan-600 dark:text-cyan-500 text-sm px-4 pb-3 ">
+
+            <!-- Use div for flex container, span for inline text elements -->
+            <span class="{{ record.status }} text-white p-1 rounded-md absolute shadow-2xl top-5 right-5 px-2">{{ record.get_status_display }}</span>
+
+            <div class="flex">
+                <div class="flex-1 mr-2 h-10 truncate flex items-center">
+                    <i class="fas fa-regular fa-calendar w-6" aria-hidden="true"></i>
+                    <span>{{ record.start_date }}</span>
+                </div>
+                <div class="flex-1 mr-2 h-10 truncate flex items-center">
+                    <i class="fas fa-solid fa-calendar w-6" aria-hidden="true"></i>
+                    <span>{{ record.end_date }}</span>
+                </div>
+            </div>
+
+            <!-- Keep <p> for paragraphs of text -->
+            <div class="mt-2 note whitespace-pre-line"> {{ record.description }} </div>
+        </div>
     </div>
-
-
-    <div class="flex flex-col text-cyan-600 dark:text-cyan-500 text-sm px-4 pb-3 ">
-
-        <!-- Use div for flex container, span for inline text elements -->
-        <span class="pending text-white p-1 rounded-md absolute shadow-2xl top-5 right-5 px-2">{{ record.get_status_display }}</span>
-
-        <div class="flex">
-            <div class="flex-1 mr-2 h-10 truncate flex items-center">
-                <i class="fas fa-regular fa-calendar w-6" aria-hidden="true"></i>
-                <span>{{ record.start_date }}</span>
+{% elif card == 'card_job' %}
+    <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
+        <div class="flex flex-row justify-between items-start px-2 relative py-3">
+            <div class="">
+                <h3 class="text-md font-semibold text-theme text-center pl-1 truncate">
+                    {{ record }}
+                </h3>
             </div>
-            <div class="flex-1 mr-2 h-10 truncate flex items-center">
-                <i class="fas fa-solid fa-calendar w-6" aria-hidden="true"></i>
-                <span>{{ record.end_date }}</span>
-            </div>
+            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl px-2">{{ record.get_status_display }}</span>
         </div>
 
-        <!-- Keep <p> for paragraphs of text -->
-        <div class="mt-2 note whitespace-pre-line"> {{ record.description }} </div>
-
 
     </div>
-</div>
+{% endif %}

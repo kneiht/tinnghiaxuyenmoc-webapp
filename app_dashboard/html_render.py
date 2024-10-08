@@ -1,12 +1,12 @@
 from django.template.loader import render_to_string
+from django.urls import reverse
+
 
 def html_render( component, request, **kwargs):
     if component=='card':
         context = {
-                'select': kwargs.get('select'),
                 'record': kwargs.get('record'), 
                 'card': kwargs.get('card'),
-                'school': kwargs.get('school'),
         }
         template = 'components/card.html'
 
@@ -19,20 +19,37 @@ def html_render( component, request, **kwargs):
         }
         template = 'components/modal.html'
 
-    elif component=='form':
+    elif component=='form':      
         context = {
                 'form': kwargs.get('form'), 
                 'modal': kwargs.get('modal'),
-                'modal_context_strings': kwargs.get('modal_context_strings'),
-        }
+                'record': kwargs.get('record'),
+        } 
+        modal = kwargs.get('modal')
+        record = kwargs.get('record')
+        if not record:
+            context['submit_button_name'] = 'Tạo mới'
+            if modal == 'modal_project':
+                context['title'] = 'Tạo dự án mới'
+                context['form_url'] = reverse('api_projects')
+            elif modal == 'modal_job':
+                context['title'] = 'Tạo công việc mới'
+                context['form_url'] = reverse('api_jobs')
+        else: 
+            context['submit_button_name'] = 'Cập nhật'
+            if modal == 'modal_project':
+                context['title'] = 'Cập nhật dự án'
+                context['form_url'] = reverse('api_project_pk', kwargs={'pk': record.pk})
+            elif modal == 'modal_job':
+                context['title'] = 'Cập nhật công việc'
+                context['form_url'] = reverse('api_job_pk', kwargs={'pk': record.pk})
+
         template = 'components/modal.html'
-    
+
+
     elif component=='display_cards':
         context = {
-                'select': kwargs.get('select'),
-                'records': kwargs.get('records'), 
-                'card': kwargs.get('card'),
-                'school': kwargs.get('school'),
+                'records': kwargs.get('records'),
         }
         template = 'components/display_cards.html'
 

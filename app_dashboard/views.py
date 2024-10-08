@@ -9,10 +9,10 @@ from io import BytesIO
 import pandas as pd
 from sqlalchemy import create_engine
 from django.db import connection
-
+from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render, redirect
-
+from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 
 
@@ -23,8 +23,10 @@ from django.contrib.auth.models import User
 from django.views import View
 from .html_render import html_render
 
-from .models import Project, ProjectUser
-from .forms import ProjectForm
+from .models import Project, ProjectUser, Job
+from .forms import ProjectForm, JobForm
+
+from django.db.models import Q, Count, Sum  # 'Sum' is imported here
 
 def is_admin(user):
     # check if there is no user => allow to upload db
@@ -43,20 +45,75 @@ def is_project_user(request, project_id):
 
 
 # GENERAL PAGES ==============================================================
-def create_form(request, model_class, pk):
-    # Get the instance if pk is provided, use None otherwise
-    record = model_class.objects.filter(pk=pk).first() if pk!='new' else None
-    
+
+def filter_records(request, records, model_class):
+    # Get all query parameters except 'sort' as they are assumed to be field filters
+    query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
+    # Determine the fields to be used as filter options based on the selected page
+    if model_class == Project:
+        fields = ['all', 'name', 'description']
+    elif model_class == Job:
+        fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
+    else:
+        fields = ['all']
+
+    if not query_params:
+        # Filter Discontinued and Archived
+        if hasattr(model_class, 'status'):
+            records = records.exclude(status__in=['archived'])
+            
+    else:
+        # Construct Q objects for filtering
+        combined_query = Q()
+        if 'all' in query_params:
+            specified_fields = fields[1:]  # Exclude 'all' to get the specified fields
+            all_fields_query = Q()
+            for value in query_params['all']:
+                for specified_field in specified_fields:
+                    if specified_field in [field.name for field in model_class._meta.get_fields()]:
+                        all_fields_query |= Q(**{f"{specified_field}__icontains": value})
+            combined_query &= all_fields_query
+            
+        else:
+            for field, values in query_params.items():
+                if field in fields:
+                    try:
+                        model_class._meta.get_field(field)
+                        field_query = Q()
+                        for value in values:
+                            field_query |= Q(**{f"{field}__icontains": value})
+                        combined_query &= field_query
+                    except FieldDoesNotExist:
+                        print(f"Ignoring invalid field: {field}")
+        # Filter records based on the query
+        records = records.filter(combined_query)
+    return records
 
 @login_required
-def home(request):
+def projects(request):
     user = request.user
     records = Project.objects.filter(users=user)
-    context = {'title': "Trang quản lý các dự án", 
+    records = filter_records(request, records, Project)
+    context = {'title': 'Trang quản lý các dự án',
                'create_new_button_name': 'Thêm dự án mới',
-               'create_new_form_url': 'projects/?get=form',
-               'records': records}
+               'create_new_form_url': reverse('api_projects') + '?get=form',
+               'card': 'card_project',
+               'tool_bar': 'tool_bar_project',
+               'records': records} 
     return render(request, 'pages/home.html', context)
+
+@login_required
+def project(request, pk):
+    user = request.user
+    records = Job.objects.filter(project_id=pk)
+    records = filter_records(request, records, Job)
+    project = Project.objects.filter(pk=pk).first()
+    context = {'title': "Trang quản lý dự án: " + project.name, 
+               'create_new_button_name': 'Thêm công việc mới',
+               'create_new_form_url':  reverse('api_jobs') + '?get=form',
+               'card': 'card_job',
+               'records': records}
+    return render(request, 'pages/project.html', context)
 
 
 # DATABASE MANAGEMENT VIEWS ===================================================
@@ -86,14 +143,7 @@ class BaseViewSet(LoginRequiredMixin, View):
         
         # Get the form
         form = self.form_class(instance=record) if record else self.form_class()
-
-        if self.modal == 'modal_project':
-            modal_context_strings = {
-                'title': 'Sửa thông tin dự án' if record else 'Tạo dự án mới',
-                'submit_button_name': 'Cập nhật' if record else 'Tạo mới'
-
-            }
-        html_modal = html_render('form', request, form=form, modal=self.modal, modal_context_strings=modal_context_strings)
+        html_modal = html_render('form', request, form=form, modal=self.modal, record=record)
         return  HttpResponse(html_modal)
 
     def post(self, request, pk=None):
@@ -104,19 +154,13 @@ class BaseViewSet(LoginRequiredMixin, View):
         if result=='success':
             instance.style = 'just-updated'
             #html_display_cards = html_render('display_cards', request, select=self.page, records=[instance], school=school)
-            html_message = html_render('message', request, message='create successfully')
-            return HttpResponse(html_message)
+            html_card = html_render('card', request, record=instance, card = self.card)
+            html_message = html_render('message', request, message='Cập nhật thành công')
+            return HttpResponse(html_message + html_card)
         else:
             record = instance
-            if self.modal == 'modal_project':
-                modal_context_strings = {
-                    'title': 'Sửa thông tin dự án' if record else 'Tạo dự án mới',
-                    'submit_button_name': 'Cập nhật' if record else 'Tạo mới'
-
-                }
-            html_modal = html_render('form', request, form=form, modal=self.modal, modal_context_strings=modal_context_strings)
-        
-            return HttpResponse(html_modal)
+            html_modal = html_render('form', request, form=form, modal=self.modal, record=record)
+            return  HttpResponse(html_modal)
 
     def process_form(self, request, instance=None):
         form = self.form_class(request.POST, request.FILES, instance=instance)
@@ -143,7 +187,12 @@ class ProjectViewSet(BaseViewSet):
     modal = 'modal_project'
     card = 'card_project'
 
-
+class JobViewSet(BaseViewSet):
+    model_class = Job
+    form_class = JobForm
+    componentContext = {}
+    modal = 'modal_job'
+    card = 'card_job'
 
 # def create_display(request, model):
 #     return "create display"

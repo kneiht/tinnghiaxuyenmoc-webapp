@@ -4,10 +4,14 @@ from django.urls import re_path, path
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('projects/', views.ProjectViewSet.as_view(), name='projects'),
-    path('projects/<int:pk>/', views.ProjectViewSet.as_view(), name='project_pk'),
+    path('', views.projects, name='projects'),
+    path('project/<int:pk>/', views.project, name='project'),
+    
+    path('api/projects/', views.ProjectViewSet.as_view(), name='api_projects'),
+    path('api/projects/<int:pk>/', views.ProjectViewSet.as_view(), name='api_project_pk'),
 
+    path('api/jobs/', views.JobViewSet.as_view(), name='api_jobs'),
+    path('api/jobs/<int:pk>/', views.JobViewSet.as_view(), name='api_job_pk'),
 
 
     # DATABASE UPLOAD AND DOWNLOAD

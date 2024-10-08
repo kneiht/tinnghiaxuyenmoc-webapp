@@ -32,7 +32,7 @@
     {% endblock %}
 </head>
 
-<body class="px-4 bg-[#F0F2F5] dark:bg-slate-900 min-h-full" style="font-family: 'Open Sans';">
+<body  class="px-4 bg-[#F0F2F5] dark:bg-slate-900 min-h-full" style="font-family: 'Open Sans';">
 
     <div id="modal" hx-swap-oob="true"></div>
 
@@ -43,6 +43,7 @@
 
 
     <script src="/static/js/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/multi-swap.js"></script>
     <script src="/static/js/main.js"></script>
 
     {% block extra_script %}

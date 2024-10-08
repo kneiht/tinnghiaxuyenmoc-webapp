@@ -1,3 +1,9 @@
+Todo:
+- Set admin for all project
+- Only admin can create project
+- Dislay new card created
+
+
 
 tailwind
 https://stackoverflow.com/questions/63392426/how-to-use-tailwindcss-with-django

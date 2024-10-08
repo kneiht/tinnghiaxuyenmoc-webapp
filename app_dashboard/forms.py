@@ -47,6 +47,53 @@ class ProjectForm(forms.ModelForm):
 
 
 
+
+class JobForm(forms.ModelForm):
+    class Meta:
+        model = Job
+        fields = ['project', 'status', 'name', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date']
+
+        labels = {
+            'project': 'Dự án',
+            'status': 'Trạng thái',
+            'name': 'Tên công việc',
+            'category': 'Loại công việc',
+            'unit': 'Đơn vị',
+            'quantity': 'Số lượng',
+            'description': 'Mô tả',
+            'start_date': 'Thời điểm bắt đầu',
+            'end_date': 'Thời điểm kết thúc',
+        }
+    
+        widgets = {
+            'project': forms.Select(attrs={
+                    'class': 'form-input'}),
+            'status': forms.Select(attrs={
+                    'class': 'form-input'}),
+            'name': forms.TextInput(attrs={
+                    'placeholder': 'Nhập tên công việc',
+                    'required': 'required',
+                    'class': 'form-input'}),
+            'category': forms.TextInput(attrs={
+                    'placeholder': 'Loại công việc',
+                    'class': 'form-input'}),
+            'unit': forms.TextInput(attrs={
+                    'placeholder': 'Đơn vị',
+                    'class': 'form-input'}),
+            'quantity': forms.NumberInput(attrs={
+                    'placeholder': 'Số lượng',
+                    'class': 'form-input'}),
+            'description': forms.Textarea(attrs={
+                    'class': 'form-input', 
+                    'rows': 2}),
+            'start_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+            'end_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+        }
+
 # from django import forms
 # from datetime import datetime
 # from django.shortcuts import get_object_or_404
