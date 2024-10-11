@@ -54,7 +54,6 @@ class JobForm(forms.ModelForm):
         fields = ['project', 'status', 'name', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date']
 
         labels = {
-            'project': 'Dự án',
             'status': 'Trạng thái',
             'name': 'Tên công việc',
             'category': 'Loại công việc',
@@ -66,8 +65,6 @@ class JobForm(forms.ModelForm):
         }
     
         widgets = {
-            'project': forms.Select(attrs={
-                    'class': 'form-input'}),
             'status': forms.Select(attrs={
                     'class': 'form-input'}),
             'name': forms.TextInput(attrs={

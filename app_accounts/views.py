@@ -79,9 +79,9 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         # Add your logic here to determine the dynamic redirect URL based on user conditions
         if is_admin(self.request.user):
-            return reverse('index')  # Example: Redirect staff users to the admin interface
+            return reverse('projects')  # Example: Redirect staff users to the admin interface
         else:
-            return reverse('index')  # Example: Redirect other users to a dashboard
+            return reverse('projects')  # Example: Redirect other users to a dashboard
 
 
 

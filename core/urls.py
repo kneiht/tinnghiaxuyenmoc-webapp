@@ -6,6 +6,10 @@ from django.conf.urls.static import static
 
 from django.views.generic import RedirectView
 
+admin.site.site_header = "Tin Nghia Xuyen Moc Administration"
+admin.site.site_title = "Admin"
+admin.site.index_title = "Welcome to Tin Nghia Xuyen Moc Admin Page"
+
 urlpatterns = [
     path('', include('app_accounts.urls')),
     path('', include('app_dashboard.urls')),

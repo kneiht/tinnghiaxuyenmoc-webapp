@@ -13,6 +13,12 @@ urlpatterns = [
     path('api/jobs/', views.JobViewSet.as_view(), name='api_jobs'),
     path('api/jobs/<int:pk>/', views.JobViewSet.as_view(), name='api_job_pk'),
 
+    path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
+    path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
+
+
+
+
 
     # DATABASE UPLOAD AND DOWNLOAD
     path('db-backup/', views.db_backup, name='db_backup'),

@@ -1,3 +1,5 @@
+htmx.config.useTemplateFragments = true;
+
 // CHANGE URL FOR SPA =========================================
 function changeUrl(newUrl) {
     // Create a new state object (it can be anything, or even null)

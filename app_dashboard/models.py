@@ -9,7 +9,8 @@ from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.fields.files import ImageFieldFile
 
-
+from django.db.models import Max
+from django.db import transaction
 
 
 class BaseModel(models.Model):
@@ -122,7 +123,19 @@ class Thumbnail(models.Model):
     reference_url = models.CharField(max_length=255, blank=True, null=True)
     thumbnail  = models.ImageField(upload_to='images/thumbnails/', blank=True, null=True)
 
+class SecondaryIDMixin(models.Model):
+    secondary_id = models.IntegerField(blank=True, null=True)
+    class Meta:
+        abstract = True  # This makes it a mixin, not a standalone model
 
+    def save(self, *args, **kwargs):
+        if self._state.adding and hasattr(self, 'project'):
+            with transaction.atomic():
+                highest_id = self.__class__.objects.filter(
+                    project=self.project
+                ).aggregate(max_secondary_id=Max('secondary_id'))['max_secondary_id'] or 0
+                self.secondary_id = highest_id + 1
+        super().save(*args, **kwargs)
 
 
 class Project(BaseModel):
@@ -152,7 +165,7 @@ class ProjectUser(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
-class Job(models.Model):
+class Job(SecondaryIDMixin, models.Model):
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
         ('done', 'Hoàn thành'),

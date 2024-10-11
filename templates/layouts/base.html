@@ -7,7 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name='csrf-token' content='{{ csrf_token }}'>
-
+    <meta name="htmx-config" content='{"useTemplateFragments":"true"}'>
+    
     <title>
         {% block title %}
         {% endblock %}
@@ -42,8 +43,8 @@
 
 
 
-    <script src="/static/js/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/multi-swap.js"></script>
+    <script src="https://unpkg.com/htmx.org"></script>
+
     <script src="/static/js/main.js"></script>
 
     {% block extra_script %}

@@ -77,8 +77,13 @@
                             {% endfor %}
                         {% endif %}
 
+                        {% if modal == 'modal_job' %}  
+                            <input type="hidden" name="project" value="{{ form.project_id }}">
+                        {% endif %}
+
                         {% csrf_token %}
                         {% for field in form %}
+                            {% if field.name != 'project' %}
                             <div class="">
                                     <div>
                                         <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -93,6 +98,7 @@
                                     </div>
 
                             </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
 

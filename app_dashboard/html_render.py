@@ -49,7 +49,9 @@ def html_render( component, request, **kwargs):
 
     elif component=='display_cards':
         context = {
+                'display_cards': kwargs.get('display_cards'),
                 'records': kwargs.get('records'),
+                'card': kwargs.get('card'),
         }
         template = 'components/display_cards.html'
 

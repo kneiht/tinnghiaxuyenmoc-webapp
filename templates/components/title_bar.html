@@ -1,10 +1,49 @@
 
-<div id="title-bar">
-    <div class="flex flex-wrap gap-4 justify-between items-center mb-6 mt-2">
+<div id="title-bar" class="flex flex-wrap justify-between mb-6">
+    <div class="flex gap-4 justify-between items-center mt-2">
         <p class="text-3xl text-center font-semibold text-theme"> {{ title }} </p>
+    </div>
+    <div class="flex gap-4 justify-end items-center mt-2">
+
+        {% if title_bar == 'title_bar_job' %}
+            <button class="btn btn-primary" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Nhập/xuất Excel </span>
+            </button>
+        {% endif %}
+
         <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
         </a>
     </div>
 </div>
+
+{% if title_bar == 'title_bar_job' %}
+<div id="extra-tool-bar" class="flex justify-center hidden">
+    <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
+
+        <form action="{% url 'upload_project' project.pk%}" method="post" enctype="multipart/form-data" id="upload-form"
+            class="flex flex-row whitespace-nowrap gap-2">
+            {% csrf_token %}
+            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" type="file" id="file" name="file"
+                accept=".xlsx" required />
+            <button class="btn btn-primary" type="submit" id="upload-button">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Nhập Excel </span>
+            </button>
+        </form>
+
+
+        <!-- download_backup.html -->
+        <form action="{% url 'download_project' project.pk %}" method="post"" class="whitespace-nowrap">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Xuất Excel </span>
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endif %}

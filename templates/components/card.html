@@ -1,5 +1,5 @@
 {% load static %}
-{% if card == 'card_project' %}
+{% if card == 'card_project'  or card == 'card_project_insert' %}
     <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
         <a href="{% url 'project' record.pk %}">
             <div class="card-image-container">
@@ -65,17 +65,16 @@
             <div class="mt-2 note whitespace-pre-line"> {{ record.description }} </div>
         </div>
     </div>
-{% elif card == 'card_job' %}
-    <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
-        <div class="flex flex-row justify-between items-start px-2 relative py-3">
-            <div class="">
-                <h3 class="text-md font-semibold text-theme text-center pl-1 truncate">
-                    {{ record }}
-                </h3>
-            </div>
-            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl px-2">{{ record.get_status_display }}</span>
-        </div>
 
-
-    </div>
+{% elif card == 'card_job' or card == 'card_job_insert' %}
+    <tr hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }} {{ record.style }}">
+        <td class="px-6 py-4">{{ record.name }}</td>
+        <td class="px-6 py-4">{{ record.category }}</td>
+        <td class="px-6 py-4">{{ record.unit }}</td>
+        <td class="px-6 py-4">{{ record.quantity }}</td>
+        <td class="px-6 py-4">{{ record.description }}</td>
+        <td class="px-6 py-4">{{ record.start_date }}</td>
+        <td class="px-6 py-4">{{ record.end_date }}</td>
+        <td class="px-6 py-4">{{ record.created_at }}</td>
+    </tr>
 {% endif %}

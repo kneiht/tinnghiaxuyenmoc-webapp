@@ -5,7 +5,7 @@
     {% else %}
         nothing
     {% endif %}">
-    <div id="db-tool-bar">
+    <div id="tool-bar">
         <div class="mt-2">
             <!-- Separate 2 sections of controls -->
             <div class="flex flex-wrap justify-between gap-4">
@@ -14,7 +14,7 @@
 
                     <!-- Controls to manage search and filter options -->
                     <div id="search-control" class="z-10 w-full">
-                        
+
                         <!-- Toggle search bar in small screen -->
                         <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
                             <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
@@ -32,26 +32,26 @@
                                 <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
                             </button>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
 
                 <!-- Right controls for view toggle and information display -->
                 {% if tool_bar == 'tool_bar_project' %}
-                    <div id='right-controls' class="flex items-center justify-end gap-4">
-                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                            type="button" class="btn btn-outline">
-                            Tất cả dự án
-                        </a>
-                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                            type="button" class="btn btn-outline">
-                            Dự án đang trễ hạn
-                        </a>
-                        <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
-                            type="button" class="btn btn-outline">
-                            Dự án đã hoàn thành
-                        </a>
-                    </div>
+                <div id='right-controls' class="flex items-center justify-end gap-4">
+                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                        type="button" class="btn btn-outline">
+                        Tất cả dự án
+                    </a>
+                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                        type="button" class="btn btn-outline">
+                        Dự án đang trễ hạn
+                    </a>
+                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                        type="button" class="btn btn-outline">
+                        Dự án đã hoàn thành
+                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>

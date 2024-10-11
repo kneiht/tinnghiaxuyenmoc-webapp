@@ -3,7 +3,7 @@
 # cần check truy cập trang cần đúng school_id and user
 
 
-import time, datetime, os, json
+import time, datetime, os, json, re
 
 from io import BytesIO
 import pandas as pd
@@ -92,9 +92,13 @@ def filter_records(request, records, model_class):
 @login_required
 def projects(request):
     user = request.user
-    records = Project.objects.filter(users=user)
+    if is_admin(user):
+        records = Project.objects.all()
+    else:
+        records = Project.objects.filter(users=user)
     records = filter_records(request, records, Project)
     context = {'title': 'Trang quản lý các dự án',
+               'title_bar': 'title_bar_project',
                'create_new_button_name': 'Thêm dự án mới',
                'create_new_form_url': reverse('api_projects') + '?get=form',
                'card': 'card_project',
@@ -109,11 +113,84 @@ def project(request, pk):
     records = filter_records(request, records, Job)
     project = Project.objects.filter(pk=pk).first()
     context = {'title': "Trang quản lý dự án: " + project.name, 
+               'title_bar': 'title_bar_job',
                'create_new_button_name': 'Thêm công việc mới',
-               'create_new_form_url':  reverse('api_jobs') + '?get=form',
+               'create_new_form_url':  reverse('api_jobs') + '?get=form&project_id=' + str(pk),
                'card': 'card_job',
-               'records': records}
+               'records': records,
+               'project': project}
     return render(request, 'pages/project.html', context)
+
+
+
+
+
+@login_required
+def download_project(request, pk):
+    project = Project.objects.filter(pk=pk).first()
+    jobs = Job.objects.filter(project_id=pk)
+    table_names = ['job']
+    def fetch_table_data(table_name):
+        if table_name == 'job':
+            data = jobs.values(
+                'id', 'name', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date', 'created_at'
+            )
+            df = pd.DataFrame(data)
+            return df
+
+
+    # Create a Pandas Excel writer using XlsxWriter as the engine
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        # Loop through tables and write each to a separate sheet
+        for table_name in table_names:
+            data = fetch_table_data(table_name)
+            # Shorten the table name for the Excel sheet
+            shortened_table_name = table_name.replace('', '')
+            data.to_excel(writer, sheet_name=shortened_table_name, index=False)
+
+
+    # Get the Excel file
+    excel_data = output.getvalue()
+
+    # Return the Excel file as an HTTP response
+    response = HttpResponse(
+        excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    # name the db based on time
+    filename = f"Project_download_{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+
+@login_required
+def upload_project(request, pk):
+    if request.method == 'GET':
+        return "API này không dùng GET"
+
+    if request.method == 'POST':
+        excel_file = request.FILES.get('file')
+        table = 'job'
+        project = Project.objects.filter(pk=pk).first()
+        if excel_file and excel_file.name.endswith('.xlsx'):
+            df = pd.read_excel(excel_file, sheet_name=table)
+            for index, row in df.iterrows():
+                job = Job(
+                    project=project,
+                    name=row['name'],
+                    category=row['category'],
+                    unit=row['unit'],
+                    quantity=row['quantity'],
+                    description=row['description'],
+                    start_date=row['start_date'],
+                    end_date=row['end_date'],
+                )
+                job.save()
+
+            html_message = html_render('message', request, message='Tải dữ liệu lên thành công')
+            return HttpResponse(html_message)
+
 
 
 # DATABASE MANAGEMENT VIEWS ===================================================
@@ -137,12 +214,16 @@ class BaseViewSet(LoginRequiredMixin, View):
 
     def create_form(self, request, **kwargs):
         pk = kwargs.pop('pk', None)
-
+    
         # Get the instance if pk is provided, use None otherwise
         record = self.model_class.objects.filter(pk=pk).first() if pk!='new' else None
         
         # Get the form
         form = self.form_class(instance=record) if record else self.form_class()
+        if self.form_class == JobForm:
+            project_id = request.GET.get('project_id')
+            form.project_id = project_id
+
         html_modal = html_render('form', request, form=form, modal=self.modal, record=record)
         return  HttpResponse(html_modal)
 
@@ -153,9 +234,13 @@ class BaseViewSet(LoginRequiredMixin, View):
         result, instance, form = self.process_form(request, instance if pk else None)
         if result=='success':
             instance.style = 'just-updated'
-            #html_display_cards = html_render('display_cards', request, select=self.page, records=[instance], school=school)
-            html_card = html_render('card', request, record=instance, card = self.card)
+            if pk: # existing record
+                html_card = html_render('card', request, record=instance, card = self.card)
+            else: # new record
+                html_card = html_render('display_cards', request, records=[instance], card=self.card)
+            
             html_message = html_render('message', request, message='Cập nhật thành công')
+            print(html_message + html_card)
             return HttpResponse(html_message + html_card)
         else:
             record = instance
@@ -192,65 +277,7 @@ class JobViewSet(BaseViewSet):
     form_class = JobForm
     componentContext = {}
     modal = 'modal_job'
-    card = 'card_job'
-
-# def create_display(request, model):
-#     return "create display"
-
-#     if model == 'Project':
-#         user = request.user
-#         records = model.objects.filter(users=user)
-#     else:
-#         records = model.objects.all()
-
-#     # Determine the fields to be used as filter options\
-#     fields = ['all', 'name', 'description']
-    
-#     # Get all query parameters except 'sort' as they are assumed to be field filters
-#     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
-#     if not query_params:
-#         # Filter Discontinued and Archived
-#         if hasattr(self.model_class, 'status'):
-#             records = records.exclude(status__in=['discontinued', 'archived'])
-            
-#     else:
-#         # Construct Q objects for filtering
-#         combined_query = Q()
-#         if 'all' in query_params:
-#             specified_fields = fields[1:]  # Exclude 'all' to get the specified fields
-#             all_fields_query = Q()
-#             for value in query_params['all']:
-#                 for specified_field in specified_fields:
-#                     if specified_field in [field.name for field in self.model_class._meta.get_fields()]:
-#                         all_fields_query |= Q(**{f"{specified_field}__icontains": value})
-#             combined_query &= all_fields_query
-#         else:
-#             for field, values in query_params.items():
-#                 if field in fields:
-#                     try:
-#                         self.model_class._meta.get_field(field)
-#                         field_query = Q()
-#                         for value in values:
-#                             field_query |= Q(**{f"{field}__icontains": value})
-#                         combined_query &= field_query
-#                     except FieldDoesNotExist:
-#                         print(f"Ignoring invalid field: {field}")
-
-#         # Filter records based on the query
-#         records = records.filter(combined_query)
-
-#     context = {
-#         'select': self.page, 
-#         'title': self.title, 
-#         'records': records,
-#         'fields':  fields,
-#         'school': School.objects.filter(pk=school_id).first() if school_id and school_id != "all" else School.objects.filter(pk=1).first()
-#     }
-
-#     return render(request, 'pages/single_page.html', context)
-
-
-
+    card = 'card_job_insert'
 
 
 
