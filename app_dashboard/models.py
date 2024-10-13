@@ -185,6 +185,22 @@ class Job(SecondaryIDMixin, models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            with transaction.atomic():
+                super().save(*args, **kwargs)
+                JobProgress.objects.create(job=self, progress=0.0)
+        else:
+            super().save(*args, **kwargs)
+
+class JobProgress(models.Model):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    progress = models.FloatField(default=0.0)
+    note = models.TextField(blank=True, null=True, default='')
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'progress of {self.job} on {self.date}'
 
 
 

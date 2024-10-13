@@ -16,6 +16,8 @@ urlpatterns = [
     path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
     path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
 
+    path('api/update-project-progress/<int:pk>/', views.update_project_progress, name='update_project_progress'),
+
 
 
 

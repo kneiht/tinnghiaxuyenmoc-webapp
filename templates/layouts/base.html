@@ -27,6 +27,7 @@
 
     <link id="style" href="{% static 'css/styles.css' %}" rel="stylesheet" />
     <link id="style" href="{% static 'css/extra_styles.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}"/>
     <!-- JS -->
 
     {% block extra_head %}
@@ -35,17 +36,22 @@
 
 <body  class="px-4 bg-[#F0F2F5] dark:bg-slate-900 min-h-full" style="font-family: 'Open Sans';">
 
+
     <div id="modal" hx-swap-oob="true"></div>
 
 
     {% block content %}
     {% endblock %}
+    
 
 
-
+    <div style="height: 100px;"></div>
+    
     <script src="https://unpkg.com/htmx.org"></script>
-
     <script src="/static/js/main.js"></script>
+
+    
+    <script type="text/javascript" src="/static/js/loading-bar.js"></script>
 
     {% block extra_script %}
     {% endblock %}

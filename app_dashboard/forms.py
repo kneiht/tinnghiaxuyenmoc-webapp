@@ -51,7 +51,7 @@ class ProjectForm(forms.ModelForm):
 class JobForm(forms.ModelForm):
     class Meta:
         model = Job
-        fields = ['project', 'status', 'name', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date']
+        fields = ['project', 'name', 'status', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date']
 
         labels = {
             'status': 'Trạng thái',

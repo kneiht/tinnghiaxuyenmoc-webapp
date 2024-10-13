@@ -3,16 +3,26 @@
     <div class="flex gap-4 justify-between items-center mt-2">
         <p class="text-3xl text-center font-semibold text-theme"> {{ title }} </p>
     </div>
+
+
+
     <div class="flex gap-4 justify-end items-center mt-2">
 
         {% if title_bar == 'title_bar_job' %}
-            <button class="btn btn-primary" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
+            <input id="check_date" type="date" name="check_date" class="form-input">
+
+            <button class="btn btn-success text-nowrap" onclick="var x = document.getElementById('display_table'), y = document.getElementById('display_form'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
+                <i class="fas fa-tasks me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Báo cáo </span>
+            </button>
+
+            <button class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Nhập/xuất Excel </span>
+                <span class="me-3"> Excel </span>
             </button>
         {% endif %}
 
-        <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary">
+        <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
         </a>
@@ -43,6 +53,11 @@
                 <span class="me-3"> Xuất Excel </span>
             </button>
         </form>
+
+        <button class="btn btn-secondary ml-5" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.add('hidden');">
+            <span class=""> Đóng </span>
+        </button>
+
     </div>
 
 </div>

@@ -2,8 +2,8 @@
 <form action="
     {% if tool_bar == 'tool_bar_project' %} 
         {% url 'projects' %} 
-    {% else %}
-        nothing
+    {% elif tool_bar == 'tool_bar_job' %}
+        {% url 'jobs' %} 
     {% endif %}">
     <div id="tool-bar">
         <div class="mt-2">

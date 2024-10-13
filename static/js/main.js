@@ -164,6 +164,34 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    let checkDate = document.querySelector('#check_date');
+    // check if there is check_date in params, if yes, set the value of checkDate to it
+    let urlParams = new URLSearchParams(window.location.search);
+    let check_date = urlParams.get('check_date');
+    if (check_date) {
+        checkDate.value = check_date;
+    }
+    else {
+        checkDate.value = new Date().toISOString().slice(0, 10);
+    }
+
+    checkDate.addEventListener('change', function() {
+        let url = window.location.href.split('?')[0] + `?check_date=${checkDate.value}`;
+        window.location.href = url;
+    });
+});
+
+
+
+
+
+
+
+
+
 // // MODAL HANDLING =========================================
 // up.compiler('.modal', function(element) {
 //     let modal = element;

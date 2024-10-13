@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.views import View
 from .html_render import html_render
 
-from .models import Project, ProjectUser, Job
+from .models import Project, ProjectUser, Job, JobProgress
 from .forms import ProjectForm, JobForm
 
 from django.db.models import Q, Count, Sum  # 'Sum' is imported here
@@ -99,7 +99,7 @@ def projects(request):
     records = filter_records(request, records, Project)
     context = {'title': 'Trang quản lý các dự án',
                'title_bar': 'title_bar_project',
-               'create_new_button_name': 'Thêm dự án mới',
+               'create_new_button_name': 'Thêm dự án',
                'create_new_form_url': reverse('api_projects') + '?get=form',
                'card': 'card_project',
                'tool_bar': 'tool_bar_project',
@@ -112,14 +112,35 @@ def project(request, pk):
     records = Job.objects.filter(project_id=pk)
     records = filter_records(request, records, Job)
     project = Project.objects.filter(pk=pk).first()
+
+    check_date = request.GET.get('check_date')
+    if check_date:
+        check_date = datetime.datetime.strptime(check_date, '%Y-%m-%d').date()
+    else:
+        check_date = datetime.date.today()
+    
+    for record in records:
+        job_progress = JobProgress.objects.filter(job=record).filter(date=check_date).first()
+        if job_progress:
+            record.job_progress = job_progress
+        else:
+            record.job_progress = 0
+
     context = {'title': "Trang quản lý dự án: " + project.name, 
                'title_bar': 'title_bar_job',
-               'create_new_button_name': 'Thêm công việc mới',
+               'create_new_button_name': 'Thêm công việc',
                'create_new_form_url':  reverse('api_jobs') + '?get=form&project_id=' + str(pk),
                'card': 'card_job',
                'records': records,
                'project': project}
     return render(request, 'pages/project.html', context)
+
+
+@login_required
+def update_project_progress(request, pk):
+    project = Project.objects.filter(pk=pk).first()
+    project.save()
+    return JsonResponse({'success': True})
 
 
 
@@ -189,7 +210,7 @@ def upload_project(request, pk):
                 job.save()
 
             html_message = html_render('message', request, message='Tải dữ liệu lên thành công')
-            return HttpResponse(html_message)
+            return redirect('project', pk=project.pk)
 
 
 
@@ -232,6 +253,8 @@ class BaseViewSet(LoginRequiredMixin, View):
             instance = get_object_or_404(self.model_class, id=pk)
             
         result, instance, form = self.process_form(request, instance if pk else None)
+        print(result)
+        
         if result=='success':
             instance.style = 'just-updated'
             if pk: # existing record
@@ -240,9 +263,12 @@ class BaseViewSet(LoginRequiredMixin, View):
                 html_card = html_render('display_cards', request, records=[instance], card=self.card)
             
             html_message = html_render('message', request, message='Cập nhật thành công')
-            print(html_message + html_card)
+            
             return HttpResponse(html_message + html_card)
+        
+  
         else:
+            
             record = instance
             html_modal = html_render('form', request, form=form, modal=self.modal, record=record)
             return  HttpResponse(html_modal)
@@ -260,6 +286,7 @@ class BaseViewSet(LoginRequiredMixin, View):
             # form.save_m2m()
             return 'success', instance_form, form
         else:
+            print(form.errors)
             return 'failed', instance, form
 
 

@@ -173,3 +173,13 @@
 .archived {
   background-image: linear-gradient(310deg, #000000 0%, #808080 100%);
 }
+
+
+
+
+.circle-bar-container {
+  margin: 20px;
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
