@@ -183,6 +183,7 @@ class Job(SecondaryIDMixin, models.Model):
     end_date = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
+
         return self.name
 
     def save(self, *args, **kwargs):
@@ -193,14 +194,109 @@ class Job(SecondaryIDMixin, models.Model):
         else:
             super().save(*args, **kwargs)
 
-class JobProgress(models.Model):
+class JobProgress(BaseModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     progress = models.FloatField(default=0.0)
+    image = models.ImageField(upload_to='images/job_progress/', blank=True, null=True, default='images/default/default_project.webp')
     note = models.TextField(blank=True, null=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'progress of {self.job} on {self.date}'
+
+
+class DataVehicleTypeDetail(BaseModel):
+    VEHICLE_TYPE_CHOICES = (
+        ('car', 'Xe con'),
+        ('dump_truck', 'Xe ben'),
+        ('excavator', 'Xe cuốc'),
+        ('road_roller', 'Xe lu'),
+        ('crane_truck', 'Xe cẩu'),
+        ('bulldozer', 'Xe ủi'),
+        ('loader', 'Xe xúc'),
+    )
+
+    # Vehicle Information Fields
+    vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", choices=VEHICLE_TYPE_CHOICES)
+    vehicle_type_detail = models.CharField(max_length=255, verbose_name="Loại xe chi tiết")
+
+    # Revenue Information Fields
+    revenue_per_8_hours = models.PositiveIntegerField(verbose_name="Đơn giá doanh thu", default=0)
+
+    # Resource Allocation Fields
+    oil_consumption_per_hour = models.PositiveIntegerField(verbose_name="Định mức dầu 1 tiếng", default=0)
+    lubricant_consumption = models.PositiveIntegerField(verbose_name="Định mức nhớt", default=0)
+    insurance_fee = models.PositiveIntegerField(verbose_name="Định mức bảo hiểm", default=0)
+    road_fee_inspection = models.PositiveIntegerField(verbose_name="Định mức sử dụng đường bộ/Đăng kiểm", default=0)
+    tire_wear = models.PositiveIntegerField(verbose_name="Định mức hao mòn lốp xe", default=0)
+    police_fee = models.PositiveIntegerField(verbose_name="Định mức CA", default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.get_vehicle_type_display()} - {self.vehicle_type_detail}'
+
+
+    # todo: thêm fields chạy ngày, chạy đêm, tabo ngày, mỗi cái có đơn giá => tính phí vận chuyể
+
+
+class DataVehicle(BaseModel):
+    vehicle_type = models.ForeignKey(DataVehicleTypeDetail, on_delete=models.CASCADE)
+    license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="")
+    vehicle_name = models.CharField(max_length=255, verbose_name="Tên nhận dạng xe", default="")
+    gps_name = models.CharField(max_length=255, verbose_name="Tên trên định vị", default="")
+    vehicle_inspection_number = models.CharField(max_length=255, verbose_name="Số đăng kiểm")
+    vehicle_inspection_due_date = models.DateField(verbose_name="Thời hạn đăng kiểm", default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f'{self.vehicle_name} - {self.license_plate}'
+
+
+
+
+class DataDriver(BaseModel):
+    STATUS_CHOICES = (
+        ('active', 'Đang làm việc'),
+        ('on_leave', 'Nghỉ phép'),
+        ('resigned', 'Đã thôi việc'),
+        ('terminated', 'Bị sa thải'),
+    )
+
+
+    # Driver Information Fields
+    full_name = models.CharField(max_length=255, verbose_name="Họ và tên")
+    hire_date = models.DateField(verbose_name="Ngày vào làm", default=timezone.now)
+    identity_card = models.CharField(max_length=255, verbose_name="CCCD", default="")
+    birth_year = models.DateField(verbose_name="Ngày sinh", default=timezone.now)
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='active',
+        verbose_name="Trạng thái"
+    )
+
+    # Salary Fields
+    basic_salary = models.PositiveIntegerField(verbose_name="Lương cơ bản", default=0)
+    hourly_salary = models.PositiveIntegerField(verbose_name="Lương theo giờ", default=0)
+    trip_salary = models.PositiveIntegerField(verbose_name="Lương theo chuyến", default=0)
+
+    # Bank Information
+    bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="")
+    account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="")
+    account_holder_name = models.CharField(max_length=255, verbose_name="Tên chủ tài khoản", default="")
+
+    # Other Information
+    fixed_allowance = models.PositiveIntegerField(verbose_name="Phụ cấp cố định", default=0)
+    insurance_amount = models.PositiveIntegerField(verbose_name="Số tiền tham gia BHXH", default=0)
+    phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
+    address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.full_name}'
+
+
+# Model báo cáo chuyến (file báo cáo xe ben tháng 8)
+# trong báo cáo chuyến, có điểm đến, điểm đi (chọn từ database)
+# điểm đến điểm đi là một bảng danh sách các nơi
 
 
 

@@ -6,12 +6,27 @@ from django.urls import re_path, path
 urlpatterns = [
     path('', views.projects, name='projects'),
     path('project/<int:pk>/', views.project, name='project'),
-    
+    path('manage-data/', views.manage_data, name='manage_data'),
+
+
+
     path('api/projects/', views.ProjectViewSet.as_view(), name='api_projects'),
     path('api/projects/<int:pk>/', views.ProjectViewSet.as_view(), name='api_project_pk'),
 
     path('api/jobs/', views.JobViewSet.as_view(), name='api_jobs'),
     path('api/jobs/<int:pk>/', views.JobViewSet.as_view(), name='api_job_pk'),
+
+    path('api/data-vehicles/', views.DataVehicleViewSet.as_view(), name='api_data_vehicles'),
+    path('api/data-vehicles/<int:pk>/', views.DataVehicleViewSet.as_view(), name='api_data_vehicle_pk'),
+
+    path('api/data-drivers/', views.DataVehicleViewSet.as_view(), name='api_data_drivers'),
+    path('api/data-drivers/<int:pk>/', views.DataDriverViewSet.as_view(), name='api_data_driver_pk'),
+
+    path('api/data-vehicle-type-details/', views.DataVehicleTypeDetailViewSet.as_view(), name='api_data_vehicle_type_details'),
+    path('api/data-vehicle-type-details/<int:pk>/', views.DataVehicleTypeDetailViewSet.as_view(), name='api_data_vehicle_type_detail_pk'),
+
+
+
 
     path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
     path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),

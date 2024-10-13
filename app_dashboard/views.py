@@ -23,8 +23,8 @@ from django.contrib.auth.models import User
 from django.views import View
 from .html_render import html_render
 
-from .models import Project, ProjectUser, Job, JobProgress
-from .forms import ProjectForm, JobForm
+from .models import Project, ProjectUser, Job, JobProgress, DataVehicle, DataDriver, DataVehicleTypeDetail
+from .forms import ProjectForm, JobForm, DataVehicleForm, DataDriverForm, DataVehicleTypeDetailForm
 
 from django.db.models import Q, Count, Sum  # 'Sum' is imported here
 
@@ -136,6 +136,25 @@ def project(request, pk):
     return render(request, 'pages/project.html', context)
 
 
+
+@login_required
+def manage_data(request):
+    data_vehicles = DataVehicle.objects.all()
+    data_drivers = DataDriver.objects.all()
+    data_vehicle_type_details = DataVehicleTypeDetail.objects.all()
+    context = {'title': "Quản lý dữ liệu",
+               'title_bar': 'title_bar_data',
+               'create_new_button_name': 'Thêm xe',
+               'create_new_form_url': reverse('api_data_vehicles') + '?get=form',
+               'tool_bar': 'tool_bar_vehicle',
+               'data_vehicles': data_vehicles,
+               'data_drivers': data_drivers,
+               'data_vehicle_type_details': data_vehicle_type_details} 
+    return render(request, 'pages/manage_data.html', context)
+
+
+
+
 @login_required
 def update_project_progress(request, pk):
     project = Project.objects.filter(pk=pk).first()
@@ -222,8 +241,10 @@ class BaseViewSet(LoginRequiredMixin, View):
     card = None
 
     def get(self, request, pk=None):
+        
         get_query = request.GET.get('get')
         if get_query=='form':
+            
             return self.create_form(request, pk=pk)
         else:
             if pk:
@@ -235,7 +256,7 @@ class BaseViewSet(LoginRequiredMixin, View):
 
     def create_form(self, request, **kwargs):
         pk = kwargs.pop('pk', None)
-    
+        
         # Get the instance if pk is provided, use None otherwise
         record = self.model_class.objects.filter(pk=pk).first() if pk!='new' else None
         
@@ -245,10 +266,15 @@ class BaseViewSet(LoginRequiredMixin, View):
             project_id = request.GET.get('project_id')
             form.project_id = project_id
 
+
+        
         html_modal = html_render('form', request, form=form, modal=self.modal, record=record)
+        
+        print(html_modal) 
         return  HttpResponse(html_modal)
 
     def post(self, request, pk=None):
+        print('POST')
         if pk:
             instance = get_object_or_404(self.model_class, id=pk)
             
@@ -305,6 +331,27 @@ class JobViewSet(BaseViewSet):
     componentContext = {}
     modal = 'modal_job'
     card = 'card_job_insert'
+
+class DataVehicleViewSet(BaseViewSet):
+    model_class = DataVehicle
+    form_class = DataVehicleForm
+    componentContext = {}
+    modal = 'modal_data_vehicle'
+    card = 'card_data_vehicle'
+
+class DataDriverViewSet(BaseViewSet):
+    model_class = DataDriver
+    form_class = DataDriverForm
+    modal = 'modal_data_driver'
+    card = 'card_data_vehicle'
+
+
+class DataVehicleTypeDetailViewSet(BaseViewSet):
+    model_class = DataVehicleTypeDetail
+    form_class = DataVehicleTypeDetailForm
+    modal = 'modal_data_vehicle_type_detail'
+    card = 'card_data_vehicle_type_detail'
+
 
 
 

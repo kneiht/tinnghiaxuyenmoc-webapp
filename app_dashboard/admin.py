@@ -4,7 +4,11 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Project,
     ProjectUser,
-    Job
+    Job,
+    JobProgress,
+    DataVehicle,
+    DataDriver,
+    DataVehicleTypeDetail
 )
 from django.utils.safestring import mark_safe
 from django import forms
@@ -25,7 +29,34 @@ class JobAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'project')
     search_fields = ('name', 'description', 'project__name')
 
+class JobProgressAdmin(admin.ModelAdmin):
+    list_display = ('job', 'date', 'progress', 'image', 'note', 'created_at')
+    list_filter = ('created_at', 'job')
+    search_fields = ('job__name', 'note')
 
+class DataVehicleAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 'vehicle_inspection_number', 'vehicle_inspection_due_date', 'created_at')
+    list_filter = ('created_at', 'vehicle_type')
+    search_fields = ('license_plate', 'vehicle_name', 'gps_name')
+
+class DataDriverAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'hire_date', 'identity_card', 'birth_year', 'status', 'created_at')
+    list_filter = ('created_at', 'status')
+    search_fields = ('full_name', 'identity_card', 'birth_year')
+
+
+class DataVehicleTypeDetailAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_type', 'vehicle_type_detail', 'revenue_per_8_hours', 'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 'road_fee_inspection', 'tire_wear', 'police_fee', 'created_at')
+    list_filter = ('created_at', 'vehicle_type')
+    search_fields = ('vehicle_type', 'vehicle_type_detail')
+
+admin.site.register(DataVehicleTypeDetail, DataVehicleTypeDetailAdmin)
+
+
+
+admin.site.register(JobProgress, JobProgressAdmin)
+admin.site.register(DataVehicle, DataVehicleAdmin)
+admin.site.register(DataDriver, DataDriverAdmin)
 
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectUser, ProjectUserAdmin)

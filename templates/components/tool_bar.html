@@ -1,5 +1,6 @@
-<!-- Toolbar for database interactions -->
-<form action="
+<div class="flex flex-row justify-between items-end w-full">
+    <!-- Toolbar for database interactions -->
+    <form action="
     {% if tool_bar == 'tool_bar_project' %} 
         {% url 'projects' %} 
     {% elif tool_bar == 'tool_bar_job' %}
@@ -56,4 +57,11 @@
             </div>
         </div>
     </div>
-</form>
+    </form>
+    {% if tool_bar_new_record_button %}
+    <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary h-full text-nowrap">
+        <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+        <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
+    </a>
+    {% endif %}
+</div>

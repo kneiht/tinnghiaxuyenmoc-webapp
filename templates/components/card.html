@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 {% if card == 'card_project'  or card == 'card_project_insert' %}
     <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
         <a href="{% url 'project' record.pk %}">
@@ -68,59 +69,169 @@
 
 {% elif card == 'card_job' or card == 'card_job_insert' %}
     <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }} border-b pb-1 flex justify-between w-full pt-4">
-        {% if select != 'card_job_update' %}
-            <span class="w-2/12">{{ record.name }}</span>
-            <span class="w-1/12 text-center">{{ record.category }}</span>
-            <span class="w-1/12 text-center">
-                <div class="ldBar" data-value="{{ record.progress }}">
-                </div>
-            </span>
-            
-            <span class="w-2/12 text-center">{{ record.description }}</span>
-            <span class="w-1/12 text-center">{{ record.unit }} </span>
-            <span class="w-1/12 text-center">{{ record.quantity }}</span>
-            
-            <span class="w-1/12 text-center">{{ record.start_date|date:"d/m/Y" }}</span>
-            <span class="w-1/12 text-center">{{ record.end_date|date:"d/m/Y" }}</span>
-            <div class="flex flex-nowrap justify-between">
-                <div class="menu relative text-sm opacity-100">
-                    <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
-                        onclick="event.stopPropagation();">
-                        <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
-                        <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
-                        <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
-                    </div>
-                
-                    <!-- Dropdown Context Menu For Record-->
-                    <ul id="menu-card-context" class="dropdown-menu absolute right-0 hidden">
-                        <!-- Add record id by js -->
-                        <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
-                            hx-get="{% url 'api_job_pk' record.pk %}?get=form&project_id={{ record.project_id }}" hx-swap="none"
-                            hx-swap="none">
-                            <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
-                            Sửa thông tin
-                        </a>
-                
-                    </ul>
-                </div>
+        <span class="w-2/12">{{ record.name }}</span>
+        <span class="w-1/12 text-center">{{ record.category }}</span>
+        <span class="w-1/12 text-center">
+            <div class="ldBar" data-value="{{ record.progress }}">
             </div>
-        {% else %}
-            <span class="w-2/12">{{ record.name }}</span>
-            <span class="w-2/12 text-center">{{ record.category }}</span>
-
-            <span class="w-1/12 text-center">{{ record.unit }} </span>
-            <span class="w-1/12 text-center">{{ record.quantity }}</span>
-
-            <span class="w-2/12 text-center px-2">
-                <input type="text" id="job_progress_{{ record.job_progress.pk }}" name="job_progress_{{ record.job_progress.pk }}" value="{{ record.job_progress.progress }}" placeholder="Nhập tiến độ ..." class="form-input">
-            </span>
-            <span class="w-4/12 text-center px-2">
-                <input type="text" id="job_note_{{ record.job_progress.pk }}" name="job_note_{{ record.job_progress.pk }}" value="{{ record.job_progress.note }}" placeholder="Nhập ghi chú ..." class="form-input">
-            </span>
-
+        </span>
+        
+        <span class="w-2/12 text-center">{{ record.description }}</span>
+        <span class="w-1/12 text-center">{{ record.unit }} </span>
+        <span class="w-1/12 text-center">{{ record.quantity }}</span>
+        
+        <span class="w-1/12 text-center">{{ record.start_date|date:"d/m/Y" }}</span>
+        <span class="w-1/12 text-center">{{ record.end_date|date:"d/m/Y" }}</span>
+        <div class="flex flex-nowrap justify-between">
+            <div class="menu relative text-sm opacity-100">
+                <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
+                    onclick="event.stopPropagation();">
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                </div>
             
-        {% endif %}
+                <!-- Dropdown Context Menu For Record-->
+                <ul id="menu-card-context" class="z-50 dropdown-menu absolute right-0 hidden">
+                    <!-- Add record id by js -->
+                    <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
+                        hx-get="{% url 'api_job_pk' record.pk %}?get=form&project_id={{ record.project_id }}" hx-swap="none"
+                        hx-swap="none">
+                        <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
+                        Sửa thông tin
+                    </a>
+            
+                </ul>
+            </div>
+        </div>
     </div>
+
+{% elif card == 'card_data_vehicle' or card == 'card_data_vehicle_insert' %}
+    <div hx-swap-oob="true" id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }} border-b pb-1 flex justify-between w-full pt-4">
+
+        <span class="w-4/12">{{ record.vehicle_name }}</span>
+        <span class="w-1/12 text-center">{{ record.vehicle_type.vehicle_type_detail }}</span>
+        
+        <span class="w-2/12 text-center">{{ record.license_plate }}</span>
+        <span class="w-2/12 text-center">{{ record.gps_name }}</span>
+        <span class="w-2/12 text-center">{{ record.vehicle_inspection_number }}</span>
+        <span class="w-1/12 text-center">{{ record.vehicle_inspection_due_date|date:"d/m/Y" }}</span>
+
+
+
+        <div class="flex flex-nowrap justify-between">
+            <div class="menu relative text-sm opacity-100">
+                <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
+                    onclick="event.stopPropagation();">
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                </div>
+            
+                <!-- Dropdown Context Menu For Record-->
+                <ul id="menu-card-context" class="z-50 dropdown-menu absolute right-0 hidden">
+                    <!-- Add record id by js -->
+                    <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
+                        hx-get="{% url 'api_data_vehicle_pk' record.pk %}?get=form&project_id={{ record.project_id }}" hx-swap="none"
+                        hx-swap="none">
+                        <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
+                        Sửa thông tin
+                    </a>
+            
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+{% elif card == 'card_data_driver' or card == 'card_data_driver_insert' %}
+    <div class="border-b pb-0.5 flex justify-between w-full">
+        <span class="w-2/12">{{ record.full_name }}</span>
+        <span class="w-1/12 text-center">{{ record.hire_date|date:"d/m/Y" }}</span>
+        <span class="w-1/12 text-center">{{ record.identity_card }}</span>
+        <span class="w-1/12 text-center">{{ record.birth_year|date:"d/m/Y" }}</span>
+        <span class="w-1/12 text-center">{{ record.get_status_display }}</span>
+        <span class="w-1/12 text-center">{{ record.basic_salary|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.hourly_salary|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.trip_salary|intcomma }}</span>
+
+        <span class="w-1/12 text-center">{{ record.fixed_allowance|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.insurance_amount|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.bank_name }}</span>
+        <span class="w-1/12 text-center">{{ record.account_number }}</span>
+        <span class="w-1/12 text-center">{{ record.account_holder_name }}</span>
+        <span class="w-1/12 text-center">{{ record.phone_number }}</span>
+        <span class="w-2/12 text-center">{{ record.address }}</span>
+
+        <div class="flex flex-nowrap justify-between">
+            <div class="menu relative text-sm opacity-100">
+                <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
+                    onclick="event.stopPropagation();">
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                </div>
+            
+                <!-- Dropdown Context Menu For Record-->
+                <ul id="menu-card-context" class="z-50 dropdown-menu absolute right-0 hidden">
+                    <!-- Add record id by js -->
+                    <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
+                        hx-get="{% url 'api_data_driver_pk' record.pk %}?get=form&project_id={{ record.project_id }}" hx-swap="none"
+                        hx-swap="none">
+                        <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
+                        Sửa thông tin
+                    </a>
+            
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    
+{% elif card == 'card_data_vehicle_type_detail' or card == 'card_data_vehicle_type_detail' %}
+    <div class="flex justify-between w-full py-2 border-b">
+        <span class="w-2/12">{{ record.get_vehicle_type_display }}</span>
+        <span class="w-2/12">{{ record.vehicle_type_detail }}</span>
+        <span class="w-1/12 text-center">{{ record.revenue_per_8_hours|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.oil_consumption_per_hour|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.lubricant_consumption|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.insurance_fee|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.road_fee_inspection|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.tire_wear|intcomma }}</span>
+        <span class="w-1/12 text-center">{{ record.police_fee|intcomma }}</span>
+
+        <div class="flex flex-nowrap justify-between">
+            <div class="menu relative text-sm opacity-100">
+                <div class="menu-button flex flex-col justify-between items-center cursor-pointer gap-y-0.5 py-1.5 w-6 rounded-xl hover:bg-gray-200 hover:dark:bg-gray-700"
+                    onclick="event.stopPropagation();">
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                    <div class="w-1 h-1 bg-theme-900 dark:bg-theme-100 rounded-full"></div>
+                </div>
+            
+                <!-- Dropdown Context Menu For Record-->
+                <ul id="menu-card-context" class="z-50 dropdown-menu absolute right-0 hidden">
+                    <!-- Add record id by js -->
+                    <a id="record-edit" class="menu-item menu-border rounded-t-xl rounded-b-xl"
+                        hx-get="{% url 'api_data_vehicle_type_detail_pk' record.pk %}?get=form&project_id={{ record.project_id }}" hx-swap="none"
+                        hx-swap="none">
+                        <i class="fa fa-school ml-3 mr-5" aria-hidden="true"></i>
+                        Sửa thông tin
+                    </a>
+            
+                </ul>
+            </div>
+        </div>
+    </div>
+
 {% endif %}
+
+
+
+
+
+
+
 
 
