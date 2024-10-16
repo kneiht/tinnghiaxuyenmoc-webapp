@@ -1,12 +1,6 @@
-<div class="flex flex-row justify-between items-end w-full">
+<div id="tool-bar" class="flex flex-row justify-between items-end w-full">
     <!-- Toolbar for database interactions -->
-    <form action="
-    {% if tool_bar == 'tool_bar_project' %} 
-        {% url 'projects' %} 
-    {% elif tool_bar == 'tool_bar_job' %}
-        {% url 'jobs' %} 
-    {% endif %}">
-    <div id="tool-bar">
+    <form action="{{ text.query_url }}" up-target="#display-records" >
         <div class="mt-2">
             <!-- Separate 2 sections of controls -->
             <div class="flex flex-wrap justify-between gap-4">
@@ -38,17 +32,17 @@
                 </div>
 
                 <!-- Right controls for view toggle and information display -->
-                {% if tool_bar == 'tool_bar_project' %}
+                {% if tool_bar == 'tool_bar_page_projects' %}
                 <div id='right-controls' class="flex items-center justify-end gap-4">
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                    <a href="{{ text.query_url }}?all="                 up-target="#display_cards
                         type="button" class="btn btn-outline">
                         Tất cả dự án
                     </a>
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                    <a href="{{ text.query_url }}?all=" up-target="#display_cards
                         type="button" class="btn btn-outline">
                         Dự án đang trễ hạn
                     </a>
-                    <a href="{{ request.path|slice:'?' }}?all=" up-target="#display_cards, #infor-bar:maybe"
+                    <a href="{{ text.query_url }}?all=" up-target="#display_cards
                         type="button" class="btn btn-outline">
                         Dự án đã hoàn thành
                     </a>
@@ -56,12 +50,11 @@
                 {% endif %}
             </div>
         </div>
-    </div>
     </form>
-    {% if tool_bar_new_record_button %}
-    <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary h-full text-nowrap">
-        <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-        <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
-    </a>
+    {% if text.create_new_button_name %}
+        <a href="{{ text.create_new_form_url }}" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap hidden">
+            <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+            <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
+        </a>
     {% endif %}
 </div>

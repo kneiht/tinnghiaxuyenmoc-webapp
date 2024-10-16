@@ -1,0 +1,34 @@
+{% load humanize %}
+{% load custom_tags %}
+
+<!-- Cards -->
+{% if record_type == 'record_project' %}
+    <div id="display-records" class="display-cards opacity-0 w-full flex justify-center
+    gap-6 grid mt-8">
+        {% for record in records %}
+            {% include 'components/record.html' with record=record record_type=record_type %}
+        {% endfor %}
+    </div>
+
+
+{% elif record_type == 'record_job' %}
+
+    <table id="display-records" class="table-auto w-full overflow-hidden mt-8 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        <thead>
+            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                {% for header in headers %}
+                    <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                {% endfor %}
+                <th></th>
+            </tr>
+
+        </thead>
+            {% for record in records %}
+                {% include 'components/record.html' with record=record record_type=record_type fields=fields %}
+            {% endfor %}
+    </table>
+
+{% endif %}
+
+

@@ -28,7 +28,7 @@
     <link id="style" href="{% static 'css/styles.css' %}" rel="stylesheet" />
     <link id="style" href="{% static 'css/extra_styles.css' %}" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}"/>
-    <!-- JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.css">
 
     {% block extra_head %}
     {% endblock %}
@@ -36,16 +36,12 @@
 
 <body  class="px-4 bg-[#F0F2F5] dark:bg-slate-900 min-h-full" style="font-family: 'Open Sans';">
 
-
-    <div id="modal" hx-swap-oob="true"></div>
-
-
     {% block content %}
     {% endblock %}
-    
 
 
     <div style="height: 100px;"></div>
+    <script src="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.js"></script>
     <script src="https://unpkg.com/htmx.org"></script>
     <script src="/static/js/main.js"></script>
 

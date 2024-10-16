@@ -1,0 +1,51 @@
+
+
+{% if not message_type %}
+    <div up-hungry id="modal">
+        <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
+            <!-- Modal Content -->
+            <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
+                <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">Thông báo</h3>
+                <div class="w-[300px] gap-4 px-6 flex justify-center">
+                    <p class="text-theme"> {{ message }} </p>
+                </div>
+                <div class="flex justify-center items-center gap-5 pt-8 pb-7">
+                    <button id='ok' type="button" class="btn btn-primary rounded-full w-36" onclick="document.getElementById('modal-body').remove();">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% elif message_type == 'confirm_delete' %}
+    <div id="modal">
+        <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
+            <!-- Modal Content -->
+            <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
+                <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">Delete confirmation</h3>
+                <div class="w-[300px] gap-4 px-6 flex justify-center">
+                    <p class="text-theme"> {{ message }} </p>
+                </div>
+
+                <form enctype="multipart/form-data" method="post"
+                action="{{ request.path }}"n up-target="#modal:maybe, #record_{{ record_id }}:maybe">
+
+                    {% csrf_token %}
+                    <input type="hidden" name="delete" value="true">
+                    <input type="hidden" name="confirm" value="true">
+                    <div class="flex justify-center items-center gap-5 pt-8 pb-7 px-10">
+                        <button id='cancel' type="button" class="btn btn-secondary rounded-full w-36">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger rounded-full w-36">
+                                Delete
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

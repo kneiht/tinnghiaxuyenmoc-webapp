@@ -1,6 +1,3 @@
-htmx.config.useTemplateFragments = true;
-
-// CHANGE URL FOR SPA =========================================
 function changeUrl(newUrl) {
     // Create a new state object (it can be anything, or even null)
     var stateObj = { foo: "bar" };
@@ -9,28 +6,63 @@ function changeUrl(newUrl) {
 }
 
 // CSRF TOKEN =========================================
-// function getCookie(name) {
-//     let cookieValue = null;
-//     if (document.cookie && document.cookie !== '') {
-//         const cookies = document.cookie.split(';');
-//         for (let i = 0; i < cookies.length; i++) {
-//             const cookie = cookies[i].trim();
-//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }   
-// const csrftoken = getCookie('csrftoken');
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}   
+const csrftoken = getCookie('csrftoken');
 
 
+
+
+// NAVIGATION BAR ITEMS =========================================
+up.compiler('#nav_bar', function(element) {
+
+    function activeMenuItem(item) {
+        // Remove specific classes from all <a> elements within #nav_bar_left
+        document.querySelectorAll('#nav_bar_left a').forEach(link => {
+            link.classList.remove('border');
+            link.classList.remove('bg-gray-200');
+            link.classList.remove('border-gray-300');
+            link.classList.remove('dark:bg-gray-800');
+            link.classList.remove('dark:border-gray-700');
+        });
+
+        // Add classes to the clicked element (referred to as 'item')
+        item.classList.add('bg-gray-200');
+        item.classList.add('border');
+        item.classList.add('border-gray-300');
+        item.classList.add('dark:bg-gray-800');
+        item.classList.add('dark:border-gray-700');
+    }
+
+    // Add event listener to each navigation item
+    document.querySelectorAll('#nav_bar_left a').forEach(item => {
+        item.addEventListener('click', function() {
+            activeMenuItem(item);
+        });
+
+        // Check if the item url equals to the current url => active the item
+        if (item.getAttribute('href') === window.location.pathname) {
+            activeMenuItem(item);
+        }
+    });
+});
 
 
 
 // THEME CHANGE =========================================
-document.addEventListener("DOMContentLoaded", function() {
+up.compiler('#theme-toggle', function(element) {
     const themeToggles = document.querySelectorAll('#theme-toggle');
     const storedTheme = localStorage.getItem('theme'); 
     console.log(storedTheme);
@@ -71,57 +103,59 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 // DROPDOWN MENUS =========================================
-htmx.onLoad(function(elt) {
-    // Find all menus 
-    elt.querySelectorAll('.menu').forEach(function(menu) {
+up.compiler('.menu', function(element) {
     // Function to show a menu
-        function showHideMenu(menu, action) {
-            var dropdownMenu = menu.querySelector('.dropdown-menu');
-            if (dropdownMenu) {
-                if (action === 'show') {
-                    dropdownMenu.classList.remove('hidden');
-                }
-                else if (action === 'hide') {
-                    dropdownMenu.classList.add('hidden');
-                }
-                else if (action === 'toggle') {
-                    dropdownMenu.classList.toggle('hidden');
-                }
+    function showHideMenu(menu, action) {
+        var dropdownMenu = menu.querySelector('.dropdown-menu');
+        if (dropdownMenu) {
+            if (action === 'show') {
+                dropdownMenu.classList.remove('hidden');
+            }
+            else if (action === 'hide') {
+                dropdownMenu.classList.add('hidden');
+            }
+            else if (action === 'toggle') {
+                dropdownMenu.classList.toggle('hidden');
             }
         }
-        // Attach click event listeners to menu buttons
-        menu.querySelector('.menu-button').addEventListener('click', function() {
-            showHideMenu(menu, 'toggle')
+    }
+    // Attach click event listeners to menu buttons
+    element.querySelector('.menu-button').addEventListener('click', function() {
+            showHideMenu(element, 'toggle')
             // Hide all other menus when click to a menu
-            document.querySelectorAll('.menu').forEach(otherMenu => {
-                if (otherMenu !== menu) {
-                    showHideMenu(otherMenu, 'hide')
+            document.querySelectorAll('.menu').forEach(menu => {
+                if (menu !== element) {
+                    showHideMenu(menu, 'hide')
                 }
             })
-        });
-
-        // Hide menus when clicking outside of them
-        document.addEventListener('click', function(event) {
-            if (!menu.contains(event.target)) {
-                showHideMenu(menu, 'hide')
-            }
-        })
     });
+
+    // Hide menus when clicking outside of them
+    document.addEventListener('click', function(event) {
+        if (!element.contains(event.target)) {
+            showHideMenu(element, 'hide')
+        }
+    })
+
+
+
 });
 
 
 
+
+
 // RESPONSIVE ELEMENTS ON RESIZE =========================================
-document.addEventListener("DOMContentLoaded", function() {
-    // count the number of cards in display_cards then put in the element with id "count"
-    const displayCards = document.getElementById("display_cards");
+up.compiler('.display-cards', function(element) {
+    // count the number of cards in display-cards then put in the element with id "count"
+    const displayCards = element;
     const count = displayCards.children.length;
     if (document.getElementById("count")) {
         document.getElementById("count").textContent = "Count: " + count;
     }
     // Function to adjust the number of grid columns
     function adjustGridColumns() {
-        const container = document.getElementById("display_cards");
+        const container = element;
         if (!container) return;
 
         const containerWidth = container.offsetWidth;
@@ -139,12 +173,12 @@ document.addEventListener("DOMContentLoaded", function() {
         gridNum = Math.min(gridNum, maxColumns);
 
         container.classList.add('grid-cols-' + gridNum); // Adjust number of columns as needed
-        // Display the display_cards container after the grid has been adjusted for the first time  
+        // Display the display-cards container after the grid has been adjusted for the first time  
         container.classList.remove("opacity-0")
         container.classList.add("opacity-100")
 
-        // Get all the .display_cards then apply the grid class of the display_cards which has the highest number of columns to the others
-        const displayCards = document.querySelectorAll('.display_cards');
+        // Get all the .display-cards then apply the grid class of the display-cards which has the highest number of columns to the others
+        const displayCards = document.querySelectorAll('.display-cards');
         // Apply the highest number of columns to the others
         displayCards.forEach(displayCard => {
             displayCard.className = displayCard.className.replace(/grid-cols-\d+/g, '');
@@ -166,8 +200,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    let checkDate = document.querySelector('#check_date');
+up.compiler('#check_date', function(element) {
+    let checkDate = element;
     // check if there is check_date in params, if yes, set the value of checkDate to it
     let urlParams = new URLSearchParams(window.location.search);
     let check_date = urlParams.get('check_date');
@@ -283,34 +317,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-// // NAVIGATION BAR ITEMS =========================================
-// up.compiler('#nav_bar', function(element) {
-
-//     function activeMenuItem(item) {
-//         // Remove specific classes from all <a> elements within #nav_bar_left
-//         document.querySelectorAll('#nav_bar_left a').forEach(link => {
-//             link.classList.remove('border');
-//             link.classList.remove('bg-gray-200');
-//             link.classList.remove('border-gray-300');
-//             link.classList.remove('dark:bg-gray-800');
-//             link.classList.remove('dark:border-gray-700');
-//         });
-
-//         // Add classes to the clicked element (referred to as 'item')
-//         item.classList.add('bg-gray-200');
-//         item.classList.add('border');
-//         item.classList.add('border-gray-300');
-//         item.classList.add('dark:bg-gray-800');
-//         item.classList.add('dark:border-gray-700');
-//     }
-
-//     // Add event listener to each navigation item
-//     document.querySelectorAll('#nav_bar_left a').forEach(item => {
-//         item.addEventListener('click', function() {
-//             activeMenuItem(item);
-//         });
-//     });
-// });
 
 
 // function formatDropdownItem(dropdown) {
@@ -617,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 //         const target_id = button.getAttribute('target_id');
-//         const elements = document.querySelectorAll('[id^="display_cards_"]');
+//         const elements = document.querySelectorAll('[id^="display-cards_"]');
 //         elements.forEach(element => {
 //             if (element.id === target_id) {
 //                 element.classList.remove('hidden');

@@ -172,16 +172,16 @@ class Job(SecondaryIDMixin, models.Model):
         ('in_progress', 'Đang thực hiện'),
         ('pending', 'Tạm hoãn'),
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress", verbose_name="Trạng thái")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    name = models.CharField(max_length=1000, default="Công việc chưa được đặt tên")
-    category = models.CharField(max_length=1000, default="Chưa phân loại")
-    unit = models.CharField(max_length=255, default="Đơn vị")
-    quantity = models.FloatField(default=1.0)
-    description = models.TextField(blank=True, null=True, default='')
-    start_date = models.DateField(default=timezone.now)
-    end_date = models.DateField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
+    name = models.CharField(max_length=1000, default="Công việc chưa được đặt tên", verbose_name="Tên công việc")
+    category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Loại công việc")
+    unit = models.CharField(max_length=255, default="Đơn vị", verbose_name="Đơn vị")
+    quantity = models.FloatField(default=1.0, verbose_name="Số lượng")
+    description = models.TextField(blank=True, null=True, default='', verbose_name="Mô tả")
+    start_date = models.DateField(default=timezone.now, verbose_name="Thời điểm bắt đầu")
+    end_date = models.DateField(default=timezone.now, verbose_name="Thời điểm kết thúc")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Thời điểm tạo")
     def __str__(self):
 
         return self.name

@@ -1,14 +1,12 @@
 
 <div id="title-bar" class="flex flex-wrap justify-between mb-6">
     <div class="flex gap-4 justify-between items-center mt-2">
-        <p class="text-3xl text-center font-semibold text-theme"> {{ title }} </p>
+        <p class="text-3xl text-center font-semibold text-theme"> {{ text.title }} </p>
     </div>
-
-
 
     <div class="flex gap-4 justify-end items-center mt-2">
 
-        {% if title_bar == 'title_bar_job' %}
+        {% if title_bar == 'title_bar_each_project' %}
             <input id="check_date" type="date" name="check_date" class="form-input">
 
             <button class="btn btn-success text-nowrap" onclick="var x = document.getElementById('display_table'), y = document.getElementById('display_form'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
@@ -22,20 +20,20 @@
             </button>
         {% endif %}
         
-        {% if create_new_button_name %}
-        <a hx-get="{{ create_new_form_url }}" hx-swap="none" class="max-sm:hidden btn btn-primary text-nowrap">
+        {% if text.create_new_button_name %}
+        <a href="{{ text.create_new_form_url }}" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-            <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
+            <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
         </a>
         {% endif %}
     </div>
 </div>
 
-{% if title_bar == 'title_bar_job' %}
+{% if title_bar == 'title_bar_each_project' %}
 <div id="extra-tool-bar" class="flex justify-center hidden">
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
-        <form action="{% url 'upload_project' project.pk%}" method="post" enctype="multipart/form-data" id="upload-form"
+        <form action="{% url 'upload_project' project.pk %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" type="file" id="file" name="file"

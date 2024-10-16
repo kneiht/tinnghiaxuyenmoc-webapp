@@ -1,143 +1,35 @@
 
 from . import views
+from . import views, views_backup, views_old
 from django.urls import re_path, path
 
 
+# If pk==0 -> create new record
+
 urlpatterns = [
-    path('', views.projects, name='projects'),
-    path('project/<int:pk>/', views.project, name='project'),
-    path('manage-data/', views.manage_data, name='manage_data'),
-
-
-
-    path('api/projects/', views.ProjectViewSet.as_view(), name='api_projects'),
-    path('api/projects/<int:pk>/', views.ProjectViewSet.as_view(), name='api_project_pk'),
-
-    path('api/jobs/', views.JobViewSet.as_view(), name='api_jobs'),
-    path('api/jobs/<int:pk>/', views.JobViewSet.as_view(), name='api_job_pk'),
-
-    path('api/data-vehicles/', views.DataVehicleViewSet.as_view(), name='api_data_vehicles'),
-    path('api/data-vehicles/<int:pk>/', views.DataVehicleViewSet.as_view(), name='api_data_vehicle_pk'),
-
-    path('api/data-drivers/', views.DataVehicleViewSet.as_view(), name='api_data_drivers'),
-    path('api/data-drivers/<int:pk>/', views.DataDriverViewSet.as_view(), name='api_data_driver_pk'),
-
-    path('api/data-vehicle-type-details/', views.DataVehicleTypeDetailViewSet.as_view(), name='api_data_vehicle_type_details'),
-    path('api/data-vehicle-type-details/<int:pk>/', views.DataVehicleTypeDetailViewSet.as_view(), name='api_data_vehicle_type_detail_pk'),
-
-
-
-
-    path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
-    path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
-
-    path('api/update-project-progress/<int:pk>/', views.update_project_progress, name='update_project_progress'),
-
-
-
-
-
     # DATABASE UPLOAD AND DOWNLOAD
-    path('db-backup/', views.db_backup, name='db_backup'),
-    path('download-db-backup/', views.download_db_backup, name='download_db_backup'),
-    path('upload-db-backup/', views.upload_db_backup, name='upload_db_backup'),
+    path('db-backup/', views_backup.db_backup, name='db_backup'),
+    path('download-db-backup/', views_backup.download_db_backup, name='download_db_backup'),
+    path('upload-db-backup/', views_backup.upload_db_backup, name='upload_db_backup'),
+
+
+
+    path('', views.page_projects, name='home'),
+    path('projects', views.page_projects, name='page_projects'),
+    path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),
+    path('manage-data/', views.page_manage_data, name='page_manage_data'),
+
+
+    path('api/handle-form/', views.handle_form, name='handle_form'),
+    path('api/load-content/<str:page>', views.load_content, name='load_content'),
+    path('api/load-content/<str:page>/<int:project_id>', views.load_content, name='load_content'),
+    path('api/load-form/', views.load_form, name='load_form'),
+
+
+
+    path('api/download-project/<int:pk>/', views_old.download_project, name='download_project'),
+    path('api/upload-project/<int:pk>/', views_old.upload_project, name='upload_project'),
+
+    path('api/update-project-progress/<int:pk>/', views_old.update_project_progress, name='update_project_progress'),
+
 ]
-
-
-
-
-
-
-
-
-
-
-# from . import views, views_db
-# from .views import (
-#     StudentConvertViewSet, CMRViewSet, CRMNoteViewSet, SchoolViewSet, ClassViewSet, StudentViewSet, StudentNoteViewSet, TuitionPaymentViewSet, ClassRoomViewSet, TuitionPaymentOldViewSet, TuitionPaymentSpecialViewSet,
-#     FinancialTransactionViewSet, AttendanceViewSet, StudentAttendanceCalendarViewSet,home,wheel,calculate_student_balance, landing_page
-# )
-
-# from django.urls import re_path, path
-
-
-# urlpatterns = [
-#     path('', landing_page, name='landing_page'),
-#     path('wheel', wheel, name='wheel'),
-#     path('calculate', calculate_student_balance, name='calculate_student_balance'),
-#     re_path(r'.*\.html', views.html_page, name='specific_page'),
-
-#     path('schools/', SchoolViewSet.as_view(), name='schools'),
-#     path('schools/<int:pk>/', SchoolViewSet.as_view(), name='school_detail'),
-
-#     path('schools/<int:school_id>/dashboard/', views.dashboard, name='dashboard'),
-
-#     path('schools/<int:school_id>/classes/', ClassViewSet.as_view(), name='classes'),
-#     path('schools/<int:school_id>/classes/<int:pk>/', ClassViewSet.as_view(), name='classroom'),
-#     path('schools/<int:school_id>/classes/<int:class_id>/<int:pk>/', ClassRoomViewSet.as_view(), name='classroom_student'),
-
-#     path('schools/<int:school_id>/students/', StudentViewSet.as_view(), name='students'),
-#     path('schools/<int:school_id>/students/<int:pk>/', StudentViewSet.as_view(), name='student_detail'),
-#     path('schools/<int:school_id>/students/<int:pk>/note/', StudentNoteViewSet.as_view(), name='student_detail_note'),
-#     path('schools/<int:school_id>/students/<int:pk>/convert/', StudentConvertViewSet.as_view(), name='crm_convert'),
-
-
-
-#     path('schools/<int:school_id>/crm/', CMRViewSet.as_view(), name='crm'),
-#     path('schools/<int:school_id>/crm/<int:pk>/', CMRViewSet.as_view(), name='crm_detail'),
-#     path('schools/<int:school_id>/crm/<int:pk>/note/', CRMNoteViewSet.as_view(), name='crm_detail_note'),
-#     path('schools/<int:school_id>/crm/<int:student_id>/attendance-calendar/', StudentAttendanceCalendarViewSet.as_view(), name='student_attendance_calendar'),
-
-
-#     path('schools/<int:school_id>/students/<int:student_id>/attendance-calendar/', StudentAttendanceCalendarViewSet.as_view(), name='student_attendance_calendar'),
-#     path('schools/<int:school_id>/students/<int:student_id>/pay-tuition/', TuitionPaymentViewSet.as_view(), name='pay_tuition'),
-#     path('schools/<int:school_id>/students/<int:student_id>/pay-tuition-old/', TuitionPaymentOldViewSet.as_view(), name='pay_tuition_old'),
-#     path('schools/<int:school_id>/students/<int:student_id>/pay-tuition-special/', TuitionPaymentSpecialViewSet.as_view(), name='pay_tuition_special'),
-
-#     path('schools/<int:school_id>/students/<int:student_id>/attendance-calendar/view/', views.student_attendance_calendar_view, name='student_attendance_calendar_view'),
-#     path('schools/<int:school_id>/students/<int:student_id>/view/', views.student_view, name='student_view'),
-    
-
-
-#     path('schools/<int:school_id>/attendances/', AttendanceViewSet.as_view(), name='attendances'),
-#     path('schools/<int:school_id>/attendances/<int:pk>/', AttendanceViewSet.as_view(), name='attendance_detail'),
-
-
-#     re_path(r'^schools/(?P<school_id>\d+|[a-z]+)/financialtransactions/?$', FinancialTransactionViewSet.as_view(), name='financialtransactions'),
-#     re_path(r'^schools/(?P<school_id>\d+|[a-z]+)/financialtransactions/(?P<pk>\d+)/?$', FinancialTransactionViewSet.as_view(), name='financialtransaction_detail'),
-
-
-    
-#     # path('classroom/<int:pk>/', views.classroom, name='classroom'),
-
-#     # DATABASE UPLOAD AND DOWNLOAD
-#     path('download_database_backup/', views_db.download_database_backup, name='download_database_backup'),
-#     path('database_handle/', views_db.database_handle, name='database_handle'),
-# ]
-
-# # urlpatterns = [
-# #     re_path(r'^schools/?$', SchoolViewSet.as_view(), name='schools'),
-# #     re_path(r'^schools/(?P<pk>\d+)/?$', SchoolViewSet.as_view(), name='school_detail'),
-
-# #     re_path(r'^schools/(?P<school_id>\d+)/dashboard/?$', views.dashboard, name='dashboard'),
-
-# #     re_path(r'^schools/(?P<school_id>\d+)/classes/?$', ClassViewSet.as_view(), name='classes'),
-# #     re_path(r'^schools/(?P<school_id>\d+)/classes/(?P<pk>\d+)/?$', ClassViewSet.as_view(), name='classroom'),
-
-# #     re_path(r'^schools/(?P<school_id>\d+)/students/?$', StudentViewSet.as_view(), name='students'),
-# #     re_path(r'^schools/(?P<school_id>\d+)/students/(?P<pk>\d+)/?$', StudentViewSet.as_view(), name='student_detail'),
-
-# #     re_path(r'^schools/(?P<school_id>\d+)/attendances/?$', AttendanceViewSet.as_view(), name='attendances'),
-# #     re_path(r'^schools/(?P<school_id>\d+)/attendances/(?P<pk>\d+)/?$', AttendanceViewSet.as_view(), name='attendance_detail'),
-
-# #     re_path(r'^schools/(?P<school_id>\d+)/financialtransactions/?$', FinancialTransactionViewSet.as_view(), name='financialtransactions'),
-# #     re_path(r'^schools/(?P<school_id>\d+)/financialtransactions/(?P<pk>\d+)/?$', FinancialTransactionViewSet.as_view(), name='financialtransaction_detail'),
-
-    
-# #     #re_path(r'^classroom/(?P<pk>\d+)/?$', views.classroom, name='classroom'),
-
-# #     # DATABASE UPLOAD AND DOWNLOAD
-# #     re_path(r'^download_database_backup/?$', views_db.download_database_backup, name='download_database_backup'),
-# #     re_path(r'^database_handle/?$', views_db.database_handle, name='database_handle'),
-
-# # ]
