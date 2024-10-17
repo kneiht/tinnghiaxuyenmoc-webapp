@@ -6,7 +6,7 @@
 
     <div class="flex gap-4 justify-end items-center mt-2">
 
-        {% if title_bar == 'title_bar_each_project' %}
+        {% if page == 'page_each_project' %}
             <input id="check_date" type="date" name="check_date" class="form-input">
 
             <button class="btn btn-success text-nowrap" onclick="var x = document.getElementById('display_table'), y = document.getElementById('display_form'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
@@ -29,11 +29,11 @@
     </div>
 </div>
 
-{% if title_bar == 'title_bar_each_project' %}
+{% if page == 'page_each_project' %}
 <div id="extra-tool-bar" class="flex justify-center hidden">
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
-        <form action="{% url 'upload_project' project.pk %}" method="post" enctype="multipart/form-data" id="upload-form"
+        <form action="{% url 'upload_project' text.project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" type="file" id="file" name="file"
@@ -46,7 +46,7 @@
 
 
         <!-- download_backup.html -->
-        <form action="{% url 'download_project' project.pk %}" method="post"" class="whitespace-nowrap">
+        <form action="{% url 'download_project' text.project_id %}" method="post"" class="whitespace-nowrap">
             {% csrf_token %}
             <button class="btn btn-primary" type="submit">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>

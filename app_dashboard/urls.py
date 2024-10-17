@@ -1,6 +1,5 @@
 
-from . import views
-from . import views, views_backup, views_old
+from . import views, views_backup, views_components
 from django.urls import re_path, path
 
 
@@ -20,16 +19,23 @@ urlpatterns = [
     path('manage-data/', views.page_manage_data, name='page_manage_data'),
 
 
-    path('api/handle-form/', views.handle_form, name='handle_form'),
-    path('api/load-content/<str:page>', views.load_content, name='load_content'),
-    path('api/load-content/<str:page>/<int:project_id>', views.load_content, name='load_content'),
-    path('api/load-form/', views.load_form, name='load_form'),
+    path('api/load-form/<str:model>/<int:pk>', views.load_form, name='load_form'),
+    path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
 
 
-    path('api/download-project/<int:pk>/', views_old.download_project, name='download_project'),
-    path('api/upload-project/<int:pk>/', views_old.upload_project, name='upload_project'),
+    path('api/load-content/<str:page>/<str:model>', views.load_content, name='load_content'),
+    path('api/load-content/<str:page>/<str:model>/<int:project_id>', views.load_content, name='load_content_with_project'),
+    
 
-    path('api/update-project-progress/<int:pk>/', views_old.update_project_progress, name='update_project_progress'),
+
+    # Test components
+    path('api/render_title_bar/<str:page>/<str:model>/', views_components.render_title_bar, name='render_title_bar'),
+
+
+    path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
+    path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
+
+    path('api/update-project-progress/<int:pk>/', views.update_project_progress, name='update_project_progress'),
 
 ]

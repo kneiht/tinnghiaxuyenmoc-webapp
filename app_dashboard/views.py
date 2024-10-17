@@ -9,7 +9,6 @@ from io import BytesIO
 import pandas as pd
 from django.urls import reverse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,20 +18,17 @@ from django.contrib.auth.models import User
 from django.views import View
 from .html_render import html_render
 
-from .models import Project, ProjectUser, Job, JobProgress, DataVehicle, DataDriver, DataVehicleTypeDetail
-from .forms import ProjectForm, JobForm, DataVehicleForm, DataDriverForm, DataVehicleTypeDetailForm
-
 from django.db.models import Q, Count, Sum  # 'Sum' is imported here
-
-
 from .utils import is_admin, is_project_user
-from .views_components import (
-    render_form, render_title_bar, 
-    render_tool_bar,
-    render_display_records,
-    render_message,
-    render_record
-)
+
+
+from .models import *
+from .forms import *
+
+from .views_components import *
+
+
+
 
 
 def filter_records(request, records, model_class):
@@ -44,7 +40,9 @@ def filter_records(request, records, model_class):
     elif model_class == Job:
         fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
     else:
-        fields = ['all']
+        # Get all fields except foreign key fields
+        fields = [field.name for field in model_class._meta.get_fields() if not isinstance(field, models.ForeignKey)]
+        fields.append('all')
 
     if not query_params:
         # Filter Discontinued and Archived
@@ -81,26 +79,19 @@ def filter_records(request, records, model_class):
 
 
 # HANDLE FORMS ===============================================================
-def handle_form(request):
+def handle_form(request, model, pk=0):
+    # Todo: should have list of model that can be accessed
+    # Convert model name to model class
+    model_class = globals()[model]
+    form_class = globals()[model + 'Form']
+
+    # Set selections
+    record_type = 'record_' + model
+    modal = 'modal_' + model
+
     # check if not Post => return 404
     if request.method != 'POST':
         return HttpResponseForbidden()
-
-    # get params
-    pk = request.GET.get('pk')
-    model = request.GET.get('model')
-
-    # Set selections
-    if model == 'project':
-        form_class = ProjectForm
-        model_class = Project
-        record_type = 'record_project'
-        modal = 'modal_project'
-    else:
-        form_class = JobForm
-        model_class = Job
-        record_type = 'record_job'
-        modal = 'modal_job'
 
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
@@ -118,25 +109,35 @@ def handle_form(request):
         record = instance_form
         record.style = 'just-updated'
         html_message = render_message(request, message='Cập nhật thành công')
+        html_record = ''
         if pk == '0' or pk == '' or pk==0:
-            html_record = render_record(request, record_type=record_type, record=record, outer_tag=True)
+            html_record = render_display_records(request, model_class, [record])
         else:
-            html_record = render_record(request, record_type=record_type, record=record, outer_tag=True)
+            html_record = render_display_records(request, model_class, [record])
         
-        print(html_record)
         return HttpResponse(html_message + html_record)
     else:
         print(form.errors)
-        html_modal = render_form(request, pk, modal=modal)
+        html_modal = render_form(request, model, pk)
         return  HttpResponse(html_modal)
+
+
+
+@login_required
+def load_form(request, model, pk=0):
+    html_modal = render_form(request, model, pk)
+    return HttpResponse(html_modal)
+
+
+
+
 
 
 
 
 
 @login_required
-def load_content(request, page, project_id=None):
-    print(page)
+def load_content(request, page, model, project_id=None):
     if page is None:
         return HttpResponseForbidden()
     # Check if there is project id i the params, if yes => get the project
@@ -145,30 +146,15 @@ def load_content(request, page, project_id=None):
     
     # render general content
     html_load_content = '<div id="load-content" class"hidden"></div>'
-    html_title_bar = render_title_bar(request, title_bar='title_bar_' + page, project=project if project_id else None)
-    html_tool_bar = render_tool_bar(request, tool_bar='tool_bar_' + page, project=project if project_id else None)
+    html_title_bar = render_title_bar(request, page, model=model, project_id=project_id)
+    html_tool_bar = render_tool_bar(request, page, model=model, project_id=project_id)
+
     # Check the page to render specific content
-    if page=='page_projects': 
-        records = Project.objects.all()
-        records = filter_records(request, records, Project)
-        html_display_records = render_display_records(request, record_type='record_project', records=records)
-        
-    elif page=='page_each_project':
-        records = Job.objects.filter(project=project)
-        print(records)
-        records = filter_records(request, records, Job)
-        print(records)
-        html_display_records = render_display_records(request, record_type='record_job', records=records)
+    model_class = globals()[model]
+    records = model_class.objects.all()
+    records = filter_records(request, records, model_class)
+    html_display_records = render_display_records(request, model_class, records)
     return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_display_records)
-
-
-@login_required
-def load_form(request):
-    pk = request.GET.get('pk')
-    modal = request.GET.get('modal')
-    project_id = request.GET.get('project_id')
-    html_modal = render_form(request, pk, modal=modal, project_id=project_id)
-    return HttpResponse(html_modal)
 
 
 
@@ -180,8 +166,6 @@ def page_projects(request):
     user = request.user
     return render(request, 'pages/page_projects.html')
 
-
-
 @login_required
 def page_each_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -191,18 +175,14 @@ def page_each_project(request, pk):
 
 @login_required
 def page_manage_data(request):
-    data_vehicles = DataVehicle.objects.all()
-    data_drivers = DataDriver.objects.all()
-    data_vehicle_type_details = DataVehicleTypeDetail.objects.all()
-    context = {'title': "Quản lý dữ liệu",
-               'title_bar': 'title_bar_data',
-               'create_new_button_name': 'Thêm xe',
-               'create_new_form_url': reverse('api_data_vehicles') + '?get=form',
-               'tool_bar': 'tool_bar_vehicle',
-               'data_vehicles': data_vehicles,
-               'data_drivers': data_drivers,
-               'data_vehicle_type_details': data_vehicle_type_details} 
-    return render(request, 'pages/page_manage_data.html', context)
+    return render(request, 'pages/page_manage_data.html')
+
+
+
+
+
+
+
 
 
 @login_required

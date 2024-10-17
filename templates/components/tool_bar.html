@@ -32,21 +32,21 @@
                 </div>
 
                 <!-- Right controls for view toggle and information display -->
-                {% if tool_bar == 'tool_bar_page_projects' %}
-                <div id='right-controls' class="flex items-center justify-end gap-4">
-                    <a href="{{ text.query_url }}?all="                 up-target="#display_cards
-                        type="button" class="btn btn-outline">
-                        Tất cả dự án
-                    </a>
-                    <a href="{{ text.query_url }}?all=" up-target="#display_cards
-                        type="button" class="btn btn-outline">
-                        Dự án đang trễ hạn
-                    </a>
-                    <a href="{{ text.query_url }}?all=" up-target="#display_cards
-                        type="button" class="btn btn-outline">
-                        Dự án đã hoàn thành
-                    </a>
-                </div>
+                {% if page == 'page_projects' %}
+                    <div id='right-controls' class="flex items-center justify-end gap-4">
+                        <a href="{{ text.query_url }}?all="                 up-target="#display_cards
+                            type="button" class="btn btn-outline">
+                            Tất cả dự án
+                        </a>
+                        <a href="{{ text.query_url }}?all=" up-target="#display_cards
+                            type="button" class="btn btn-outline">
+                            Dự án đang trễ hạn
+                        </a>
+                        <a href="{{ text.query_url }}?all=" up-target="#display_cards
+                            type="button" class="btn btn-outline">
+                            Dự án đã hoàn thành
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </div>

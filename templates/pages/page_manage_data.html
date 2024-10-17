@@ -2,70 +2,28 @@
 {% load static %}
 
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %}
+    Dự án - {{ project.name }}
+{% endblock %}
 
 
 
 {% block extra_head %}
 {% endblock %}
 
-
 {% block content %}
-
-    {% include 'components/nav_bar.html' %}
-    <!-- The title bar -->
-    <div class="border-b border-gray-200 dark:border-neutral-700">
-        <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-          <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-neutral-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-x-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 focus:outline-none focus:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 dark:focus:text-neutral-200 active" id="card-type-tab-item-1" aria-selected="true" data-hs-tab="#card-type-tab-preview" aria-controls="card-type-tab-preview" role="tab">
-            Dữ liệu xe
-          </button>
-          <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-neutral-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-x-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 focus:outline-none focus:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 dark:focus:text-neutral-200" id="card-type-tab-item-2" aria-selected="false" data-hs-tab="#card-type-tab-2" aria-controls="card-type-tab-2" role="tab">
-            Dữ liệu nhân sự
-          </button>
-          <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-neutral-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-x-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 focus:outline-none focus:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 dark:focus:text-neutral-200" id="card-type-tab-item-3" aria-selected="false" data-hs-tab="#card-type-tab-3" aria-controls="card-type-tab-3" role="tab">
-            Dữ liệu tài xế
-          </button>
-        </nav>
-      </div>
-      
-
-      <div>
-        <div id="card-type-tab-preview" role="tabpanel" aria-labelledby="card-type-tab-item-1" class="py-2">
-            {% include 'components/tool_bar.html' with tool_bar_new_record_button=True create_new_form_url='' create_new_button_name='Thêm xe' %}
-            {% include 'components/display_cards.html' with records=data_vehicles card='card_data_vehicle' %} 
-
-
-            {% include 'components/tool_bar.html' with tool_bar_new_record_button=True create_new_form_url='' create_new_button_name='Thêm tài xế' %}
-            {% include 'components/display_cards.html' with records=data_drivers card='card_data_driver' %}
-
-            
-            {% include 'components/tool_bar.html' with tool_bar_new_record_button=True create_new_form_url='' create_new_button_name='Thêm tài xế' %}
-            {% include 'components/display_cards.html' with records=data_vehicle_type_details card='card_data_vehicle_type_detail' %}
-
-            
-
-
-
-
+    <div up-hungry id="modal"></div>
+    <main>
+        {% include 'components/nav_bar.html' %}
+        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_data_vehicle_type_details' %}">
+            Loading content
         </div>
-        <div id="card-type-tab-2" class="hidden" role="tabpanel" aria-labelledby="card-type-tab-item-2">
-          <p class="text-gray-500 dark:text-neutral-400">
-            This is the <em class="font-semibold text-gray-800 dark:text-neutral-200">second</em> item's tab body.
-          </p>
-        </div>
-        <div id="card-type-tab-3" class="hidden" role="tabpanel" aria-labelledby="card-type-tab-item-3">
-          <p class="text-gray-500 dark:text-neutral-400">
-            This is the <em class="font-semibold text-gray-800 dark:text-neutral-200">third</em> item's tab body.
-          </p>
-        </div>
-      </div>
-   
-
-
-
+        <div up-hungry id="title-bar"></div>
+        <div up-hungry id="extra-tool-bar"></div>
+        <div up-hungry id="tool-bar"></div>
+        <div up-hungry id="display-records"></div>
+    </main>
 {% endblock %}
-
-
 
 {% block extra_script %}
 {% endblock %}

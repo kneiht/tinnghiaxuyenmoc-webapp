@@ -15,7 +15,7 @@
     <div up-hungry id="modal"></div>
     <main>
         {% include 'components/nav_bar.html' %}
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_projects' %}">
+        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_projects' model='Project' %}">
             Loading content
         </div>
         <div up-hungry id="title-bar"></div>

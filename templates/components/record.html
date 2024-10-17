@@ -2,7 +2,7 @@
 {% load custom_tags %}
 
 
-{% if record_type == 'record_project' %}
+{% if model == 'Project' %}
 
     {% if outer_tag  %}
     <div id="display-records" class="display-cards opacity-0 w-full flex justify-center
@@ -74,7 +74,8 @@
     {% if outer_tag  %}
     </div>
     {% endif %}
-{% elif record_type == 'record_job' %}
+
+{% else %}
     {% if outer_tag  %}
     <table id="display-records">
     {% endif %}
