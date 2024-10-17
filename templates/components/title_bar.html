@@ -7,8 +7,14 @@
     <div class="flex gap-4 justify-end items-center mt-2">
 
         {% if page == 'page_each_project' %}
-            <input id="check_date" type="date" name="check_date" class="form-input">
 
+            <a id="show-weekplan" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap">
+                <i class="fas fa-bullseye me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Kế hoạch tuần </span>
+            </a>
+
+            <input id="check_date" type="date" name="check_date" class="form-input">
+            
             <button class="btn btn-success text-nowrap" onclick="var x = document.getElementById('display_table'), y = document.getElementById('display_form'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
                 <i class="fas fa-tasks me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span class="me-3"> Báo cáo </span>

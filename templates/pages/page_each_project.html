@@ -15,12 +15,14 @@
     <div up-hungry id="modal"></div>
     <main>
         {% include 'components/nav_bar.html' %}
-        <div id="load-content" up-defer up-href="{% url 'load_content_with_project' page='page_each_project' model='Job' project_id=project.pk %}">
+        <div id="load-content" up-defer up-href="{% url 'load_content_with_project' page='page_each_project' model='Job' project_id=project.pk %}?check_date={{ check_date }}">
             Loading content
         </div>
         <div up-hungry id="title-bar"></div>
-        <!-- <div up-hungry id="extra-tool-bar"></div> -->
+        <div up-hungry id="extra-tool-bar"></div>
+        
         <div up-hungry id="tool-bar"></div>
+        <div up-hungry id="infor-bar"></div>
         <div up-hungry id="display-records"></div>
     </main>
 {% endblock %}

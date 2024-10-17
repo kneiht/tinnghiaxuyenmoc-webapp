@@ -6,9 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from django.db.models import Exists, OuterRef
 
-from .models import (Project, Job, ProjectUser, User, DataVehicle)
-
-
+from .models import *
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -90,6 +88,37 @@ class JobForm(forms.ModelForm):
                     'class': 'form-input',
                     'type': 'date'}),
         }
+
+
+
+class JobPlanForm(forms.ModelForm):
+    class Meta:
+        model = JobPlan
+        fields = ['job', 'plan_quantity', 'start_date', 'end_date']
+        labels = {
+            'job': 'Công việc',
+            'quantity': 'Khối lượng',
+            'start_date': 'Thời điểm bắt đầu',
+            'end_date': 'Thời điểm kết thúc',
+            'status': 'Trạng thái',
+        }
+        widgets = {
+            'job': forms.Select(attrs={
+                    'class': 'form-input'}),
+            'plan_quantity': forms.NumberInput(attrs={
+                    'placeholder': 'Số lượng',
+                    'class': 'form-input'}),
+            'start_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+            'end_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+        }
+
+
+
+
 
 
 class DataVehicleForm(forms.ModelForm):

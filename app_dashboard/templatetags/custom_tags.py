@@ -5,14 +5,33 @@ from django.urls import reverse
 from app_dashboard.models import Thumbnail
 
 register = template.Library()
+import datetime
 
+
+
+
+@register.filter(name='format_display')
+def format_display(record, field):
+    if hasattr(record, 'get_{}_display'.format(field)):
+        return getattr(record, 'get_{}_display'.format(field))()
+    value = getattr(record, field)  
+    _type = type(value)
+    if _type == datetime.date:
+        return value.strftime("%d/%m/%Y")
+    elif _type == datetime.time:
+        return value.strftime("%H:%M:%S")
+    elif _type == int:
+        return "{:,}".format(value)
+    elif _type == float:
+        return "{:,}".format(value)
+    else:
+        return value
 
 
 
 @register.filter
 def get_field_value(obj, field_name):
     return getattr(obj, field_name)
-
 
 
 

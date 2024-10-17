@@ -4,6 +4,8 @@
 
 
 import time, datetime, os, json, re
+from datetime import timedelta
+from django.utils import timezone
 
 from io import BytesIO
 import pandas as pd
@@ -131,13 +133,9 @@ def load_form(request, model, pk=0):
 
 
 
-
-
-
-
-
 @login_required
 def load_content(request, page, model, project_id=None):
+    check_date = request.GET.get('check_date')
     if page is None:
         return HttpResponseForbidden()
     # Check if there is project id i the params, if yes => get the project
@@ -146,16 +144,97 @@ def load_content(request, page, model, project_id=None):
     
     # render general content
     html_load_content = '<div id="load-content" class"hidden"></div>'
-    html_title_bar = render_title_bar(request, page, model=model, project_id=project_id)
+    html_title_bar = render_title_bar(request, page, model=model, project_id=project_id, check_date=check_date)
     html_tool_bar = render_tool_bar(request, page, model=model, project_id=project_id)
-
+    html_infor_bar = render_infor_bar(request, page, project_id=project_id)
     # Check the page to render specific content
     model_class = globals()[model]
-    records = model_class.objects.all()
+    if not project_id:
+        records = model_class.objects.all()
+    else:
+        records = model_class.objects.filter(project=project)
     records = filter_records(request, records, model_class)
     html_display_records = render_display_records(request, model_class, records)
-    return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_display_records)
+    return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_infor_bar + html_display_records)
 
+
+
+def load_weekplan_table(request, project_id):
+    project = Project.objects.filter(pk=project_id).first()
+    check_date = request.GET.get('check_date')
+
+    try:
+        check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+        print('>>>>', check_date)
+        print('>>>>', type(check_date))
+    except:
+        check_date = timezone.now().date()
+        print('>>>>', check_date)
+        print('>>>>', type(check_date))
+
+    
+    # Get monday and sunday dates of the week that contains check_date
+    monday = check_date - timedelta(days=check_date.weekday())
+    sunday = check_date + timedelta(days=6 - check_date.weekday())
+    week = f'{monday.strftime("%d-%m-%Y")} đến {sunday.strftime("%d-%m-%Y")}'
+    jobplans_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job__project=project)
+    jobs = Job.objects.filter(project=project)
+
+    for job in jobs:
+        jobplan_in_week = jobplans_in_week.filter(job=job).first()
+        if jobplan_in_week:
+            job.note = jobplan_in_week.note
+            job.plan_quantity = jobplan_in_week.plan_quantity
+        else:
+            job.plan_quantity = ""
+            job.note = ""
+
+    template = 'components/weekplan_table.html'
+    context = {'jobplans_in_week': jobplans_in_week, 'jobs':jobs, 
+               'week': week, 'monday': monday.strftime('%Y-%m-%d'), 
+               'sunday': sunday.strftime('%Y-%m-%d'), 
+               'project_id': project_id}
+    
+    html_weekplan_table = render_to_string(template, context, request)
+
+    return HttpResponse(html_weekplan_table)
+
+
+def handle_weekplan_form(request):
+    if request.method != 'POST':
+        return HttpResponseForbidden()
+    form = request.POST
+
+    start_date = form.get('start_date')
+    end_date = form.get('end_date')
+    project_id = form.get('project_id')
+
+    # get all jobs of the project
+    jobs = Job.objects.filter(project_id=project_id)
+    for job in jobs:
+        note = form.get(f'note_{job.pk}')
+        quantity = form.get(f'plan_quantity_{job.pk}')
+        if not note or not quantity:
+            continue
+        jobplan_id = form.get(f'jobplan_{job.pk}')
+        if jobplan_id:
+            jobplan = JobPlan.objects.filter(pk=jobplan_id).first()
+            jobplan.note = note
+            jobplan.plan_quantity = quantity
+            jobplan.save()
+            continue
+        else:
+            jobplan = JobPlan(
+                job=job,
+                start_date=start_date,
+                end_date=end_date,
+                plan_quantity=quantity,
+                note=note
+            )
+            jobplan.save()
+
+
+    return HttpResponse('OK')
 
 
 
@@ -168,9 +247,11 @@ def page_projects(request):
 
 @login_required
 def page_each_project(request, pk):
+    check_date = request.GET.get('check_date')
+    print('>>>>', 'page_each_project',check_date)
     project = get_object_or_404(Project, pk=pk)
     # Should check if the project is belong to the user
-    context = {'project': project}
+    context = {'project': project, 'check_date': check_date}
     return render(request, 'pages/page_each_project.html', context)
 
 @login_required

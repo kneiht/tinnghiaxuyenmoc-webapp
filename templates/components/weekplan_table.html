@@ -1,0 +1,150 @@
+{% load custom_tags %}
+<div id="display-records">
+    <table id="weekplan-table"
+        class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        <thead>
+            <tr class="text-md text-center leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-700
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                <th colspan="3" class="px-6 py-3 text-left font-semibold">
+                    <div class="flex justify-between items-center">
+                        <span>Kế hoạch tuần {{ week }}</span>
+                        <button class="btn btn-primary" onclick="document.getElementById('weekplan-table').classList.add('hidden'); document.getElementById('weekplan-form-table').classList.remove('hidden');">Cập nhật kế hoạch</button>
+                    </div>
+                </th>
+                
+            </tr> 
+        </thead>
+        <thead>
+            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                <th class="px-6 py-3 text-left font-semibold">Công việc</th>
+                <th class="px-6 py-3 text-left font-semibold">Khối lượng</th>
+                <th class="px-6 py-3 text-left font-semibold">Ghi chú</th>
+
+            </tr>
+
+        </thead>
+        {% for record in jobplans_in_week %}
+        <tbody id="record_{{ record.pk }}">
+            <tr
+                class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.job.name }}
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.plan_quantity }}
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.note }}
+                </td>
+            </tr>
+        </tbody>
+
+
+        {% endfor %}
+    </table>
+<form id="weekplan-form" action="{% url 'handle_weekplan_form' %}" method="POST" up-target=":none">
+    {% csrf_token %}
+    <input type="date" name="start_date" value="{{ monday }}" class="hidden">
+    <input type="date" name="end_date" value="{{ sunday }}" class="hidden">
+    <input type="number" name="project_id" value="{{ project_id }}" class="hidden">
+    <table id="weekplan-form-table"
+        class="hidden table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        <thead>
+            <tr class="text-md text-center leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-700
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                <th colspan="9" class="px-6 py-3 text-left font-semibold">
+                    <div class="flex justify-between items-center">
+                        <span>Cập nhật kế hoạch tuần {{ week }}</span>
+                        <button class="btn btn-primary" onclick="document.getElementById('weekplan-form-table').classList.add('hidden'); document.getElementById('weekplan-table').classList.remove('hidden');">Xem kế hoạch</button>
+                        <button type="submit" class="btn btn-primary">Lưu kế hoạch</button>
+                    </div>
+                </th>
+                
+            </tr> 
+        </thead>
+        <thead>
+            <thead>
+                <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+                border border-slate-300 dark:border-slate-900 border-opacity-50">
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Tên công việc</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Loại công việc</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Trạng thái</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Đơn vị</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Khối lượng</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Bắt đầu</th>
+                    
+                        <th class="px-6 py-3 text-left font-semibold">Kết thúc</th>
+
+                        <th class="px-6 py-3 text-left font-semibold">Khối lượng kế hoạch tuần</th>
+                        <th class="px-6 py-3 text-left font-semibold">Ghi chú trong tuần</th>
+                    
+                    <th></th>
+                </tr>
+    
+            </thead>
+
+        </thead>
+        {% for record in jobs %}
+        <tbody id="record_{{ record.pk }}">
+            <tr
+                class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.name }}
+                </td>
+
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.category }}
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.status }}
+                </td>
+
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.unit }}
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.quantity }}
+                </td>
+
+
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.start_date }}
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.end_date }}
+                </td>
+                {% for jobplan in jobplans_in_week %}
+                    {% if jobplan.job == record %}
+                        <input type="number" name="jobplan_{{ record.pk }}" class="hidden form-input" value="{{ jobplan.pk }}" />
+                    {% endif %}
+                {% endfor %}
+                <td class="px-6 py-3 border-b border-gray-200 text-sm">
+
+                    <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}"/>
+                </td>
+                <td class="px-6 py-3 border-b border-gray-200 text-sm">
+                    <input type="text" name="note_{{ record.pk }}" class="form-input" 
+                    value="{{ record.note }}" />
+
+                </td>
+            </tr>
+        </tbody>
+
+
+        {% endfor %}
+    </table>
+
+</form>
+
+</div>
+
+

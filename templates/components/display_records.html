@@ -1,10 +1,9 @@
-{% load humanize %}
 {% load custom_tags %}
 
 <!-- Cards -->
 {% if model == 'Project' %}
     <div id="display-records" class="display-cards opacity-0 w-full flex justify-center
-    gap-6 grid mt-8">
+    gap-6 grid mt-5">
         {% for record in records %}
             <div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
                 <a href="{% url 'page_each_project' record.pk %}">
@@ -55,14 +54,27 @@
                     <div class="flex">
                         <div class="flex-1 mr-2 h-10 truncate flex items-center">
                             <i class="fas fa-regular fa-calendar w-6" aria-hidden="true"></i>
-                            <span>{{ record.start_date }}</span>
+                            <span>{{ record.start_date|date:"d/m/Y" }}</span>
                         </div>
                         <div class="flex-1 mr-2 h-10 truncate flex items-center">
                             <i class="fas fa-solid fa-calendar w-6" aria-hidden="true"></i>
-                            <span>{{ record.end_date }}</span>
+                            <span>{{ record.end_date|date:"d/m/Y" }}</span>
                         </div>
                     </div>
     
+                    <div class="flex">
+                        <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                                <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                                    {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
+                                        {{ record.progress_by_time.progress }}/{{ record.progress_by_time.duration }} ngày
+                                    {% else %}
+                                        {{ record.get_status_display }}
+                                    {% endif %}
+                                </div>
+
+                        </div>
+                    </div>
+
                     <!-- Keep <p> for paragraphs of text -->
                     <div class="mt-2 note whitespace-pre-line"> {{ record.description }} </div>
                 </div>
@@ -73,8 +85,8 @@
 
 
 {% else %}
-
-    <table id="display-records" class="table-auto w-full overflow-hidden mt-8 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+<div id="display-records" >
+    <table class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         <thead>
             <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
@@ -90,7 +102,7 @@
                 <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
                     {% for field in fields %}
                     <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record|get_field_value:field }}
+                            {{ record|format_display:field }}
                     </td>
                     {% endfor %}
     
@@ -121,7 +133,7 @@
             </tbody>
         {% endfor %}
     </table>
-
+</div>
 {% endif %}
 
 

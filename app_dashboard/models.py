@@ -158,6 +158,47 @@ class Project(BaseModel):
     def __str__(self):
         return self.name
 
+    def get_number_of_jobs(self):
+        return {
+            'all': self.job_set.count(),
+            'not_started': self.job_set.filter(status='not_started').count(),
+            'done': self.job_set.filter(status='done').count(),
+            'in_progress': self.job_set.filter(status='in_progress').count(),
+            'pending': self.job_set.filter(status='pending').count(),
+        }
+
+
+    def progress_by_time(self):
+        now = timezone.now().date()
+        duration = (self.end_date - self.start_date).days + 1
+        if duration == 0:
+            progress = 1
+            percent = 100
+        else:
+            progress = int((now - self.start_date).days) + 1
+            percent = int((progress / duration) * 100) if progress<=duration else 100
+            
+
+        if self.status == 'done':
+            status = 'green'
+        elif self.status == 'in_progress':
+            if percent < 100:
+                status = 'blue'
+            else:
+                status = 'red'
+        else:
+            status = 'gray'
+
+        return {
+            'progress': progress,
+            'duration': duration,
+            'percent': percent,
+            'status': status
+        }
+
+
+
+
 
 class ProjectUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -165,7 +206,7 @@ class ProjectUser(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
-class Job(SecondaryIDMixin, models.Model):
+class Job(SecondaryIDMixin, BaseModel):
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
         ('done', 'Hoàn thành'),
@@ -173,17 +214,30 @@ class Job(SecondaryIDMixin, models.Model):
         ('pending', 'Tạm hoãn'),
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress", verbose_name="Trạng thái")
+    price_code = models.CharField(max_length=255, default="", verbose_name="Mã hiệu đơn giá")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    name = models.CharField(max_length=1000, default="Công việc chưa được đặt tên", verbose_name="Tên công việc")
+    name = models.CharField(max_length=1000, default="", verbose_name="Tên công việc")
     category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Loại công việc")
     unit = models.CharField(max_length=255, default="Đơn vị", verbose_name="Đơn vị")
-    quantity = models.FloatField(default=1.0, verbose_name="Số lượng")
-    description = models.TextField(blank=True, null=True, default='', verbose_name="Mô tả")
-    start_date = models.DateField(default=timezone.now, verbose_name="Thời điểm bắt đầu")
-    end_date = models.DateField(default=timezone.now, verbose_name="Thời điểm kết thúc")
-    created_at = models.DateTimeField(default=timezone.now, verbose_name="Thời điểm tạo")
-    def __str__(self):
+    quantity = models.FloatField(default=1.0, verbose_name="Khối lượng")
+    description = models.TextField(blank=True, null=True, default='')
+    start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
+    end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
+    created_at = models.DateTimeField(default=timezone.now)
 
+    def get_jobplan_by_id(self, id):
+        return JobPlan.objects.get(job=self, id=id)
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['name', 'category', 'status', 'unit', 'quantity', 'start_date', 'end_date']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -193,6 +247,21 @@ class Job(SecondaryIDMixin, models.Model):
                 JobProgress.objects.create(job=self, progress=0.0)
         else:
             super().save(*args, **kwargs)
+
+
+
+
+class JobPlan(BaseModel):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
+    plan_quantity = models.FloatField(default=0.0)
+    note = models.TextField(blank=True, null=True, default='')
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'Plan of {self.job} from {self.start_date} to {self.end_date}'
+
+
 
 class JobProgress(BaseModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)

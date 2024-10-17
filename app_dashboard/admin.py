@@ -1,15 +1,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import (
-    Project,
-    ProjectUser,
-    Job,
-    JobProgress,
-    DataVehicle,
-    DataDriver,
-    DataVehicleTypeDetail
-)
+from .models import *
 from django.utils.safestring import mark_safe
 from django import forms
 
@@ -49,6 +41,16 @@ class DataVehicleTypeDetailAdmin(admin.ModelAdmin):
     list_display = ('vehicle_type', 'vehicle_type_detail', 'revenue_per_8_hours', 'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 'road_fee_inspection', 'tire_wear', 'police_fee', 'created_at')
     list_filter = ('created_at', 'vehicle_type')
     search_fields = ('vehicle_type', 'vehicle_type_detail')
+
+
+
+class JobPlanAdmin(admin.ModelAdmin):
+    list_display = ('job', 'start_date', 'end_date', 'plan_quantity', 'note', 'created_at')
+    list_filter = ('created_at', 'job')
+    search_fields = ('job__name', 'note')
+
+admin.site.register(JobPlan, JobPlanAdmin)
+
 
 admin.site.register(DataVehicleTypeDetail, DataVehicleTypeDetailAdmin)
 

@@ -22,20 +22,21 @@ urlpatterns = [
     path('api/load-form/<str:model>/<int:pk>', views.load_form, name='load_form'),
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
-
-
     path('api/load-content/<str:page>/<str:model>', views.load_content, name='load_content'),
     path('api/load-content/<str:page>/<str:model>/<int:project_id>', views.load_content, name='load_content_with_project'),
     
 
+    path('api/load-weekplan-table/<int:project_id>', views.load_weekplan_table, name='load_weekplan_table'),
+    path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
 
-    # Test components
-    path('api/render_title_bar/<str:page>/<str:model>/', views_components.render_title_bar, name='render_title_bar'),
+
+
+
+
+
 
 
     path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
     path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
-
     path('api/update-project-progress/<int:pk>/', views.update_project_progress, name='update_project_progress'),
-
 ]

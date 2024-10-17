@@ -1,0 +1,26 @@
+
+{% if page == 'page_each_project' %}
+
+    <div id="infor-bar" class="card p-2 mt-2 flex flex-row justify-center items-center gap-4 w-full">
+        <span class="badge badge-primary">
+            <span class="me-3"> Số lượng công việc: {{ text.total_jobs }} </span>
+        </span>
+
+        <span class="badge badge-primary">
+            <span class="me-3"> Số lượng công việc đã hoàn thành: {{ text.total_jobs_done }} </span>
+        </span>
+
+        <span class="badge badge-primary">
+            <span class="me-3"> Số lượng đang thực hiện: {{ text.total_jobs_in_progress }} </span>
+        </span>
+
+        <span class="badge badge-primary">
+            <span class="me-3"> Số lượng đang tạm hoãn: {{ text.total_jobs_pending }} </span>
+        </span>
+
+        <span class="badge badge-primary">
+            <span class="me-3"> Số lượng chưa bắt đầu: {{ text.total_jobs_not_started }} </span>
+        </span>
+
+    </div>
+{% endif %}

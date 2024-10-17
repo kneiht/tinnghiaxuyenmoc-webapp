@@ -5,6 +5,33 @@
 
 @layer components {
 
+    .extra-css {
+        @apply
+            bg-red-600
+            bg-blue-600
+            bg-green-600;
+    }
+
+    .badge{
+        @apply
+            flex items-center justify-center
+            px-3 pb-2 pt-2.5
+            rounded-lg text-center
+            text-sm font-medium leading-normal text-theme
+            text-neutral-100
+            border border-theme;
+    }
+
+    .badge-secondary {
+        @apply  
+            bg-gray-400 dark:bg-gray-500 
+    }
+
+    .badge-primary {
+        @apply 
+            bg-theme-500 dark:bg-theme-600 
+    }
+
     .btn {
         @apply 
             flex items-center justify-center
