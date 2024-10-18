@@ -8,10 +8,17 @@
 
         {% if page == 'page_each_project' %}
 
-            <a id="show-weekplan" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap">
+            <a id="show-weekplan" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap"
+                onclick="var x = document.getElementById('show-weekplan'), y = document.getElementById('show-all-jobs'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
                 <i class="fas fa-bullseye me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Kế hoạch tuần </span>
+                <span class="me-3"> Xem kế hoạch tuần </span>
             </a>
+
+            <a id="show-all-jobs" up-target="#display-records" href="{{ request.path }}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap hidden"
+                onclick="var x = document.getElementById('show-weekplan'), y = document.getElementById('show-all-jobs'); x.classList.toggle('hidden'); y.classList.toggle('hidden')">
+                <span class="me-3"> Xem tất cả công việc </span>
+            </a>
+
 
             <input id="check_date" type="date" name="check_date" class="form-input">
             
