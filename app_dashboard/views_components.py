@@ -76,8 +76,12 @@ def render_tool_bar(request, page, model, project_id=None):
     project = Project.objects.filter(pk=project_id).first()
     # Create text dictionary
     param_string = f'?project_id=project_id' if project_id else ''
+    if project_id:
+        query_url = reverse('load_content_with_project', kwargs={'page': page, 'model': model, 'project_id': project_id})
+    else:
+        query_url = reverse('load_content', kwargs={'page': page, 'model': model})
     text_dict = {
-        'query_url': '',
+        'query_url': query_url,
         'create_new_button_name': f'Thêm {model}',
         'create_new_form_url': reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string,
         'project_id': project_id if project_id else '',
