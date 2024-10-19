@@ -4,7 +4,7 @@
 
 
 import time, datetime, os, json, re
-
+from datetime import timedelta
 from io import BytesIO
 import pandas as pd
 from django.urls import reverse
@@ -32,22 +32,6 @@ def translate(text):
     return text
 
 
-def render_title_bar(request, page, model, project_id=None, check_date=None):
-    project = Project.objects.filter(pk=project_id).first()
-    param_string = f'?project_id={project_id}' if project_id else ''
-    text_dict = {
-        'title': translate('Tiêu đề cho trang: ' + page),
-        'create_new_button_name': f'Thêm {model}',
-        'create_new_form_url': reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string,
-        'project_id': project_id if project_id else '',
-        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
-    }
-    if page=='page_each_project': text_dict['title'] = translate(f'Quản lý dự án: {project.name}')
-
-    # Render
-    template = 'components/title_bar.html'
-    context = {'page': page, 'text': text_dict}
-    return render_to_string(template, context, request)
 
 
 
@@ -70,6 +54,25 @@ def render_infor_bar(request, page, project_id):
     return render_to_string(template, context, request)
 
 
+
+
+
+def render_title_bar(request, page, model, project_id=None, check_date=None):
+    project = Project.objects.filter(pk=project_id).first()
+    param_string = f'?project_id={project_id}' if project_id else ''
+    text_dict = {
+        'title': translate('Tiêu đề cho trang: ' + page),
+        'create_new_button_name': f'Thêm {model}',
+        'create_new_form_url': reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string,
+        'project_id': project_id if project_id else '',
+        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
+    }
+    if page=='page_each_project': text_dict['title'] = translate(f'Quản lý dự án: {project.name}')
+
+    # Render
+    template = 'components/title_bar.html'
+    context = {'page': page, 'text': text_dict}
+    return render_to_string(template, context, request)
 
 
 def render_tool_bar(request, page, model, project_id=None):
@@ -95,7 +98,7 @@ def render_tool_bar(request, page, model, project_id=None):
 
 
 
-def render_display_records(request, model_class, records):
+def render_display_records(request, model_class, records, update=None):
     user = request.user
     model = model_class.__name__
     for record in records:
@@ -114,7 +117,7 @@ def render_display_records(request, model_class, records):
 
     # Render 
     template = 'components/display_records.html'
-    context = {'model': model, 'records': records, 'fields': fields, 'headers': headers}
+    context = {'model': model, 'records': records, 'fields': fields, 'headers': headers, 'update': update}
     return render_to_string(template, context, request)
 
 
@@ -155,3 +158,57 @@ def render_message(request, message):
 
 
 
+def render_weekplan_table(request, project_id, check_date=None):
+    project = Project.objects.filter(pk=project_id).first()
+
+    try:
+        check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+        print('>>>>', check_date)
+        print('>>>>', type(check_date))
+    except:
+        check_date = timezone.now().date()
+        print('>>>>', check_date)
+        print('>>>>', type(check_date))
+
+    
+    # Get monday and sunday dates of the week that contains check_date
+    monday = check_date - timedelta(days=check_date.weekday())
+    sunday = check_date + timedelta(days=6 - check_date.weekday())
+    week = f'{monday.strftime("%d-%m-%Y")} đến {sunday.strftime("%d-%m-%Y")}'
+    jobplans_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job__project=project)
+    job_date_reports = JobDateReport.objects.filter(date__gte=check_date)
+    jobs = Job.objects.filter(project=project)
+
+    for job in jobs:
+        # Get jobplan in week
+        jobplan_in_week = jobplans_in_week.filter(job=job).first()
+        
+        if jobplan_in_week:
+            job.plane_note = jobplan_in_week.note
+            job.plan_quantity = jobplan_in_week.plan_quantity
+        else:
+            job.plan_quantity = ""
+            job.plane_note = ""
+
+        # Get date report
+        job_date_report = job_date_reports.filter(job=job, date=check_date).first()
+        if job_date_report:
+            job.date_quantity = job_date_report.quantity
+            job.date_note = job_date_report.note
+        else:
+            job.date_quantity = ""
+            job.date_note = ""
+
+
+    template = 'components/weekplan_table.html'
+    context = {'jobplans_in_week': jobplans_in_week, 
+               'job_date_reports': job_date_reports,
+               'jobs':jobs,
+               'week': week,
+               'monday': monday.strftime('%Y-%m-%d'), 
+               'sunday': sunday.strftime('%Y-%m-%d'), 
+               'check_date': check_date.strftime('%Y-%m-%d'),
+               'check_date_format': check_date.strftime('%d-%m-%Y'),
+               'project_id': project_id}
+
+    return render_to_string(template, context, request)

@@ -13,7 +13,7 @@
                     {% if record %}
                         up-target="#modal:maybe, #record_{{ record.pk }}:maybe"
                     {% else %}
-                        up-target="#modal:maybe, #display-records:before:maybe"
+                        up-target="#modal:maybe, #display-table-records:before:maybe, #display-records:before:maybe"
                     {% endif %}>
 
                 {% if form.fields|length >= 5 %}

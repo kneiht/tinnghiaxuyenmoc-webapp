@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('api/load-weekplan-table/<int:project_id>', views.load_weekplan_table, name='load_weekplan_table'),
     path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
+    path('api/handle-date-report-form/', views.handle_date_report_form, name='handle_date_report_form'),
 
 
 

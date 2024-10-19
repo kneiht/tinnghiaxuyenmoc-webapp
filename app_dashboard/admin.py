@@ -21,8 +21,8 @@ class JobAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'project')
     search_fields = ('name', 'description', 'project__name')
 
-class JobProgressAdmin(admin.ModelAdmin):
-    list_display = ('job', 'date', 'progress', 'image', 'note', 'created_at')
+class JobDateReportAdmin(admin.ModelAdmin):
+    list_display = ('job', 'date', 'quantity', 'note', 'created_at')
     list_filter = ('created_at', 'job')
     search_fields = ('job__name', 'note')
 
@@ -56,7 +56,7 @@ admin.site.register(DataVehicleTypeDetail, DataVehicleTypeDetailAdmin)
 
 
 
-admin.site.register(JobProgress, JobProgressAdmin)
+admin.site.register(JobDateReport, JobDateReportAdmin)
 admin.site.register(DataVehicle, DataVehicleAdmin)
 admin.site.register(DataDriver, DataDriverAdmin)
 

@@ -111,11 +111,7 @@ def handle_form(request, model, pk=0):
         record = instance_form
         record.style = 'just-updated'
         html_message = render_message(request, message='Cập nhật thành công')
-        html_record = ''
-        if pk == '0' or pk == '' or pk==0:
-            html_record = render_display_records(request, model_class, [record])
-        else:
-            html_record = render_display_records(request, model_class, [record])
+        html_record = render_display_records(request, model_class, [record], update='True')
         
         return HttpResponse(html_message + html_record)
     else:
@@ -160,44 +156,10 @@ def load_content(request, page, model, project_id=None):
 
 
 def load_weekplan_table(request, project_id):
-    project = Project.objects.filter(pk=project_id).first()
     check_date = request.GET.get('check_date')
-
-    try:
-        check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
-        print('>>>>', check_date)
-        print('>>>>', type(check_date))
-    except:
-        check_date = timezone.now().date()
-        print('>>>>', check_date)
-        print('>>>>', type(check_date))
-
-    
-    # Get monday and sunday dates of the week that contains check_date
-    monday = check_date - timedelta(days=check_date.weekday())
-    sunday = check_date + timedelta(days=6 - check_date.weekday())
-    week = f'{monday.strftime("%d-%m-%Y")} đến {sunday.strftime("%d-%m-%Y")}'
-    jobplans_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job__project=project)
-    jobs = Job.objects.filter(project=project)
-
-    for job in jobs:
-        jobplan_in_week = jobplans_in_week.filter(job=job).first()
-        if jobplan_in_week:
-            job.note = jobplan_in_week.note
-            job.plan_quantity = jobplan_in_week.plan_quantity
-        else:
-            job.plan_quantity = ""
-            job.note = ""
-
-    template = 'components/weekplan_table.html'
-    context = {'jobplans_in_week': jobplans_in_week, 'jobs':jobs, 
-               'week': week, 'monday': monday.strftime('%Y-%m-%d'), 
-               'sunday': sunday.strftime('%Y-%m-%d'), 
-               'project_id': project_id}
-    
-    html_weekplan_table = render_to_string(template, context, request)
-
-    return HttpResponse(html_weekplan_table)
+    html_weekplan_table = render_weekplan_table(request, project_id, check_date)
+    html_tool_bar = '<div id="tool-bar" class="hidden"></div>'
+    return HttpResponse(html_weekplan_table + html_tool_bar)
 
 
 def handle_weekplan_form(request):
@@ -205,36 +167,84 @@ def handle_weekplan_form(request):
         return HttpResponseForbidden()
     form = request.POST
 
-    start_date = form.get('start_date')
-    end_date = form.get('end_date')
-    project_id = form.get('project_id')
+    try:
+        start_date = form.get('start_date')
+        end_date = form.get('end_date')
+        check_date = form.get('check_date')
+        project_id = form.get('project_id')
 
-    # get all jobs of the project
-    jobs = Job.objects.filter(project_id=project_id)
-    for job in jobs:
-        note = form.get(f'note_{job.pk}')
-        quantity = form.get(f'plan_quantity_{job.pk}')
-        if not note or not quantity:
-            continue
-        jobplan_id = form.get(f'jobplan_{job.pk}')
-        if jobplan_id:
-            jobplan = JobPlan.objects.filter(pk=jobplan_id).first()
-            jobplan.note = note
-            jobplan.plan_quantity = quantity
-            jobplan.save()
-            continue
-        else:
-            jobplan = JobPlan(
-                job=job,
-                start_date=start_date,
-                end_date=end_date,
-                plan_quantity=quantity,
-                note=note
-            )
-            jobplan.save()
+        # get all jobs of the project
+        jobs = Job.objects.filter(project_id=project_id)
+        for job in jobs:
+            note = form.get(f'note_{job.pk}')
+            quantity = form.get(f'plan_quantity_{job.pk}')
+            if not note or not quantity:
+                continue
+            jobplan_id = form.get(f'jobplan_{job.pk}')
+            if jobplan_id:
+                jobplan = JobPlan.objects.filter(pk=jobplan_id).first()
+                jobplan.note = note
+                jobplan.plan_quantity = quantity
+                jobplan.save()
+                continue
+            else:
+                jobplan = JobPlan(
+                    job=job,
+                    start_date=start_date,
+                    end_date=end_date,
+                    plan_quantity=quantity,
+                    note=note
+                )
+                jobplan.save()
+        html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
+        html_message = render_message(request, message='Cập nhật thông tin thành công')
+        return HttpResponse(html_message + html_weekplan_table)
+
+    except Exception as e:
+        html = render_message(request, message='Có lỗi: ' + str(e))
+        return HttpResponse(html)
+        
 
 
-    return HttpResponse('OK')
+def handle_date_report_form(request):
+    if request.method != 'POST':
+        return HttpResponseForbidden()
+    form = request.POST
+    print(form)
+    try:
+        check_date = form.get('check_date')
+        project_id = form.get('project_id')
+
+        # get all jobs of the project
+        jobs = Job.objects.filter(project_id=project_id)
+        for job in jobs:
+            note = form.get(f'date_note_{job.pk}')
+            quantity = form.get(f'date_quantity_{job.pk}')
+            if not note or not quantity:
+                continue
+            job_date_report_id = form.get(f'job_date_report_{job.pk}')
+            if job_date_report_id:
+                job_date_report = JobDateReport.objects.filter(pk=job_date_report_id).first()
+                job_date_report.note = note
+                job_date_report.quantity = quantity
+                job_date_report.save()
+                continue
+            else:
+                job_date_report = JobDateReport(
+                    job=job,
+                    date=check_date,
+                    quantity=quantity,
+                    note=note
+                )
+                job_date_report.save()
+        html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
+        html_message = render_message(request, message='Cập nhật báo cáo thành công')
+        return HttpResponse(html_message + html_weekplan_table)
+
+    except Exception as e:
+        html = render_message(request, message='Có lỗi: ' + str(e))
+        return HttpResponse(html)
+        
 
 
 

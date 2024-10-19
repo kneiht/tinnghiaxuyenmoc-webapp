@@ -219,7 +219,7 @@ class Job(SecondaryIDMixin, BaseModel):
     name = models.CharField(max_length=1000, default="", verbose_name="Tên công việc")
     category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Loại công việc")
     unit = models.CharField(max_length=255, default="Đơn vị", verbose_name="Đơn vị")
-    quantity = models.FloatField(default=1.0, verbose_name="Khối lượng")
+    quantity = models.PositiveIntegerField(default=1.0, verbose_name="Khối lượng")
     description = models.TextField(blank=True, null=True, default='')
     start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
     end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
@@ -230,7 +230,7 @@ class Job(SecondaryIDMixin, BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['name', 'category', 'status', 'unit', 'quantity', 'start_date', 'end_date']
+        fields = ['name', 'category', 'status', 'quantity', 'unit', 'start_date', 'end_date']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -255,7 +255,7 @@ class JobPlan(BaseModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(default=timezone.now)
-    plan_quantity = models.FloatField(default=0.0)
+    plan_quantity = models.PositiveIntegerField(default=0.0)
     note = models.TextField(blank=True, null=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
@@ -263,15 +263,15 @@ class JobPlan(BaseModel):
 
 
 
-class JobProgress(BaseModel):
+class JobDateReport(BaseModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
-    progress = models.FloatField(default=0.0)
-    image = models.ImageField(upload_to='images/job_progress/', blank=True, null=True, default='images/default/default_project.webp')
+    quantity = models.PositiveIntegerField(default=0.0)
     note = models.TextField(blank=True, null=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'progress of {self.job} on {self.date}'
+
 
 
 class DataVehicleTypeDetail(BaseModel):

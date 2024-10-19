@@ -54,17 +54,16 @@
                     <div class="flex">
                         <div class="flex-1 mr-2 h-10 truncate flex items-center">
                             <i class="fas fa-regular fa-calendar w-6" aria-hidden="true"></i>
-                            <span>{{ record.start_date|date:"d/m/Y" }}</span>
+                            <span>Từ {{ record.start_date|date:"d/m/Y" }}</span>
                         </div>
                         <div class="flex-1 mr-2 h-10 truncate flex items-center">
-                            <i class="fas fa-solid fa-calendar w-6" aria-hidden="true"></i>
-                            <span>{{ record.end_date|date:"d/m/Y" }}</span>
+                            <span> đến {{ record.end_date|date:"d/m/Y" }}</span>
                         </div>
                     </div>
     
                     <div class="flex">
-                        <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
-                                <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
                                     {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
                                         {{ record.progress_by_time.progress }}/{{ record.progress_by_time.duration }} ngày
                                     {% else %}
@@ -86,7 +85,8 @@
 
 {% else %}
 <div id="display-records" >
-    <table class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+    <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        {% if not update %}
         <thead>
             <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
@@ -95,6 +95,7 @@
                 {% endfor %}
                 <th></th>
             </tr>
+        {% endif %}
 
         </thead>
         {% for record in records %}
