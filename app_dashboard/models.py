@@ -240,15 +240,6 @@ class Job(SecondaryIDMixin, BaseModel):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if self._state.adding:
-            with transaction.atomic():
-                super().save(*args, **kwargs)
-                JobProgress.objects.create(job=self, progress=0.0)
-        else:
-            super().save(*args, **kwargs)
-
-
 
 
 class JobPlan(BaseModel):
