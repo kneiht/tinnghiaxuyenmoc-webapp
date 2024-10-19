@@ -5,7 +5,7 @@
         <!-- Modal Content -->
         <div class="relative top-16 mb-10 mx-4 card h-fit w-full sm:w-fit">
 
-            <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">{{ text.title }}</h3>
+            <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ text.title }}</h3>
             
             <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
             <form enctype="multipart/form-data" method="post"
@@ -16,17 +16,19 @@
                         up-target="#modal:maybe, #display-table-records:before:maybe, #display-records:before:maybe"
                     {% endif %}>
 
+                {% if form.non_field_errors %}
+                <div class="px-6 py-3">
+                    {% for error in form.non_field_errors %}
+                    <p class="text-red-500">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
                 {% if form.fields|length >= 5 %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[600px] gap-4 px-6">
                 {% else %}
                 <div class="grid grid-cols-1 w-[400px]  gap-4 px-6">
                 {% endif %}
-
-                    {% if form.non_field_errors %}
-                        {% for error in form.non_field_errors %}
-                        <p class="text-red-500 pt-3">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
 
                     {% if text.project_id %}  
                         <input type="hidden" name="project" value="{{ text.project_id }}">

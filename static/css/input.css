@@ -86,6 +86,14 @@
             focus:bg-slate-200 dark:focus:bg-slate-800;
     }
 
+    .btn-outline-no-focus {
+        @apply 
+            bg-transparent border border-theme border-opacity-50 text-theme
+            shadow-none hover:shadow-none active:shadow-none focus:shadow-none;
+    }
+
+
+
     .form-input {
         @apply 
             w-full h-10 block px-3 pr-4

@@ -116,7 +116,7 @@ def handle_form(request, model, pk=0):
         return HttpResponse(html_message + html_record)
     else:
         print(form.errors)
-        html_modal = render_form(request, model, pk)
+        html_modal = render_form(request, model, pk, form)
         return  HttpResponse(html_modal)
 
 
@@ -150,8 +150,11 @@ def load_content(request, page, model, project_id=None):
     else:
         records = model_class.objects.filter(project=project)
     records = filter_records(request, records, model_class)
-    html_display_records = render_display_records(request, model_class, records)
+    html_display_records = render_display_records(request, model_class, records, update=False, check_date=check_date)
     return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_infor_bar + html_display_records)
+
+
+
 
 
 
@@ -166,7 +169,7 @@ def handle_weekplan_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     form = request.POST
-
+    print(form)
     try:
         start_date = form.get('start_date')
         end_date = form.get('end_date')
@@ -178,7 +181,7 @@ def handle_weekplan_form(request):
         for job in jobs:
             note = form.get(f'note_{job.pk}')
             quantity = form.get(f'plan_quantity_{job.pk}')
-            if not note or not quantity:
+            if not note and not quantity:
                 continue
             jobplan_id = form.get(f'jobplan_{job.pk}')
             if jobplan_id:
@@ -214,22 +217,24 @@ def handle_date_report_form(request):
     try:
         check_date = form.get('check_date')
         project_id = form.get('project_id')
-
+        print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
         for job in jobs:
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
-            if not note or not quantity:
+            if not note and not quantity:
                 continue
             job_date_report_id = form.get(f'job_date_report_{job.pk}')
             if job_date_report_id:
+                print('>>>>>>>>>>>>>>> current job_date_report_id:', job_date_report_id)
                 job_date_report = JobDateReport.objects.filter(pk=job_date_report_id).first()
                 job_date_report.note = note
                 job_date_report.quantity = quantity
                 job_date_report.save()
                 continue
             else:
+                print('>>>>>>>>>>>>>>>', 'new_job_date_report_id')
                 job_date_report = JobDateReport(
                     job=job,
                     date=check_date,

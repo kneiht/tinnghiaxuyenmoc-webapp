@@ -34,6 +34,97 @@ def translate(text):
 
 
 
+def progress_by_time(record, check_date=None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+
+
+    duration = (record.end_date - record.start_date).days + 1
+    if duration == 0:
+        progress = 1
+        percent = 100
+    else:
+        progress = int((check_date - record.start_date).days) + 1
+        percent = int((progress / duration) * 100) if progress<=duration else 100
+
+
+    # Check if the record is jobplan
+    if record.__class__.__name__ == 'JobPlan':
+        record.status = record.job.status
+
+    if record.status == 'done':
+        status = 'green'
+    elif record.status == 'in_progress':
+        if percent < 100:
+            status = 'blue'
+        else:
+            status = 'red'
+    else:
+        status = 'gray'
+
+    return {
+        'progress': progress,
+        'duration': duration,
+        'percent': percent,
+        'status': status
+    }
+
+def progress_by_quantity(record, check_date=None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+
+    if record.__class__.__name__ == 'Project':
+        # Caculate all the quantity of jobs in the project
+        total_quantity = record.job_set.aggregate(Sum('quantity'))['quantity__sum'] or 0
+        
+        # Calculate the quantity of all job reports
+        job_date_reports = JobDateReport.objects.filter(job__project=record)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+    elif record.__class__.__name__ == 'Job':
+        total_quantity = record.quantity
+        job_date_reports = JobDateReport.objects.filter(job=record, date__lte=check_date)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+    elif record.__class__.__name__ == 'JobPlan':
+        total_quantity = record.plan_quantity
+        job_date_reports = JobDateReport.objects.filter(job=record.job, date__gte=record.start_date, date__lte=check_date)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+        
+    if total_quantity == 0:
+        percent = 0
+    else:
+        percent = min(int((total_quantity_reported / total_quantity) * 100), 100)
+
+
+    if record.status == 'done':
+        status = 'green'
+    elif record.status == 'in_progress':
+        status = 'blue'
+    else:
+        status = 'gray'
+
+    return {
+        'total_quantity': total_quantity,
+        'total_quantity_reported': total_quantity_reported,
+        'percent': percent,
+        'status': status
+    }
+
+
+
+
+
+
+
+
 
 def render_infor_bar(request, page, project_id):
     text_dict = {}
@@ -98,7 +189,7 @@ def render_tool_bar(request, page, model, project_id=None):
 
 
 
-def render_display_records(request, model_class, records, update=None):
+def render_display_records(request, model_class, records, update=None, check_date=None):
     user = request.user
     model = model_class.__name__
     for record in records:
@@ -114,6 +205,10 @@ def render_display_records(request, model_class, records, update=None):
             fields.append(field)
             headers.append(model_class._meta.get_field(field).verbose_name)
 
+    if model_class == Job:
+        for record in records:
+            record.progress_by_time = progress_by_time(record, check_date=check_date)
+            record.progress_by_quantity = progress_by_quantity(record, check_date=check_date)
 
     # Render 
     template = 'components/display_records.html'
@@ -122,7 +217,7 @@ def render_display_records(request, model_class, records, update=None):
 
 
 
-def render_form(request, model, pk=0):
+def render_form(request, model, pk=0, form=None):
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -144,7 +239,8 @@ def render_form(request, model, pk=0):
         text_dict[key] = value
 
     # Get the form
-    form = form_class(instance=record) if record else form_class()
+    if not form:
+        form = form_class(instance=record) if record else form_class()
     template = 'components/modal.html'
     context = {'modal': modal, 'form': form, 'record': record, 'text': text_dict}
     return render_to_string(template, context, request)
@@ -163,20 +259,20 @@ def render_weekplan_table(request, project_id, check_date=None):
 
     try:
         check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
-        print('>>>>', check_date)
-        print('>>>>', type(check_date))
     except:
         check_date = timezone.now().date()
-        print('>>>>', check_date)
-        print('>>>>', type(check_date))
 
-    
+    print('>>>>>>>>>>>>>> check_date', check_date, type(check_date))
     # Get monday and sunday dates of the week that contains check_date
     monday = check_date - timedelta(days=check_date.weekday())
     sunday = check_date + timedelta(days=6 - check_date.weekday())
     week = f'{monday.strftime("%d-%m-%Y")} đến {sunday.strftime("%d-%m-%Y")}'
     jobplans_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job__project=project)
-    job_date_reports = JobDateReport.objects.filter(date__gte=check_date)
+    job_date_reports = JobDateReport.objects.filter(date=check_date, job__project=project)
+
+
+    print('>>>>>>> job_date_reports', job_date_reports)
+
     jobs = Job.objects.filter(project=project)
 
     for job in jobs:
@@ -184,20 +280,27 @@ def render_weekplan_table(request, project_id, check_date=None):
         jobplan_in_week = jobplans_in_week.filter(job=job).first()
         
         if jobplan_in_week:
-            job.plane_note = jobplan_in_week.note
+            job.plan_note = jobplan_in_week.note
             job.plan_quantity = jobplan_in_week.plan_quantity
         else:
             job.plan_quantity = ""
-            job.plane_note = ""
+            job.plan_note = ""
 
+    for jobplan in jobplans_in_week:
         # Get date report
-        job_date_report = job_date_reports.filter(job=job, date=check_date).first()
+        job_date_report = job_date_reports.filter(job=jobplan.job, date=check_date).first()
         if job_date_report:
-            job.date_quantity = job_date_report.quantity
-            job.date_note = job_date_report.note
+            jobplan.date_quantity = job_date_report.quantity
+            jobplan.date_note = job_date_report.note
         else:
-            job.date_quantity = ""
-            job.date_note = ""
+            jobplan.date_quantity = ""
+            jobplan.date_note = ""
+
+
+    for jobplan_in_week in jobplans_in_week:
+        jobplan_in_week.progress_by_time = progress_by_time(jobplan_in_week, check_date=check_date)
+        jobplan_in_week.progress_by_quantity = progress_by_quantity(jobplan_in_week, check_date=check_date)
+
 
 
     template = 'components/weekplan_table.html'
@@ -205,10 +308,15 @@ def render_weekplan_table(request, project_id, check_date=None):
                'job_date_reports': job_date_reports,
                'jobs':jobs,
                'week': week,
-               'monday': monday.strftime('%Y-%m-%d'), 
+               'monday': monday.strftime('%Y-%m-%d'),
+               'tuesday': (monday + timedelta(days=1)).strftime('%Y-%m-%d'),
+               'wednesday': (monday + timedelta(days=2)).strftime('%Y-%m-%d'),
+               'thursday': (monday + timedelta(days=3)).strftime('%Y-%m-%d'),
+               'friday': (monday + timedelta(days=4)).strftime('%Y-%m-%d'),
+               'saturday': (monday + timedelta(days=5)).strftime('%Y-%m-%d'),
                'sunday': sunday.strftime('%Y-%m-%d'), 
                'check_date': check_date.strftime('%Y-%m-%d'),
                'check_date_format': check_date.strftime('%d-%m-%Y'),
-               'project_id': project_id}
+               'project_id': project_id,}
 
     return render_to_string(template, context, request)

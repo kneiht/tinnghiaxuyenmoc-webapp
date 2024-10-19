@@ -8,6 +8,16 @@ from django.db.models import Exists, OuterRef
 
 from .models import *
 
+
+from django.core.exceptions import ValidationError
+
+
+def validate_username_length(value, min_length=6):
+    if len(value) < min_length:  # 7 because it should be more than 6 characters
+        raise ValidationError('Tên tài khoản phải dài ít nhất 7 ký tự')
+
+
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -19,8 +29,8 @@ class ProjectForm(forms.ModelForm):
             'status': 'Trạng thái',
             'description': 'Mô tả',
             'image': 'Hình ảnh',
-            'start_date': 'Thời điểm bắt đầu',
-            'end_date': 'Thời điểm kết thúc',
+            'start_date': 'Ngày bắt đầu',
+            'end_date': 'Ngày kết thúc',
         }
     
         widgets = {
@@ -43,7 +53,15 @@ class ProjectForm(forms.ModelForm):
                     'type': 'date'}),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
 
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError('Ngày bắt đầu phải nhỏ hoặc bằng ngày kết thúc.')
+        return cleaned_data
 
 
 class JobForm(forms.ModelForm):
@@ -58,8 +76,8 @@ class JobForm(forms.ModelForm):
             'unit': 'Đơn vị',
             'quantity': 'Số lượng',
             'description': 'Mô tả',
-            'start_date': 'Thời điểm bắt đầu',
-            'end_date': 'Thời điểm kết thúc',
+            'start_date': 'Ngày bắt đầu',
+            'end_date': 'Ngày kết thúc',
         }
     
         widgets = {
@@ -74,6 +92,7 @@ class JobForm(forms.ModelForm):
                     'class': 'form-input'}),
             'unit': forms.TextInput(attrs={
                     'placeholder': 'Đơn vị',
+                    'required': 'required',
                     'class': 'form-input'}),
             'quantity': forms.NumberInput(attrs={
                     'placeholder': 'Số lượng',
@@ -83,12 +102,23 @@ class JobForm(forms.ModelForm):
                     'rows': 2}),
             'start_date': forms.DateInput(attrs={
                     'class': 'form-input',
+                    'required': 'required',
                     'type': 'date'}),
             'end_date': forms.DateInput(attrs={
                     'class': 'form-input',
+                    'required': 'required',
                     'type': 'date'}),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError('Ngày bắt đầu phải nhỏ hoặc bằng ngày kết thúc.')
+        return cleaned_data
 
 
 class JobPlanForm(forms.ModelForm):
@@ -98,8 +128,8 @@ class JobPlanForm(forms.ModelForm):
         labels = {
             'job': 'Công việc',
             'quantity': 'Khối lượng',
-            'start_date': 'Thời điểm bắt đầu',
-            'end_date': 'Thời điểm kết thúc',
+            'start_date': 'Ngày bắt đầu',
+            'end_date': 'Ngày kết thúc',
             'status': 'Trạng thái',
         }
         widgets = {

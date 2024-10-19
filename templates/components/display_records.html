@@ -1,5 +1,5 @@
 {% load custom_tags %}
-
+{% load humanize %}
 <!-- Cards -->
 {% if model == 'Project' %}
     <div id="display-records" class="display-cards opacity-0 w-full flex justify-center
@@ -61,18 +61,26 @@
                         </div>
                     </div>
     
-                    <div class="flex">
+                    <div class="flex flex-col gap-2">
                         <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                 <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
                                     {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
-                                        {{ record.progress_by_time.progress }}/{{ record.progress_by_time.duration }} ngày
+                                        {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }} ngày
                                     {% else %}
                                         {{ record.get_status_display }}
                                     {% endif %}
                                 </div>
 
                         </div>
+
+                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                <div class="bg-{{ record.progress_by_quantity.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_quantity.percent }}%">
+                                    {{ record.progress_by_quantity.total_quantity_reported|intcomma }} / {{ record.progress_by_quantity.total_quantity|intcomma }} khối lượng
+                                </div>
+
+                        </div>
                     </div>
+
 
                     <!-- Keep <p> for paragraphs of text -->
                     <div class="mt-2 note whitespace-pre-line"> {{ record.description }} </div>
@@ -93,6 +101,9 @@
                 {% for header in headers %}
                     <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
                 {% endfor %}
+                {% if model == 'Job' %}
+                    <th class="px-6 py-3 text-left font-semibold">Tiến độ</th>
+                {% endif %}
                 <th></th>
             </tr>
         {% endif %}
@@ -103,10 +114,40 @@
                 <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
                     {% for field in fields %}
                     <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                            
+                        {% if field == 'status' %} 
+                            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                        {% else %}
                             {{ record|format_display:field }}
+                        {% endif %} 
                     </td>
                     {% endfor %}
     
+
+                    <td class="px-6 py-3 border-b border-gray-200 text-sm text-gray-700 dark:text-gray-300">
+                        <div class="flex flex-col gap-2">
+                            <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                    <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                                        {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
+                                            {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }} ngày
+                                        {% else %}
+                                            {{ record.get_status_display }}
+                                        {% endif %}
+                                    </div>
+
+                            </div>
+
+                            <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                    <div class="bg-{{ record.progress_by_quantity.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_quantity.percent }}%">
+                                        {{ record.progress_by_quantity.total_quantity_reported|intcomma }} / {{ record.progress_by_quantity.total_quantity|intcomma }} khối lượng
+                                    </div>
+
+                            </div>
+                        </div>
+                    </td>
+
+
+
                     <td>
                         <div class="menu relative text-sm opacity-100">
     
@@ -130,7 +171,7 @@
                         </div>
                     </td>
                 </tr>
-            
+                
             </tbody>
         {% endfor %}
     </table>

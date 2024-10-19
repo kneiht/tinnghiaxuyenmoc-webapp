@@ -12,6 +12,13 @@ from django.db.models.fields.files import ImageFieldFile
 from django.db.models import Max
 from django.db import transaction
 
+from django.db.models import Sum
+
+
+
+
+
+
 
 class BaseModel(models.Model):
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
@@ -168,37 +175,6 @@ class Project(BaseModel):
         }
 
 
-    def progress_by_time(self):
-        now = timezone.now().date()
-        duration = (self.end_date - self.start_date).days + 1
-        if duration == 0:
-            progress = 1
-            percent = 100
-        else:
-            progress = int((now - self.start_date).days) + 1
-            percent = int((progress / duration) * 100) if progress<=duration else 100
-            
-
-        if self.status == 'done':
-            status = 'green'
-        elif self.status == 'in_progress':
-            if percent < 100:
-                status = 'blue'
-            else:
-                status = 'red'
-        else:
-            status = 'gray'
-
-        return {
-            'progress': progress,
-            'duration': duration,
-            'percent': percent,
-            'status': status
-        }
-
-
-
-
 
 class ProjectUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -218,8 +194,8 @@ class Job(SecondaryIDMixin, BaseModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=1000, default="", verbose_name="Tên công việc")
     category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Loại công việc")
-    unit = models.CharField(max_length=255, default="Đơn vị", verbose_name="Đơn vị")
-    quantity = models.PositiveIntegerField(default=1.0, verbose_name="Khối lượng")
+    unit = models.CharField(max_length=255, default="", verbose_name="Đơn vị")
+    quantity = models.PositiveIntegerField(default=0, verbose_name="Khối lượng")
     description = models.TextField(blank=True, null=True, default='')
     start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
     end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
@@ -251,7 +227,6 @@ class JobPlan(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'Plan of {self.job} from {self.start_date} to {self.end_date}'
-
 
 
 class JobDateReport(BaseModel):
