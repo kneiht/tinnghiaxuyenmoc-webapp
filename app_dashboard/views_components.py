@@ -210,6 +210,12 @@ def render_display_records(request, model_class, records, update=None, check_dat
             record.progress_by_time = progress_by_time(record, check_date=check_date)
             record.progress_by_quantity = progress_by_quantity(record, check_date=check_date)
 
+    elif model_class == Project:
+        for record in records:
+            record.progress_by_time = progress_by_time(record)
+            record.progress_by_quantity = progress_by_quantity(record)
+
+
     # Render 
     template = 'components/display_records.html'
     context = {'model': model, 'records': records, 'fields': fields, 'headers': headers, 'update': update}

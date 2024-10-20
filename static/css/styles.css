@@ -2937,6 +2937,11 @@ select {
   border-color: rgb(15 23 42 / var(--tw-border-opacity));
 }
 
+.dark\:border-gray-600:is(.dark *) {
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity));
+}
+
 .dark\:bg-blue-300:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(147 197 253 / var(--tw-bg-opacity));
