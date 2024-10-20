@@ -136,7 +136,7 @@ def load_content(request, page, model, project_id=None):
         return HttpResponseForbidden()
     # Check if there is project id i the params, if yes => get the project
     if project_id:
-        project = get_object_or_404(Project, pk=project_id)
+        project = Project.objects.filter(pk=project_id).first()
     
     # render general content
     html_load_content = '<div id="load-content" class"hidden"></div>'
@@ -169,7 +169,6 @@ def handle_weekplan_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     form = request.POST
-    print(form)
     try:
         start_date = form.get('start_date')
         end_date = form.get('end_date')
@@ -181,29 +180,42 @@ def handle_weekplan_form(request):
         for job in jobs:
             note = form.get(f'note_{job.pk}')
             quantity = form.get(f'plan_quantity_{job.pk}')
+            try:
+                quantity = int(quantity)
+            except:
+                quantity = 0
+
+            if quantity > job.quantity:
+                message = f'Lỗi khi nhập khối lượng kế hoạch cho công việc "{job.name}". Khối lượng kế hoạch phải nhỏ hơn khối lượng công việc ({str(job.quantity)}).'
+                html_message = render_message(request, message=message, message_type='red')
+                return HttpResponse(html_message)
             if not note and not quantity:
                 continue
-            jobplan_id = form.get(f'jobplan_{job.pk}')
-            if jobplan_id:
-                jobplan = JobPlan.objects.filter(pk=jobplan_id).first()
+
+
+
+            jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
+
+
+            if jobplan:
                 jobplan.note = note
                 jobplan.plan_quantity = quantity
                 jobplan.save()
                 continue
             else:
-                jobplan = JobPlan(
+                JobPlan(
                     job=job,
                     start_date=start_date,
                     end_date=end_date,
                     plan_quantity=quantity,
                     note=note
-                )
-                jobplan.save()
+                ).save()
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
         html_message = render_message(request, message='Cập nhật thông tin thành công')
         return HttpResponse(html_message + html_weekplan_table)
 
     except Exception as e:
+        # raise e
         html = render_message(request, message='Có lỗi: ' + str(e))
         return HttpResponse(html)
         
@@ -223,30 +235,47 @@ def handle_date_report_form(request):
         for job in jobs:
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
+            try:
+                quantity = int(quantity)
+            except:
+                quantity = 0
+
+
+            job_date_report = JobDateReport.objects.filter(job=job, date=check_date).first()
+
+            current_date_quantity = job_date_report.quantity if job_date_report else 0
+
+            total_quantity_reported = progress_by_quantity(job)['total_quantity_reported'] - current_date_quantity
+            total_quantity_left = job.quantity - total_quantity_reported
+            print('>>>>>>>>>>>>>>> total_quantity_reported:', total_quantity_reported, 'total_quantity_left:', total_quantity_left)
+            if int(quantity) > total_quantity_left:
+                message = f'Lỗi khi nhập khối lượng hoàn thành (đang nhập {quantity}) trong ngày cho công việc "{job.name}". Khối lượng hoàn thành phải nhỏ hơn khối lượng còn lại ({str(total_quantity_left)}).'
+                html_message = render_message(request, message=message, message_type='red')
+                return HttpResponse(html_message)
+
+
             if not note and not quantity:
                 continue
-            job_date_report_id = form.get(f'job_date_report_{job.pk}')
-            if job_date_report_id:
-                print('>>>>>>>>>>>>>>> current job_date_report_id:', job_date_report_id)
-                job_date_report = JobDateReport.objects.filter(pk=job_date_report_id).first()
+            
+            if job_date_report:
                 job_date_report.note = note
                 job_date_report.quantity = quantity
                 job_date_report.save()
                 continue
             else:
-                print('>>>>>>>>>>>>>>>', 'new_job_date_report_id')
-                job_date_report = JobDateReport(
+                JobDateReport(
                     job=job,
                     date=check_date,
                     quantity=quantity,
                     note=note
-                )
-                job_date_report.save()
+                ).save()
+
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
         html_message = render_message(request, message='Cập nhật báo cáo thành công')
         return HttpResponse(html_message + html_weekplan_table)
 
     except Exception as e:
+        # raise e
         html = render_message(request, message='Có lỗi: ' + str(e))
         return HttpResponse(html)
         
@@ -269,9 +298,17 @@ def page_each_project(request, pk):
     context = {'project': project, 'check_date': check_date}
     return render(request, 'pages/page_each_project.html', context)
 
+
 @login_required
 def page_manage_data(request):
     return render(request, 'pages/page_manage_data.html')
+
+
+@login_required
+def page_transport_department(request):
+    return render(request, 'pages/page_transport_department.html')
+
+
 
 
 

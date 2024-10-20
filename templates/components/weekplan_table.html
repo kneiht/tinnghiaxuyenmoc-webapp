@@ -82,14 +82,16 @@
                         <th class="px-6 py-3 text-left font-semibold">Loại công việc</th>
                         <th class="px-6 py-3 text-left font-semibold">Trạng thái</th>
                         <th class="px-6 py-3 text-left font-semibold">Đơn vị</th>
+
+                        <th class="px-6 py-3 text-left font-semibold">Khối lượng tổng</th>
+
                         <th class="px-6 py-3 text-left font-semibold">Khối lượng kế hoạch tuần</th>
                         <th class="px-6 py-3 text-left font-semibold">Ghi chú tuần</th>
 
                         <th class="px-6 py-3 text-left font-semibold">Khối lượng ngày</th>
                         <th class="px-6 py-3 text-left font-semibold">Ghi chú ngày</th>
 
-                        <th class="px-6 py-3 text-left font-semibold">Tiến độ</th>
-
+                        <th class="px-6 py-3 text-left font-semibold">Tiến độ tuần</th>
                     
                     <th></th>
                 </tr>
@@ -112,6 +114,10 @@
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                     {{ record.job.unit }}
+                </td>
+
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                    {{ record.job.quantity|intcomma }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -209,13 +215,18 @@
                         
                             <th class="px-6 py-3 text-left font-semibold">Trạng thái</th>
                     
-                            <th class="px-6 py-3 text-left font-semibold">Khối lượng</th>
+                            <th class="px-6 py-3 text-left font-semibold">Đơn vị</th>
+
+                            <th class="px-6 py-3 text-left font-semibold">Khối lượng tổng</th>
                         
                             <th class="px-6 py-3 text-left font-semibold">Bắt đầu</th>
                         
                             <th class="px-6 py-3 text-left font-semibold">Kết thúc</th>
 
-                            <th class="px-6 py-3 text-left font-semibold">Khối lượng kế hoạch tuần</th>
+                            <th class="px-6 py-3 text-left font-semibold">KL còn lại đến kì trước</th>
+
+
+                            <th class="px-6 py-3 text-left font-semibold">KL kế hoạch tuần</th>
                             <th class="px-6 py-3 text-left font-semibold">Ghi chú trong tuần</th>
                         
                         <th></th>
@@ -236,12 +247,18 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         {{ record.category }}
                     </td>
+
+
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.get_status_display }}
+                        <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record.get_status_display }}</span>
                     </td>
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.quantity|intcomma }} ({{ record.unit }})
+                        ({{ record.unit }})
+                    </td>
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        {{ record.quantity|intcomma }}
                     </td>
 
 
@@ -256,6 +273,12 @@
                             <input type="number" name="jobplan_{{ record.pk }}" class="hidden form-input" value="{{ jobplan.pk }}" />
                         {% endif %}
                     {% endfor %}
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        {{ record.progress_left_by_quantity_upto_lastweek|intcomma }}
+                    </td>
+                    
+
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
 
                         <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}"/>
@@ -313,14 +336,10 @@
                             <th class="px-6 py-3 text-left font-semibold">Loại công việc</th>
                         
                             <th class="px-6 py-3 text-left font-semibold">Trạng thái</th>
+                            <th class="px-6 py-3 text-left font-semibold">Đơn vị</th>
+                            <th class="px-6 py-3 text-left font-semibold">Khối lượng tổng</th>
                     
-                            <th class="px-6 py-3 text-left font-semibold">Khối lượng</th>
-                        
-                            <th class="px-6 py-3 text-left font-semibold">Bắt đầu</th>
-                        
-                            <th class="px-6 py-3 text-left font-semibold">Kết thúc</th>
-
-                            <th class="px-6 py-3 text-left font-semibold">Khối lượng hoàn thành</th>
+                            <th class="px-6 py-3 text-left font-semibold">Khối lượng đã hoàn thành</th>
 
                             <th class="px-6 py-3 text-left font-semibold">Ghi chú trong ngày</th>
                         
@@ -342,21 +361,20 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         {{ record.job.category }}
                     </td>
+
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.job.get_status_display }}
+                        <span class="{{ record.job.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record.job.get_status_display }}</span>
                     </td>
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.job.quantity|intcomma }} ({{ record.job.unit }})
+                        {{ record.job.unit }}
+                    </td>
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        {{ record.job.quantity|intcomma }}
                     </td>
 
 
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.job.start_date|date:"d/m/Y" }}
-                    </td>
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        {{ record.job.end_date|date:"d/m/Y" }}
-                    </td>
                     {% for job_date_report in job_date_reports %}
                         {% if job_date_report.job == record.job %}
                             <input type="number" name="job_date_report_{{ record.job.pk }}" class="hidden form-input" value="{{ job_date_report.pk }}" />

@@ -17,7 +17,7 @@ urlpatterns = [
     path('projects', views.page_projects, name='page_projects'),
     path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),
     path('manage-data/', views.page_manage_data, name='page_manage_data'),
-
+    path('transport-department/', views.page_transport_department, name='page_transport_department'),
 
     path('api/load-form/<str:model>/<int:pk>', views.load_form, name='load_form'),
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),

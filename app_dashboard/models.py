@@ -206,7 +206,7 @@ class Job(SecondaryIDMixin, BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['name', 'category', 'status', 'quantity', 'unit', 'start_date', 'end_date']
+        fields = ['name', 'category', 'status', 'unit', 'quantity', 'start_date', 'end_date']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -269,7 +269,16 @@ class DataVehicleTypeDetail(BaseModel):
     def __str__(self):
         return f'{self.get_vehicle_type_display()} - {self.vehicle_type_detail}'
 
-
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle_type', 'vehicle_type_detail', 'revenue_per_8_hours', 
+                  'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 
+                  'road_fee_inspection', 'tire_wear', 'police_fee']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
     # todo: thêm fields chạy ngày, chạy đêm, tabo ngày, mỗi cái có đơn giá => tính phí vận chuyể
 
 
@@ -284,7 +293,16 @@ class DataVehicle(BaseModel):
     
     def __str__(self):
         return f'{self.vehicle_name} - {self.license_plate}'
-
+    
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 
+                  'vehicle_inspection_number', 'vehicle_inspection_due_date']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 
 
@@ -327,6 +345,151 @@ class DataDriver(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'{self.full_name}'
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['full_name', 'hire_date', 'identity_card', 'birth_year', 'status', 
+                  'basic_salary', 'hourly_salary', 'trip_salary',
+                  'bank_name', 'account_number', 'account_holder_name',
+                  'fixed_allowance', 'insurance_amount', 'phone_number', 'address']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+class DumbTruckPayRate(BaseModel):
+    xe = models.ForeignKey(
+        DataVehicle,
+        on_delete=models.CASCADE,
+        limit_choices_to={'vehicle_type__vehicle_type': 'dump_truck'},
+        verbose_name="Xe"
+    )
+    chay_ngay = models.PositiveIntegerField(verbose_name="Chạy ngày")
+    chay_dem = models.PositiveIntegerField(verbose_name="Chạy đêm")
+    tanbo_ngay = models.PositiveIntegerField(verbose_name="Tanbo ngày")
+    tanbo_dem = models.PositiveIntegerField(verbose_name="Tanbo đêm")
+    chay_xa = models.PositiveIntegerField(verbose_name="Chạy xa")
+    keo_xe = models.PositiveIntegerField(verbose_name="Kéo xe")
+    keo_xe_ngay_le = models.PositiveIntegerField(verbose_name="Kéo xe ngày lễ")
+    chay_ngay_le = models.PositiveIntegerField(verbose_name="Chạy ngày lễ")
+    tanbo_ngay_le = models.PositiveIntegerField(verbose_name="Tanbo ngày lễ")
+    chay_xa_dem = models.PositiveIntegerField(verbose_name="Chạy xa đêm")
+    luong_co_ban = models.PositiveIntegerField(verbose_name="Lương cơ bản")
+    tanbo_cat_bc = models.PositiveIntegerField(verbose_name="Tanbo cát BC")
+    tanbo_hh = models.PositiveIntegerField(verbose_name="Tanbo HH")
+    chay_thue_sr = models.PositiveIntegerField(verbose_name="Chạy thuê SR")
+    tanbo_cat_bc_dem = models.PositiveIntegerField(verbose_name="Tanbo cát BC đêm")
+    tanbo_doi_3 = models.PositiveIntegerField(verbose_name="Tanbo Đội 3")
+    chay_nhua = models.PositiveIntegerField(verbose_name="Chạy nhựa")
+    chay_nhua_dem = models.PositiveIntegerField(verbose_name="Chạy nhựa đêm")
+    keo_xe_dem = models.PositiveIntegerField(verbose_name="Kéo xe đêm")
+
+    def __str__(self):
+        return str(self.xe)
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['xe', 'chay_ngay', 'chay_dem', 'tanbo_ngay', 'tanbo_dem', 'chay_xa',
+                  'keo_xe', 'keo_xe_ngay_le', 'chay_ngay_le', 'tanbo_ngay_le', 'chay_xa_dem',
+                  'luong_co_ban', 'tanbo_cat_bc', 'tanbo_hh', 'chay_thue_sr', 'tanbo_cat_bc_dem',
+                  'tanbo_doi_3', 'chay_nhua', 'chay_nhua_dem', 'keo_xe_dem']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+
+class DumbTruckRevenueData(BaseModel):
+    # Choices for 'Loại chạy'
+    LOAI_CHAY_CHOICES = [
+        ('chay_ngay', 'Chạy ngày'),
+        ('chay_dem', 'Chạy đêm'),
+        ('chay_xa', 'Chạy xa'),
+        ('tanbo_ngay', 'Tanbo ngày'),
+        ('tanbo_dem', 'Tanbo đêm'),
+    ]
+
+    # Choices for 'Cách tính'
+    CACH_TINH_CHOICES = [
+        ('tren_1_km', 'Trên 1 km'),
+        ('tren_chuyen', 'Trên chuyến'),
+    ]
+
+    # Choices for 'Loại vật tư'
+    LOAI_VAT_TU_CHOICES = [
+        ('khong_vat_tu', 'Không vật tư'),
+        ('cat_dat_da', 'Cát, đá, đất'),
+        ('vat_tu_khac', 'Vật tư khác'),
+    ]
+
+    # Choices for 'Mốc'
+    MOC_CHOICES = [
+        ('moc_1_20km', 'Mốc 1 (0-20km)'),
+        ('moc_2_35km', 'Mốc 2 (0-35)'),
+        ('moc_3_55km', 'Mốc 3 (0-55)'),
+    ]
+
+    # Choices for 'Kích cỡ xe'
+    KICH_CO_XE_CHOICES = [
+        ('xe_nho', 'Xe nhỏ'),
+        ('xe_lon', 'Xe lớn'),
+    ]
+
+    loai_chay = models.CharField(
+        max_length=255, choices=LOAI_CHAY_CHOICES, verbose_name="Loại chạy"
+    )
+    cach_tinh = models.CharField(
+        max_length=255, choices=CACH_TINH_CHOICES, verbose_name="Cách tính"
+    )
+    loai_vat_tu = models.CharField(
+        max_length=255, choices=LOAI_VAT_TU_CHOICES, verbose_name="Loại vật tư"
+    )
+    moc = models.CharField(max_length=255, choices=MOC_CHOICES, verbose_name="Mốc")
+    kich_co_xe = models.CharField(
+        max_length=255, choices=KICH_CO_XE_CHOICES, verbose_name="Kích cỡ xe"
+    )
+    don_gia = models.PositiveIntegerField(verbose_name="Đơn giá")
+
+    def __str__(self):
+        return f"{self.loai_chay} - {self.kich_co_xe}"
+    @classmethod
+    def get_display_fields(self):
+        fields = ['loai_chay', 'cach_tinh', 'loai_vat_tu', 'moc', 'kich_co_xe', 'don_gia']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+
+class Location(BaseModel):
+    TYPE_OF_LOCATION_CHOICES = [
+        ('du_an', 'Dự án/công trình'),
+        ('kho_noi_bo', 'Kho nội bộ'),
+        ('bat_dong_san_noi_bo', 'Bất động sản nội bộ'),
+        ('khach_hang_dau_ra', 'Khách hàng đầu ra'),
+        ('khach_hang_dau_vao', 'Khách hàng đầu vào'),
+    ]
+
+    name = models.CharField(max_length=500, verbose_name="Tên địa điểm")
+    address = models.CharField(max_length=1000, verbose_name="Địa chỉ")
+    type_of_location = models.CharField(max_length=255, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại hình")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['name', 'address', 'type_of_location']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return self.name
+
 
 
 # Model báo cáo chuyến (file báo cáo xe ben tháng 8)

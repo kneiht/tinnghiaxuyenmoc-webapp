@@ -15,13 +15,68 @@
     <div up-hungry id="modal"></div>
     <main>
         {% include 'components/nav_bar.html' %}
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_data_vehicle_type_details' %}">
+
+        <div id="database-selection" class="flex items-center m-auto mb-2" 
+                onclick="
+                    event.target.closest('a').classList.add('bg-slate-300', 'dark:active:bg-slate-700');
+                    document.querySelectorAll('#database-selection a').forEach((button) => {
+                        if (button !== event.target.closest('a')) {
+                            button.classList.remove('bg-slate-300', 'dark:active:bg-slate-700');
+                        }
+                    });">
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_manage_data' model='DataVehicleTypeDetail' %}" 
+                    class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
+                    Dữ liệu loại xe chi tiết
+
+                </a>
+                
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_manage_data' model='DataVehicle' %}" 
+                    class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                    Dữ liệu xe
+                    
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_manage_data' model='DataDriver' %}" 
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    Dữ liệu tài xế
+                
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_manage_data' model='DumbTruckPayRate' %}" 
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    Dữ liệu tính lương tài xế xe ben
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_manage_data' model='DumbTruckRevenueData' %}" 
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    Dữ liệu tính doanh thu xe ben
+                
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                href="{% url 'load_content' page='page_manage_data' model='Location' %}" 
+                class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
+                Dữ liệu địa điểm
+            
+            </a>
+
+        </div>
+
+
+        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_manage_data' model='DataVehicleTypeDetail' %}">
             Loading content
         </div>
-        <div up-hungry id="title-bar"></div>
-        <div up-hungry id="extra-tool-bar"></div>
+
         <div up-hungry id="tool-bar"></div>
+        <!-- <div up-hungry id="infor-bar"></div> -->
         <div up-hungry id="display-records"></div>
+        
     </main>
 {% endblock %}
 

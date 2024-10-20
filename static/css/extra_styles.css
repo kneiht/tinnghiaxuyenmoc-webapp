@@ -184,9 +184,20 @@
 
 
 
-.circle-bar-container {
-  margin: 20px;
-  width: 200px;
-  height: 200px;
-  position: relative;
+
+/* STATUS STYLES */
+.active {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.on_leave {
+  background-image: linear-gradient(310deg, #b54d0d 0%, #ff9c4b 100%);
+}
+
+.resigned {
+  background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
+}
+
+.terminated {
+  background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
 }

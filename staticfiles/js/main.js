@@ -268,6 +268,19 @@ up.compiler('.select-date', function(selectDate) {
 
 
 
+up.compiler('#record-edit', function(recordEdit) {
+    console.log(recordEdit);
+    function getClosestRecordElement() {
+        let closestRecord = recordEdit.closest('[id*="record_"]');
+        closestRecord.addEventListener('dblclick', function() {
+            recordEdit.click();
+        });
+    
+    }
+    getClosestRecordElement();
+})
+
+
 
 
 // // MODAL HANDLING =========================================

@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Tất cả dự án
+{% endblock %}
+
+
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <div up-hungry id="modal"></div>
+    <main>
+        {% include 'components/nav_bar.html' %}
+        <div id="load-content" up-defer up-href="">
+            Loading content
+        </div>
+        <div up-hungry id="title-bar"></div>
+        <div up-hungry id="tool-bar"></div>
+        <div up-hungry id="display-records"></div>
+    </main>
+{% endblock %}
+
+{% block extra_script %}
+{% endblock %}
+
+
+
+
