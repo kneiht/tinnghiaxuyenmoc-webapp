@@ -8,7 +8,7 @@
 
         {% if page == 'page_each_project' %}
 
-            <a id="show-weekplan" up-target="#display-records, #tool-bar" up-preload href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap"
+            <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap"
                     onclick="
                         var x = document.getElementById('show-weekplan'), y = document.getElementById('show-all-jobs'); 
                         x.classList.toggle('hidden'); y.classList.toggle('hidden');
@@ -21,7 +21,7 @@
                 <span class="me-3"> Xem kế hoạch tuần </span>
             </a>
 
-            <a id="show-all-jobs" up-target="#display-records, #tool-bar" up-preload href="{{ request.path }}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap hidden"
+            <a id="show-all-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{{ request.path }}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap hidden"
                     onclick="
                         var x = document.getElementById('show-weekplan'), y = document.getElementById('show-all-jobs'); 
                         x.classList.toggle('hidden'); y.classList.toggle('hidden')
@@ -42,7 +42,7 @@
         {% endif %}
         
         {% if text.create_new_button_name %}
-        <a id="create-new" href="{{ text.create_new_form_url }}" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
+        <a id="create-new" href="{{ text.create_new_form_url }}" up-preload="insert" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
         </a>

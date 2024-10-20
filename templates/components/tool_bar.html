@@ -52,7 +52,7 @@
         </div>
     </form>
     {% if text.create_new_button_name %}
-        <a href="{{ text.create_new_form_url }}" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap hidden">
+        <a href="{{ text.create_new_form_url }}" up-preload="insert" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap hidden">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
         </a>
