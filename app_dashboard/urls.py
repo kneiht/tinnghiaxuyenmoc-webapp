@@ -1,5 +1,5 @@
 
-from . import views, views_backup, views_components
+from . import views, views_backup
 from django.urls import re_path, path
 
 

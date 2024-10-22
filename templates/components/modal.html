@@ -40,7 +40,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'project' %}
+                        {% if field.name != 'project' and field.name != 'description'%}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -53,11 +53,21 @@
                                         <p class="text-red-500 px-3">{{ error }}</p>
                                     {% endfor %}
                                 </div>
-
                         </div>
                         {% endif %}
                     {% endfor %}
+
+                    {% if form.description.name == 'description' %}  
+                    <div class="col-span-full">
+                            <label for="description" class="text-theme">Mô tả</label>
+                            <textarea placeholder="Nhập mô tả"  "description" cols="40" class="form-input h-20" id="id_description"></textarea> 
+                    </div>
+                    {% endif %}
+
+
                 </div>
+
+
 
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
                     <button type="submit" class="btn btn-primary rounded-full w-36" onclick="this.form.delete.value = 'false';">

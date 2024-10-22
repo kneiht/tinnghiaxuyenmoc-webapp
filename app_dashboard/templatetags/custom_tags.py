@@ -14,7 +14,11 @@ import datetime
 def format_display(record, field):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
-    value = getattr(record, field)  
+    value = getattr(record, field)
+
+    if field in {'unit_price', 'total_amount'}:
+        return "{:,}".format(int(value))
+    
     _type = type(value)
     if _type == datetime.date:
         return value.strftime("%d/%m/%Y")

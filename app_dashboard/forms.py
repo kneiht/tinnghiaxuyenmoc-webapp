@@ -21,7 +21,7 @@ def validate_username_length(value, min_length=6):
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'status', 'description', 'image', 'start_date', 'end_date']
+        fields = ['name', 'status', 'description', 'start_date', 'end_date', 'image']
 
     
         labels = {
@@ -67,14 +67,15 @@ class ProjectForm(forms.ModelForm):
 class JobForm(forms.ModelForm):
     class Meta:
         model = Job
-        fields = ['project', 'name', 'status', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date']
+        fields = ['project', 'name', 'status', 'category', 'unit', 'unit_price', 'quantity', 'start_date', 'end_date', 'description']
 
         labels = {
             'status': 'Trạng thái',
             'name': 'Tên công việc',
             'category': 'Loại công việc',
             'unit': 'Đơn vị',
-            'quantity': 'Số lượng',
+            'unit_price': 'Đơn giá',
+            'quantity': 'Khối lượng',
             'description': 'Mô tả',
             'start_date': 'Ngày bắt đầu',
             'end_date': 'Ngày kết thúc',
@@ -94,8 +95,13 @@ class JobForm(forms.ModelForm):
                     'placeholder': 'Đơn vị',
                     'required': 'required',
                     'class': 'form-input'}),
+
+            'unit_price': forms.NumberInput(attrs={
+                    'placeholder': 'Đơn giá',
+                    'class': 'form-input'}),
+
             'quantity': forms.NumberInput(attrs={
-                    'placeholder': 'Số lượng',
+                    'placeholder': 'Khối lượng',
                     'class': 'form-input'}),
             'description': forms.Textarea(attrs={
                     'class': 'form-input', 

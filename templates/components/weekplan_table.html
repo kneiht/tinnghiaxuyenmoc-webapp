@@ -106,10 +106,10 @@
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ record.job.category }}
+                    {{ record.job|format_display:"category" }}
                 </td>
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    <span class="{{ record.job.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record.job.get_status_display }}</span>
+                    <span class="{{ record.job.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record.job|format_display:"status" }}</span>
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -117,11 +117,11 @@
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ record.job.quantity|intcomma }}
+                    {{ record.job|format_display:"quantity" }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ record.plan_quantity|intcomma }}
+                    {{ record|format_display:"plan_quantity" }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -130,7 +130,7 @@
 
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ record.date_quantity|intcomma }}
+                    {{ record|format_display:"date_quantity" }}
                 </td>
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                     {{ record.date_note }}
@@ -138,23 +138,34 @@
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                     <div class="flex flex-col gap-2">
-                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
-                                <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
-                                    {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
-                                        {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }} ngày
-                                    {% else %}
-                                        {{ record.job.get_status_display }}
-                                    {% endif %}
+
+                        {% if record.progress_by_time.status != "not_started" %}
+                            <div class="flex flex-row items-center text-theme w-52">
+                                <i class="fas fa-clock w-6" aria-hidden="true"></i>   
+
+                                <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                    <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                                        {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
+                                            {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }}
+                                        {% else %}
+                                            {{ record.job.get_status_display }}
+                                        {% endif %}
+                                    </div>
                                 </div>
+                            </div>
 
-                        </div>
+                            <div class="flex flex-row items-center text-theme w-52">
+                                <i class="fas fa-check-double w-6" aria-hidden="true"></i>   
+                                <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                    <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
+                                        {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
+                                    </div>
 
-                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
-                                <div class="bg-{{ record.progress_by_quantity.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_quantity.percent }}%">
-                                    {{ record.progress_by_quantity.total_quantity_reported|intcomma }} / {{ record.progress_by_quantity.total_quantity|intcomma }} khối lượng
                                 </div>
-
-                        </div>
+                            </div>
+                            {% else %}
+                                Công việc chưa đến ngày bắt đầu
+                            {% endif %}
                     </div>
                 </td>
 

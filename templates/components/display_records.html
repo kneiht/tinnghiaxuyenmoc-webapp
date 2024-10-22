@@ -8,7 +8,7 @@
     gap-6 grid mt-5">
         {% for record in records %}
             <div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
-                <a href="{% url 'page_each_project' record.pk %}">
+                <a up-preload href="{% url 'page_each_project' record.pk %}">
                     <div class="card-image-container">
                         {% if record.image %}
                         <img src="{{ record.image.url }}" alt="{{ record.name }}"
@@ -22,7 +22,7 @@
     
                 <div class="flex justify-between items-center px-2 relative">
                     <div class="w-10/12">
-                        <h3 class="text-md font-semibold text-theme text-center pl-1 truncate">
+                        <h3 class="text-md font-semibold text-theme text-center pl-1">
                             {{ record }}
                         </h3>
                     </div>
@@ -30,8 +30,9 @@
                     <div class="w-2/12 text-sm opacity-100 flex justify-end items-center">
                         <div class="w-10 h-10 flex justify-end items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
-                                href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=4" alt="Edit Record" class="w-6 h-6">
+                            up-preload    
+                            href="{{ record.edit_form_url }}" up-target=":none">
+                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </div>
@@ -71,7 +72,7 @@
                             <i class="fas fa-bullseye w-6" aria-hidden="true"></i>   
                             <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                 <div class="bg-cyan-500 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_plan.percent }}%">
-                                    {{ record.progress_by_plan.planned_quantity_to_now_project|intcomma }} / {{ record.progress_by_plan.quantity|intcomma }}
+                                    {{ record.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ record.progress_by_plan.quantity|intcomma }}
                                 </div>
                             </div>
                         </div>
@@ -79,8 +80,8 @@
                         <div class="flex flex-row items-center ">
                             <i class="fas fa-check-double w-6" aria-hidden="true"></i>   
                             <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
-                                    <div class="bg-{{ record.progress_by_quantity.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_quantity.percent }}%">
-                                        {{ record.progress_by_quantity.total_quantity_reported|intcomma }} / {{ record.progress_by_quantity.total_quantity|intcomma }}
+                                    <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
+                                        {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
                                     </div>
 
                             </div>
@@ -101,7 +102,7 @@
 
 
 {% elif model == 'Job' %}
-<div id="display-records" >
+<div id="display-records" class="w-full overflow-scroll">
     <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
         <thead>
@@ -134,7 +135,8 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         <div class="flex flex-col gap-2">
 
-                            <div class="flex flex-row items-center text-theme">
+                        {% if record.progress_by_time.status != "not_started" %}
+                            <div class="flex flex-row items-center text-theme w-52">
                                 <i class="fas fa-clock w-6" aria-hidden="true"></i>   
 
                                 <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
@@ -149,15 +151,18 @@
                                 </div>
                             </div>
 
-                            <div class="flex flex-row items-center text-theme">
+
+                            <div class="flex flex-row items-center text-theme w-52">
                                 <i class="fas fa-check-double w-6" aria-hidden="true"></i>   
                                 <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
-                                    <div class="bg-{{ record.progress_by_quantity.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_quantity.percent }}%">
-                                        {{ record.progress_by_quantity.total_quantity_reported|intcomma }} / {{ record.progress_by_quantity.total_quantity|intcomma }}
+                                    <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
+                                        {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
                                     </div>
-
                                 </div>
                             </div>
+                            {% else %}
+                                Công việc chưa đến ngày bắt đầu
+                            {% endif %}
                         </div>
                     </td>
 
@@ -166,8 +171,8 @@
                     <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
-                                href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=4" alt="Edit Record" class="w-6 h-6">
+                            up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>
@@ -211,8 +216,8 @@
                     <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
-                                href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=4" alt="Edit Record" class="w-6 h-6">
+                            up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>
