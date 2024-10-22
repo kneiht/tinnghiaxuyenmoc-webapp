@@ -1,26 +1,81 @@
-
+{% load humanize %}
+{% load custom_tags %}
 {% if page == 'page_each_project' %}
-
-    <div id="infor-bar" class="card p-2 mt-2 flex flex-row justify-center items-center gap-4 w-full">
-        <span class="badge badge-primary">
-            <span class="me-3"> Số lượng công việc: {{ text.total_jobs }} </span>
-        </span>
-
-        <span class="badge badge-primary">
-            <span class="me-3"> Số lượng công việc đã hoàn thành: {{ text.total_jobs_done }} </span>
-        </span>
-
-        <span class="badge badge-primary">
-            <span class="me-3"> Số lượng đang thực hiện: {{ text.total_jobs_in_progress }} </span>
-        </span>
-
-        <span class="badge badge-primary">
-            <span class="me-3"> Số lượng đang tạm hoãn: {{ text.total_jobs_pending }} </span>
-        </span>
-
-        <span class="badge badge-primary">
-            <span class="me-3"> Số lượng chưa bắt đầu: {{ text.total_jobs_not_started }} </span>
-        </span>
-
+<div id="infor-bar" class="card p-4 mt-4 mb-3 flex flex-col md:flex-row justify-between items-center gap-4 w-full bg-white shadow-md rounded-lg">
+    
+    <!-- Project Information -->
+    <div class="flex flex-col gap-2 text-center md:text-left">
+        <p class="{{ project.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ project.get_status_display }}</p>
+        <p class="text-md text-theme">Bắt đầu: {{ project|format_display:"start_date" }}</p>
+        <p class="text-md text-theme">Kết thúc: {{ project|format_display:"end_date" }}</p>
     </div>
+
+    <!-- Job Statistics -->
+    <div class="flex flex-row gap-4 w-full max-w-lg ">
+        <div class="flex flex-col gap-2 text-center">
+            <span class="inline-flex items-center px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                Số lượng công việc: {{ text.total_jobs }}
+            </span>
+            <span class="inline-flex items-center px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                Số lượng công việc đã hoàn thành: {{ text.total_jobs_done }}
+            </span>
+            <span class="inline-flex items-center px-4 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
+                Số lượng đang thực hiện: {{ text.total_jobs_in_progress }}
+            </span>
+        </div>
+
+        <!-- Job Statistics -->
+        <div class="flex flex-col gap-2 text-center">
+            <span class="inline-flex items-center px-4 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                Số lượng đang tạm hoãn: {{ text.total_jobs_pending }}
+            </span>
+            <span class="inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                Số lượng chưa bắt đầu: {{ text.total_jobs_not_started }}
+            </span>
+        </div>
+    </div>
+
+
+
+    <!-- Progress Bars -->
+    <div class="flex flex-col gap-4 w-full max-w-lg">
+        
+        <!-- Time Progress -->
+        <div class="flex items-center space-x-2 text-nowrap">
+            <i class="fas fa-clock text-blue-500"></i>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-{{ text.progress_by_time.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_time.percent }}%">
+                    {% if text.progress_by_time.status != 'gray' and text.progress_by_time.status != 'green' %}
+                        {{ text.progress_by_time.progress }} / {{ text.progress_by_time.duration }}
+                    {% else %}
+                        {{ text.get_status_display }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Progress -->
+        <div class="flex items-center space-x-2 text-nowrap">
+            <i class="fas fa-bullseye text-cyan-500"></i>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-cyan-500 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_plan.percent }}%">
+                    {{ text.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ text.progress_by_plan.total_amount|intcomma }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Amount Progress -->
+        <div class="flex items-center space-x-2 text-nowrap">
+            <i class="fas fa-check-double text-green-500"></i>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-{{ text.progress_by_amount.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_amount.percent }}%">
+                    {{ text.progress_by_amount.total_amount_reported|intcomma }} / {{ text.progress_by_amount.total_amount|intcomma }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
 {% endif %}

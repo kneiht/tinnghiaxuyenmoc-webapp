@@ -32,7 +32,7 @@
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload    
                             href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v=6" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </div>
@@ -54,7 +54,7 @@
     
                     <div class="flex flex-col gap-2">
                         <div class="flex flex-row items-center ">
-                            <i class="fas fa-clock w-6" aria-hidden="true"></i>   
+                            <i class="fas fa-clock text-blue-500 w-6" aria-hidden="true"></i>   
                             <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                  
                                 <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
@@ -72,13 +72,13 @@
                             <i class="fas fa-bullseye w-6" aria-hidden="true"></i>   
                             <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                 <div class="bg-cyan-500 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_plan.percent }}%">
-                                    {{ record.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ record.progress_by_plan.quantity|intcomma }}
+                                    {{ record.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ record.progress_by_plan.total_amount|intcomma }}
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex flex-row items-center ">
-                            <i class="fas fa-check-double w-6" aria-hidden="true"></i>   
+                            <i class="fas fa-check-double text-green-500 w-6" aria-hidden="true"></i>   
                             <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                     <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
                                         {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
@@ -137,7 +137,7 @@
 
                         {% if record.progress_by_time.status != "not_started" %}
                             <div class="flex flex-row items-center text-theme w-52">
-                                <i class="fas fa-clock w-6" aria-hidden="true"></i>   
+                                <i class="fas fa-clock text-blue-500 w-6" aria-hidden="true"></i>   
 
                                 <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                         <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
@@ -153,7 +153,7 @@
 
 
                             <div class="flex flex-row items-center text-theme w-52">
-                                <i class="fas fa-check-double w-6" aria-hidden="true"></i>   
+                                <i class="fas fa-check-double text-green-500 w-6" aria-hidden="true"></i>   
                                 <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
                                     <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
                                         {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
@@ -172,7 +172,7 @@
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v=6" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>
@@ -217,7 +217,7 @@
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v=5" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v=6" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>

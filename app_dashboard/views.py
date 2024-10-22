@@ -151,7 +151,7 @@ def progress_by_amount(record, check_date=None):
         total_amount = record.job_set.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
         
         # Calculate the amount of all job reports
-        job_date_reports = JobDateReport.objects.filter(job__project=record)
+        job_date_reports = JobDateReport.objects.filter(job__project=record, date__lte=check_date)
         total_amount_reported = job_date_reports.aggregate(Sum('date_amount'))['date_amount__sum'] or 0
 
     elif record.__class__.__name__ == 'Job':
@@ -223,7 +223,7 @@ def progress_by_plan(record, check_date = None):
 
     res = {
         'planned_amount_to_now_project': int(planned_amount_to_now_project),
-        'quantity': int(project_amount),
+        'total_amount': int(project_amount),
         'percent': percent
     }
     return res
@@ -236,7 +236,8 @@ def progress_by_plan(record, check_date = None):
 
 
 
-def render_infor_bar(request, page, project_id):
+def render_infor_bar(request, page, project_id, check_date=None):
+    # print(check_date)
     text_dict = {}
     if page == 'page_each_project':
         project = Project.objects.filter(pk=project_id).first()
@@ -247,13 +248,18 @@ def render_infor_bar(request, page, project_id):
             'total_jobs_not_started': number_of_jobs['not_started'],
             'total_jobs_done': number_of_jobs['done'],
             'total_jobs_pending': number_of_jobs['pending'],
+            'progress_by_time': progress_by_time(project, check_date=check_date),
+            'progress_by_amount': progress_by_amount(project, check_date=check_date),
+            'progress_by_plan': progress_by_plan(project, check_date=check_date),
         }
 
-    # Render
-    template = 'components/infor_bar.html'
-    context = {'page': page, 'text': text_dict}
-    return render_to_string(template, context, request)
-
+        # Render
+        template = 'components/infor_bar.html'
+        context = {'page': page, 'text': text_dict, 'project': project}
+        # print(context)
+        return render_to_string(template, context, request)
+    else:
+        return None
 
 
 
@@ -322,8 +328,6 @@ def render_display_records(request, model_class, records, update=None, check_dat
         for field in model_class.get_display_fields():
             fields.append(field)
             headers.append(model_class._meta.get_field(field).verbose_name)
-    print('>>>>', headers)
-
 
     if model_class == Job:
         for record in records:
@@ -370,9 +374,7 @@ def render_form(request, model, pk=0, form=None):
         form = form_class(instance=record) if record else form_class()
     else:
         # Get project id from the form
-        print(request.POST)
         project_id = request.POST.get('project')
-        print('project_id', project_id)
         text_dict['project_id'] = project_id
 
 
@@ -397,7 +399,7 @@ def render_weekplan_table(request, project_id, check_date=None):
     except:
         check_date = timezone.now().date()
 
-    print('>>>>>>>>>>>>>> check_date', check_date, type(check_date))
+    # print('>>>>>>>>>>>>>> check_date', check_date, type(check_date))
     # Get monday and sunday dates of the week that contains check_date
     monday = check_date - timedelta(days=check_date.weekday())
     sunday = check_date + timedelta(days=6 - check_date.weekday())
@@ -407,7 +409,7 @@ def render_weekplan_table(request, project_id, check_date=None):
     job_date_reports = JobDateReport.objects.filter(date=check_date, job__project=project)
 
 
-    print('>>>>>>> job_date_reports', job_date_reports)
+    # print('>>>>>>> job_date_reports', job_date_reports)
 
     jobs = Job.objects.filter(project=project)
 
@@ -440,7 +442,7 @@ def render_weekplan_table(request, project_id, check_date=None):
         jobplan_in_week.progress_by_amount = progress_by_amount(jobplan_in_week, check_date=check_date)
         
 
-    print('>>>>>>>>>>>>>> jobplans_in_week', jobplans_in_week)
+    # print('>>>>>>>>>>>>>> jobplans_in_week', jobplans_in_week)
 
 
     template = 'components/weekplan_table.html'
@@ -572,7 +574,12 @@ def load_content(request, page, model, project_id=None):
     html_load_content = '<div id="load-content" class"hidden"></div>'
     html_title_bar = render_title_bar(request, page, model=model, project_id=project_id, check_date=check_date)
     html_tool_bar = render_tool_bar(request, page, model=model, project_id=project_id)
-    html_infor_bar = render_infor_bar(request, page, project_id=project_id)
+    
+    if page == 'page_each_project':
+        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
+    else:
+        html_infor_bar = ''
+
     # Check the page to render specific content
     model_class = globals()[model]
     if not project_id:
@@ -615,17 +622,22 @@ def handle_weekplan_form(request):
             except:
                 quantity = 0
 
+            if type(note) != str: note = ''
+
+
             if quantity > job.quantity:
                 message = f'Lỗi khi nhập khối lượng kế hoạch cho công việc "{job.name}". Khối lượng kế hoạch phải nhỏ hơn khối lượng công việc ({str(job.quantity)}).'
                 html_message = render_message(request, message=message, message_type='red')
                 return HttpResponse(html_message)
-            if not note and not quantity:
-                continue
-
+            
 
 
             jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
-
+            if quantity == 0 and note.strip() == '':
+                if jobplan:
+                    print('jobplan: ', jobplan)
+                    jobplan.delete()
+                continue
 
             if jobplan:
                 jobplan.note = note
@@ -641,8 +653,9 @@ def handle_weekplan_form(request):
                     note=note
                 ).save()
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
+        html_infor_bar = render_infor_bar(request, 'page_each_project', project_id=project_id, check_date=check_date)
         html_message = render_message(request, message='Cập nhật thông tin thành công')
-        return HttpResponse(html_message + html_weekplan_table)
+        return HttpResponse(html_message + html_weekplan_table + html_infor_bar)
 
     except Exception as e:
         # raise e
@@ -655,11 +668,10 @@ def handle_date_report_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     form = request.POST
-    print(form)
     try:
         check_date = form.get('check_date')
         project_id = form.get('project_id')
-        print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
+        # print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
         for job in jobs:
@@ -669,7 +681,7 @@ def handle_date_report_form(request):
                 quantity = int(quantity)
             except:
                 quantity = 0
-
+            if type(note) != str: note = ''
 
             job_date_report = JobDateReport.objects.filter(job=job, date=check_date).first()
 
@@ -677,14 +689,16 @@ def handle_date_report_form(request):
 
             total_quantity_reported = progress_by_quantity(job)['total_quantity_reported'] - current_date_quantity
             total_quantity_left = job.quantity - total_quantity_reported
-            print('>>>>>>>>>>>>>>> total_amount_reported:', total_quantity_reported, 'total_quantity_left:', total_quantity_left)
+            # print('>>>>>>>>>>>>>>> total_amount_reported:', total_quantity_reported, 'total_quantity_left:', total_quantity_left)
             if int(quantity) > total_quantity_left:
                 message = f'Lỗi khi nhập khối lượng hoàn thành (đang nhập {quantity}) trong ngày cho công việc "{job.name}". Khối lượng hoàn thành phải nhỏ hơn khối lượng còn lại ({str(total_quantity_left)}).'
                 html_message = render_message(request, message=message, message_type='red')
                 return HttpResponse(html_message)
 
 
-            if not note and not quantity:
+            if quantity == 0 and note.strip() == '':
+                if job_date_report:
+                    job_date_report.delete()
                 continue
             
             if job_date_report:
@@ -702,8 +716,9 @@ def handle_date_report_form(request):
 
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
         html_message = render_message(request, message='Cập nhật báo cáo thành công')
-        return HttpResponse(html_message + html_weekplan_table)
-
+        html_infor_bar = render_infor_bar(request, 'page_each_project', project_id=project_id, check_date=check_date)
+        return HttpResponse(html_message + html_weekplan_table + html_infor_bar) 
+    
     except Exception as e:
         # raise e
         html = render_message(request, message='Có lỗi: ' + str(e))
@@ -722,7 +737,6 @@ def page_projects(request):
 @login_required
 def page_each_project(request, pk):
     check_date = request.GET.get('check_date')
-    print('>>>>', 'page_each_project',check_date)
     project = get_object_or_404(Project, pk=pk)
     # Should check if the project is belong to the user
     context = {'project': project, 'check_date': check_date}
