@@ -200,74 +200,7 @@ up.compiler('.display-cards', function(element) {
 
 
 
-up.compiler('#check_date', function(element) {
-    let checkDate = element;
-    // check if there is check_date in params, if yes, set the value of checkDate to it
-    let urlParams = new URLSearchParams(window.location.search);
-    let check_date = urlParams.get('check_date');
-    if (check_date) {
-        checkDate.value = check_date;
-    }
-    else {
-        checkDate.value = new Date().toISOString().slice(0, 10);
-    }
-
-    checkDate.addEventListener('change', function() {
-        // let url = window.location.href.split('?')[0] + `?check_date=${checkDate.value}`;
-
-        let showAllJobs = document.getElementById('show-all-jobs');
-        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showAllJobs.href 
-            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            up.render({ target: '#display-records, #tool-bar, #infor-bar', url: url })
-        }
-
-        let showWeekplan = document.getElementById('show-weekplan');
-        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showWeekplan.href 
-            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            up.render({ target: '#display-records, #tool-bar, #infor-bar', url: url })
-        }
-
-
-    });
-});
-
-
-
-up.compiler('.select-date', function(selectDate) {
-    // If the link is pressed, set the value of check_date to the selected date
-    selectDate.addEventListener('click', function() {
-        // Get data date
-        let dataDate = selectDate.getAttribute('data-date');
-        // Set check_date to the selected date
-        let checkDate = document.getElementById('check_date');
-        checkDate.value = dataDate;
-        
-        // Set check_date in url in href if tag <a> with id show-weekplan
-        let showWeekplan = document.getElementById('show-weekplan');
-        if (showWeekplan) {
-            let currentUrl = showWeekplan.href 
-            let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
-            showWeekplan.href = url;
-        }
-
-        let showAllJobs = document.getElementById('show-all-jobs');
-        if (showAllJobs) {
-            let currentUrl = showAllJobs.href 
-            let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
-            showAllJobs.href = url;
-        }
-        // up.render({ target: '#display-records', url: url })
-    });
-})
-
-
-
 up.compiler('#record-edit', function(recordEdit) {
-    console.log(recordEdit);
     function getClosestRecordElement() {
         let closestRecord = recordEdit.closest('[id*="record_"]');
         closestRecord.addEventListener('dblclick', function() {
@@ -277,4 +210,5 @@ up.compiler('#record-edit', function(recordEdit) {
     }
     getClosestRecordElement();
 })
+
 

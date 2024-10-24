@@ -25,13 +25,12 @@
         rel="stylesheet">
 
 
-    <link id="style" href="{% static 'css/styles.css' %}?v=6" rel="stylesheet" />
-    <link id="style" href="{% static 'css/extra_styles.css' %}?v=6" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}?v=6"/>
+    <link id="style" href="{% static 'css/styles.css' %}?v=7" rel="stylesheet" />
+    <link id="style" href="{% static 'css/extra_styles.css' %}?v=7" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}?v=7"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 
-
+    
     {% block extra_head %}
     {% endblock %}
 </head>
@@ -43,10 +42,11 @@
 
 
     <div style="height: 100px;"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.js"></script>
-    <script src="{% static 'js/main.js' %}?v=6"></script>
-    <script src="{% static 'js/loading-bar.js' %}?v=6"></script>
-
+    <script src="{% static 'js/main.js' %}?v=7"></script>
+    <script src="{% static 'js/loading-bar.js' %}?v=7"></script>
+    <script src="{% static 'js/charts.js' %}?v=7"></script>
     {% block extra_script %}
     {% endblock %}
 </body>

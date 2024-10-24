@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    /* Style the layout */
+    .container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .table-container {
+      width: 45%;
+    }
+
+    .chart-container {
+      width: 45%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+  
+  <script type="text/javascript">
+    google.charts.load('current', {packages: ['timeline']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var container = document.getElementById('timeline-chart');
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      // Define the columns
+      dataTable.addColumn({ type: 'string', id: 'Tên công việc' });
+      dataTable.addColumn({ type: 'string', id: 'Loại công việc' });
+      dataTable.addColumn({ type: 'date', id: 'Bắt đầu' });
+      dataTable.addColumn({ type: 'date', id: 'Kết thúc' });
+
+      // Add your data here (make sure these match your table rows)
+      dataTable.addRows([
+        ['Phát rừng tạo mặt bằng', 'Chưa phân loại', new Date(2024, 9, 22), new Date(2024, 9, 24)],
+        ['sgfsdfg', 'Chưa phân loại', new Date(2024, 9, 22), new Date(2024, 9, 30)],
+        ['2211', 'Chưa phân loại', new Date(2024, 9, 22), new Date(2024, 9, 22)],
+      ]);
+
+      // Draw the chart
+      chart.draw(dataTable);
+    }
+  </script>
+</head>
+
+<body>
+
+  <div class="container">
+    
+    <!-- Table with job information -->
+    <div class="table-container">
+      <h2>Job Information</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tên công việc</th>
+            <th>Loại công việc</th>
+            <th>Bắt đầu</th>
+            <th>Kết thúc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Phát rừng tạo mặt bằng</td>
+            <td>Chưa phân loại</td>
+            <td>22/10/2024</td>
+            <td>24/10/2024</td>
+          </tr>
+          <tr>
+            <td>sgfsdfg</td>
+            <td>Chưa phân loại</td>
+            <td>22/10/2024</td>
+            <td>30/10/2024</td>
+          </tr>
+          <tr>
+            <td>2211</td>
+            <td>Chưa phân loại</td>
+            <td>22/10/2024</td>
+            <td>22/10/2024</td>
+          </tr>
+          <!-- Add more rows as needed -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Gantt chart -->
+    <div class="chart-container">
+      <h2>Gantt Chart</h2>
+      <div id="timeline-chart" style="height: 500px;"></div>
+    </div>
+
+  </div>
+
+</body>
+</html>

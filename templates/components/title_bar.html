@@ -52,6 +52,7 @@
 
 {% if page == 'page_each_project' %}
 <div id="extra-tool-bar" class="flex justify-center hidden">
+    <div class="hidden" id="project-id" data-id="{{ text.project_id }}"></div>
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
         <form action="{% url 'upload_project' text.project_id %}" method="post" enctype="multipart/form-data" id="upload-form"

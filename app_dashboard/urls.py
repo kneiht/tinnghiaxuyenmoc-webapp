@@ -22,15 +22,16 @@ urlpatterns = [
 
     path('api/load-content/<str:page>/<str:model>', views.load_content, name='load_content'),
     path('api/load-content/<str:page>/<str:model>/<int:project_id>', views.load_content, name='load_content_with_project'),
+    path('api/load-element/<str:element>/', views.load_element, name='load_element'),
     
 
-    path('api/load-weekplan-table/<int:project_id>', views.load_weekplan_table, name='load_weekplan_table'),
+    path('api/load-weekplan-table/<int:project_id>/', views.load_weekplan_table, name='load_weekplan_table'),
     path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
     path('api/handle-date-report-form/', views.handle_date_report_form, name='handle_date_report_form'),
 
 
 
-
+    path('test', views.test, name='test.html'),
 
 
 

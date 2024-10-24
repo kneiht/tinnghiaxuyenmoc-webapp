@@ -52,7 +52,7 @@ def progress_by_time(record, check_date=None):
     else:
         if type(check_date) == str:
             check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
-
+    # print('>>>>>>>>>>>>>>>>>>>> progress_by_time', check_date, type(check_date))
 
     duration = (record.end_date - record.start_date).days + 1
     if duration == 0:
@@ -235,9 +235,9 @@ def progress_by_plan(record, check_date = None):
 
 
 
-
 def render_infor_bar(request, page, project_id, check_date=None):
-    # print(check_date)
+    print(check_date)
+    print(project_id)
     text_dict = {}
     if page == 'page_each_project':
         project = Project.objects.filter(pk=project_id).first()
@@ -259,9 +259,22 @@ def render_infor_bar(request, page, project_id, check_date=None):
         # print(context)
         return render_to_string(template, context, request)
     else:
-        return None
+        return HttpResponse("")
 
-
+@login_required
+def load_element(request, element):
+    # Get page
+    page = request.GET.get('page')
+    # Get project_id
+    project_id = request.GET.get('project_id')
+    # Get check_date
+    check_date = request.GET.get('check_date')
+    # Render
+    if element == 'infor_bar':
+        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
+        return HttpResponse(html_infor_bar)
+    else:
+        return HttpResponse("")
 
 
 def render_title_bar(request, page, model, project_id=None, check_date=None):
@@ -756,7 +769,8 @@ def page_transport_department(request):
 
 
 
-
+def test(request):
+    return render(request, 'pages/test.html')
 
 
 
