@@ -21,12 +21,13 @@ def validate_username_length(value, min_length=6):
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'status', 'description', 'start_date', 'end_date', 'image']
+        fields = ['name', 'status', 'image', 'func_source', 'description', 'start_date', 'end_date']
 
     
         labels = {
             'name': 'Tên dự án',
             'status': 'Trạng thái',
+            'func_source': 'Nguồn vốn',
             'description': 'Mô tả',
             'image': 'Hình ảnh',
             'start_date': 'Ngày bắt đầu',
@@ -38,10 +39,15 @@ class ProjectForm(forms.ModelForm):
                     'placeholder': 'Nhập tên dự án',
                     'required': 'required',
                     'class': 'form-input'}),
+            'func_source': forms.TextInput(attrs={
+                    'placeholder': 'Nhập nguồn vốn',
+                    'required': 'required',
+                    'class': 'form-input'}),
+
             'status': forms.Select(attrs={
                     'class': 'form-input'}),
             'description': forms.Textarea(attrs={
-                    'class': 'form-input', 
+                    'class': 'form-input h-20', 
                     'rows': 2}),
             'image': forms.FileInput(attrs={
                     'class': 'form-input-file',}),
@@ -104,7 +110,7 @@ class JobForm(forms.ModelForm):
                     'placeholder': 'Khối lượng',
                     'class': 'form-input'}),
             'description': forms.Textarea(attrs={
-                    'class': 'form-input', 
+                    'class': 'form-input h-20', 
                     'rows': 2}),
             'start_date': forms.DateInput(attrs={
                     'class': 'form-input',

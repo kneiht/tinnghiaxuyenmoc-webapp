@@ -161,6 +161,7 @@ class Project(BaseModel):
     users = models.ManyToManyField(User, through='ProjectUser')
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(default=timezone.now)
+    func_source = models.CharField(max_length=255, default="")
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.name

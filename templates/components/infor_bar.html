@@ -4,10 +4,16 @@
 <div id="infor-bar" class="card p-4 mt-4 mb-3 flex flex-col md:flex-row justify-between items-center gap-4 w-full bg-white shadow-md rounded-lg">
     
     <!-- Project Information -->
-    <div class="flex flex-col gap-2 text-center md:text-left">
+    <div class="flex flex-col gap-2 text-center md:text-left text-nowrap">
         <p class="{{ project.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ project.get_status_display }}</p>
         <p class="text-md text-theme">Bắt đầu: {{ project|format_display:"start_date" }}</p>
         <p class="text-md text-theme">Kết thúc: {{ project|format_display:"end_date" }}</p>
+    </div>
+
+
+    <div class="flex flex-col gap-2 text-center md:text-left px-4">
+        <p class="text-md text-theme">Nguồn vốn: {{ project.func_source }}</p>
+        <p class="text-md text-theme">Mô tả: {{ project.description }}</p>
     </div>
 
     <!-- Job Statistics -->
@@ -24,6 +30,9 @@
             </span>
         </div>
 
+
+
+        
         <!-- Job Statistics -->
         <div class="flex flex-col gap-2 text-center">
             <span class="inline-flex items-center px-4 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">

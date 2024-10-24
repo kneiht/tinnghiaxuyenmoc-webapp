@@ -60,7 +60,7 @@
                     {% if form.description.name == 'description' %}  
                     <div class="col-span-full">
                             <label for="description" class="text-theme">Mô tả</label>
-                            <textarea placeholder="Nhập mô tả"  "description" cols="40" class="form-input h-20" id="id_description"></textarea> 
+                            {{ form.description }}    
                     </div>
                     {% endif %}
 

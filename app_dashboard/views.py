@@ -236,8 +236,6 @@ def progress_by_plan(record, check_date = None):
 
 
 def render_infor_bar(request, page, project_id, check_date=None):
-    print(check_date)
-    print(project_id)
     text_dict = {}
     if page == 'page_each_project':
         project = Project.objects.filter(pk=project_id).first()
@@ -261,20 +259,6 @@ def render_infor_bar(request, page, project_id, check_date=None):
     else:
         return HttpResponse("")
 
-@login_required
-def load_element(request, element):
-    # Get page
-    page = request.GET.get('page')
-    # Get project_id
-    project_id = request.GET.get('project_id')
-    # Get check_date
-    check_date = request.GET.get('check_date')
-    # Render
-    if element == 'infor_bar':
-        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
-        return HttpResponse(html_infor_bar)
-    else:
-        return HttpResponse("")
 
 
 def render_title_bar(request, page, model, project_id=None, check_date=None):
@@ -566,12 +550,53 @@ def handle_form(request, model, pk=0):
 
 
 
+
+
+@login_required
+def get_gantt_chart_data(request, project_id):
+    # Get project
+    project = get_object_or_404(Project, pk=project_id)
+    jobs = project.job_set.all()
+
+    # Get checkdate from params
+    check_date = request.GET.get('check_date')
+
+    
+    # Return json data including job names, start and end dates
+    data = []
+    for job in jobs:
+        data.append({
+            'id': job.secondary_id,
+            'name': job.name,
+            'start': job.start_date.isoformat(),
+            'end': job.end_date.isoformat(),
+            'progress': progress_by_time(job, check_date=check_date)['percent'],
+        })
+    return JsonResponse(data, safe=False)
+
+
+
+
+@login_required
+def load_element(request, element):
+    # Get page
+    page = request.GET.get('page')
+    # Get project_id
+    project_id = request.GET.get('project_id')
+    # Get check_date
+    check_date = request.GET.get('check_date')
+    # Render
+    if element == 'infor_bar':
+        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
+        return HttpResponse(html_infor_bar)
+    else:
+        return HttpResponse("")
+
+
 @login_required
 def load_form(request, model, pk=0):
     html_modal = render_form(request, model, pk)
     return HttpResponse(html_modal)
-
-
 
 
 @login_required
