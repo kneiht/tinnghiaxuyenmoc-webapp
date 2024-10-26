@@ -298,6 +298,8 @@ class JobDateReport(BaseModel):
     date_amount = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
     note = models.TextField(blank=True, null=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
+    material_cost = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Vật tư")  # Material
+    labor_cost = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Nhân công")   # Labor
 
     def save(self, *args, **kwargs):
         self.date_amount = self.quantity * self.job.unit_price

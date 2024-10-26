@@ -421,7 +421,7 @@ def render_weekplan_table(request, project_id, check_date=None):
         
         # Get jobplan in week
         jobplan_in_week = jobplans_in_week.filter(job=job).first()
-        
+        print('>>>>>>>>>>>>>> jobplan_in_week', jobplan_in_week)
         if jobplan_in_week:
             job.plan_note = jobplan_in_week.note
             job.plan_quantity = jobplan_in_week.plan_quantity
@@ -429,15 +429,21 @@ def render_weekplan_table(request, project_id, check_date=None):
             job.plan_quantity = ""
             job.plan_note = ""
 
+        print('>>>>>>>>>>>>>> job', job.plan_quantity, job.plan_note)
+
     for jobplan in jobplans_in_week:
         # Get date report
         job_date_report = job_date_reports.filter(job=jobplan.job, date=check_date).first()
         if job_date_report:
             jobplan.date_quantity = job_date_report.quantity
             jobplan.date_note = job_date_report.note
+            jobplan.date_material_cost = job_date_report.material_cost
+            jobplan.date_labor_cost = job_date_report.labor_cost
         else:
             jobplan.date_quantity = ""
             jobplan.date_note = ""
+            jobplan.date_material_cost = ""
+            jobplan.date_labor_cost = ""
 
 
     for jobplan_in_week in jobplans_in_week:
@@ -721,10 +727,21 @@ def handle_date_report_form(request):
         for job in jobs:
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
+            material_cost = form.get(f'date_material_cost_{job.pk}')
+            labor_cost = form.get(f'date_labor_cost_{job.pk}')
             try:
-                quantity = int(quantity)
+                quantity = float(quantity)
             except:
                 quantity = 0
+            try:
+                material_cost = float(material_cost)
+            except:
+                material_cost = 0
+            try:
+                labor_cost = float(labor_cost)
+            except:
+                labor_cost = 0
+
             if type(note) != str: note = ''
 
             job_date_report = JobDateReport.objects.filter(job=job, date=check_date).first()
@@ -748,6 +765,8 @@ def handle_date_report_form(request):
             if job_date_report:
                 job_date_report.note = note
                 job_date_report.quantity = quantity
+                job_date_report.material_cost = material_cost
+                job_date_report.labor_cost = labor_cost
                 job_date_report.save()
                 continue
             else:
@@ -755,6 +774,8 @@ def handle_date_report_form(request):
                     job=job,
                     date=check_date,
                     quantity=quantity,
+                    material_cost=material_cost,
+                    labor_cost=labor_cost,
                     note=note
                 ).save()
 

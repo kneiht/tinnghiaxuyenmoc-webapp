@@ -209,6 +209,24 @@ up.compiler('#record-edit', function(recordEdit) {
     
     }
     getClosestRecordElement();
-})
+});
 
 
+up.compiler('.expand', function(expand) {
+    // Add event listener to the document
+    document.addEventListener('click', function(event) {
+        // If the target is not the expand element, then remove the style height
+        if (event.target !== expand) {
+            expand.style.height = '';
+        }
+    });
+    // Add event listener to the expand element
+    expand.addEventListener('click', function() {
+        // Add style height 100px
+        expand.style.height = '150px';
+    });
+    expand.addEventListener('focus', function() {
+        // Add style height 100px
+        expand.style.height = '150px';
+    });
+});

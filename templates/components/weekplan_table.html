@@ -90,6 +90,9 @@
 
                         <th class="px-6 py-3 text-left font-semibold">Khối lượng ngày</th>
                         <th class="px-6 py-3 text-left font-semibold">Ghi chú ngày</th>
+                        <th class="px-6 py-3 text-left font-semibold">Vật tư ngày</th>
+                        <th class="px-6 py-3 text-left font-semibold">Nhân công ngày</th>
+
 
                         <th class="px-6 py-3 text-left font-semibold">Tiến độ tuần</th>
                     
@@ -124,7 +127,7 @@
                     {{ record|format_display:"plan_quantity" }}
                 </td>
 
-                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                     {{ record.note }}
                 </td>
 
@@ -132,8 +135,17 @@
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                     {{ record|format_display:"date_quantity" }}
                 </td>
-                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                     {{ record.date_note }}
+                </td>
+
+
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                    {{ record.date_material_cost }}
+                </td>
+
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                    {{ record.date_labor_cost }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -292,11 +304,11 @@
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
 
-                        <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}"/>
+                        <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}" style="width: 150px"/>
                     </td>
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <input type="text" name="note_{{ record.pk }}" class="form-input" 
-                        value="{{ record.plan_note }}" />
+                        <textarea name="note_{{ record.pk }}" class="form-input expand" style="width: 250px"
+                        >{{ record.plan_note }}</textarea>
 
                     </td>
                 </tr>
@@ -351,7 +363,9 @@
                             <th class="px-6 py-3 text-left font-semibold">Khối lượng tổng</th>
                     
                             <th class="px-6 py-3 text-left font-semibold">Khối lượng đã hoàn thành</th>
-
+                            <th class="px-6 py-3 text-left font-semibold">Vật tư</th>
+                            <th class="px-6 py-3 text-left font-semibold">Nhân công</th>
+                            
                             <th class="px-6 py-3 text-left font-semibold">Ghi chú trong ngày</th>
                         
                         <th></th>
@@ -392,13 +406,21 @@
                         {% endif %}
                     {% endfor %}
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-
-                        <input type="number" name="date_quantity_{{ record.job.pk }}" class="form-input" value="{{ record.date_quantity }}"/>
+                        <input type="number" name="date_quantity_{{ record.job.pk }}" class="form-input" value="{{ record.date_quantity }}" style="width: 150px"/>
                     </td>
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <input type="text" name="date_note_{{ record.job.pk }}" class="form-input" 
-                        value="{{ record.date_note }}" />
 
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
+                        <input type="number" name="date_material_cost_{{ record.job.pk }}" class="form-input" value="{{ record.date_material_cost }}" style="width: 150px"/>
+                    </td>
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
+                        <input type="number" name="date_labor_cost_{{ record.job.pk }}" class="form-input" value="{{ record.date_labor_cost }}" style="width: 150px"/>
+                    </td>
+
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
+                        <textarea name="date_note_{{ record.job.pk }}" class="form-input expand" style="width: 250px"
+                        >{{ record.date_note }}</textarea>
                     </td>
                 </tr>
             </tbody>
