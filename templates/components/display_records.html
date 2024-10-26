@@ -32,7 +32,7 @@
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload    
                             href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v={% get_static_version %}" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </div>
@@ -176,7 +176,7 @@
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v={% get_static_version %}" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>
@@ -221,7 +221,7 @@
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v={% get_static_version %}" alt="Edit Record" class="w-6 h-6">
+                                <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
                     </td>
