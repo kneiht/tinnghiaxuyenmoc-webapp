@@ -140,12 +140,13 @@ up.compiler('.just-updated', function (justUpdatedRecord) {
 });
 
 
-
-
-
-
-
-
+// check file size of the upload file, the fuction will be call onchange in the input
+function checkFileSize(file) {
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File phải nhỏ hơn 5 MB');
+    }
+    return true;
+}
 // const tasks = [
 //     { id: 'Task 1', name: 'Phát rừng tạo mặt bằng', start: new Date(2024, 9, 22), end: new Date(2024, 9, 24), progress: 66 },
 //     { id: 'Task 2', name: 'Công việc 2', start: new Date(2024, 11, 22), end: new Date(2024, 12, 22), progress: 22 },
@@ -209,10 +210,26 @@ function drawGanttChart(tasks) {
         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
         .attr("class", "text-gray-700 dark:text-gray-300");
 
+
+
+    // Axis x => show date
     svg.append("g")
         .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d-%m-%Y")))
         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
         .attr("class", "text-gray-700 dark:text-gray-300");
+
+
+
+    // // X-axis with task-specific start and end dates
+    // svg.append("g")
+    //     .call(d3.axisBottom(x)
+    //         .tickValues(tasks.flatMap(d => [d.start, d.end]))  // Custom tick values for each task's start and end date
+    //         .tickFormat(d3.timeFormat("%d-%m-%Y"))  // Date format for ticks
+    //     )
+    //     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+    //     .attr("class", "text-gray-700 dark:text-gray-300");
+
+
 
     svg.append("g")
         .call(d3.axisLeft(y))

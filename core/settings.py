@@ -23,6 +23,8 @@ import json
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = str(Path(__file__).resolve().parent.parent)
 
+# Version to reload static files
+STATIC_VERSION = timezone.now().strftime("%Y%m%d%H%M%S")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

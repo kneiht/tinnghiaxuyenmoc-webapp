@@ -37,7 +37,7 @@ urlpatterns = [
 
 
 
-    path('api/download-project/<int:pk>/', views.download_project, name='download_project'),
-    path('api/upload-project/<int:pk>/', views.upload_project, name='upload_project'),
-    path('api/update-project-progress/<int:pk>/', views.update_project_progress, name='update_project_progress'),
+    path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),
+    path('api/upload-project/<int:project_id>/', views.upload_project, name='upload_project'),
+    
 ]

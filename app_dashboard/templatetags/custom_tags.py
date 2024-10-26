@@ -6,9 +6,11 @@ from app_dashboard.models import Thumbnail
 
 register = template.Library()
 import datetime
+from core import settings
 
-
-
+@register.simple_tag
+def get_static_version():
+    return settings.STATIC_VERSION
 
 @register.filter(name='format_display')
 def format_display(record, field):

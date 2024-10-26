@@ -1,4 +1,4 @@
-{% load static %}
+{% load static custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en" class="light">
@@ -25,9 +25,9 @@
         rel="stylesheet">
 
 
-    <link id="style" href="{% static 'css/styles.css' %}?v=7" rel="stylesheet" />
-    <link id="style" href="{% static 'css/extra_styles.css' %}?v=7" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}?v=7"/>
+    <link id="style" href="{% static 'css/styles.css' %}?v={% get_static_version %}" rel="stylesheet" />
+    <link id="style" href="{% static 'css/extra_styles.css' %}?v={% get_static_version %}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-bar.css' %}?v={% get_static_version %}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.css">
 
     
@@ -44,10 +44,10 @@
     <div style="height: 100px;"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/unpoly@3.9.2/unpoly.min.js"></script>
-    <script src="{% static 'js/main.js' %}?v=7"></script>
-    <script src="{% static 'js/loading-bar.js' %}?v=7"></script>
-    <script src="{% static 'js/charts.js' %}?v=7"></script>
-    <script src="{% static 'js/project.js' %}?v=7"></script>
+    <script src="{% static 'js/main.js' %}?v={% get_static_version %}"></script>
+    <script src="{% static 'js/loading-bar.js' %}?v={% get_static_version %}"></script>
+    <script src="{% static 'js/charts.js' %}?v={% get_static_version %}"></script>
+    <script src="{% static 'js/project.js' %}?v={% get_static_version %}"></script>
     {% block extra_script %}
     {% endblock %}
 </body>

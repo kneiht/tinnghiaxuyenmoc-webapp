@@ -2,11 +2,15 @@
 # https://chat.openai.com/share/16295269-0f56-4c6a-8cd7-7ea903fdaf86
 # cần check truy cập trang cần đúng school_id and user
 
+from core import settings
 import datetime
 import json
 import os
 import re
 import time
+from io import BytesIO
+import pandas as pd
+
 
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -380,8 +384,10 @@ def render_form(request, model, pk=0, form=None):
     return render_to_string(template, context, request)
 
 
-def render_message(request, message, message_type='green'):
-    context = {'message': message, 'message_type': message_type}
+def render_message(request, message, **kwargs):
+    message_type = kwargs.get('message_type', 'green')
+    ok_button_function = kwargs.get('ok_button_function', 'remove_modal')
+    context = {'message': message, 'message_type': message_type, 'ok_button_function': ok_button_function}
     template = 'components/message.html'
     return render_to_string(template, context, request)
 
@@ -801,82 +807,95 @@ def test(request):
 
 
 
-@login_required
-def update_project_progress(request, pk):
-    project = Project.objects.filter(pk=pk).first()
-    project.save()
-    return JsonResponse({'success': True})
+
+
+
+
+
+
+
+
 
 
 @login_required
-def download_project(request, pk):
-    project = Project.objects.filter(pk=pk).first()
-    jobs = Job.objects.filter(project_id=pk)
-    table_names = ['job']
-    def fetch_table_data(table_name):
-        if table_name == 'job':
-            data = jobs.values(
-                'id', 'name', 'category', 'unit', 'quantity', 'description', 'start_date', 'end_date', 'created_at'
-            )
-            df = pd.DataFrame(data)
-            return df
+def download_excel_template(request, template_name):
+    # Get the Excel file from media/excel/Mẫu công việc trong dự án.xlsx
+    excel_file = os.path.join(settings.MEDIA_ROOT, 'excel', f'cong-viec-trong-du-an.xlsx')
 
+    # Return the file
+    with open(excel_file, 'rb') as f:
+        excel_data = f.read()
 
-    # Create a Pandas Excel writer using XlsxWriter as the engine
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        # Loop through tables and write each to a separate sheet
-        for table_name in table_names:
-            data = fetch_table_data(table_name)
-            # Shorten the table name for the Excel sheet
-            shortened_table_name = table_name.replace('', '')
-            data.to_excel(writer, sheet_name=shortened_table_name, index=False)
-
-
-    # Get the Excel file
-    excel_data = output.getvalue()
-
-    # Return the Excel file as an HTTP response
-    response = HttpResponse(
-        excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    # name the db based on time
-    filename = f"Project_download_{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="cong-viec-trong-du-an.xlsx]"'
     return response
 
 
-
 @login_required
-def upload_project(request, pk):
-    if request.method == 'GET':
-        return "API này không dùng GET"
+def upload_project(request, project_id):
+    if request.method != 'POST':
+        return "API này chỉ dùng POST"
 
-    if request.method == 'POST':
-        excel_file = request.FILES.get('file')
-        table = 'job'
-        project = Project.objects.filter(pk=pk).first()
-        if excel_file and excel_file.name.endswith('.xlsx'):
-            df = pd.read_excel(excel_file, sheet_name=table)
-            for index, row in df.iterrows():
-                job = Job(
-                    project=project,
-                    name=row['name'],
-                    category=row['category'],
-                    unit=row['unit'],
-                    quantity=row['quantity'],
-                    description=row['description'],
-                    start_date=row['start_date'],
-                    end_date=row['end_date'],
-                )
-                job.save()
+    excel_file = request.FILES.get('file')
+    project = Project.objects.filter(pk=project_id).first()
 
-            html_message = html_render('message', request, message='Tải dữ liệu lên thành công')
-            return redirect('project', pk=project.pk)
+    if not excel_file:
+        html_message = render_message(request, message='Vui lý nhập file Excel', message_type='red')
+        return HttpResponse(html_message)
+    if not project:
+        html_message = render_message(request, message='Dự án này không tồn tại', message_type='red')
+        return HttpResponse(html_message)
 
+    # Read the data from the Excel file then save as job record
+    df = pd.read_excel(excel_file, header=1)
 
+    # The table uses verbose names in the excel file, so we need to convert the verbose names to real names
+    # Loop through the fields in job
+    for field in Job._meta.get_fields():
+        if not hasattr(field, 'verbose_name'):
+            continue
+        if field.verbose_name in df.columns:
+            df.rename(columns={field.verbose_name: field.name}, inplace=True)
+    # remove duplicate with same name and category
+    df = df.drop_duplicates(subset=['name', 'category'], keep='first')
+    
+    # Before saving any data, we must check if the data of each column is valid
+    errors = ''
+    jobs = []
+    for index, row in df.iterrows():
+        print(">>>>> row:", index)
+        job = Job()
+        job.project = project
+        for field in df.columns:
+            value = row[field]
+            # if value is NaN
+            if pd.isna(value):
+                value = ''
 
-
-
-
+            # If field has choice field, we need to convert the string to the correct value
+            if field == 'status':
+                real_status = ""
+                for choice in job.STATUS_CHOICES:
+                    if value == choice[1]:
+                        real_status = choice[0]
+                        break
+                if real_status:
+                    setattr(job, field, real_status)
+                else:
+                    setattr(job, field, value) # to raise error
+            else:
+                setattr(job, field, value) 
+        try:
+            job.clean()
+        except ValidationError as e:
+            errors += f'Hàng {str(index + 1)}:\n {e.message}' + '\n'
+        jobs.append(job)
+        
+    if errors:
+        html_message = render_message(request, message=errors, message_type='red')
+        return HttpResponse(html_message)
+    else:
+        Job.objects.bulk_create(jobs)
+        html_message = render_message(request, message="Cập nhật thành công", ok_button_function='reload')
+        return HttpResponse(html_message)
 

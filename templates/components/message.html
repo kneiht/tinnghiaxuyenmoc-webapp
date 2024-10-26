@@ -6,11 +6,13 @@
             <!-- Modal Content -->
             <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
                 <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-green-500 dark:text-green-800">Thông báo thành công</h3>
-                <div class="w-[300px] gap-4 px-6 flex justify-center">
-                    <p class="text-theme"> {{ message }} </p>
+                <div class="w-[300px] gap-4 px-6 flex justify-center whitespace-pre-line">
+                    <div class="text-theme whitespace-pre-line leading-10"> {{ message }} </div>
                 </div>
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
-                    <button id='ok' type="button" class="btn btn-primary rounded-full w-36" onclick="document.getElementById('modal-body').remove();">
+                    <button id='ok' type="button" class="btn btn-primary rounded-full w-36" 
+                        onclick="document.getElementById('modal-body').remove();
+                        {% if ok_button_function == 'reload' %} window.location.href = window.location.href; {% endif %}">
                         OK
                     </button>
                 </div>
@@ -23,11 +25,13 @@
             <!-- Modal Content -->
             <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
                 <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-red-500 dark:text-red-800">Thông báo thất bại</h3>
-                <div class="w-[300px] gap-4 px-6 flex justify-center">
-                    <p class="text-theme"> {{ message }} </p>
+                <div style="max-height: 500px; overflow-y: auto;" class="w-[300px] gap-4 px-6">
+                    <p class="text-theme whitespace-pre-line"> {{ message }}</p>
                 </div>
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
-                    <button id='ok' type="button" class="btn btn-primary rounded-full w-36" onclick="document.getElementById('modal-body').remove();">
+                    <button id='ok' type="button" class="btn btn-primary rounded-full w-36" 
+                        onclick="document.getElementById('modal-body').remove();
+                        {% if ok_button_function == 'reload' %} window.location.href = window.location.href; {% endif %}">
                         OK
                     </button>
                 </div>

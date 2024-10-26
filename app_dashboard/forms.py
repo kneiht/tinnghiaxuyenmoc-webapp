@@ -78,7 +78,7 @@ class JobForm(forms.ModelForm):
         labels = {
             'status': 'Trạng thái',
             'name': 'Tên công việc',
-            'category': 'Loại công việc',
+            'category': 'Danh mục',
             'unit': 'Đơn vị',
             'unit_price': 'Đơn giá',
             'quantity': 'Khối lượng',

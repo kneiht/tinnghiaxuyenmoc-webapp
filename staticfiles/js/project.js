@@ -1,3 +1,57 @@
+up.compiler('#show-all-jobs', function () {
+    const showWeekplan = document.getElementById('show-weekplan');
+    const showAllJobs = document.getElementById('show-all-jobs');
+    const showGanttJobs = document.getElementById('show-gantt-jobs');
+    const showTableJobs = document.getElementById('show-table-jobs');
+    const tableChartToggle  = document.getElementById('table-chart-toggle');
+    const jobsPlanToggle  = document.getElementById('jobs-plan-toggle');
+
+    showWeekplan.addEventListener('click', function (e) {
+        showWeekplan.classList.add('hidden');
+        showAllJobs.classList.remove('hidden');
+        tableChartToggle.classList.add('hidden');
+        ganttChartContainer = document.getElementById('gantt-chart-container');
+        ganttChartContainer.classList.add('hidden');
+        document.getElementById('display-records').innerHTML = 'loading';
+        document.getElementById('create-new').classList.add('disabled');
+        document.getElementById('excel-button').classList.add('disabled');
+    });
+
+    showAllJobs.addEventListener('click', function (e) {
+        showWeekplan.classList.remove('hidden');
+        showAllJobs.classList.add('hidden');
+        tableChartToggle.classList.remove('hidden');
+        document.getElementById('display-records').innerHTML = 'loading';
+        document.getElementById('create-new').classList.remove('disabled');
+        document.getElementById('excel-button').classList.remove('disabled');
+    });
+
+
+    showGanttJobs.addEventListener('click', function (e) {
+        ganttChartContainer = document.getElementById('gantt-chart-container');
+        displayRecords = document.getElementById('display-records');
+        showGanttJobs.classList.add('hidden');
+        showTableJobs.classList.remove('hidden');
+        ganttChartContainer.classList.remove('hidden');
+        displayRecords.classList.add('hidden');
+        fetchAndDrawGanttChart();
+    });
+
+    showTableJobs.addEventListener('click', function (e) {
+        ganttChartContainer = document.getElementById('gantt-chart-container');
+        displayRecords = document.getElementById('display-records');
+        showGanttJobs.classList.remove('hidden');
+        showTableJobs.classList.add('hidden');
+        ganttChartContainer.classList.add('hidden');
+        displayRecords.classList.remove('hidden');
+    });
+
+});
+
+
+
+
+
 
 up.compiler('#check_date', function (element) {
     let checkDate = element;
@@ -86,25 +140,53 @@ up.compiler('.just-updated', function (justUpdatedRecord) {
 });
 
 
+// check file size of the upload file, the fuction will be call onchange in the input
+function checkFileSize(file) {
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File phải nhỏ hơn 5 MB');
+    }
+    return true;
+}
+// const tasks = [
+//     { id: 'Task 1', name: 'Phát rừng tạo mặt bằng', start: new Date(2024, 9, 22), end: new Date(2024, 9, 24), progress: 66 },
+//     { id: 'Task 2', name: 'Công việc 2', start: new Date(2024, 11, 22), end: new Date(2024, 12, 22), progress: 22 },
+//     { id: 'Task 3', name: 'Công việc 3', start: new Date(2024, 9, 22), end: new Date(2024, 9, 30), progress: 100 },
+//     { id: 'Task 4', name: 'Công việc 4', start: new Date(2024, 9, 23), end: new Date(2024, 9, 25), progress: 45 },
+//     { id: 'Task 5', name: 'Công việc 5', start: new Date(2024, 9, 23), end: new Date(2024, 9, 27), progress: 80 },
+//     { id: 'Task 6', name: 'Công việc 6', start: new Date(2024, 9, 25), end: new Date(2024, 10, 2), progress: 30 },
+//     { id: 'Task 7', name: 'Công việc 7', start: new Date(2024, 10, 1), end: new Date(2024, 10, 5), progress: 10 }
+// ];
 
+async function fetchAndDrawGanttChart() {
+    let ganttChart = document.getElementById('ganttChart');
+    let projectID = ganttChart.getAttribute('data-project-id');
+    let checkDate = ganttChart.getAttribute('data-check-date');
+    let url = `/api/gantt-chart-data/${projectID}/?check_date=${checkDate}`;
+    console.log(url);
+    const response = await fetch(url);
+    const tasks = await response.json();
 
+    // Convert date strings to Date objects
+    tasks.forEach(task => {
+        const startDate = new Date(task.start);
+        startDate.setHours(0, 0, 0, 0);
+        task.start = startDate;
 
+        const endDate = new Date(task.end);
+        endDate.setHours(0, 0, 0, 0);
+        task.end = endDate;
+    });
+    drawGanttChart(tasks);
+}
 
-const tasks = [
-    { id: 'Task 1', name: 'Phát rừng tạo mặt bằng', start: new Date(2024, 9, 22), end: new Date(2024, 9, 24), progress: 66 },
-    { id: 'Task 2', name: 'Công việc 2', start: new Date(2024, 9, 22), end: new Date(2024, 9, 30), progress: 22 },
-    { id: 'Task 3', name: 'Công việc 3', start: new Date(2024, 9, 22), end: new Date(2024, 9, 22), progress: 100 },
-    { id: 'Task 4', name: 'Công việc 4', start: new Date(2024, 9, 23), end: new Date(2024, 9, 25), progress: 45 },
-    { id: 'Task 5', name: 'Công việc 5', start: new Date(2024, 9, 23), end: new Date(2024, 9, 27), progress: 80 },
-    { id: 'Task 6', name: 'Công việc 6', start: new Date(2024, 9, 25), end: new Date(2024, 10, 2), progress: 30 },
-    { id: 'Task 7', name: 'Công việc 7', start: new Date(2024, 10, 1), end: new Date(2024, 10, 5), progress: 10 }
-];
-
-up.compiler('#ganttChart', function(ganttChart) {
-    const margin = { top: 40, right: 40, bottom: 40, left: 150 };
+function drawGanttChart(tasks) {
+    // Remove previous gantt chart
+    const ganttChart = document.getElementById('ganttChart');
+    ganttChart.innerHTML = '';
+    const margin = { top: 40, right: 40, bottom: 40, left: 130 };
     const width = document.getElementById('ganttChart').offsetWidth - margin.left - margin.right;
     const height = tasks.length * 50 + margin.top + margin.bottom;
-
+    
     const svg = d3.select("#ganttChart")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -128,10 +210,26 @@ up.compiler('#ganttChart', function(ganttChart) {
         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
         .attr("class", "text-gray-700 dark:text-gray-300");
 
+
+
+    // Axis x => show date
     svg.append("g")
-        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%Y-%m-%d")))
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d-%m-%Y")))
         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
         .attr("class", "text-gray-700 dark:text-gray-300");
+
+
+
+    // // X-axis with task-specific start and end dates
+    // svg.append("g")
+    //     .call(d3.axisBottom(x)
+    //         .tickValues(tasks.flatMap(d => [d.start, d.end]))  // Custom tick values for each task's start and end date
+    //         .tickFormat(d3.timeFormat("%d-%m-%Y"))  // Date format for ticks
+    //     )
+    //     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+    //     .attr("class", "text-gray-700 dark:text-gray-300");
+
+
 
     svg.append("g")
         .call(d3.axisLeft(y))
@@ -170,11 +268,13 @@ up.compiler('#ganttChart', function(ganttChart) {
     svg.selectAll("rect")
         .on("mouseover", function (event, d) {
             tooltip.classed("hidden", false)
-                .html(`<strong>${d.name}</strong><br>Start: ${d3.timeFormat("%Y-%m-%d")(d.start)}<br>End: ${d3.timeFormat("%Y-%m-%d")(d.end)}<br>Progress: ${d.progress}%`)
+                .html(`<strong>${d.name}</strong><br>Start: ${d3.timeFormat("%d-%m-%Y")(d.start)}<br>End: ${d3.timeFormat("%d-%m-%Y")(d.end)}<br>Progress: ${d.progress}%`)
                 .style("left", `${event.pageX + 5}px`)
                 .style("top", `${event.pageY - 28}px`);
         })
         .on("mouseout", function () {
             tooltip.classed("hidden", true);
         });
-});
+}
+
+

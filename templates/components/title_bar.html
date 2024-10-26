@@ -50,26 +50,27 @@
     <div class="hidden" id="project-id" data-id="{{ text.project_id }}"></div>
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
-        <form action="{% url 'upload_project' text.project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
+        <form up-target="#display-records:maybe" action="{% url 'upload_project' text.project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
-            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" type="file" id="file" name="file"
-                accept=".xlsx" required />
+            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
+                accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
+            <input type="hidden" name="project" value="{{ text.project_id }}">
             <button class="btn btn-primary" type="submit" id="upload-button">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Nhập Excel </span>
+                <span class="me-3"> Nhập File Excel </span>
             </button>
         </form>
 
 
         <!-- download_backup.html -->
-        <form action="{% url 'download_project' text.project_id %}" method="post"" class="whitespace-nowrap">
+        <a href="{% url 'download_excel_template' 'jobs' %}"  class="whitespace-nowrap">
             {% csrf_token %}
             <button class="btn btn-primary" type="submit">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Xuất Excel </span>
+                <span class="me-3"> Tải mẫu excel </span>
             </button>
-        </form>
+        </a>
 
         <button class="btn btn-secondary ml-5" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.add('hidden');">
             <span class=""> Đóng </span>

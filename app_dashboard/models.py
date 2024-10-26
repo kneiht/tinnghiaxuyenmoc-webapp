@@ -17,7 +17,7 @@ from django.db.models import Sum
 
 from django.core.validators import MinValueValidator
 
-
+from django.core.exceptions import ValidationError
 
 
 class BaseModel(models.Model):
@@ -195,19 +195,64 @@ class Job(SecondaryIDMixin, BaseModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress", verbose_name="Trạng thái")
     price_code = models.CharField(max_length=255, default="", verbose_name="Mã hiệu đơn giá")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    name = models.CharField(max_length=1000, default="", verbose_name="Tên công việc")
-    category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Loại công việc")
+    name = models.CharField(max_length=1000, verbose_name="Tên công việc")
+    category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Danh mục")
     unit = models.CharField(max_length=255, default="", verbose_name="Đơn vị")
 
     quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng")
     unit_price = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Đơn giá")
     total_amount = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Thành tiền")
 
-    description = models.TextField(blank=True, null=True, default='')
+    description = models.TextField(blank=True, null=True, default='', verbose_name="Mô tả")
     start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
     end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
     created_at = models.DateTimeField(default=timezone.now)
 
+    def clean(self):
+        errors = ""
+
+        # check if the job name is unique within the project
+        # if the job is new
+
+        if self._state.adding:
+            if Job.objects.filter(project=self.project, name=self.name, category=self.category).exists():
+                errors += ('- Trùng công việc và danh mục trong cùng dự án\n')
+
+        # 1. Start date must be before or equal to the end date
+        if self.start_date > self.end_date:
+            errors += ('- Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.\n')
+
+        # 3. Ensure valid status
+        valid_statuses = [choice[0] for choice in self.STATUS_CHOICES]
+        if self.status not in valid_statuses:
+            errors += (f'- Trạng thái "{self.status}" không hợp lệ.\n')
+
+        # 5. Ensure required fields are not empty (even though they have blank=False)
+        if not self.name:
+            errors += ('- Tên công việc không được để trống.\n')
+        if not self.unit:
+            errors += ('- Đơn vị không được để trống.\n')
+        if not self.unit_price:
+            errors += ('- Đơn giá không được để trống.\n')
+        if not self.quantity:
+            errors += ('- Khối lượng không được để trống.\n')
+
+        # 2. Ensure quantity and unit_price are non-negative
+        try:
+            if float(self.quantity) < 0:
+                errors += ('- Khối lượng phải là số dương\n')
+        except:
+            errors += ('- Khối lượng phải là dạng số\n')
+        try:
+            if float(self.unit_price) < 0:
+                errors += ('- Khối lượng phải là số dương\n')
+        except:
+            errors += ('- Khối lượng phải là dạng số\n')
+
+
+        if errors:
+            raise ValidationError(errors)
+    
     def save(self, *args, **kwargs):
         self.total_amount = self.quantity * self.unit_price
         super().save(*args, **kwargs)  # Call the original save method
