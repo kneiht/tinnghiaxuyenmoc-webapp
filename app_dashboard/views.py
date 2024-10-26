@@ -827,7 +827,7 @@ def download_excel_template(request, template_name):
         excel_data = f.read()
 
     response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="cong-viec-trong-du-an.xlsx]"'
+    response['Content-Disposition'] = f'attachment; filename="cong-viec-trong-du-an.xlsx"'
     return response
 
 
