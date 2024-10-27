@@ -437,13 +437,13 @@ def render_weekplan_table(request, project_id, check_date=None):
         if job_date_report:
             jobplan.date_quantity = job_date_report.quantity
             jobplan.date_note = job_date_report.note
-            jobplan.date_material_cost = job_date_report.material_cost
-            jobplan.date_labor_cost = job_date_report.labor_cost
+            jobplan.date_material = job_date_report.material
+            jobplan.date_labor = job_date_report.labor
         else:
             jobplan.date_quantity = ""
             jobplan.date_note = ""
-            jobplan.date_material_cost = ""
-            jobplan.date_labor_cost = ""
+            jobplan.date_material = ""
+            jobplan.date_labor = ""
 
 
     for jobplan_in_week in jobplans_in_week:
@@ -582,7 +582,7 @@ def get_gantt_chart_data(request, project_id):
             'name': job.name,
             'start': job.start_date.isoformat(),
             'end': job.end_date.isoformat(),
-            'progress': progress_by_time(job, check_date=check_date)['percent'],
+            'progress': progress_by_amount(job, check_date=check_date)['percent'],
         })
     return JsonResponse(data, safe=False)
 
@@ -727,22 +727,16 @@ def handle_date_report_form(request):
         for job in jobs:
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
-            material_cost = form.get(f'date_material_cost_{job.pk}')
-            labor_cost = form.get(f'date_labor_cost_{job.pk}')
+            material = form.get(f'date_material_{job.pk}')
+            labor = form.get(f'date_labor_{job.pk}')
             try:
                 quantity = float(quantity)
             except:
                 quantity = 0
-            try:
-                material_cost = float(material_cost)
-            except:
-                material_cost = 0
-            try:
-                labor_cost = float(labor_cost)
-            except:
-                labor_cost = 0
 
             if type(note) != str: note = ''
+            if type(material) != str: material = ''
+            if type(labor) != str: labor = ''
 
             job_date_report = JobDateReport.objects.filter(job=job, date=check_date).first()
 
@@ -757,7 +751,7 @@ def handle_date_report_form(request):
                 return HttpResponse(html_message)
 
 
-            if quantity == 0 and note.strip() == '':
+            if quantity == 0 and note.strip() == '' and material.strip() == '' and labor.strip() == '':
                 if job_date_report:
                     job_date_report.delete()
                 continue
@@ -765,8 +759,8 @@ def handle_date_report_form(request):
             if job_date_report:
                 job_date_report.note = note
                 job_date_report.quantity = quantity
-                job_date_report.material_cost = material_cost
-                job_date_report.labor_cost = labor_cost
+                job_date_report.material = material
+                job_date_report.labor = labor
                 job_date_report.save()
                 continue
             else:
@@ -774,8 +768,8 @@ def handle_date_report_form(request):
                     job=job,
                     date=check_date,
                     quantity=quantity,
-                    material_cost=material_cost,
-                    labor_cost=labor_cost,
+                    material=material,
+                    labor=labor,
                     note=note
                 ).save()
 
@@ -916,7 +910,8 @@ def upload_project(request, project_id):
         html_message = render_message(request, message=errors, message_type='red')
         return HttpResponse(html_message)
     else:
-        Job.objects.bulk_create(jobs)
+        for job in jobs:
+            job.save()
         html_message = render_message(request, message="Cập nhật thành công", ok_button_function='reload')
         return HttpResponse(html_message)
 

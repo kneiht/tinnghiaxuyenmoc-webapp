@@ -220,6 +220,13 @@ up.compiler('.expand', function(expand) {
             expand.style.height = '';
         }
     });
+    // Add event listener to the document
+    document.addEventListener('focus', function(event) {
+        // If the target is not the expand element, then remove the style height
+        if (event.target !== expand) {
+            expand.style.height = '';
+        }
+    });
     // Add event listener to the expand element
     expand.addEventListener('click', function() {
         // Add style height 100px
@@ -229,4 +236,87 @@ up.compiler('.expand', function(expand) {
         // Add style height 100px
         expand.style.height = '150px';
     });
+});
+
+
+
+// up.compiler('.form-input', function(inputfield) {
+//     // Check if the input field is a number field by getting the input type
+//     if (inputfield.type !== 'number') {
+//         // Set the input type to 'text' for flexible formatting
+//         inputfield.type = 'text';
+//     }
+    
+//     // Function to format the number with commas
+//     function formatNumber(value) {
+//         var n = parseInt(value.replace(/\D/g, ''), 10);
+//         return isNaN(n) ? '' : n.toLocaleString();
+//     }
+
+//     // Initialize the field value if present
+//     inputfield.value = formatNumber(inputfield.value);
+
+//     // Add keyup event listener to format the value and update tooltip
+//     inputfield.addEventListener('keyup', function() {
+//         // Format the value with commas and set it back to the input
+//         this.value = formatNumber(this.value);
+
+//         // Update the tooltip (title attribute) with the formatted number
+//         this.title = this.value;
+//     });
+// });
+
+
+up.compiler('.form-input', function(inputfield) {
+    // Check if the input field is a number field by getting the input type
+    if (inputfield.type !== 'number') {
+        return;
+    }
+
+    function formatNumber(number) {
+        // Check if the number is a valid number
+        if (number === '' || isNaN(parseFloat(number))) {
+            return '';
+        }
+
+        // Convert the number to a float, just in case it's passed as a string
+        let num = parseFloat(number);
+
+        // Convert the number to a string with two decimal places
+        let parts = num.toString().split('.');
+            
+        // Add thousand separators (dots) to the integer part
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        
+        // Join the integer and fractional parts with a comma
+        return parts.join(',');
+    }
+
+
+    // Create a popup element
+    const popup = document.createElement('div');
+    popup.classList.add('text-blue-500'); // You can style this with Tailwind or custom CSS
+
+
+    // Event listener for focus
+    inputfield.addEventListener('focus', function() {
+
+        // Initialize the field value if present
+         popup.innerText = formatNumber(inputfield.value);
+
+        // Insert the popup after the input field
+        inputfield.parentNode.insertBefore(popup, inputfield.nextSibling);
+        
+        // Optionally, remove the popup on blur or some other event
+        inputfield.addEventListener('blur', function() {
+            popup.remove();
+        });
+    });
+
+    // Add keyup event listener to format the value and update tooltip
+    inputfield.addEventListener('keyup', function() {
+        popup.innerText = formatNumber(inputfield.value);
+
+    });
+
 });

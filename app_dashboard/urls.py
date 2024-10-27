@@ -12,6 +12,7 @@ urlpatterns = [
     path('upload-db-backup/', views_backup.upload_db_backup, name='upload_db_backup'),
 
     path('', views.page_projects, name='home'),
+    
     path('projects', views.page_projects, name='page_projects'),
     path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),
     path('manage-data/', views.page_manage_data, name='page_manage_data'),
@@ -31,10 +32,6 @@ urlpatterns = [
 
 
     path('api/gantt-chart-data/<int:project_id>/', views.get_gantt_chart_data, name='get_gantt_chart_data'),
-
-    path('test', views.test, name='test.html'),
-
-
 
 
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),

@@ -18,6 +18,7 @@ from django.db.models import Sum
 from django.core.validators import MinValueValidator
 
 from django.core.exceptions import ValidationError
+import pandas as pd
 
 
 class BaseModel(models.Model):
@@ -125,6 +126,24 @@ class BaseModel(models.Model):
                         thumbnail.save()
 
 
+class UserExtra(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
+    settings = models.JSONField(blank=True, null=True)
+    def __str__(self):
+        return self.user.username
+
+
+class Task(BaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    due_date = models.DateField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class TaskUser(BaseModel):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Thumbnail(models.Model):
     reference_url = models.CharField(max_length=255, blank=True, null=True)
@@ -222,6 +241,10 @@ class Job(SecondaryIDMixin, BaseModel):
         if self.start_date > self.end_date:
             errors += ('- Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.\n')
 
+        # End date must be before or equal to the project end date
+        if self.end_date > pd.Timestamp(self.project.end_date):
+            errors += (f'- Ngày kết thúc phải nhỏ hơn hoặc bằng ngày kết thúc dự án {self.project.end_date.strftime("%d/%m/%Y")}.\n')
+
         # 3. Ensure valid status
         valid_statuses = [choice[0] for choice in self.STATUS_CHOICES]
         if self.status not in valid_statuses:
@@ -298,8 +321,8 @@ class JobDateReport(BaseModel):
     date_amount = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
     note = models.TextField(blank=True, null=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
-    material_cost = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Vật tư")  # Material
-    labor_cost = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Nhân công")   # Labor
+    material = models.TextField(default='', verbose_name="Vật tư")  # Material
+    labor = models.TextField(default='', verbose_name="Nhân công")   # Labor
 
     def save(self, *args, **kwargs):
         self.date_amount = self.quantity * self.job.unit_price

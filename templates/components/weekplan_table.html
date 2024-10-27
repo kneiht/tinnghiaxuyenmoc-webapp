@@ -141,11 +141,11 @@
 
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                    {{ record.date_material_cost }}
+                    {{ record.date_material }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                    {{ record.date_labor_cost }}
+                    {{ record.date_labor }}
                 </td>
 
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -410,16 +410,21 @@
                     </td>
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <input type="number" name="date_material_cost_{{ record.job.pk }}" class="form-input" value="{{ record.date_material_cost }}" style="width: 150px"/>
+
+                        <textarea name="date_material_{{ record.job.pk }}" class="form-input expand" style="width: 200px"
+                        >{{ record.date_material }}</textarea>
+                    
                     </td>
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <input type="number" name="date_labor_cost_{{ record.job.pk }}" class="form-input" value="{{ record.date_labor_cost }}" style="width: 150px"/>
+                        <textarea name="date_labor_{{ record.job.pk }}" class="form-input expand" style="width: 200px"
+                        >{{ record.date_labor }}</textarea>
+                    
                     </td>
 
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <textarea name="date_note_{{ record.job.pk }}" class="form-input expand" style="width: 250px"
+                        <textarea name="date_note_{{ record.job.pk }}" class="form-input expand" style="width: 200px"
                         >{{ record.date_note }}</textarea>
                     </td>
                 </tr>

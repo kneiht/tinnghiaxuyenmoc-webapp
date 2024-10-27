@@ -183,7 +183,7 @@ function drawGanttChart(tasks) {
     // Remove previous gantt chart
     const ganttChart = document.getElementById('ganttChart');
     ganttChart.innerHTML = '';
-    const margin = { top: 40, right: 40, bottom: 40, left: 130 };
+    const margin = { top: 40, right: 40, bottom: 40, left: 150 };
     const width = document.getElementById('ganttChart').offsetWidth - margin.left - margin.right;
     const height = tasks.length * 50 + margin.top + margin.bottom;
     
@@ -210,8 +210,6 @@ function drawGanttChart(tasks) {
         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
         .attr("class", "text-gray-700 dark:text-gray-300");
 
-
-
     // Axis x => show date
     svg.append("g")
         .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d-%m-%Y")))
@@ -235,6 +233,7 @@ function drawGanttChart(tasks) {
         .call(d3.axisLeft(y))
         .attr("class", "text-gray-700 dark:text-gray-300");
 
+
     const color = d3.scaleLinear()
         .domain([0, 50, 100])
         .range(["#ff8a65", "#ffd54f", "#4caf50"]); // Different colors for progress
@@ -244,6 +243,7 @@ function drawGanttChart(tasks) {
         .enter()
         .append("rect")
         .attr("x", d => x(d.start))
+        .attr("y", d => y(d.name))
         .attr("y", d => y(d.name))
         .attr("width", d => x(d.end) - x(d.start))
         .attr("height", y.bandwidth())
@@ -275,6 +275,67 @@ function drawGanttChart(tasks) {
         .on("mouseout", function () {
             tooltip.classed("hidden", true);
         });
+
+
+    // Find all <text> elements that match the specified attributes
+    textElements = ganttChart.querySelectorAll('text[fill="currentColor"][x="-9"][dy="0.32em"]');
+    
+    // Log the found elements to the console
+    textElements.forEach((element, index) => {
+        // Calcuate the width of the element
+        let width = element.getBBox().width;
+
+        // Get the original text
+        const textContent = element.textContent;
+        console.log(`Original text: ${textContent}`);
+
+        // Create a helper function to measure text width dynamically
+        function measureTextWidth(text, element) {
+            element.textContent = text
+            textWidth = element.getBBox().width;
+            return  textWidth
+        }
+
+        // Split the text into multiple lines, each with a max width of 100px
+        const maxWidth = 120; // Maximum width in pixels
+        let words = textContent.split(' '); // Split text into words
+        let currentLine = '';
+        let lines = [];
+
+        words.forEach((word) => {
+            let testLine = currentLine ? currentLine + ' ' + word : word;
+            let testWidth = measureTextWidth(testLine, element);
+            if (testWidth <= maxWidth) {
+                currentLine = testLine; // Add the word to the current line
+            } else {
+                lines.push(currentLine); // Push the current line and start a new one
+                currentLine = word;
+            }
+        });
+
+        if (currentLine) {
+            lines.push(currentLine); // Push the last line
+        }
+        console.log(lines)
+
+        // Make copies of element for each line, change x to make the lines separate
+        // then remove the old element and add the new ones
+        element.textContent = ''
+        const offset = (lines.length-1) * 6
+        lines.forEach((line, index) => {
+            
+            const newElement = element.cloneNode(true);
+            newElement.textContent = line;
+            newElement.setAttribute('y', `${index * 12 - offset}`);
+            element.parentNode.appendChild(newElement);
+            
+        });
+
+        // // Remove the old text element
+        // element.remove();
+    });
+
+    
 }
 
 
