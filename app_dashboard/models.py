@@ -129,7 +129,7 @@ class BaseModel(models.Model):
 class UserExtra(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
-    settings = models.JSONField(blank=True, null=True)
+    settings = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.user.username
 
