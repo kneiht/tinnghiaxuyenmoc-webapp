@@ -304,7 +304,7 @@
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
 
-                        <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}" style="width: 150px"/>
+                        <input type="number" name="plan_quantity_{{ record.pk }}" class="form-input" value="{{ record.plan_quantity }}" step="any" style="width: 150px"/>
                     </td>
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
                         <textarea name="note_{{ record.pk }}" class="form-input expand" style="width: 250px"
@@ -406,7 +406,7 @@
                         {% endif %}
                     {% endfor %}
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">
-                        <input type="number" name="date_quantity_{{ record.job.pk }}" class="form-input" value="{{ record.date_quantity }}" style="width: 150px"/>
+                        <input type="number" name="date_quantity_{{ record.job.pk }}" class="form-input" step="any" value="{{ record.date_quantity }}" style="width: 150px"/>
                     </td>
 
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm">

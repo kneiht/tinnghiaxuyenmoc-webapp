@@ -160,7 +160,7 @@ function checkFileSize(file) {
 async function fetchAndDrawGanttChart() {
     let ganttChart = document.getElementById('ganttChart');
     let projectID = ganttChart.getAttribute('data-project-id');
-    let checkDate = ganttChart.getAttribute('data-check-date');
+    let checkDate = document.getElementById('check_date').value;
     let url = `/api/gantt-chart-data/${projectID}/?check_date=${checkDate}`;
     console.log(url);
     const response = await fetch(url);
@@ -287,7 +287,6 @@ function drawGanttChart(tasks) {
 
         // Get the original text
         const textContent = element.textContent;
-        console.log(`Original text: ${textContent}`);
 
         // Create a helper function to measure text width dynamically
         function measureTextWidth(text, element) {
@@ -316,7 +315,6 @@ function drawGanttChart(tasks) {
         if (currentLine) {
             lines.push(currentLine); // Push the last line
         }
-        console.log(lines)
 
         // Make copies of element for each line, change x to make the lines separate
         // then remove the old element and add the new ones

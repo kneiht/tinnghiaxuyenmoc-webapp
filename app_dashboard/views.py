@@ -68,7 +68,10 @@ def progress_by_time(record, check_date=None):
 
     if progress <= 0:
         return {
+            'progress': 0,
             'status': 'not_started',
+            'duration': duration,
+            'percent': 0,
         }
 
 
@@ -421,7 +424,6 @@ def render_weekplan_table(request, project_id, check_date=None):
         
         # Get jobplan in week
         jobplan_in_week = jobplans_in_week.filter(job=job).first()
-        print('>>>>>>>>>>>>>> jobplan_in_week', jobplan_in_week)
         if jobplan_in_week:
             job.plan_note = jobplan_in_week.note
             job.plan_quantity = jobplan_in_week.plan_quantity
@@ -429,7 +431,6 @@ def render_weekplan_table(request, project_id, check_date=None):
             job.plan_quantity = ""
             job.plan_note = ""
 
-        print('>>>>>>>>>>>>>> job', job.plan_quantity, job.plan_note)
 
     for jobplan in jobplans_in_week:
         # Get date report
@@ -582,11 +583,10 @@ def get_gantt_chart_data(request, project_id):
             'name': job.name,
             'start': job.start_date.isoformat(),
             'end': job.end_date.isoformat(),
-            'progress_time': progress_by_time(job, check_date=check_date),
-            'progress_amount': progress_by_amount(job, check_date=check_date),
+            'progress_time': progress_by_time(job, check_date=check_date)['percent'],
+            'progress_amount': progress_by_amount(job, check_date=check_date)['percent'],
         })
 
-        print('>>>>>>>>>>>>>> data', data)
     return JsonResponse(data, safe=False)
 
 
@@ -659,6 +659,7 @@ def handle_weekplan_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     form = request.POST
+    # print(form)
     try:
         start_date = form.get('start_date')
         end_date = form.get('end_date')
@@ -671,8 +672,8 @@ def handle_weekplan_form(request):
             note = form.get(f'note_{job.pk}')
             quantity = form.get(f'plan_quantity_{job.pk}')
             try:
-                quantity = int(quantity)
-            except:
+                quantity = float(quantity)
+            except ValueError as e:
                 quantity = 0
 
             if type(note) != str: note = ''
@@ -688,8 +689,8 @@ def handle_weekplan_form(request):
             jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
             if quantity == 0 and note.strip() == '':
                 if jobplan:
-                    print('jobplan: ', jobplan)
                     jobplan.delete()
+                    pass
                 continue
 
             if jobplan:
@@ -881,7 +882,6 @@ def upload_project(request, project_id):
     errors = ''
     jobs = []
     for index, row in df.iterrows():
-        print(">>>>> row:", index)
         job = Job()
         job.project = project
         for field in df.columns:
