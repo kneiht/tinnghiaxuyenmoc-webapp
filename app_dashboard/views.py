@@ -582,9 +582,11 @@ def get_gantt_chart_data(request, project_id):
             'name': job.name,
             'start': job.start_date.isoformat(),
             'end': job.end_date.isoformat(),
-            'progress_time': progress_by_time(job, check_date=check_date)['percent'],
-            'progress_amount': progress_by_amount(job, check_date=check_date)['percent'],
+            'progress_time': progress_by_time(job, check_date=check_date),
+            'progress_amount': progress_by_amount(job, check_date=check_date),
         })
+
+        print('>>>>>>>>>>>>>> data', data)
     return JsonResponse(data, safe=False)
 
 
