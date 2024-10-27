@@ -242,7 +242,9 @@ class Job(SecondaryIDMixin, BaseModel):
             errors += ('- Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.\n')
 
         # End date must be before or equal to the project end date
-        if self.end_date > pd.Timestamp(self.project.end_date):
+        print(self.project.end_date)
+        print(self.end_date)
+        if pd.Timestamp(self.end_date) > pd.Timestamp(self.project.end_date):
             errors += (f'- Ngày kết thúc phải nhỏ hơn hoặc bằng ngày kết thúc dự án {self.project.end_date.strftime("%d/%m/%Y")}.\n')
 
         # 3. Ensure valid status
