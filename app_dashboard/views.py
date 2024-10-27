@@ -210,6 +210,7 @@ def progress_by_plan(record, check_date = None):
     planned_amount_to_now_project = 0
     project_amount = 0
     for job in jobs:
+        project_amount += job.total_amount
         duration_job = (job.end_date - job.start_date).days + 1
         days_to_now_job = (check_date - job.start_date).days + 1
         # Skip if the job is not started
@@ -221,7 +222,7 @@ def progress_by_plan(record, check_date = None):
         if planned_amount_to_now_job >= job.total_amount:
             planned_amount_to_now_job = job.total_amount
         planned_amount_to_now_project += planned_amount_to_now_job
-        project_amount += job.total_amount
+        
     
     if project_amount == 0:
         return None
