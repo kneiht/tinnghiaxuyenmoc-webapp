@@ -247,7 +247,7 @@ function drawGanttChart(tasks) {
         .attr("y", d => y(d.name))
         .attr("width", d => x(d.end) - x(d.start))
         .attr("height", y.bandwidth())
-        .attr("fill", d => color(d.progress))  // Dynamic color based on progress
+        .attr("fill", d => color(d.progress_time))  // Dynamic color based on progress
         .attr("rx", 6)  // More rounded corners
         .attr("class", "shadow-lg transition-all duration-300");
 
@@ -257,7 +257,7 @@ function drawGanttChart(tasks) {
         .append("text")
         .attr("x", d => x(d.start) + 5)
         .attr("y", d => y(d.name) + y.bandwidth() / 2 + 4)
-        .text(d => `${d.progress}%`)
+        .text(d => `${d.progress_amount}%`)
         .attr("class", "text-gray-800 dark:text-gray-300 font-semibold");
 
     // Tooltip for interactivity
