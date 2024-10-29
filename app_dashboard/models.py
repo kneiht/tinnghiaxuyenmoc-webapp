@@ -131,8 +131,9 @@ class UserExtra(BaseModel):
         ('admin', 'Quản Lý Cao Cấp'),
         ('technician', 'Kỹ Thuật'),
         ('supervisor', 'Giám Sát'),
+        ('normal_staff', 'Nhân Viên'),
     )
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
     settings = models.TextField(blank=True, null=True)
