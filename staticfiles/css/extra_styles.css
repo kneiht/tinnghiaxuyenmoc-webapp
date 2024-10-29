@@ -201,3 +201,23 @@
 .terminated {
   background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
 }
+
+
+
+th {
+    position: relative;
+    padding-right: 20px;
+}
+th:hover {
+    background-color: #f2f1f1;
+}
+th.sorted-asc::after {
+    content: ' ▲';
+    position: absolute;
+    right: 5px;
+}
+th.sorted-desc::after {
+    content: ' ▼';
+    position: absolute;
+    right: 5px;
+}
