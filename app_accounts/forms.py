@@ -56,18 +56,20 @@ class RegistrationForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = UsernameField(
-        label=("Email"),
+        label=("Tên đăng nhập"),
         widget=forms.TextInput(attrs={
-            "placeholder": "Email của bạn",
+            "placeholder": "Tên đăng nhập",
             'class': 'form-input'}))
+    
     password = forms.CharField(
         label=("Mật khẩu"),
         strip=False,
         widget=forms.PasswordInput(attrs={
             "placeholder": "Mật khẩu của bạn",
-            'class': 'form-input'}),
-    )
+            'class': 'form-input'}))
+
     remember_me = forms.BooleanField(
+        label='Ghi nhớ đăng nhập',
         required=False,
-        widget=forms.CheckboxInput(attrs={"class": "checkbox"}),)
+        widget=forms.CheckboxInput(attrs={"class": "checkbox"}))
     

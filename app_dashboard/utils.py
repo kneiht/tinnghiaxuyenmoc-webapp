@@ -1,20 +1,282 @@
 
+import datetime
 
 
-from django.contrib.auth.models import User
-from .models import Project, ProjectUser
+from django.db.models import Q, Sum
+from django.utils import timezone
 
+from .forms import *
+from .models import *
+
+# AUTHENTICATION =============================================================
 def is_admin(user):
-    # check if there is no user => allow to upload db
-    if User.objects.count() == 0:
-        return True
-    else:
-        return user.is_authenticated and user.is_active and user.is_staff and user.is_superuser
+    return user.is_authenticated and user.is_active and user.is_staff and user.is_superuser
 
-def is_project_user(request, project_id):
-    project = Project.objects.filter(pk=project_id).first()
-    project_user = ProjectUser.objects.filter(project=project, user=request.user).first()
-    if project_user:
-        return True
+
+
+
+def translate(text):
+    translated_text = {
+        'title_bar_page_projects': 'Trang quản lý các dự án',
+        'Tiêu đề cho trang: page_projects': 'Trang quản lý các dự án',
+        'Thêm Project': 'Thêm dự án',
+        'Thêm Job': 'Thêm CV',
+        'Tạo Project mới': 'Tạo dự án mới',
+        'Cập nhật Project': 'Cập nhật dự án'
+    }
+
+    if text not in translated_text:
+        return text
     else:
-        return False
+        return translated_text[text]
+
+
+
+
+
+
+def progress_by_time(record, check_date=None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+    # print('>>>>>>>>>>>>>>>>>>>> progress_by_time', check_date, type(check_date))
+
+    duration = (record.end_date - record.start_date).days + 1
+    if duration == 0:
+        progress = 1
+        percent = 100
+    else:
+        progress = int((check_date - record.start_date).days) + 1
+        percent = int((progress / duration) * 100) if progress<=duration else 100
+
+    if progress <= 0:
+        return {
+            'progress': 0,
+            'status': 'not_started',
+            'duration': duration,
+            'percent': 0,
+        }
+
+
+    # Check if the record is jobplan
+    if record.__class__.__name__ == 'JobPlan':
+        record.status = record.job.status
+
+    if record.status == 'done':
+        status = 'green'
+    elif record.status == 'in_progress':
+        if percent < 100:
+            status = 'blue'
+        else:
+            status = 'red'
+    else:
+        status = 'gray'
+
+    return {
+        'progress': progress,
+        'duration': duration,
+        'percent': percent,
+        'status': status
+    }
+
+def progress_by_quantity(record, check_date=None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+
+    if record.__class__.__name__ == 'Project':
+        # Caculate all the quantity of jobs in the project
+        total_quantity = record.job_set.aggregate(Sum('quantity'))['quantity__sum'] or 0
+        
+        # Calculate the quantity of all job reports
+        job_date_reports = JobDateReport.objects.filter(job__project=record)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+    elif record.__class__.__name__ == 'Job':
+        total_quantity = record.quantity
+        job_date_reports = JobDateReport.objects.filter(job=record, date__lte=check_date)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+    elif record.__class__.__name__ == 'JobPlan':
+        total_quantity = record.plan_quantity
+        job_date_reports = JobDateReport.objects.filter(job=record.job, date__gte=record.start_date, date__lte=check_date)
+        total_quantity_reported = job_date_reports.aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+        
+    if total_quantity == 0:
+        percent = 0
+    else:
+        percent = min(int((total_quantity_reported / total_quantity) * 100), 100)
+
+
+    if record.status == 'done':
+        status = 'green'
+    elif record.status == 'in_progress':
+        status = 'blue'
+    else:
+        status = 'gray'
+
+    return {
+        'total_quantity': total_quantity,
+        'total_quantity_reported': total_quantity_reported,
+        'percent': percent,
+        'status': status
+    }
+
+
+
+
+
+def progress_by_amount(record, check_date=None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+
+    if record.__class__.__name__ == 'Project':
+        # Caculate all the total_amount of jobs in the project
+        total_amount = record.job_set.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        
+        # Calculate the amount of all job reports
+        job_date_reports = JobDateReport.objects.filter(job__project=record, date__lte=check_date)
+        total_amount_reported = job_date_reports.aggregate(Sum('date_amount'))['date_amount__sum'] or 0
+
+    elif record.__class__.__name__ == 'Job':
+        total_amount = record.total_amount
+        job_date_reports = JobDateReport.objects.filter(job=record, date__lte=check_date)
+        total_amount_reported = job_date_reports.aggregate(Sum('date_amount'))['date_amount__sum'] or 0
+
+    elif record.__class__.__name__ == 'JobPlan':
+        total_amount = record.plan_amount
+        job_date_reports = JobDateReport.objects.filter(job=record.job, date__gte=record.start_date, date__lte=check_date)
+        total_amount_reported = job_date_reports.aggregate(Sum('date_amount'))['date_amount__sum'] or 0
+
+        
+    if total_amount == 0:
+        percent = 0
+    else:
+        percent = min(int((total_amount_reported / total_amount) * 100), 100)
+
+
+    if record.status == 'done':
+        status = 'green'
+    elif record.status == 'in_progress':
+        status = 'blue'
+    else:
+        status = 'gray'
+
+    return {
+        'total_amount': int(total_amount),
+        'total_amount_reported': int(total_amount_reported),
+        'percent': percent,
+        'status': status
+    }
+
+
+
+
+def progress_by_plan(record, check_date = None):
+    if not check_date or check_date == 'None':
+        check_date = timezone.now().date()
+    else:
+        if type(check_date) == str:
+            check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+
+    if record.__class__.__name__ != 'Project':
+        return None
+
+    # Get jobs in the project
+    jobs = Job.objects.filter(project_id=record.id)
+    planned_amount_to_now_project = 0
+    project_amount = 0
+    for job in jobs:
+        project_amount += job.total_amount
+        duration_job = (job.end_date - job.start_date).days + 1
+        days_to_now_job = (check_date - job.start_date).days + 1
+        # Skip if the job is not started
+        if days_to_now_job < 0:
+            continue
+
+        # Caculate planned amount
+        planned_amount_to_now_job = int((days_to_now_job / duration_job) * job.total_amount)
+        if planned_amount_to_now_job >= job.total_amount:
+            planned_amount_to_now_job = job.total_amount
+        planned_amount_to_now_project += planned_amount_to_now_job
+        
+    
+    if project_amount == 0:
+        return None
+    percent = int((planned_amount_to_now_project / project_amount) * 100)
+
+
+    res = {
+        'planned_amount_to_now_project': int(planned_amount_to_now_project),
+        'total_amount': int(project_amount),
+        'percent': percent
+    }
+    return res
+
+
+
+
+
+
+
+
+
+def filter_records(request, records, model_class):
+    # Get all query parameters except 'sort' as they are assumed to be field filters
+    query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
+    # Determine the fields to be used as filter options based on the selected page
+    if model_class == Project:
+        fields = ['all', 'name', 'description']
+    elif model_class == Job:
+        fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
+    else:
+        # Get all fields except foreign key fields
+        fields = [field.name for field in model_class._meta.get_fields() if not isinstance(field, models.ForeignKey)]
+        fields.append('all')
+
+    if not query_params:
+        # Filter Discontinued and Archived
+        if hasattr(model_class, 'status'):
+            records = records.exclude(status__in=['archived'])
+            
+    else:
+        # Construct Q objects for filtering
+        combined_query = Q()
+        if 'all' in query_params:
+            specified_fields = fields[1:]  # Exclude 'all' to get the specified fields
+            all_fields_query = Q()
+            for value in query_params['all']:
+                for specified_field in specified_fields:
+                    if specified_field in [field.name for field in model_class._meta.get_fields()]:
+                        all_fields_query |= Q(**{f"{specified_field}__icontains": value})
+            combined_query &= all_fields_query
+            
+        else:
+            for field, values in query_params.items():
+                if field in fields:
+                    try:
+                        model_class._meta.get_field(field)
+                        field_query = Q()
+                        for value in values:
+                            field_query |= Q(**{f"{field}__icontains": value})
+                        combined_query &= field_query
+                    except FieldDoesNotExist:
+                        print(f"Ignoring invalid field: {field}")
+        # Filter records based on the query
+        records = records.filter(combined_query)
+    
+    
+    if request.GET.get('sort'):
+        records = records.order_by(request.GET.get('sort'))
+            
+    
+    return records
+

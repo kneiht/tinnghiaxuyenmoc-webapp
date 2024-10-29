@@ -11,7 +11,7 @@ urlpatterns = [
     path('download-db-backup/', views_backup.download_db_backup, name='download_db_backup'),
     path('upload-db-backup/', views_backup.upload_db_backup, name='upload_db_backup'),
 
-    path('', views.page_projects, name='home'),
+    path('', views.page_home, name='page_home'),
     
     path('projects', views.page_projects, name='page_projects'),
     path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),

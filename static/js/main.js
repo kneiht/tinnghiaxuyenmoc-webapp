@@ -320,3 +320,65 @@ up.compiler('.form-input', function(inputfield) {
     });
 
 });
+
+
+
+
+
+// up.compiler('.table-auto', function(table) {
+//     const headers = table.querySelectorAll('th');
+//     let sortOrder = 1;  // 1 for ascending, -1 for descending
+//     let activeColumnIndex = null;  // Track the currently sorted column
+
+//     headers.forEach((header, index) => {
+//         header.addEventListener('click', function() {
+//             // Remove existing sort classes from all headers
+//             headers.forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
+
+//             // Set the active column index and sort order
+//             if (activeColumnIndex === index) {
+//                 // If clicking the same column, toggle the sort order
+//                 sortOrder = -sortOrder;
+//             } else {
+//                 // If clicking a new column, reset to ascending order
+//                 sortOrder = 1;
+//                 activeColumnIndex = index;
+//             }
+
+//             // Add appropriate class to indicate sort direction
+//             header.classList.add(sortOrder === 1 ? 'sorted-asc' : 'sorted-desc');
+
+//             // Sort the table by the clicked column
+//             sortTableByColumn(table, index);
+//         });
+//     });
+
+//     function sortTableByColumn(table, columnIndex) {
+//         const rowsArray = Array.from(table.querySelectorAll('tbody'));
+//         const type = getColumnType(rowsArray, columnIndex);
+
+//         rowsArray.sort((rowA, rowB) => {
+//             const cellA = rowA.children[columnIndex].innerText;
+//             const cellB = rowB.children[columnIndex].innerText;
+
+//             if (type === 'number') {
+//                 return sortOrder * (parseFloat(cellA) - parseFloat(cellB));
+//             } else {
+//                 return sortOrder * cellA.localeCompare(cellB);
+//             }
+//         });
+
+//         rowsArray.forEach(row => table.appendChild(row));
+//     }
+
+//     function getColumnType(rows, columnIndex) {
+//         // Check if the column contains only numbers
+//         for (const row of rows) {
+//             const cellValue = row.children[columnIndex].innerText;
+//             if (isNaN(cellValue)) {
+//                 return 'string';
+//             }
+//         }
+//         return 'number';
+//     }
+// });

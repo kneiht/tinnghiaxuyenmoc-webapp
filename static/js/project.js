@@ -69,13 +69,18 @@ up.compiler('#check_date', function (element) {
 
     checkDate.addEventListener('change', function () {
         // let url = window.location.href.split('?')[0] + `?check_date=${checkDate.value}`;
+        // Get all input with class name check_date then change the value
+        date_inputs = document.getElementsByClassName('check_date');
+        for (let i = 0; i < date_inputs.length; i++) {
+            date_inputs[i].value = checkDate.value;
+        }
 
         let showAllJobs = document.getElementById('show-all-jobs');
         if (showAllJobs && showAllJobs.classList.contains('hidden')) {
             let checkDate = document.getElementById('check_date').value;
             let currentUrl = showAllJobs.href
             let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            up.render({ target: '#display-records, #tool-bar, #infor-bar', url: url })
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
         }
 
         let showWeekplan = document.getElementById('show-weekplan');
@@ -83,7 +88,8 @@ up.compiler('#check_date', function (element) {
             let checkDate = document.getElementById('check_date').value;
             let currentUrl = showWeekplan.href
             let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            up.render({ target: '#display-records, #tool-bar, #infor-bar', url: url })
+            console.log(url)
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
         }
 
 
@@ -161,7 +167,7 @@ async function fetchAndDrawGanttChart() {
     let ganttChart = document.getElementById('ganttChart');
     let projectID = ganttChart.getAttribute('data-project-id');
     let checkDate = document.getElementById('check_date').value;
-    let url = `/api/gantt-chart-data/${projectID}/?check_date=${checkDate}`;
+    let url = `/api/gantt-chart-data/${projectID}/?check_date=${checkDate}&sort=start_date`;
     console.log(url);
     const response = await fetch(url);
     const tasks = await response.json();
@@ -319,17 +325,30 @@ function drawGanttChart(tasks) {
         // Make copies of element for each line, change x to make the lines separate
         // then remove the old element and add the new ones
         element.textContent = ''
-        const offset = (lines.length-1) * 6
-        lines.forEach((line, index) => {
-            
-            const newElement = element.cloneNode(true);
-            newElement.textContent = line;
+        const maxLines = 3
+        var offset = 0
+        if  (lines.length > 3) {
+            offset = (maxLines - 1) * 6;
+        } else {
+            offset = (lines.length-1) * 6;
+        }
+        
+        let count =  0
+        lines.slice(0, maxLines).forEach((line, index) => {
+            count += 1;
+            if (count === maxLines && lines.length > maxLines) {
+                var newLine = line + ' ...';
+                // break to stop adding more lines
+            } else {
+                var newLine = line;
+            }
+            var newElement = element.cloneNode(true);
+            newElement.textContent = newLine;
             newElement.setAttribute('y', `${index * 12 - offset}`);
             element.parentNode.appendChild(newElement);
-            
         });
 
-        // // Remove the old text element
+        // Remove the old text element
         // element.remove();
     });
 

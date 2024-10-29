@@ -127,9 +127,16 @@ class BaseModel(models.Model):
 
 
 class UserExtra(BaseModel):
+    ROLE_CHOICES = (
+        ('admin', 'Quản Lý Cao Cấp'),
+        ('technician', 'Kỹ Thuật'),
+        ('supervisor', 'Giám Sát'),
+    )
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
     settings = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.user.username
 
@@ -182,8 +189,14 @@ class Project(BaseModel):
     end_date = models.DateField(default=timezone.now)
     func_source = models.CharField(max_length=255, default="")
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+
 
     def get_number_of_jobs(self):
         return {
@@ -226,6 +239,9 @@ class Job(SecondaryIDMixin, BaseModel):
     start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
     end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['category', 'secondary_id']
 
     def clean(self):
         errors = ""

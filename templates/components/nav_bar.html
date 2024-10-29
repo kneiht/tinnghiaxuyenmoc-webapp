@@ -9,6 +9,11 @@
         <!-- This is the center part of the navagation bar with various icons and links. It only appears when user is in dashboard-->
             <div id="nav_menu" class="flex items-center m-auto gap-5">
 
+                <a href="{% url 'page_home' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                    <span class="fa fa-home w-8" style="font-size: 18px;"></span>
+                    Trang của tôi
+                </a>
+
                 <a href="{% url 'page_projects' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-building w-8" style="font-size: 18px;"></span>
                     Dự án
@@ -45,6 +50,13 @@
     <!-- This is the right part of the navagation bar with quick settings, and profile dropdown. -->
     <div id="nav_bar_right" class="flex justify-end items-center gap-5">
 
+        <!-- Display user role with an icon and styled text -->
+        <div id="user_role" class="flex justify-center items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 text-md font-semibold text-nowrap">
+            <i class="fa fa-user-circle" aria-hidden="true"></i> <!-- Add user icon -->
+            <span>{{ user.userextra.get_role_display }}</span> <!-- Display the user role (human-readable) -->
+        </div>
+
+
         <!-- This div contains quick settings that can be toggled. -->
         <div id="quick-settings" class="flex justify-between gap-4">
 
@@ -80,12 +92,18 @@
 
                 <a href="#" class="menu-item rounded-t-xl rounded-b-xl m-1">
                     <i class="fa fa-user ml-3 mr-6"></i>
-                    <span>Profile</span>
+                    <span>Thông tin tài khoản</span>
                 </a>
                 <a href="#" class="menu-item rounded-t-xl rounded-b-xl m-1">
                     <i class="fa fa-gear ml-3 mr-5"></i>
-                    <span>Settings</span>
+                    <span>Cài đặt</span>
                 </a>
+
+                <a href="{% url 'logout' %}" class="menu-item rounded-t-xl rounded-b-xl m-1">
+                    <i class="fa fa-sign-out ml-3 mr-5"></i>
+                    <span>Thoát</span>
+                </a>
+
             </ul>
         </div>
     </div>

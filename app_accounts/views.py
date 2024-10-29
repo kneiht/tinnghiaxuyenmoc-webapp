@@ -18,7 +18,7 @@ from .forms import (
 
 from django_ratelimit.decorators import ratelimit
 
-
+from django.http import HttpResponse, HttpResponseForbidden
 
 # AUTHENTICATION =============================================================
 def is_admin(user):
@@ -27,6 +27,7 @@ def is_admin(user):
 
 @ratelimit(key='ip', rate='5/h', method='POST', block=False)
 def register(request):
+    return HttpResponse("Chỉ có admin mới có quyền tạo tài khoản")
     was_limited = getattr(request, 'limited', False)
     context = {'was_limited': was_limited}
 
@@ -79,9 +80,9 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         # Add your logic here to determine the dynamic redirect URL based on user conditions
         if is_admin(self.request.user):
-            return reverse('home')  # Example: Redirect staff users to the admin interface
+            return reverse('page_home')  # Example: Redirect staff users to the admin interface
         else:
-            return reverse('home')  # Example: Redirect other users to a dashboard
+            return reverse('page_home')  # Example: Redirect other users to a dashboard
 
 
 

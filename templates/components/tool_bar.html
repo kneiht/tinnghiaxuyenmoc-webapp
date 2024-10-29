@@ -1,22 +1,23 @@
-<div id="tool-bar" class="flex flex-row justify-between items-end w-full">
+<div id="tool-bar" class="flex flex-row items-end w-full gap-5">
     <!-- Toolbar for database interactions -->
     <form action="{{ text.query_url }}" up-target="#display-records" >
         <div class="mt-2">
+            <input type="hidden" name="check_date" value="{{ text.check_date }}" />
             <!-- Separate 2 sections of controls -->
             <div class="flex flex-wrap justify-between gap-4">
                 <!-- Left controls for filtering and sorting -->
-                <div id='left-controls' class="flex justify-start gap-4 h-10 w-[800px]">
+                <div id='left-controls' class="flex justify-start gap-4 h-10 w-fit">
 
                     <!-- Controls to manage search and filter options -->
-                    <div id="search-control" class="z-10 w-full">
+                    <div id="search-control" class="z-10 w-full flex flex-row justify-between items-center gap-4">
 
-                        <!-- Toggle search bar in small screen -->
+                        <!-- Toggle search bar in small screen
                         <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
                             <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
-                        </button>
+                        </button> -->
 
                         <!-- Search bar and filter options -->
-                        <div id="search-bar" class="flex w-full h-10 max-sm:hidden">
+                        <div id="search-bar" class="flex h-10 w-[500px]">
                             <!-- Input field for filter values -->
                             <input id="filter-input" name="all" type="text" placeholder="Nhập để tìm kiếm ..."
                                 class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme border-opacity-50 text-theme"
@@ -28,33 +29,61 @@
                             </button>
                         </div>
 
+                        {% if page == 'page_each_project' %}
+                        <select id="sort-select" name="sort" class="form-input w-fit border border-theme border-opacity-50">
+                            <option value="" selected>Sắp xếp ...</option>
+                            <option value="name">Tên công việc - (A → Z)</option>
+                            <option value="-name">Tên công việc - (Z → A)</option>
+                            <option value="category">Danh mục - (A → Z)</option>
+                            <option value="-category">Danh mục - (Z → A)</option>
+                            <option value="status">Trạng thái</option>
+                            <option value="unit">Đơn vị - (A → Z)</option>
+                            <option value="-unit">Đơn vị - (Z → A)</option>
+                            <option value="quantity">Khối lượng - (Tăng)</option>
+                            <option value="-quantity">Khối lượng - (Giảm)</option>
+                            <option value="unit_price">Đơn giá - (Tăng)</option>
+                            <option value="-unit_price">Đơn giá - (Giảm)</option>
+                            <option value="total_amount">Thành tiền - (Tăng)</option>
+                            <option value="-total_amount">Thành tiền - (Giảm)</option>
+                            <option value="start_date">Ngày bắt đầu - (Tăng)</option>
+                            <option value="-start_date">Ngày bắt đầu - (Giảm)</option>
+                            <option value="end_date">Ngày kết thúc - (Tăng)</option>
+                            <option value="-end_date">Ngày kết thúc - (Giảm)</option>
+
+                        
+                        </select>
+                        <script>
+                            document.getElementById('sort-select').addEventListener('change', function() {
+                                // Press search-button
+                                document.getElementById('search-button').click();
+                            });
+                        </script>
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- Right controls for view toggle and information display -->
-                {% if page == 'page_projects' %}
-                    <div id='right-controls' class="flex items-center justify-end gap-4">
-                        <a href="{{ text.query_url }}?all="                 up-target="#display_cards
-                            type="button" class="btn btn-outline">
-                            Tất cả dự án
-                        </a>
-                        <a href="{{ text.query_url }}?all=" up-target="#display_cards
-                            type="button" class="btn btn-outline">
-                            Dự án đang trễ hạn
-                        </a>
-                        <a href="{{ text.query_url }}?all=" up-target="#display_cards
-                            type="button" class="btn btn-outline">
-                            Dự án đã hoàn thành
-                        </a>
-                    </div>
-                {% endif %}
+
             </div>
         </div>
     </form>
-    {% if text.create_new_button_name %}
-        <a href="{{ text.create_new_form_url }}" up-preload="insert" up-target=":none" class="btn btn-primary text-nowrap">
-            <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-            <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
-        </a>
+    <!-- Right controls for view toggle and information display -->
+    {% if page == 'page_each_project' %}
+
+
+
+    <div id='right-controls' class="flex flex-wrap items-end justify-between gap-4">
+
+
+        <form action="{{ text.query_url }}" up-target="#display-records" >
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <input type="hidden" name="check_date" value="{{ text.check_date }}" />
+                <button type="submit" class="btn btn-outline">
+                    <input type="submit" name="all" value=""/>
+                    Tất cả công việc
+                </button>
+                <!-- Separate 2 sections of controls -->
+            </div>
+        </form>
+    </div>
     {% endif %}
 </div>

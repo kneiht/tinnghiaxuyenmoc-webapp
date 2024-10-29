@@ -49,12 +49,18 @@ class JobPlanAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'job')
     search_fields = ('job__name', 'note')
 
+
+
+class UserExtraAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'avatar', 'settings', 'created_at')
+    list_filter = ('created_at', 'role')
+    search_fields = ('user__username', 'role')
+
+admin.site.register(UserExtra, UserExtraAdmin)
+
+
 admin.site.register(JobPlan, JobPlanAdmin)
-
-
 admin.site.register(DataVehicleTypeDetail, DataVehicleTypeDetailAdmin)
-
-
 
 admin.site.register(JobDateReport, JobDateReportAdmin)
 admin.site.register(DataVehicle, DataVehicleAdmin)

@@ -84,13 +84,7 @@
                 <!-- ONLY FOR LOGIN PAGE -->
                 {% if is_log_in %}
                     <p class="mt-4 flex justify-center text-theme-950">
-                      Bạn chưa có tài khoản? 
-                      <a href="{% url 'register' %}" class="text-blue-600 ml-3 hover:underline">Tạo mới</a>
-                    </p>
-                {% elif is_register %}
-                    <p class="mt-4 flex justify-center">
-                      Bạn đã có tài khoản? 
-                      <a href="{% url 'login' %}" class="text-blue-600 ml-3 hover:underline">Đăng nhập</a>
+                      Chỉ có admin mới có quyền tạo tài khoản
                     </p>
                 {% endif %}
 

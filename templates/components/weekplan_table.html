@@ -1,9 +1,9 @@
 {% load custom_tags %}
 {% load humanize %}
 
-<div id="display-records">
+<div id="display-records" class="w-full overflow-scroll">
     <table id="weekplan-table"
-        class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+            class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         <thead>
             <tr class="text-md text-center leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-700
             border border-slate-300 dark:border-slate-900 border-opacity-50">
@@ -104,12 +104,12 @@
             <tr
                 class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
 
-                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 300px;">
                     {{ record.job.name }}
                 </td>
 
-                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ record.job|format_display:"category" }}
+                <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 150px;">
+                    {{ record.job.category }}
                 </td>
                 <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                     <span class="{{ record.job.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record.job|format_display:"status" }}</span>
@@ -263,11 +263,11 @@
                 <tr
                     class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
 
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 300px;">
                         {{ record.name }}
                     </td>
 
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 150px;">
                         {{ record.category }}
                     </td>
 
@@ -379,11 +379,11 @@
                 <tr
                     class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
 
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"  style="min-width: 300px;">
                         {{ record.job.name }}
                     </td>
 
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 150px;">
                         {{ record.job.category }}
                     </td>
 

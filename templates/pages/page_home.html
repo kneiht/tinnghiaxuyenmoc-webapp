@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Trang của tôi
+{% endblock %}
+
+
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <div up-hungry id="modal"></div>
+    <main>
+        {% include 'components/nav_bar.html' %}
+        Trang này sẽ dùng để hiển thị công việc được giao, công việc cần duyệt tùy theo title của nhân viên
+    </main>
+{% endblock %}
+
+{% block extra_script %}
+{% endblock %}
+
+
+
+
