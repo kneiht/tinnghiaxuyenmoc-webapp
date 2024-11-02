@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 
 import pandas as pd
 import datetime
@@ -100,7 +102,7 @@ def get_binhanh_service_operation_time(check_date):
             print("Login successful!")
             operation_time = {}
             count = 0
-            for vehicle in vehicles[0:3]:
+            for vehicle in vehicles:
                 url = f'https://gps.binhanh.vn/HttpHandlers/RouteHandler.ashx?method=getRouterByCarNumberLite&carNumber={vehicle}&fromDate={start_date}%2000:00&toDate={end_date}%2023:59&split=false&isItinerary=false'
                 response = session.get(url, headers=headers)
                 data = response.json().get("data")
