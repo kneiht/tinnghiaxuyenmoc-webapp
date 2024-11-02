@@ -7,7 +7,6 @@ from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup   
 
 
-
 def get_binhanh_service_operation_time(check_date):
     # if check_date is None:
     #     check_date = datetime.now()
@@ -102,7 +101,7 @@ def get_binhanh_service_operation_time(check_date):
             print("Login successful!")
             operation_time = {}
             count = 0
-            for vehicle in vehicles[0:5]:
+            for vehicle in vehicles:
                 url = f'https://gps.binhanh.vn/HttpHandlers/RouteHandler.ashx?method=getRouterByCarNumberLite&carNumber={vehicle}&fromDate={start_date}%2000:00&toDate={end_date}%2023:59&split=false&isItinerary=false'
                 response = session.get(url, headers=headers)
                 data = response.json().get("data")
@@ -158,12 +157,21 @@ def get_binhanh_service_operation_time(check_date):
 
 # Create a post request to send data to the server
 def send_data_to_server(data):
-    url = 'http://127.0.0.1:8000/api/save-vehicle-operation-record'
+    if DOMAIN == "localhost":
+        url = 'http://127.0.0.1:8000/api/save-vehicle-operation-record'
+    else:
+        url = 'https://www.tinnghiaxuyenmoc.com /api/save-vehicle-operation-record'
     response = requests.post(url, json=data)
-    print(response.text)
 
 
-for i in range(1):
-    # format dd/mm/yyyy
-    check_date = (f'{i+1:02d}/05/2024')
-    get_binhanh_service_operation_time(check_date)
+# Load from a file
+with open("env.json", "r") as f:
+    env = json.load(f)
+DOMAIN = env["domain"]
+
+
+# Get today date
+today = datetime.date.today()
+check_date = today.strftime('%d/%m/%Y')
+get_binhanh_service_operation_time(check_date)
+
