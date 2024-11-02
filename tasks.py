@@ -100,7 +100,7 @@ def get_binhanh_service_operation_time(check_date):
             print("Login successful!")
             operation_time = {}
             count = 0
-            for vehicle in vehicles:
+            for vehicle in vehicles[0:3]:
                 url = f'https://gps.binhanh.vn/HttpHandlers/RouteHandler.ashx?method=getRouterByCarNumberLite&carNumber={vehicle}&fromDate={start_date}%2000:00&toDate={end_date}%2023:59&split=false&isItinerary=false'
                 response = session.get(url, headers=headers)
                 data = response.json().get("data")
@@ -159,7 +159,7 @@ def send_data_to_server(data):
     if DOMAIN == "localhost":
         url = 'http://127.0.0.1:8000/api/save-vehicle-operation-record'
     else:
-        url = 'https://www.tinnghiaxuyenmoc.com /api/save-vehicle-operation-record'
+        url = 'https://www.tinnghiaxuyenmoc.com/api/save-vehicle-operation-record'
     response = requests.post(url, json=data)
 
 
