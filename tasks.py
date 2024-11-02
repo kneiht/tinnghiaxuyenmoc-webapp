@@ -107,7 +107,7 @@ def get_binhanh_service_operation_time(check_date):
                 response = session.get(url, headers=headers)
                 data = response.json().get("data")
                 count += 1
-                print(f'Vehicle {count}/{len(vehicles)}:', vehicle)
+                print('Vehicle {}/{}:'.format(count, len(vehicles)), vehicle)
                 # print(data)
                 # print('\n\n\n')
                 if data == []:
