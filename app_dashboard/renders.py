@@ -76,7 +76,7 @@ def render_tool_bar(request, page, model, project_id=None, check_date=None):
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
     }
 
-    if model not in ['Project', 'Job']:
+    if model not in ['Project', 'Job', 'VehicleOperationRecords']:
         text_dict['create_new_button_name'] = translate(f'Thêm {model}')
         url = reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string
         text_dict['create_new_form_url'] = url

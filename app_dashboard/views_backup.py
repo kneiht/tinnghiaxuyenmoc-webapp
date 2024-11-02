@@ -39,7 +39,7 @@ def insert_rows_using_to_sql(df, table_name):
     # Write the DataFrame to the database table using df.to_sql
     columns_to_keep = [col for col in df.columns if "exclude" not in col]
     df_filtered = df[columns_to_keep]
-    
+
     df_filtered.to_sql(table_name, con=engine, if_exists='append', index=False)
 
 
@@ -159,7 +159,6 @@ def upload_db_backup(request):
                     'class',
                     'student',
                     'studentclass',
-                    
                     'attendance',
                     'financialtransaction',
                 ]
@@ -174,11 +173,13 @@ def upload_db_backup(request):
 
             for table_name in table_list_reverse:
                 sql_table_name = 'app_dashboard_' + table_name if table_name != 'auth_user' else table_name
+
                 try:
                     # Delete all current rows from the table
                     delete_all_rows(sql_table_name)
                     reset_primary_key(sql_table_name)
                 except Exception as e:
+
                     return JsonResponse({'error': str(e), 'table': sql_table_name, 'delete':'delete'})
 
 
@@ -186,6 +187,7 @@ def upload_db_backup(request):
                 try:
                     # Read the Excel file into a DataFrame
                     df = pd.read_excel(excel_file, sheet_name=table_name)
+                    print(df.head(5))
                     sql_table_name = 'app_dashboard_' + table_name if table_name != 'auth_user' else table_name
                     # Insert new rows into the specified table using df.to_sql
                     insert_rows_using_to_sql(df, sql_table_name)

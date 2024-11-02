@@ -10,7 +10,9 @@
                 <th colspan="100" class="px-6 py-3 text-left font-semibold">
                     <div class="flex justify-between items-center">
                         <span>Kế hoạch tuần {{ week }}</span>
-
+                        <span class="{{ jobplans_in_week.first.status }} select-date btn rounded-full px-5">
+                            {{ jobplans_in_week.first|format_display:"status" }}
+                        </span>
                         <div class="flex flex-wrap gap-4">
 
                             <a data-date="{{ monday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ monday }}" type="button" class="select-date btn btn-outline-no-focus
@@ -59,14 +61,14 @@
                                     onclick="
                                         document.getElementById('weekplan-table').classList.add('hidden'); 
                                         document.getElementById('date-report-form-table').classList.remove('hidden');">
-                                Cập nhật báo cáo ngày {{check_date_format }}
+                                Cập nhật BC ngày {{check_date_format }}
                             </button>
 
                             <button class="btn btn-primary" 
                                     onclick="
                                         document.getElementById('weekplan-table').classList.add('hidden'); 
                                         document.getElementById('weekplan-form-table').classList.remove('hidden');">
-                                Cập nhật kế hoạch tuần
+                                Cập nhật KH tuần
                             </button>
                         </div>
                     </div>

@@ -3,7 +3,7 @@
 
 
 {% block title %}
-    Dự án - {{ project.name }}
+    Quản lý dữ liệu nhập tay
 {% endblock %}
 
 
@@ -60,11 +60,11 @@
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_content' page='page_manage_data' model='Location' %}" 
-                class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
-                Dữ liệu địa điểm
+                    href="{% url 'load_content' page='page_manage_data' model='Location' %}" 
+                    class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
+                    Dữ liệu địa điểm
             
-            </a>
+                </a>
 
         </div>
 

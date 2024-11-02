@@ -211,6 +211,12 @@ class Project(BaseModel):
 
 
 class ProjectUser(models.Model):
+    ROLE_CHOICES = (
+        ('admin', 'Quản Lý Cao Cấp'),
+        ('technician', 'Kỹ Thuật'),
+        ('supervisor', 'Giám Sát'),
+        ('normal_staff', 'Nhân Viên'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=255, default="Member")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -317,6 +323,12 @@ class Job(SecondaryIDMixin, BaseModel):
 
 
 class JobPlan(BaseModel):
+    STATUS_CHOICES = (
+        ('wait_for_approval', 'Chờ phê duyệt'),
+        ('approved', 'Đã phê duyệt'),
+        ('rejected', 'Đã bị từ chối'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="wait_for_approval", verbose_name="Trạng thái")
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(default=timezone.now)
@@ -326,7 +338,9 @@ class JobPlan(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
+        self.status = 'wait_for_approval'
         self.plan_amount = self.plan_quantity * self.job.unit_price
+        self.created_at = timezone.now()
         super().save(*args, **kwargs)  # Call the original save method
 
     def __str__(self):
@@ -394,12 +408,12 @@ class DataVehicleTypeDetail(BaseModel):
 
 
 class DataVehicle(BaseModel):
-    vehicle_type = models.ForeignKey(DataVehicleTypeDetail, on_delete=models.CASCADE)
+    vehicle_type = models.ForeignKey(DataVehicleTypeDetail, on_delete=models.SET_NULL, null=True)
     license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="")
     vehicle_name = models.CharField(max_length=255, verbose_name="Tên nhận dạng xe", default="")
     gps_name = models.CharField(max_length=255, verbose_name="Tên trên định vị", default="")
     vehicle_inspection_number = models.CharField(max_length=255, verbose_name="Số đăng kiểm")
-    vehicle_inspection_due_date = models.DateField(verbose_name="Thời hạn đăng kiểm", default=timezone.now)
+    vehicle_inspection_due_date = models.DateField(verbose_name="Thời hạn đăng kiểm", default=timezone.now, null=True)  
     created_at = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
@@ -415,7 +429,24 @@ class DataVehicle(BaseModel):
                 fields.remove(field)
         return fields
 
+class VehicleOperationRecords(models.Model):
+    class Meta:
+        ordering = ['-start_time', 'vehicle']
 
+    vehicle = models.CharField(max_length=20, verbose_name="Xe")
+    start_time = models.DateTimeField(verbose_name="Thời điểm mở máy")
+    end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy")
+    duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động (giây)")
+    def __str__(self):
+        return self.vehicle
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 class DataDriver(BaseModel):
     STATUS_CHOICES = (
@@ -472,7 +503,8 @@ class DataDriver(BaseModel):
 class DumbTruckPayRate(BaseModel):
     xe = models.ForeignKey(
         DataVehicle,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL, 
+        null=True,
         limit_choices_to={'vehicle_type__vehicle_type': 'dump_truck'},
         verbose_name="Xe"
     )

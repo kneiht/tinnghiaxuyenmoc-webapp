@@ -204,6 +204,21 @@
 
 
 
+.approved {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.wait_for_approval {
+  background-image: linear-gradient(310deg, #b54d0d 0%, #ff9c4b 100%);
+}
+
+.rejected {
+  background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
+}
+
+
+
+
 th {
     position: relative;
     padding-right: 20px;

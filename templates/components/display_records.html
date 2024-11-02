@@ -197,8 +197,14 @@
 </div>
 
 
-{% else %}
-<div id="display-records" class="w-full overflow-scroll">
+
+
+
+
+
+
+{% elif model == 'VehicleOperationRecords' %}
+<div class="w-full overflow-scroll">
     <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
         <thead>
@@ -207,7 +213,10 @@
                 {% for header in headers %}
                     <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
                 {% endfor %}
-                <th></th>
+
+                {% if model != 'VehicleOperationRecords' %}
+                    <th></th>
+                {% endif %}
             </tr>
         {% endif %}
 
@@ -226,14 +235,77 @@
                     </td>
                     {% endfor %}
     
-                    <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                        <div class="w-10 h-10 flex justify-center items-center">
-                            <a id="record-edit" class="flex flex-row justify-center items-center"
-                            up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
-                            </a>
-                        </div>  
+                    {% if model != 'VehicleOperationRecords' %}
+                        <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <div class="w-10 h-10 flex justify-center items-center">
+                                <a id="record-edit" class="flex flex-row justify-center items-center"
+                                up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                                    <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
+                                </a>
+                            </div>  
+                        </td>
+                    {% endif %}
+                </tr>
+                
+            </tbody>
+        {% endfor %}
+    </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% else %}
+<div id="display-records" class="w-full overflow-scroll">
+    <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        {% if not update %}
+        <thead>
+            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                {% for header in headers %}
+                    <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                {% endfor %}
+
+                {% if model != 'VehicleOperationRecords' %}
+                    <th></th>
+                {% endif %}
+            </tr>
+        {% endif %}
+
+        </thead>
+        {% for record in records %}
+            <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
+                <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                    {% for field in fields %}
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            
+                        {% if field == 'status' %} 
+                            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                        {% else %}
+                            {{ record|format_display:field }}
+                        {% endif %} 
                     </td>
+                    {% endfor %}
+    
+                    {% if model != 'VehicleOperationRecords' %}
+                        <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <div class="w-10 h-10 flex justify-center items-center">
+                                <a id="record-edit" class="flex flex-row justify-center items-center"
+                                up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                                    <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
+                                </a>
+                            </div>  
+                        </td>
+                    {% endif %}
                 </tr>
                 
             </tbody>

@@ -26,6 +26,8 @@ def format_display(record, field):
         return value.strftime("%d/%m/%Y")
     elif _type == datetime.time:
         return value.strftime("%H:%M:%S")
+    elif _type == datetime.datetime:
+        return value.strftime("%d/%m/%Y %H:%M:%S")
     elif _type == int:
         return "{:,}".format(value)
     elif _type == float:

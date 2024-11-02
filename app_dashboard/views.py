@@ -5,7 +5,7 @@
 from core import settings
 import pandas as pd
 
-
+import json
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -56,10 +56,6 @@ def handle_form(request, model, pk=0):
     else:
         html_modal = render_form(request, model, pk, form)
         return  HttpResponse(html_modal)
-
-
-
-
 
 @login_required
 def get_gantt_chart_data(request, project_id):
@@ -146,14 +142,14 @@ def load_content(request, page, model, project_id=None):
 
 
 
-
+@login_required
 def load_weekplan_table(request, project_id):
     check_date = request.GET.get('check_date')
     html_weekplan_table = render_weekplan_table(request, project_id, check_date)
     html_tool_bar = '<div id="tool-bar" class="hidden"></div>'
     return HttpResponse(html_weekplan_table + html_tool_bar)
 
-
+@login_required
 def handle_weekplan_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
@@ -177,14 +173,11 @@ def handle_weekplan_form(request):
 
             if type(note) != str: note = ''
 
-
             if quantity > job.quantity:
                 message = f'Lỗi khi nhập khối lượng kế hoạch cho công việc "{job.name}". Khối lượng kế hoạch phải nhỏ hơn khối lượng công việc ({str(job.quantity)}).'
                 html_message = render_message(request, message=message, message_type='red')
                 return HttpResponse(html_message)
             
-
-
             jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
             if quantity == 0 and note.strip() == '':
                 if jobplan:
@@ -207,7 +200,7 @@ def handle_weekplan_form(request):
                 ).save()
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
         html_infor_bar = render_infor_bar(request, 'page_each_project', project_id=project_id, check_date=check_date)
-        html_message = render_message(request, message='Cập nhật thông tin thành công')
+        html_message = render_message(request, message='Cập nhật thông tin thành công.\n\nĐã chuyển đến bộ phận phê duyệt kế hoạch')
         return HttpResponse(html_message + html_weekplan_table + html_infor_bar)
 
     except Exception as e:
@@ -216,18 +209,33 @@ def handle_weekplan_form(request):
         return HttpResponse(html)
         
 
-
+@login_required
 def handle_date_report_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
+    
     form = request.POST
+    check_date = form.get('check_date')
+    try:
+        check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+    except:
+        check_date = timezone.now().date()
+    # Get monday and sunday dates of the week that contains check_date
+    monday = check_date - timedelta(days=check_date.weekday())
+    sunday = check_date + timedelta(days=6 - check_date.weekday())
     try:
         check_date = form.get('check_date')
         project_id = form.get('project_id')
         # print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
+                    
         for job in jobs:
+            jobplan_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job=job).first()
+            if not jobplan_in_week:
+                html = render_message(request, message='Không cập nhật được báo cáo ngày.\n\nVui lòng chờ báo cáo tuần được phê duyệt trước.', message_type='red')
+                return HttpResponse(html)
+            
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
             material = form.get(f'date_material_{job.pk}')
@@ -283,10 +291,53 @@ def handle_date_report_form(request):
     
     except Exception as e:
         # raise e
-        html = render_message(request, message='Có lỗi: ' + str(e))
+        html = render_message(request, message='Có lỗi: ' + str(e), message_type='red')
         return HttpResponse(html)
         
 
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def save_vehicle_operation_record(request):
+    if request.method != 'POST':
+        return HttpResponseForbidden()
+    
+    try:
+        # Parse JSON data from the request body
+        data = json.loads(request.body)
+        for vehicle, other_values_list in data.items():
+            for other_values in other_values_list:
+                start_time = other_values.get('start_time')
+                end_time = other_values.get('end_time')
+                duration_seconds = other_values.get('duration_seconds')
+                
+                # get the date of the start_time
+                check_date = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S').date()
+                # check if the records which has start_time in the check_date
+                vehicle_operation_records = VehicleOperationRecords.objects.filter(
+                    vehicle=vehicle,
+                    start_time__date=check_date
+                )
+                # delete the records which has start_time in the check_date
+                vehicle_operation_records.delete()
+
+                # Create and save the VehicleOperationRecords instance
+                VehicleOperationRecords.objects.create(
+                    vehicle=vehicle,
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration_seconds=duration_seconds
+                )
+        # Process the data (for example, print it or save it to the database)
+        # Here, we will just return it in the response for demonstration
+        return JsonResponse({
+            'status': 'success',
+        }, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
 
 
 
@@ -294,7 +345,20 @@ def handle_date_report_form(request):
 @login_required
 def page_home(request):
     user = request.user
-    return render(request, 'pages/page_home.html')
+    jobplans = JobPlan.objects.filter(status='wait_for_approval')
+    # get dictionary of projects, start_date and end_date of the jobplans
+    approval_tasks = []
+    for jobplan in jobplans:
+        approval_tasks.append({
+            'project': jobplan.job.project,
+            'start_date': jobplan.start_date,
+            'end_date': jobplan.end_date
+        })
+
+    context = {'approval_tasks': approval_tasks}
+    return render(request, 'pages/page_home.html', context)
+
+
 
 @login_required
 def page_projects(request):

@@ -3,7 +3,7 @@
 
 
 {% block title %}
-    Tất cả dự án
+    Phòng vận tải
 {% endblock %}
 
 
@@ -15,12 +15,32 @@
     <div up-hungry id="modal"></div>
     <main>
         {% include 'components/nav_bar.html' %}
-        <div id="load-content" up-defer up-href="">
+
+        <div id="database-selection" class="flex items-center m-auto mb-2" 
+                onclick="
+                    event.target.closest('a').classList.add('bg-slate-300', 'dark:active:bg-slate-700');
+                    document.querySelectorAll('#database-selection a').forEach((button) => {
+                        if (button !== event.target.closest('a')) {
+                            button.classList.remove('bg-slate-300', 'dark:active:bg-slate-700');
+                        }
+                    });">
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecords' %}" 
+                    class="btn btn-outline-no-focus rounded-lg rounded-e-lg cursor-pointer text-theme">
+                    Dữ liệu thời gian hoạt động
+                </a>
+
+        </div>
+
+
+        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecords' %}">
             Loading content
         </div>
-        <div up-hungry id="title-bar"></div>
+
         <div up-hungry id="tool-bar"></div>
+        <!-- <div up-hungry id="infor-bar"></div> -->
         <div up-hungry id="display-records"></div>
+        
     </main>
 {% endblock %}
 

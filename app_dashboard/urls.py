@@ -18,6 +18,10 @@ urlpatterns = [
     path('manage-data/', views.page_manage_data, name='page_manage_data'),
     path('transport-department/', views.page_transport_department, name='page_transport_department'),
 
+
+    path('api/save-vehicle-operation-record', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
+
+
     path('api/load-form/<str:model>/<int:pk>', views.load_form, name='load_form'),
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
