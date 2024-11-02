@@ -31,12 +31,11 @@ def get_binhanh_service_operation_time(check_date):
         auth=HTTPBasicAuth(customer_code, api_key)
         url = 'http://api.gps.binhanh.vn/apiwba/gps/tracking'
         payload = {
-            'IsFuel': True  # True nếu muốn tính toán nhiên liệu
+            'IsFuel': True 
         }
         response = call_api(url, payload, auth)
-        # Xử lý kết quả trả về
         if response.status_code == 200:
-            data = response.json()  # Chuyển dữ liệu JSON trả về thành dict
+            data = response.json()  
             message_result = data.get('MessageResult')
             if message_result == 'Success':
                 vehicles = data.get('Vehicles', [])
