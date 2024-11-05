@@ -59,7 +59,14 @@ def calcate_operation_duration(vehicle_operation_records):
 def format_display(record, field):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
+    
+    if record == None:
+        return ""
     value = getattr(record, field)
+    if value == None:
+        return ""
+
+    
 
     if field=='duration_seconds':
         # convert to hours, minutes, seconds
@@ -71,8 +78,7 @@ def format_display(record, field):
     if field in {'unit_price', 'total_amount'}:
         return "{:,}".format(int(value))
     
-    if value == None:
-        return ""
+
 
 
     _type = type(value)
