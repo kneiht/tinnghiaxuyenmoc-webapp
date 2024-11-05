@@ -201,55 +201,336 @@
 
 
 
+{% elif model == 'VehicleOperationRecord' and group == 'vehicle' %}
+<div id="display-records" class="w-full overflow-scroll">
+    {% for group in records|group:'vehicle' %}
+    <div class="transport-table private-code-{{ group }} mt-5">
 
+        <form action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".private-code-{{ group }}">
+            {% csrf_token %}
+            
+            <table id="display-table-records-{{ group }}" class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
 
-{% elif model == 'VehicleOperationRecords' %}
-<div class="w-full overflow-scroll">
-    <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
-        {% if not update %}
-        <thead>
-            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
-            border border-slate-300 dark:border-slate-900 border-opacity-50">
-                {% for header in headers %}
-                    <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
-                {% endfor %}
-
-                {% if model != 'VehicleOperationRecords' %}
-                    <th></th>
-                {% endif %}
-            </tr>
-        {% endif %}
-
-        </thead>
-        {% for record in records %}
-            <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
-                <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
-                    {% for field in fields %}
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                <thead class="text-sm leading-normal text-theme rounded-t-2xl shadow-md bg-white dark:bg-slate-800
+                border border-slate-300 dark:border-slate-900 border-opacity-50">
+                    <th colspan="100" class="px-6 py-3 text-left font-semibold">
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-semibold">{{ group }}</span>
+                                <span class="text-lg font-semibold text-green-600 dark:text-green-300">
+                                    <i class="fa fa-clock mr-1"></i>
+                                    {% with records|filter_by_vehicle:group as filtered_records %}
+                                        Total Operation Duration: {{ filtered_records|calcate_operation_duration }}
+                                    {% endwith %}
+                                </span>
+                            </div>
                             
-                        {% if field == 'status' %} 
-                            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
-                        {% else %}
-                            {{ record|format_display:field }}
-                        {% endif %} 
-                    </td>
-                    {% endfor %}
-    
-                    {% if model != 'VehicleOperationRecords' %}
-                        <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                            <div class="w-10 h-10 flex justify-center items-center">
-                                <a id="record-edit" class="flex flex-row justify-center items-center"
-                                up-preload href="{{ record.edit_form_url }}" up-target=":none">
-                                    <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
-                                </a>
-                            </div>  
+                            <div class="flex gap-4">
+        
+                                <button id="edit" class="btn btn-primary w-32">
+                                    Chỉnh sửa
+                                </button>
+        
+                                <button id="add" class="btn btn-primary hidden">
+                                    Thêm dữ liệu nhập tay
+                                </button>
+
+                                <button type="submit" id="save" class="btn btn-success hidden w-32">
+                                    Lưu thay đổi
+                                </button>   
+
+                                <button id="cancel" class="btn btn-secondary hidden w-32">
+                                    Hủy bỏ
+                                </button>
+        
+                                </button>
+                            </div>
+                        </div>
+                    </th>
+                </thead>
+
+                <thead>
+                    <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+                    border border-slate-300 dark:border-slate-900 border-opacity-50">
+                        {% for header in headers %}
+                            <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                        {% endfor %}
+
+                    </tr>
+                </thead>
+
+
+                {% for record in records|filter_by_vehicle:group %}
+                    <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
+                        <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                            {% for field in fields %}
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 ">
+                                    
+                                {% if field == 'status' %} 
+                                    <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                                {% elif field == 'driver' %}
+                                    <input type="hidden" name="id" value="{{ record.pk }}">
+                                    <span class="display">{{ record|format_display:field }}</span>
+                                    <select name="driver_{{ record.pk }}" class="form-input input hidden" id="id_driver">
+                                        {% for driver in record.get_driver_choices %}
+                                            <option value="" selected">----------</option>
+                                            {% if driver.id == record.driver.id %}
+                                                <option selected value="{{ driver.id }}">{{ driver.name }}</option>
+                                            {% else %}
+                                                <option value="{{ driver.id }}">{{ driver.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                {% elif field == 'duration_seconds' %}
+                                    
+                                    {% if record.source == 'manual' %}
+                                        <span class="display {{ record.duration_type }}">
+                                            {% if record.duration_type == 'plus' %} + {% else %} - {% endif %}
+                                            {{ record|format_display:field }}
+                                        </span>
+
+                                        <div class="flex flex-row">
+                                            <select name="duration_type_{{ record.pk }}" class="form-input input hidden" id="id_duration_type">
+                                                <option value="plus" {% if record.duration_type == 'plus' %} selected {% endif %}>+ Cộng</option>
+                                                <option value="minus" {% if record.duration_type == 'minus' %} selected {% endif %}>- Trừ</option>
+                                            </select>
+                                        
+                                            <input type="time" step="1" id="duration_time_{{ record.pk }}" name="duration_time_{{ record.pk }}" class="form-input input hidden" value="{{ record|format_display:'duration_seconds' }}" required="">
+                                        </div>
+                                    {% else %}
+                                        <span class=" {{ record.duration_type }}">
+                                            {% if record.duration_type == 'plus' %} + {% else %} - {% endif %}
+                                            {{ record|format_display:field }}
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    {{ record|format_display:field }}
+                                {% endif %} 
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                {% endfor %}
+                <tbody class="add-row-template hidden">
+                    <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <input disabled type="hidden" name="vehicle_new" value="{{ group }}">
+                            {{ group }}
+                            
                         </td>
-                    {% endif %}
-                </tr>
-                
-            </tbody>
-        {% endfor %}
-    </table>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <input disabled type="hidden" name="start_time_new" value="{{ records.first.start_time.date|date:"d/m/Y" }}">
+                            {{ records.first.start_time.date|date:"d/m/Y" }}
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            {{ records.first.start_time.date|date:"d/m/Y" }}
+                        </td>   
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 flex flex-row">
+                            <select disabled name="duration_type_new" class="form-input input hidden" id="id_duration_type">
+                                <option value="plus" selected>Cộng</option>
+                                <option value="minus">Trừ</option>
+                            </select>
+                            <input disabled type="time" id="duration_time_new" name="duration_time_new" class="form-input" value="00:00:00" step="1">
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            Nhập tay
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <select disabled name="driver_new" class="form-input input hidden" id="id_driver">
+                                {% for driver in records.first.get_driver_choices %}
+                                    <option value="0">----------</option>
+                                    {% if driver.id == record.driver.id %}
+                                        <option selected value="{{ driver.id }}">{{ driver.name }}</option>
+                                    {% else %}
+                                        <option value="{{ driver.id }}">{{ driver.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            Chọn hình ảnh
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+
+
+
+
+{% elif model == 'VehicleOperationRecord' and group == 'driver' %}
+<div id="display-records" class="w-full overflow-scroll">
+    {% for group in records|group:'driver' %}
+    <div class="transport-table private-code-{{ group }} mt-5">
+
+        <form action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".private-code-{{ group }}">
+            {% csrf_token %}
+            
+            <table id="display-table-records-{{ group }}" class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+
+                <thead class="text-sm leading-normal text-theme rounded-t-2xl shadow-md bg-white dark:bg-slate-800
+                border border-slate-300 dark:border-slate-900 border-opacity-50">
+                    <th colspan="100" class="px-6 py-3 text-left font-semibold">
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-semibold">{{ group }}</span>
+                                <span class="text-lg font-semibold text-green-600 dark:text-green-300">
+                                    <i class="fa fa-clock mr-1"></i>
+                                    {% with records|filter_by_vehicle:group as filtered_records %}
+                                        Total Operation Duration: {{ filtered_records|calcate_operation_duration }}
+                                    {% endwith %}
+                                </span>
+                            </div>
+                            
+                            <div class="flex gap-4">
+        
+                                <button id="edit" class="btn btn-primary w-32">
+                                    Chỉnh sửa
+                                </button>
+        
+                                <button id="add" class="btn btn-primary hidden">
+                                    Thêm dữ liệu nhập tay
+                                </button>
+
+                                <button type="submit" id="save" class="btn btn-success hidden w-32">
+                                    Lưu thay đổi
+                                </button>   
+
+                                <button id="cancel" class="btn btn-secondary hidden w-32">
+                                    Hủy bỏ
+                                </button>
+        
+                                </button>
+                            </div>
+                        </div>
+                    </th>
+                </thead>
+
+                <thead>
+                    <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+                    border border-slate-300 dark:border-slate-900 border-opacity-50">
+                        {% for header in headers %}
+                            <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                        {% endfor %}
+
+                    </tr>
+                </thead>
+
+
+                {% for record in records|filter_by_driver:group %}
+                    <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
+                        <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                            {% for field in fields %}
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 ">
+                                    
+                                {% if field == 'status' %} 
+                                    <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                                {% elif field == 'driver' %}
+                                    <input type="hidden" name="id" value="{{ record.pk }}">
+                                    <span class="display">{{ record|format_display:field }}</span>
+                                    <select name="driver_{{ record.pk }}" class="form-input input hidden" id="id_driver">
+                                        {% for driver in record.get_driver_choices %}
+                                            <option value="" selected">----------</option>
+                                            {% if driver.id == record.driver.id %}
+                                                <option selected value="{{ driver.id }}">{{ driver.name }}</option>
+                                            {% else %}
+                                                <option value="{{ driver.id }}">{{ driver.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                {% elif field == 'duration_seconds' %}
+                                    
+                                    {% if record.source == 'manual' %}
+                                        <span class="display {{ record.duration_type }}">
+                                            {% if record.duration_type == 'plus' %} + {% else %} - {% endif %}
+                                            {{ record|format_display:field }}
+                                        </span>
+
+                                        <div class="flex flex-row">
+                                            <select name="duration_type_{{ record.pk }}" class="form-input input hidden" id="id_duration_type">
+                                                <option value="plus" {% if record.duration_type == 'plus' %} selected {% endif %}>+ Cộng</option>
+                                                <option value="minus" {% if record.duration_type == 'minus' %} selected {% endif %}>- Trừ</option>
+                                            </select>
+                                        
+                                            <input type="time" step="1" id="duration_time_{{ record.pk }}" name="duration_time_{{ record.pk }}" class="form-input input hidden" value="{{ record|format_display:'duration_seconds' }}" required="">
+                                        </div>
+                                    {% else %}
+                                        <span class=" {{ record.duration_type }}">
+                                            {% if record.duration_type == 'plus' %} + {% else %} - {% endif %}
+                                            {{ record|format_display:field }}
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    {{ record|format_display:field }}
+                                {% endif %} 
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                {% endfor %}
+                <tbody class="add-row-template hidden">
+                    <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <input disabled type="hidden" name="vehicle_new" value="{{ group }}">
+                            {{ group }}
+                            
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <input disabled type="hidden" name="start_time_new" value="{{ records.first.start_time.date|date:"d/m/Y" }}">
+                            {{ records.first.start_time.date|date:"d/m/Y" }}
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            {{ records.first.start_time.date|date:"d/m/Y" }}
+                        </td>   
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 flex flex-row">
+                            <select disabled name="duration_type_new" class="form-input input hidden" id="id_duration_type">
+                                <option value="plus" selected>Cộng</option>
+                                <option value="minus">Trừ</option>
+                            </select>
+                            <input disabled type="time" id="duration_time_new" name="duration_time_new" class="form-input" value="00:00:00" step="1">
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            Nhập tay
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            <select disabled name="driver_new" class="form-input input hidden" id="id_driver">
+                                {% for driver in records.first.get_driver_choices %}
+                                    <option value="0">----------</option>
+                                    {% if driver.id == record.driver.id %}
+                                        <option selected value="{{ driver.id }}">{{ driver.name }}</option>
+                                    {% else %}
+                                        <option value="{{ driver.id }}">{{ driver.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        
+                        <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                            Chọn hình ảnh
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    {% endfor %}
 </div>
 
 
@@ -264,7 +545,16 @@
 
 
 
+
+
+
+
+
+
+
+
 {% else %}
+
 <div id="display-records" class="w-full overflow-scroll">
     <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
@@ -275,9 +565,7 @@
                     <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
                 {% endfor %}
 
-                {% if model != 'VehicleOperationRecords' %}
                     <th></th>
-                {% endif %}
             </tr>
         {% endif %}
 
@@ -296,7 +584,6 @@
                     </td>
                     {% endfor %}
     
-                    {% if model != 'VehicleOperationRecords' %}
                         <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             <div class="w-10 h-10 flex justify-center items-center">
                                 <a id="record-edit" class="flex flex-row justify-center items-center"
@@ -305,7 +592,6 @@
                                 </a>
                             </div>  
                         </td>
-                    {% endif %}
                 </tr>
                 
             </tbody>

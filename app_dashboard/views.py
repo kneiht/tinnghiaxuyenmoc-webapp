@@ -135,6 +135,7 @@ def load_content(request, page, model, project_id=None):
     else:
         records = model_class.objects.filter(project=project)
     records = filter_records(request, records, model_class)
+
     html_display_records = render_display_records(request, model_class, records, update=False, check_date=check_date)
     return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_infor_bar + html_display_records)
 
@@ -300,10 +301,11 @@ from django.views.decorators.csrf import csrf_exempt
 def save_vehicle_operation_record(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
-    
+
     try:
         # Parse JSON data from the request body
         data = json.loads(request.body)
+        print(data)
         for vehicle, other_values_list in data.items():
             for other_values in other_values_list:
                 start_time = other_values.get('start_time')
@@ -313,20 +315,23 @@ def save_vehicle_operation_record(request):
                 # get the date of the start_time
                 check_date = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S').date()
                 # check if the records which has start_time in the check_date
-                vehicle_operation_records = VehicleOperationRecords.objects.filter(
+                vehicle_operation_record = VehicleOperationRecord.objects.filter(
                     vehicle=vehicle,
-                    start_time__date=check_date
-                )
-                # delete the records which has start_time in the check_date
-                vehicle_operation_records.delete()
+                    start_time=start_time
+                ).first()
 
-                # Create and save the VehicleOperationRecords instance
-                VehicleOperationRecords.objects.create(
-                    vehicle=vehicle,
-                    start_time=start_time,
-                    end_time=end_time,
-                    duration_seconds=duration_seconds
-                )
+                if vehicle_operation_record:
+                    vehicle_operation_record.end_time = end_time
+                    vehicle_operation_record.duration_seconds = duration_seconds
+                    vehicle_operation_record.save()
+                else:
+                    # Create and save the VehicleOperationRecord instance
+                    VehicleOperationRecord.objects.create(
+                        vehicle=vehicle,
+                        start_time=start_time,
+                        end_time=end_time,
+                        duration_seconds=duration_seconds
+                    )
         # Process the data (for example, print it or save it to the database)
         # Here, we will just return it in the response for demonstration
         return JsonResponse({
@@ -338,6 +343,117 @@ def save_vehicle_operation_record(request):
             'status': 'error',
             'message': 'Invalid JSON data'
         }, status=400)
+
+
+
+def handle_vehicle_operation_form(request):
+    if request.method != 'POST':
+        return HttpResponseForbidden()
+    
+    try:
+        form = request.POST
+        print(form)
+        # Get list of ids
+        ids = form.getlist('id')
+        for id in ids:
+            print('>>>> id:', id)
+            driver_id = form.get(f'driver_{id}', None)
+            if driver_id is None: 
+                continue
+            else:
+                # check if driver is not a int string
+                try:
+                    driver_id = int(driver_id)
+                    driver = DataDriver.objects.filter(pk=driver_id).first()
+                except:
+                    driver = None
+            
+            record = VehicleOperationRecord.objects.get(pk=id)
+            record.driver = driver
+            if record.source == 'manual':
+                try:
+                    duration_time_str = form.get(f'duration_time_{id}', None)
+                    hours, minutes, seconds = map(int, duration_time_str.split(":"))
+                    total_seconds = hours * 3600 + minutes * 60 + seconds
+                    duration_seconds = total_seconds
+                    duration_type = form.get(f'duration_type_{id}', None)
+                    if duration_type == 'minus':
+                        record.duration_type = 'minus'
+                    else:
+                        record.duration_type = 'plus'
+                    record.duration_seconds = duration_seconds
+                    
+                except:
+                    pass
+            record.save()
+        
+        # Add new records
+        new_vehicles = form.getlist('vehicle_new')
+        new_start_times = form.getlist('start_time_new')
+        new_end_times = form.getlist('start_time_new')
+        new_duration_seconds = form.getlist('duration_time_new')
+        new_driver_ids = form.getlist('driver_new')
+        new_duration_types = form.getlist('duration_type_new')
+        for i in range(0, len(new_vehicles)): # start from 1 because the first one is a template
+            try:
+                duration_time_str = new_duration_seconds[i]
+                hours, minutes, seconds = map(int, duration_time_str.split(":"))
+                total_seconds = hours * 3600 + minutes * 60 + seconds
+                duration_seconds = total_seconds
+                if duration_seconds == 0:
+                    continue
+            except:
+                continue
+            
+        
+            vehicle = new_vehicles[i]
+            driver_id = new_driver_ids[i]
+
+            if driver_id is None: 
+                continue
+            else:
+                # check if driver is not a int string
+                try:
+                    driver_id = int(driver_id)
+                    driver = DataDriver.objects.filter(pk=driver_id).first()
+                except:
+                    driver = None
+            
+            start_time = new_start_times[i]
+            # convert start time to datetime object
+            start_time = datetime.strptime(start_time, '%d/%m/%Y')
+            end_time = start_time
+
+            duration_type = new_duration_types[i]
+            if duration_type == 'minus':
+                record.duration_type = 'minus'
+            else:
+                record.duration_type = 'plus'
+
+            new_record = VehicleOperationRecord.objects.create(
+                vehicle=vehicle,
+                start_time=start_time,
+                end_time=end_time,
+                duration_seconds=duration_seconds,
+                source='manual',
+                duration_type=duration_type,
+                driver=driver
+            )
+            ids.append(new_record.id)
+
+        # Get records by ids
+        records = VehicleOperationRecord.objects.filter(pk__in=ids)
+        html_display = render_display_records(request, VehicleOperationRecord, records)
+        html_message = render_message(request, message='Cập nhật thành công', message_type='green')
+        html = html_message + html_display
+        return HttpResponse(html)
+    except Exception as e:
+        raise e
+        html = render_message(request, message='Có lỗi: ' + str(e), message_type='red') 
+        return HttpResponse(html)
+
+
+
 
 
 

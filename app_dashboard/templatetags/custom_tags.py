@@ -8,9 +8,52 @@ register = template.Library()
 import datetime
 from core import settings
 
+from ..models import *
+
+
 @register.simple_tag
 def get_static_version():
     return settings.STATIC_VERSION
+
+
+
+@register.filter(name='group')
+def group(records, field):
+    # get all values of the field
+    values = [getattr(record, field) for record in records]
+    # get unique values
+    unique_values = set(values)
+    return unique_values
+
+@register.filter(name='filter_by_vehicle')
+def filter_by_vehicle(records, vehicle):
+    return records.filter(vehicle=vehicle)
+
+@register.filter(name='filter_by_driver')
+def filter_by_driver(records, driver):
+    return records.filter(driver=driver)
+
+
+
+@register.filter(name='calcate_operation_duration')
+def calcate_operation_duration(vehicle_operation_records):
+    if vehicle_operation_records:
+        time_seconds = vehicle_operation_records.filter(source='gps').aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+        # convert to hours, minutes, seconds
+        hours = time_seconds // 3600
+        minutes = (time_seconds % 3600) // 60
+        seconds = time_seconds % 60
+        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    else:
+        return "00:00:00"
+
+
+
+
+
+
+
+
 
 @register.filter(name='format_display')
 def format_display(record, field):
@@ -18,9 +61,20 @@ def format_display(record, field):
         return getattr(record, 'get_{}_display'.format(field))()
     value = getattr(record, field)
 
+    if field=='duration_seconds':
+        # convert to hours, minutes, seconds
+        hours = value // 3600
+        minutes = (value % 3600) // 60
+        seconds = value % 60
+        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+
     if field in {'unit_price', 'total_amount'}:
         return "{:,}".format(int(value))
     
+    if value == None:
+        return ""
+
+
     _type = type(value)
     if _type == datetime.date:
         return value.strftime("%d/%m/%Y")
@@ -60,9 +114,9 @@ def format_vnd(amount):
 
 
 
-@register.filter
-def multiply(value, arg):
-    return value * arg
+
+
+
 
 
 

@@ -76,7 +76,7 @@ def render_tool_bar(request, page, model, project_id=None, check_date=None):
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
     }
 
-    if model not in ['Project', 'Job', 'VehicleOperationRecords']:
+    if model not in ['Project', 'Job', 'VehicleOperationRecord']:
         text_dict['create_new_button_name'] = translate(f'Thêm {model}')
         url = reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string
         text_dict['create_new_form_url'] = url
@@ -84,13 +84,13 @@ def render_tool_bar(request, page, model, project_id=None, check_date=None):
 
     # Render 
     template = 'components/tool_bar.html'
-    context = {'page': page, 'text': text_dict}
+    context = {'page': page, 'text': text_dict, 'request': request}
     return render_to_string(template, context, request)
 
 
 
 
-def render_display_records(request, model_class, records, update=None, check_date=None):
+def render_display_records(request, model_class, records, update=None, check_date=None, group=None):
     user = request.user
     model = model_class.__name__
     for record in records:
@@ -118,10 +118,11 @@ def render_display_records(request, model_class, records, update=None, check_dat
             record.progress_by_amount = progress_by_amount(record)
             record.progress_by_plan = progress_by_plan(record)
 
-
+    group = request.GET.get('group')
+    print('group', group)
     # Render 
     template = 'components/display_records.html'
-    context = {'model': model, 'records': records, 'fields': fields, 'headers': headers, 'update': update}
+    context = {'model': model, 'records': records, 'fields': fields, 'headers': headers, 'update': update, 'group': group}
     return render_to_string(template, context, request)
 
 

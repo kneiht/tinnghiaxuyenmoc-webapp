@@ -56,6 +56,14 @@ class UserExtraAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'role')
     search_fields = ('user__username', 'role')
 
+
+class VehicleOperationRecordAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'image')
+    search_fields = ('vehicle', 'driver__full_name')
+    raw_id_fields = ('driver',)
+
+admin.site.register(VehicleOperationRecord, VehicleOperationRecordAdmin)
+
 admin.site.register(UserExtra, UserExtraAdmin)
 
 

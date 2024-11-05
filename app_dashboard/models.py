@@ -429,24 +429,6 @@ class DataVehicle(BaseModel):
                 fields.remove(field)
         return fields
 
-class VehicleOperationRecords(models.Model):
-    class Meta:
-        ordering = ['-start_time', 'vehicle']
-
-    vehicle = models.CharField(max_length=20, verbose_name="Xe")
-    start_time = models.DateTimeField(verbose_name="Thời điểm mở máy")
-    end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy")
-    duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động (giây)")
-    def __str__(self):
-        return self.vehicle
-    @classmethod
-    def get_display_fields(self):
-        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
 
 class DataDriver(BaseModel):
     STATUS_CHOICES = (
@@ -499,6 +481,15 @@ class DataDriver(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+
+
+
+
+
+
+
+
+
 
 class DumbTruckPayRate(BaseModel):
     xe = models.ForeignKey(
@@ -640,3 +631,86 @@ class Location(BaseModel):
 # điểm đến điểm đi là một bảng danh sách các nơi
 
 
+
+
+
+
+class VehicleOperationRecord(models.Model):
+
+    SOURCE_CHOICES = [
+        ('gps', 'GPS'),
+        ('manual', 'Nhập tay'),
+    ]
+    TYPE_CHOICES = [
+        ('plus', 'Cộng'),
+        ('minus', 'Trừ'),
+    ]
+
+    class Meta:
+        ordering = ['vehicle', '-start_time']
+
+    vehicle = models.CharField(max_length=20, verbose_name="Xe")
+    start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
+    end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
+    duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động")
+    duration_type = models.CharField(max_length=20, verbose_name="Cộng/Trừ", choices=TYPE_CHOICES, default='plus')
+    driver = models.ForeignKey(DataDriver, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tài xế")
+    image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
+    def __str__(self):
+        return self.vehicle
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'image']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    def get_driver_choices(self):
+        drivers = DataDriver.objects.all()
+        # return a dict of choices with key id and name
+        dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
+        return dict_drivers
+
+
+
+
+
+class DriverOperationRecord(models.Model):
+
+    SOURCE_CHOICES = [
+        ('gps', 'GPS'),
+        ('manual', 'Nhập tay'),
+    ]
+    TYPE_CHOICES = [
+        ('plus', 'Cộng'),
+        ('minus', 'Trừ'),
+    ]
+
+    class Meta:
+        ordering = ['vehicle', '-start_time']
+
+    vehicle = models.CharField(max_length=20, verbose_name="Xe")
+    start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
+    end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
+    duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động")
+    duration_type = models.CharField(max_length=20, verbose_name="Cộng/Trừ", choices=TYPE_CHOICES, default='plus')
+    driver = models.ForeignKey(DataDriver, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tài xế")
+    image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
+    def __str__(self):
+        return self.vehicle
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'image']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    def get_driver_choices(self):
+        drivers = DataDriver.objects.all()
+        # return a dict of choices with key id and name
+        dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
+        return dict_drivers

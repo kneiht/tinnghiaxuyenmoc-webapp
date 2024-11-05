@@ -22,7 +22,7 @@
                                 <!-- Input field for filter values -->
                                 <input id="filter-input" name="all" type="text" placeholder="Nhập để tìm kiếm ..."
                                     class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme border-opacity-50 text-theme"
-                                    autocomplete="off" />
+                                    autocomplete="off"/>
                                 <!-- Button to submit search -->
                                 <button id="search-button" type="submit"
                                     class="btn btn-outline rounded-l-none h-full shadow-none">
@@ -50,15 +50,24 @@
                                 <option value="-start_date">Ngày bắt đầu - (Giảm)</option>
                                 <option value="end_date">Ngày kết thúc - (Tăng)</option>
                                 <option value="-end_date">Ngày kết thúc - (Giảm)</option>
-
-                            
                             </select>
+
                             <script>
                                 document.getElementById('sort-select').addEventListener('change', function() {
                                     // Press search-button
                                     document.getElementById('search-button').click();
                                 });
                             </script>
+                            {% elif page == 'page_transport_department' %}
+                                <input id="start_date" type="date" name="start_date" class="form-input w-fit">
+                                <input id="group" class="hidden" name="group" value="{{  request.GET.group }}">
+                                <script>
+                                    document.getElementById('start_date').addEventListener('change', function() {
+                                        // Press search-button
+                                        document.getElementById('search-button').click();
+                                    });
+                                </script>
+
                             {% endif %}
                         </div>
                     </div>

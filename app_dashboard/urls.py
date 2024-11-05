@@ -34,6 +34,12 @@ urlpatterns = [
     path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
     path('api/handle-date-report-form/', views.handle_date_report_form, name='handle_date_report_form'),
 
+    path('api/handle-vehicle-operation-form/', views.handle_vehicle_operation_form, name='handle_vehicle_operation_form'),
+
+
+
+
+
 
     path('api/gantt-chart-data/<int:project_id>/', views.get_gantt_chart_data, name='get_gantt_chart_data'),
 

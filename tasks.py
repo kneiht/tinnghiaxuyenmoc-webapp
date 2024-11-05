@@ -147,7 +147,7 @@ def get_binhanh_service_operation_time(check_date):
 
     
     vehicles = get_vehicle_list()
-    # start_date = '01/05/2024'
+    # start_date = '01/05/2024' 
     # end_date = '01/05/2024'
 
     # Get operation time
@@ -171,8 +171,19 @@ with open("env.json", "r") as f:
 DOMAIN = env["domain"]
 
 
-# Get today date
-today = datetime.date.today()
-check_date = today.strftime('%d/%m/%Y')
-get_binhanh_service_operation_time(check_date)
+# # Get today date
+# today = datetime.date.today()
+# check_date = today.strftime('%d/%m/%Y')
+# get_binhanh_service_operation_time('01/05/2024')
 
+from datetime import datetime, timedelta
+
+check_date = datetime.strptime('01/05/2024', '%d/%m/%Y').date()
+for i in range(0, 5):
+    # Increase check_date by 1 day
+    current_date = check_date + timedelta(days=i)
+    # Format date for display or function calls
+    formatted_date = current_date.strftime('%d/%m/%Y')
+    print(formatted_date)
+    # Call your function with the formatted date
+    get_binhanh_service_operation_time(formatted_date)

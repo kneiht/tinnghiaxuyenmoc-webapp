@@ -1,6 +1,6 @@
 
 import datetime
-
+from datetime import timedelta
 
 from django.db.models import Q, Sum
 from django.utils import timezone
@@ -232,6 +232,17 @@ def progress_by_plan(record, check_date = None):
 def filter_records(request, records, model_class):
     # Get all query parameters except 'sort' as they are assumed to be field filters
     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
+
+    if model_class == VehicleOperationRecord:
+        # set start_date = yesterday
+        start_date = timezone.now().date() - timedelta(days=1)
+        print(start_date)
+        for k, v in query_params.items():
+            if k == 'start_date':
+                start_date = v[0]
+        records = records.filter(start_time__date=start_date)
+
+
     # Determine the fields to be used as filter options based on the selected page
     if model_class == Project:
         fields = ['all', 'name', 'description']

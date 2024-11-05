@@ -623,3 +623,4 @@ class LocationForm(forms.ModelForm):
                 'required': 'required'
             })
         }
+

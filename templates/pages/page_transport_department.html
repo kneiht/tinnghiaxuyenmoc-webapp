@@ -25,19 +25,23 @@
                         }
                     });">
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecords' %}" 
-                    class="btn btn-outline-no-focus rounded-lg rounded-e-lg cursor-pointer text-theme">
-                    Dữ liệu thời gian hoạt động
+                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=vehicle" 
+                    class="btn btn-outline-no-focus rounded-lg rounded-e-none cursor-pointer text-theme">
+                    Dữ liệu thời gian xe hoạt động
                 </a>
-
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=driver" 
+                    class="btn btn-outline-no-focus rounded-lg rounded-s-none cursor-pointer text-theme">
+                    Dữ liệu lương tài xế
+                </a>
         </div>
 
 
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecords' %}">
+        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=vehicle">
             Loading content
         </div>
 
-        <div up-hungry id="tool-bar"></div>
+    <div up-hungry id="tool-bar"></div>
         <!-- <div up-hungry id="infor-bar"></div> -->
         <div up-hungry id="display-records"></div>
         
