@@ -223,9 +223,9 @@ th {
     position: relative;
     padding-right: 20px;
 }
-th:hover {
+/* th:hover {
     background-color: #f2f1f1;
-}
+} */
 th.sorted-asc::after {
     content: ' ▲';
     position: absolute;
@@ -235,4 +235,15 @@ th.sorted-desc::after {
     content: ' ▼';
     position: absolute;
     right: 5px;
+}
+
+
+
+.plus {
+  color: green;
+  
+}
+
+.minus {
+  color: red;
 }
