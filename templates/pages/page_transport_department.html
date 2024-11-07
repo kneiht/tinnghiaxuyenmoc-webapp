@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load custom_tags %}
 
 
 {% block title %}
@@ -25,25 +26,25 @@
                         }
                     });">
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=vehicle" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date elements='tool_bar|display_records' group_by='vehicle' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-e-none cursor-pointer text-theme">
                     Dữ liệu thời gian xe hoạt động
                 </a>
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=driver" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date elements='tool_bar|display_records' group_by='driver' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-s-none cursor-pointer text-theme">
                     Dữ liệu lương tài xế
                 </a>
         </div>
 
 
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_transport_department' model='VehicleOperationRecord' %}?group=vehicle">
+        <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date group_by='vehicle' elements='tool_bar|display_records' %}">
             Loading content
         </div>
 
+
     <div up-hungry id="tool-bar"></div>
-        <!-- <div up-hungry id="infor-bar"></div> -->
-        <div up-hungry id="display-records"></div>
+    <div up-hungry id="display-records"></div>
         
     </main>
 {% endblock %}

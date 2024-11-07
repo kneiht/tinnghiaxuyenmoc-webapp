@@ -21,19 +21,17 @@ urlpatterns = [
 
     path('api/save-vehicle-operation-record', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
 
-
-    path('api/load-form/<str:model>/<int:pk>', views.load_form, name='load_form'),
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
-    path('api/load-content/<str:page>/<str:model>', views.load_content, name='load_content'),
-    path('api/load-content/<str:page>/<str:model>/<int:project_id>', views.load_content, name='load_content_with_project'),
-    path('api/load-element/<str:element>/', views.load_element, name='load_element'),
+    path('api/load-elements', views.load_elements, name='load_elements'),
+    path('api/gantt-chart-data/<int:project_id>/', views.get_gantt_chart_data, name='get_gantt_chart_data'),
+
     
+
 
     path('api/load-weekplan-table/<int:project_id>/', views.load_weekplan_table, name='load_weekplan_table'),
     path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
     path('api/handle-date-report-form/', views.handle_date_report_form, name='handle_date_report_form'),
-
     path('api/handle-vehicle-operation-form/', views.handle_vehicle_operation_form, name='handle_vehicle_operation_form'),
 
 
@@ -41,7 +39,6 @@ urlpatterns = [
 
 
 
-    path('api/gantt-chart-data/<int:project_id>/', views.get_gantt_chart_data, name='get_gantt_chart_data'),
 
 
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),

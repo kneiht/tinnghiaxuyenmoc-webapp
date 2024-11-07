@@ -5,11 +5,11 @@
         <!-- Modal Content -->
         <div class="relative top-16 mb-10 mx-4 card h-fit w-full sm:w-fit">
 
-            <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ text.title }}</h3>
+            <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ title }}</h3>
             
             <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
             <form enctype="multipart/form-data" method="post"
-                   action="{{ text.form_url }}" up-submit
+                   action="{{ form_url }}" up-submit
                     {% if record %}
                         up-target="#modal:maybe, #record_{{ record.pk }}:maybe"
                     {% else %}
@@ -19,9 +19,9 @@
                 {% if form.non_field_errors %}
                 <div class="px-6 py-3">
                     {% for error in form.non_field_errors %}
-                    <p class="text-red-500">{{ error }}</p>
+                        <p class="text-red-500 whitespace-pre-line">{{ error }}</p>
                     {% endfor %}
-                </div>
+                </div>  
                 {% endif %}
 
                 {% if form.fields|length >= 12 %}
@@ -34,8 +34,9 @@
                 <div class="grid grid-cols-1 w-[400px]  gap-4 px-6">
                 {% endif %}
 
-                    {% if text.project_id %}  
-                        <input type="hidden" name="project" value="{{ text.project_id }}">
+                    {% if project_id %}  
+                        <input type="hidden" name="project" value="{{ project_id }}">
+
                     {% endif %}
 
                     {% csrf_token %}
@@ -71,7 +72,7 @@
 
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
                     <button type="submit" class="submit btn btn-primary rounded-full w-36" onclick="this.form.delete.value = 'false';">
-                        {{ text.submit_button_name }}
+                        {{ submit_button_name }}
                     </button>
                     <button id='cancel-modal' type="button" class="btn btn-secondary rounded-full w-36" onclick="document.getElementById('modal-body').remove();">
                         Hủy bỏ

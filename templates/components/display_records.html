@@ -31,7 +31,7 @@
                         <div class="w-10 h-10 flex justify-end items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload    
-                            href="{{ record.edit_form_url }}" up-target=":none">
+                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target=":none">
                                 <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
@@ -184,7 +184,7 @@
                     <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
-                            up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                            up-preload href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target=":none">
                                 <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
@@ -201,14 +201,14 @@
 
 
 
-{% elif model == 'VehicleOperationRecord' and group == 'vehicle' %}
+{% elif model == 'VehicleOperationRecord' and group_by == 'vehicle' %}
 <div id="display-records" class="w-full overflow-scroll">
     {% for group in records|group:'vehicle' %}
     <div class="transport-table private-code-{{ group }} mt-5">
 
         <form action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".private-code-{{ group }}">
             {% csrf_token %}
-            
+            <input type="hidden" name="group_by" value="vehicle" />
             <table id="display-table-records-{{ group }}" class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
 
                 <thead class="text-sm leading-normal text-theme rounded-t-2xl shadow-md bg-white dark:bg-slate-800
@@ -273,8 +273,8 @@
                                     <input type="hidden" name="id" value="{{ record.pk }}">
                                     <span class="display">{{ record|format_display:field }}</span>
                                     <select name="driver_{{ record.pk }}" class="form-input input hidden" id="id_driver">
+                                        <option value="" selected">----------</option>
                                         {% for driver in record.get_driver_choices %}
-                                            <option value="" selected">----------</option>
                                             {% if driver.id == record.driver.id %}
                                                 <option selected value="{{ driver.id }}">{{ driver.name }}</option>
                                             {% else %}
@@ -369,14 +369,14 @@
 
 
 
-{% elif model == 'VehicleOperationRecord' and group == 'driver' %}
+{% elif model == 'VehicleOperationRecord' and group_by == 'driver' %}
 <div id="display-records" class="w-full overflow-scroll">
     {% for group in records|group:'driver' %}
-    <div class="transport-table private-code-{{ group }} mt-5">
+    <div class="transport-table private-code-{{ group.id }} mt-5">
 
-        <form action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".private-code-{{ group }}">
+        <form action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".private-code-{{ group.id }}">
             {% csrf_token %}
-            
+            <input type="hidden" name="group_by" value="driver" />
             <table id="display-table-records-{{ group }}" class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
 
                 <thead class="text-sm leading-normal text-theme rounded-t-2xl shadow-md bg-white dark:bg-slate-800
@@ -441,8 +441,8 @@
                                     <input type="hidden" name="id" value="{{ record.pk }}">
                                     <span class="display">{{ record|format_display:field }}</span>
                                     <select name="driver_{{ record.pk }}" class="form-input input hidden" id="id_driver">
+                                        <option value="">----------</option>
                                         {% for driver in record.get_driver_choices %}
-                                            <option value="" selected">----------</option>
                                             {% if driver.id == record.driver.id %}
                                                 <option selected value="{{ driver.id }}">{{ driver.name }}</option>
                                             {% else %}
@@ -587,7 +587,7 @@
                         <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             <div class="w-10 h-10 flex justify-center items-center">
                                 <a id="record-edit" class="flex flex-row justify-center items-center"
-                                up-preload href="{{ record.edit_form_url }}" up-target=":none">
+                                up-preload  href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}"  up-target=":none">
                                     <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                                 </a>
                             </div>  

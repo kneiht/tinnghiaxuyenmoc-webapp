@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load custom_tags %}
 
 
 {% block title %}
@@ -26,41 +27,41 @@
                     });">
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='DataVehicleTypeDetail' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicleTypeDetail' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
                     Dữ liệu loại xe chi tiết
 
                 </a>
                 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='DataVehicle' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicle' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
                     Dữ liệu xe
                     
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='DataDriver' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataDriver' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
                     Dữ liệu tài xế
                 
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='DumbTruckPayRate' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DumbTruckPayRate' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
                     Dữ liệu tính lương tài xế xe ben
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='DumbTruckRevenueData' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DumbTruckRevenueData' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
                     Dữ liệu tính doanh thu xe ben
                 
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_content' page='page_manage_data' model='Location' %}" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='Location' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
                     Dữ liệu địa điểm
             
@@ -68,11 +69,9 @@
 
         </div>
 
-
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_manage_data' model='DataVehicleTypeDetail' %}">
+        <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicleTypeDetail' elements='tool_bar|display_records' %}">
             Loading content
         </div>
-
         <div up-hungry id="tool-bar"></div>
         <!-- <div up-hungry id="infor-bar"></div> -->
         <div up-hungry id="display-records"></div>

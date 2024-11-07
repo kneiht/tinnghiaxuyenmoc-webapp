@@ -15,12 +15,78 @@ from .models import *
 from .utils import *
 
 
-def render_infor_bar(request, page, project_id, check_date=None):
-    text_dict = {}
+def render_title_bar(request, **kwargs):
+    params = kwargs
+    page = params.get('page', '')
+    model = params.get('model', '')
+    project_id = get_valid_id(params.get('project_id', 0))
+    project = Project.objects.filter(pk=project_id).first()
+    check_date = get_valid_date(params.get('check_date', ''))
+        
+    context = {
+        'page': page,
+        'model': model,
+        'title': translate('Tiêu đề cho trang: ' + page),
+        'create_new_button_name': translate(f'Thêm {model}'),
+        'project_id': project_id,
+        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
+    }
+
+    if page=='page_each_project': 
+        project = Project.objects.filter(pk=project_id).first()
+        context['title'] = translate(f'Quản lý dự án: {project.name}')
+
+    # Render
+    template = 'components/title_bar.html'
+    return render_to_string(template, context, request)
+
+
+
+
+
+def render_tool_bar(request, **kwargs):
+    params = kwargs
+    page = params.get('page', '')
+    model = params.get('model', '')
+    project_id = get_valid_id(params.get('project_id', 0))
+    check_date = get_valid_date(params.get('check_date', ''))
+    start_date = get_valid_date(params.get('start_date', ''))
+    group_by = params.get('group_by', '')
+    # print(check_date)
+    project = Project.objects.filter(pk=project_id).first()
+    context = {
+        'page': page,
+        'model': model,
+        'project_id': project_id,
+        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d'),
+        'start_date': start_date,
+        'group_by': group_by
+    }
+    if model not in ['Project', 'Job', 'VehicleOperationRecord']:
+        context['create_new_button_name'] = translate(f'Thêm {model}')
+    print(context)
+    # Render 
+    template = 'components/tool_bar.html'
+    return render_to_string(template, context, request)
+
+
+
+
+
+
+def render_infor_bar(request, **kwargs):
+    params = kwargs
+    page = params.get('page', '')
+    project_id = get_valid_id(params.get('project_id', 0))
+    check_date = get_valid_date(params.get('check_date', ''))
     if page == 'page_each_project':
         project = Project.objects.filter(pk=project_id).first()
         number_of_jobs = project.get_number_of_jobs()
-        text_dict = {
+        context = {
+            'project': project,
+            'check_date': check_date,
+            'project_id': project_id,
+            'page': page,
             'total_jobs': number_of_jobs['all'],
             'total_jobs_in_progress': number_of_jobs['in_progress'],
             'total_jobs_not_started': number_of_jobs['not_started'],
@@ -33,69 +99,33 @@ def render_infor_bar(request, page, project_id, check_date=None):
 
         # Render
         template = 'components/infor_bar.html'
-        context = {'page': page, 'text': text_dict, 'project': project}
-        # print(context)
         return render_to_string(template, context, request)
     else:
         return HttpResponse("")
 
 
 
-def render_title_bar(request, page, model, project_id=None, check_date=None):
+
+
+def render_display_records(request, **kwargs):
+    params = kwargs
+    model = params.get('model', '')
+    update = params.get('update', False)
+    project_id = get_valid_id(params.get('project_id', 0))
+    check_date = get_valid_date(params.get('check_date', ''))
+    start_date = get_valid_date(params.get('start_date', ''))
+    group_by = params.get('group_by', '')
+    records = params.get('records', None)
+    # Check the page to render specific content
+    model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
-    param_string = f'?project_id={project_id}' if project_id else ''
-    text_dict = {
-        'title': translate('Tiêu đề cho trang: ' + page),
-        'create_new_button_name': translate(f'Thêm {model}'),
-        'create_new_form_url': reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string,
-        'project_id': project_id if project_id else '',
-        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
-    }
-    if page=='page_each_project': text_dict['title'] = translate(f'Quản lý dự án: {project.name}')
-
-    # Render
-    template = 'components/title_bar.html'
-    context = {'page': page, 'text': text_dict}
-    return render_to_string(template, context, request)
-
-
-def render_tool_bar(request, page, model, project_id=None, check_date=None):
-    project = Project.objects.filter(pk=project_id).first()
-    # Create text dictionary
-    param_string = f'?project_id=project_id' if project_id else ''
-    if project_id:
-        query_url = reverse('load_content_with_project', kwargs={'page': page, 'model': model, 'project_id': project_id})
-    else:
-        query_url = reverse('load_content', kwargs={'page': page, 'model': model})
     
-
-    
-    text_dict = {
-        'query_url': query_url,
-        'project_id': project_id if project_id else '',
-        'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
-    }
-
-    if model not in ['Project', 'Job', 'VehicleOperationRecord']:
-        text_dict['create_new_button_name'] = translate(f'Thêm {model}')
-        url = reverse('load_form', kwargs={'model': model, 'pk': 0}) + param_string
-        text_dict['create_new_form_url'] = url
-        
-
-    # Render 
-    template = 'components/tool_bar.html'
-    context = {'page': page, 'text': text_dict, 'request': request}
-    return render_to_string(template, context, request)
-
-
-
-
-def render_display_records(request, model_class, records, update=None, check_date=None, group=None):
-    user = request.user
-    model = model_class.__name__
-    for record in records:
-        param_string = f'?project_id={record.project.pk}' if hasattr(record, 'project') else ''
-        record.edit_form_url = reverse('load_form', kwargs={'model': model, 'pk': record.pk}) + param_string
+    if not records:
+        if not project_id:
+            records = model_class.objects.all()
+        else:
+            records = model_class.objects.filter(project=project)
+        records = filter_records(request, records, model_class)
 
 
     # Get fields to be displayed by using record meta
@@ -118,47 +148,53 @@ def render_display_records(request, model_class, records, update=None, check_dat
             record.progress_by_amount = progress_by_amount(record)
             record.progress_by_plan = progress_by_plan(record)
 
-    group = request.GET.get('group')
-    print('group', group)
     # Render 
     template = 'components/display_records.html'
-    context = {'model': model, 'records': records, 'fields': fields, 'headers': headers, 'update': update, 'group': group}
+    context = {'model': model, 
+               'records': records, 
+               'fields': fields, 
+               'headers': headers, 
+               'update': update, 
+               'group_by': group_by,
+               'project_id': project_id,
+               'project': project,
+               'check_date': check_date
+    }
     return render_to_string(template, context, request)
 
 
 
-def render_form(request, model, pk=0, form=None):
+def render_form(request, **kwargs):
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
+    model = kwargs.get('model', '')
+    pk = get_valid_id(kwargs.get('pk', 0))
+    form = kwargs.get('form', '')
     model_class = globals()[model]
     form_class = globals()[model + 'Form']
+    project_id = get_valid_id(kwargs.get('project_id', 0))
 
     # Set selections
     modal = 'modal_' + model
 
     # Get the instance if pk is provided, use None otherwise
     record = model_class.objects.filter(pk=pk).first()
-    text_dict = {
-        'submit_button_name': 'Cập nhật' if record else 'Tạo mới',
-        'title': translate(f'Cập nhật {model}') if record else translate(f'Tạo {model} mới'),
-        'form_url': reverse('handle_form', kwargs={'model': model, 'pk': pk if record else 0}),
-    }
-    
-    # Add all params from the request to text dict, include projet id
-    for key, value in request.GET.items():
-        text_dict[key] = value  
-
     # Get the form
     if not form:
         form = form_class(instance=record) if record else form_class()
-    else:
-        # Get project id from the form
-        project_id = request.POST.get('project')
-        text_dict['project_id'] = project_id
-
+        
+    context = {
+        'submit_button_name': 'Cập nhật' if record else 'Tạo mới',
+        'title': translate(f'Cập nhật {model}') if record else translate(f'Tạo {model} mới'),
+        'form_url': reverse('handle_form', kwargs={'model': model, 'pk': pk}),
+        'model': model,
+        'project_id': project_id,
+        'modal': modal,
+        'form': form,
+        'record': record
+    }
 
     template = 'components/modal.html'
-    context = {'modal': modal, 'form': form, 'record': record, 'text': text_dict}
     return render_to_string(template, context, request)
 
 

@@ -265,8 +265,6 @@ class Job(SecondaryIDMixin, BaseModel):
             errors += ('- Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.\n')
 
         # End date must be before or equal to the project end date
-        print(self.project.end_date)
-        print(self.end_date)
         if pd.Timestamp(self.end_date) > pd.Timestamp(self.project.end_date):
             errors += (f'- Ngày kết thúc phải nhỏ hơn hoặc bằng ngày kết thúc dự án {self.project.end_date.strftime("%d/%m/%Y")}.\n')
 
@@ -655,13 +653,18 @@ class VehicleOperationRecord(models.Model):
     duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động")
     duration_type = models.CharField(max_length=20, verbose_name="Cộng/Trừ", choices=TYPE_CHOICES, default='plus')
     driver = models.ForeignKey(DataDriver, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tài xế")
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Địa điểm")
+    overtime = models.IntegerField(verbose_name="Thời gian tăng ca", default=0)
+    holiday_time = models.IntegerField(verbose_name="Thời gian làm ngày lễ", default=0)
+    fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
+    note = models.TextField(verbose_name="Ghi chú", default='')
     def __str__(self):
         return self.vehicle
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'image']
+        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'location', 'overtime', 'holiday_time', 'fuel_allowance', 'image']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -675,42 +678,3 @@ class VehicleOperationRecord(models.Model):
 
 
 
-
-
-class DriverOperationRecord(models.Model):
-
-    SOURCE_CHOICES = [
-        ('gps', 'GPS'),
-        ('manual', 'Nhập tay'),
-    ]
-    TYPE_CHOICES = [
-        ('plus', 'Cộng'),
-        ('minus', 'Trừ'),
-    ]
-
-    class Meta:
-        ordering = ['vehicle', '-start_time']
-
-    vehicle = models.CharField(max_length=20, verbose_name="Xe")
-    start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
-    end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
-    duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động")
-    duration_type = models.CharField(max_length=20, verbose_name="Cộng/Trừ", choices=TYPE_CHOICES, default='plus')
-    driver = models.ForeignKey(DataDriver, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tài xế")
-    image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
-    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
-    def __str__(self):
-        return self.vehicle
-    @classmethod
-    def get_display_fields(self):
-        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'image']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-    def get_driver_choices(self):
-        drivers = DataDriver.objects.all()
-        # return a dict of choices with key id and name
-        dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
-        return dict_drivers

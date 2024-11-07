@@ -12,6 +12,31 @@ from .models import *
 def is_admin(user):
     return user.is_authenticated and user.is_active and user.is_staff and user.is_superuser
 
+def get_valid_date(date):
+    try:
+        date = datetime.strptime(date, '%Y-%m-%d').date()
+    except:
+        date = timezone.now().date()
+    date = date.strftime('%Y-%m-%d')
+    return date
+
+def get_valid_id(id):
+    try:
+        id = int(id)
+    except:
+        id = 0
+    return id
+
+
+
+import base64, json
+def decode_params(encoded_params):
+    # Convert string back to bytes
+    byte_string = encoded_params.encode('utf-8')
+    # Base64 decode the byte string
+    decoded_bytes = base64.b64decode(byte_string)
+    # Convert bytes back to string
+    return decoded_bytes.decode('utf-8')
 
 
 
@@ -236,7 +261,7 @@ def filter_records(request, records, model_class):
     if model_class == VehicleOperationRecord:
         # set start_date = yesterday
         start_date = timezone.now().date() - timedelta(days=1)
-        print(start_date)
+        # print(start_date)
         for k, v in query_params.items():
             if k == 'start_date':
                 start_date = v[0]
@@ -248,6 +273,8 @@ def filter_records(request, records, model_class):
         fields = ['all', 'name', 'description']
     elif model_class == Job:
         fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
+    elif model_class == DataDriver:
+        fields = ['all', 'full_name', 'identity_card']
     else:
         # Get all fields except foreign key fields
         fields = [field.name for field in model_class._meta.get_fields() if not isinstance(field, models.ForeignKey)]

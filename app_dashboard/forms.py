@@ -122,21 +122,6 @@ class JobForm(forms.ModelForm):
                     'type': 'date'}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        project = cleaned_data.get('project')
-        # Validate date
-        if start_date and end_date:
-            if start_date > end_date:
-                raise ValidationError('Ngày bắt đầu phải nhỏ hoặc bằng ngày kết thúc.')
-            
-        # Check if job end date is after project end date
-        if end_date > project.end_date:
-                raise ValidationError(f'Ngày kết thúc phải nhỏ hoặc bằng ngày kết thúc dự án {project.end_date.strftime("%d/%m/%Y")}.')
-    
-        return cleaned_data
 
 
 class JobPlanForm(forms.ModelForm):

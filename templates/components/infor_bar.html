@@ -20,13 +20,13 @@
     <div class="flex flex-row justify-center gap-4 w-full max-w-lg ">
         <div class="flex flex-col gap-2 text-center">
             <span class="inline-flex items-center px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                SL công việc: {{ text.total_jobs }}
+                SL công việc: {{ total_jobs }}
             </span>
             <span class="inline-flex items-center px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                SL đã hoàn thành: {{ text.total_jobs_done }}
+                SL đã hoàn thành: {{ total_jobs_done }}
             </span>
             <span class="inline-flex items-center px-4 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
-                SL đang thực hiện: {{ text.total_jobs_in_progress }}
+                SL đang thực hiện: {{ total_jobs_in_progress }}
             </span>
         </div>
 
@@ -36,10 +36,10 @@
         <!-- Job Statistics -->
         <div class="flex flex-col gap-2 text-center">
             <span class="inline-flex items-center px-4 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
-                SL đang tạm hoãn: {{ text.total_jobs_pending }}
+                SL đang tạm hoãn: {{ total_jobs_pending }}
             </span>
             <span class="inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                SL chưa bắt đầu: {{ text.total_jobs_not_started }}
+                SL chưa bắt đầu: {{ total_jobs_not_started }}
             </span>
         </div>
     </div>
@@ -53,11 +53,11 @@
         <div class="flex items-center space-x-2 text-nowrap">
             <i class="fas fa-clock text-blue-500"></i>
             <div class="w-full bg-gray-200 rounded-full h-4">
-                <div class="bg-{{ text.progress_by_time.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_time.percent }}%">
-                    {% if text.progress_by_time.status != 'gray' and text.progress_by_time.status != 'green' %}
-                        {{ text.progress_by_time.progress }} / {{ text.progress_by_time.duration }}
+                <div class="bg-{{ progress_by_time.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ progress_by_time.percent }}%">
+                    {% if progress_by_time.status != 'gray' and progress_by_time.status != 'green' %}
+                        {{ progress_by_time.progress }} / {{ progress_by_time.duration }}
                     {% else %}
-                        {{ text.get_status_display }}
+                        {{ get_status_display }}
                     {% endif %}
                 </div>
             </div>
@@ -67,8 +67,8 @@
         <div class="flex items-center space-x-2 text-nowrap">
             <i class="fas fa-bullseye text-cyan-500"></i>
             <div class="w-full bg-gray-200 rounded-full h-4">
-                <div class="bg-cyan-500 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_plan.percent }}%">
-                    {{ text.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ text.progress_by_plan.total_amount|intcomma }}
+                <div class="bg-cyan-500 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ progress_by_plan.percent }}%">
+                    {{ progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ progress_by_plan.total_amount|intcomma }}
                 </div>
             </div>
         </div>
@@ -77,8 +77,8 @@
         <div class="flex items-center space-x-2 text-nowrap">
             <i class="fas fa-check-double text-green-500"></i>
             <div class="w-full bg-gray-200 rounded-full h-4">
-                <div class="bg-{{ text.progress_by_amount.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ text.progress_by_amount.percent }}%">
-                    {{ text.progress_by_amount.total_amount_reported|intcomma }} / {{ text.progress_by_amount.total_amount|intcomma }}
+                <div class="bg-{{ progress_by_amount.status }}-600 h-4 rounded-full text-xs text-white text-center p-0.5 leading-none" style="width: {{ progress_by_amount.percent }}%">
+                    {{ progress_by_amount.total_amount_reported|intcomma }} / {{ progress_by_amount.total_amount|intcomma }}
                 </div>
             </div>
         </div>

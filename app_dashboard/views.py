@@ -6,6 +6,7 @@ from core import settings
 import pandas as pd
 
 import json
+import os
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -26,18 +27,18 @@ def handle_form(request, model, pk=0):
     model_class = globals()[model]
     form_class = globals()[model + 'Form']
 
-    # Set selections
-    record_type = 'record_' + model
-    modal = 'modal_' + model
-
     # check if not Post => return 404
     if request.method != 'POST':
         return HttpResponseForbidden()
 
+
+    # project_id
+    project_id = get_valid_id(request.POST.get('project', 0))
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
-
+    # print("instance:", instance)
+    # print("instance", form)
     if form.is_valid():
         instance_form = form.save(commit=False)
         if instance is None:  # This is a new form
@@ -50,11 +51,12 @@ def handle_form(request, model, pk=0):
         record = instance_form
         record.style = 'just-updated'
         html_message = render_message(request, message='Cập nhật thành công')
-        html_record = render_display_records(request, model_class, [record], update='True')
+        html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
         
         return HttpResponse(html_message + html_record)
     else:
-        html_modal = render_form(request, model, pk, form)
+
+        html_modal = render_form(request, model=model, pk=pk, form=form, project_id=project_id)
         return  HttpResponse(html_modal)
 
 @login_required
@@ -86,59 +88,43 @@ def get_gantt_chart_data(request, project_id):
 
 
 
-
 @login_required
-def load_element(request, element):
-    # Get page
-    page = request.GET.get('page')
-    # Get project_id
-    project_id = request.GET.get('project_id')
-    # Get check_date
-    check_date = request.GET.get('check_date')
-    # Render
-    if element == 'infor_bar':
-        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
-        return HttpResponse(html_infor_bar)
-    else:
-        return HttpResponse("")
+def load_elements(request):
+    print('>>>>>>>>>> load_elements request:', request.GET)
+    encoded_params = request.GET.get('q', '')
+    params = json.loads(decode_params(encoded_params))
+    for key, value in request.GET.items():
+        if key != 'q':
+            params[key] = value
 
-
-@login_required
-def load_form(request, model, pk=0):
-    html_modal = render_form(request, model, pk)
-    return HttpResponse(html_modal)
-
-
-@login_required
-def load_content(request, page, model, project_id=None):
-    check_date = request.GET.get('check_date')
-    if page is None:
-        return HttpResponseForbidden()
-    # Check if there is project id i the params, if yes => get the project
-    if project_id:
-        project = Project.objects.filter(pk=project_id).first()
-    
-    # render general content
-    html_load_content = '<div id="load-content" class"hidden"></div>'
-    html_title_bar = render_title_bar(request, page, model=model, project_id=project_id, check_date=check_date)
-    html_tool_bar = render_tool_bar(request, page, model=model, project_id=project_id, check_date=check_date)
-    
-    if page == 'page_each_project':
-        html_infor_bar = render_infor_bar(request, page, project_id=project_id, check_date=check_date)
-    else:
-        html_infor_bar = ''
-
-    # Check the page to render specific content
-    model_class = globals()[model]
-    if not project_id:
-        records = model_class.objects.all()
-    else:
-        records = model_class.objects.filter(project=project)
-    records = filter_records(request, records, model_class)
-
-    html_display_records = render_display_records(request, model_class, records, update=False, check_date=check_date)
-    return HttpResponse(html_load_content + html_title_bar + html_tool_bar + html_infor_bar + html_display_records)
-
+    print('>>>>>>>>>> elements params:', params, '\n\n')
+    html = '<div id="load-elements" class"hidden"></div>'
+    elements = params.get('elements', '')
+    for element in elements.split('|'):
+        element = element.strip()
+        if element == 'title_bar':
+            html_title_bar = render_title_bar(request, **params)
+            html += html_title_bar
+        elif element == 'tool_bar':
+            html_tool_bar = render_tool_bar(request, **params)
+            html += html_tool_bar
+        elif element == 'infor_bar':
+            html_infor_bar = render_infor_bar(request, **params)
+            html += html_infor_bar
+        elif element == 'display_records':
+            html_display_records = render_display_records(request, **params)
+            html += html_display_records
+        elif element == 'message':
+            html_message = render_message(request, **params)
+            html += html_message
+        elif element == 'modal_form':
+            html_modal_form = render_form(request, **params)
+            html += html_modal_form
+        elif element == 'gantt_chart':
+            pass
+        elif element == 'weekplan_table':
+            html_weekplan_table = render_weekplan_table(request, **params)
+    return HttpResponse(html)
 
 
 
@@ -305,7 +291,6 @@ def save_vehicle_operation_record(request):
     try:
         # Parse JSON data from the request body
         data = json.loads(request.body)
-        print(data)
         for vehicle, other_values_list in data.items():
             for other_values in other_values_list:
                 start_time = other_values.get('start_time')
@@ -352,11 +337,10 @@ def handle_vehicle_operation_form(request):
     
     try:
         form = request.POST
-        print(form)
         # Get list of ids
         ids = form.getlist('id')
         for id in ids:
-            print('>>>> id:', id)
+            # print('>>>> id:', id)
             driver_id = form.get(f'driver_{id}', None)
             if driver_id is None: 
                 continue
@@ -442,8 +426,9 @@ def handle_vehicle_operation_form(request):
             ids.append(new_record.id)
 
         # Get records by ids
+        group_by = form.get('group_by')
         records = VehicleOperationRecord.objects.filter(pk__in=ids)
-        html_display = render_display_records(request, VehicleOperationRecord, records)
+        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by)
         html_message = render_message(request, message='Cập nhật thành công', message_type='green')
         html = html_message + html_display
         return HttpResponse(html)
@@ -478,15 +463,18 @@ def page_home(request):
 
 @login_required
 def page_projects(request):
-    user = request.user
     return render(request, 'pages/page_projects.html')
+
+
+
 
 @login_required
 def page_each_project(request, pk):
     check_date = request.GET.get('check_date')
-    project = get_object_or_404(Project, pk=pk)
+    project_id = get_valid_id(pk)
+    project = get_object_or_404(Project, pk=project_id)
     # Should check if the project is belong to the user
-    context = {'project': project, 'check_date': check_date}
+    context = {'project_id': project_id, 'check_date': check_date, 'project':project}
     return render(request, 'pages/page_each_project.html', context)
 
 
@@ -497,19 +485,17 @@ def page_manage_data(request):
 
 @login_required
 def page_transport_department(request):
-    return render(request, 'pages/page_transport_department.html')
+    params = request.GET.copy()
+    if 'start_date' not in params:
+        start_date = get_valid_date('')
+    context = {'start_date': start_date}
+    return render(request, 'pages/page_transport_department.html', context)
+
+
 
 
 def test(request):
     return render(request, 'pages/test.html')
-
-
-
-
-
-
-
-
 
 
 

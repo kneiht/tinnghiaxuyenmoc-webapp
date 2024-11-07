@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-
+{% load custom_tags %}
 
 {% block title %}
     Tất cả dự án
@@ -15,9 +15,11 @@
     <div up-hungry id="modal"></div>
     <main>
         {% include 'components/nav_bar.html' %}
-        <div id="load-content" up-defer up-href="{% url 'load_content' page='page_projects' model='Project' %}">
+
+        <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_projects' model='Project' check_date=check_date elements='title_bar|tool_bar|display_records' %}">
             Loading content
         </div>
+
         <div up-hungry id="title-bar"></div>
         <div up-hungry id="tool-bar"></div>
         <div up-hungry id="display-records"></div>

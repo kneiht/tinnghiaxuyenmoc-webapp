@@ -16,6 +16,27 @@ def get_static_version():
     return settings.STATIC_VERSION
 
 
+import base64, json
+@register.simple_tag
+def encode_params(**kwargs):
+    params = kwargs
+    # Filter out keys with None or 'None' values
+    filtered_params = {key: str(value) if isinstance(value, datetime.date) else value for key, value in params.items() if value not in [None, 'None', '']}
+    # convert to json
+    
+    json_params = json.dumps(filtered_params)
+    # Convert string to bytes
+    byte_string = json_params.encode('utf-8')
+    # Base64 encode the byte string
+    encoded_string = base64.b64encode(byte_string)
+    # Convert back to string from bytes
+    query_string = encoded_string.decode('utf-8')
+    return query_string
+
+
+
+
+
 
 @register.filter(name='group')
 def group(records, field):
@@ -23,7 +44,15 @@ def group(records, field):
     values = [getattr(record, field) for record in records]
     # get unique values
     unique_values = set(values)
+    # remove None values
+    unique_values = [value for value in unique_values if value != None]
+    # order
+    try:
+        unique_values = sorted(unique_values)
+    except Exception as e:
+        print(e)
     return unique_values
+
 
 @register.filter(name='filter_by_vehicle')
 def filter_by_vehicle(records, vehicle):
@@ -37,6 +66,7 @@ def filter_by_driver(records, driver):
 
 @register.filter(name='calcate_operation_duration')
 def calcate_operation_duration(vehicle_operation_records):
+    return "Tính toán sau"
     if vehicle_operation_records:
         time_seconds = vehicle_operation_records.filter(source='gps').aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
         # convert to hours, minutes, seconds

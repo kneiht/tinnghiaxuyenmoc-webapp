@@ -1,7 +1,9 @@
+{% load custom_tags %}
+
 
 <div id="title-bar" class="flex flex-wrap justify-between mb-6 gap-5">
     <div class="w-3/6 flex gap-4 justify-between items-center mt-2">
-        <p class="text-2xl text-center font-semibold text-theme truncate"> {{ text.title }} </p>
+        <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
     </div>
 
     <div class="flex gap-4 justify-end items-center mt-2">
@@ -11,18 +13,19 @@
                 <a id="show-gantt-jobs" class="btn btn-primary text-nowrap cursor-pointer">
                     <span class="me-3"> Xem Gantt </span>
                 </a>
-                <a id="show-table-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{{ request.path }}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap hidden">
+                
+                <a id="show-table-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap hidden">
                     <span class="me-3"> Xem Table </span>
                 </a>
             </div>
 
             <div id="jobs-plan-toggle">
-                <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=text.project_id %}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap">
+                <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ check_date }}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-bullseye me-3" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="me-3"> Xem KH tuần </span>
                 </a>
 
-                <a id="show-all-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{{ request.path }}?check_date={{ text.check_date }}" class="btn btn-primary text-nowrap hidden">
+                <a id="show-all-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap hidden">
                     <span class="me-3"> Xem công việc </span>
                 </a>
             </div>
@@ -36,10 +39,10 @@
             </button>
         {% endif %}
         
-        {% if text.create_new_button_name %}
-        <a id="create-new" href="{{ text.create_new_form_url }}" up-preload="insert" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
+        {% if create_new_button_name %}
+        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-            <span class="max-sm:hidden me-3"> {{ text.create_new_button_name }} </span>
+            <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
         </a>
         {% endif %}
     </div>
@@ -47,15 +50,15 @@
 
 {% if page == 'page_each_project' %}
 <div id="extra-tool-bar" class="flex justify-center hidden">
-    <div class="hidden" id="project-id" data-id="{{ text.project_id }}"></div>
+    <div class="hidden" id="project-id" data-id="{{ project_id }}"></div>
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
-        <form up-target="#display-records:maybe" action="{% url 'upload_project' text.project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
+        <form up-target="#display-records:maybe" action="{% url 'upload_project' project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
                 accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
-            <input type="hidden" name="project" value="{{ text.project_id }}">
+            <input type="hidden" name="project" value="{{ project_id }}">
             <button class="btn btn-primary" type="submit" id="upload-button">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span class="me-3"> Nhập File Excel </span>
