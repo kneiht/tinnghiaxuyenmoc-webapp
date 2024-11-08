@@ -731,7 +731,7 @@ def get_binhanh_service_operation_time(check_date):
             return []
 
     
-    vehicles = get_vehicle_list()[0:5]
+    vehicles = get_vehicle_list()
     # start_date = '01/05/2024' 
     # end_date = '01/05/2024'
 
