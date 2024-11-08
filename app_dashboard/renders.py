@@ -52,6 +52,7 @@ def render_tool_bar(request, **kwargs):
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
     group_by = params.get('group_by', '')
+    tab = params.get('tab', '')
     # print(check_date)
     project = Project.objects.filter(pk=project_id).first()
     context = {
@@ -60,7 +61,8 @@ def render_tool_bar(request, **kwargs):
         'project_id': project_id,
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d'),
         'start_date': start_date,
-        'group_by': group_by
+        'group_by': group_by,
+        'tab': tab
     }
     if model not in ['Project', 'Job', 'VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
