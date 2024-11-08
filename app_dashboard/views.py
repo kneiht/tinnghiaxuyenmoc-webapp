@@ -285,102 +285,135 @@ def handle_date_report_form(request):
 
 
 def handle_vehicle_operation_form(request):
+    def convert_time(time_str, time_sign):
+        print('time_str:', time_str, 'time_type:', time_sign)
+        hours, minutes, seconds = map(int, time_str.split(":"))
+        total_seconds = hours * 3600 + minutes * 60 + seconds
+        duration_seconds = total_seconds
+        if time_sign == 'minus':
+            duration_seconds = -duration_seconds
+        print('duration_seconds:', duration_seconds)
+        return duration_seconds
+    
     if request.method != 'POST':
         return HttpResponseForbidden()
     
     try:
         form = request.POST
+        print(form)
         # Get list of ids
         ids = form.getlist('id')
         for id in ids:
-            # print('>>>> id:', id)
-            driver_id = form.get(f'driver_{id}', None)
-            if driver_id is None: 
-                continue
-            else:
-                # check if driver is not a int string
-                try:
-                    driver_id = int(driver_id)
-                    driver = DataDriver.objects.filter(pk=driver_id).first()
-                except:
-                    driver = None
-            
+            print('>>>> id:', id)
+            driver = DataDriver.objects.filter(pk=get_valid_id(form.get(f'driver_{id}', None))).first()
+            location = Location.objects.filter(pk=get_valid_id(form.get(f'location_{id}', None))).first()
             record = VehicleOperationRecord.objects.get(pk=id)
             record.driver = driver
+            record.location = location
+            record.fuel_allowance = form.get(f'fuel_allowance_{id}', None)
+            record.note = form.get(f'note_{id}', None)
             if record.source == 'manual':
                 try:
-                    duration_time_str = form.get(f'duration_time_{id}', None)
-                    hours, minutes, seconds = map(int, duration_time_str.split(":"))
-                    total_seconds = hours * 3600 + minutes * 60 + seconds
-                    duration_seconds = total_seconds
-                    duration_type = form.get(f'duration_type_{id}', None)
-                    if duration_type == 'minus':
-                        record.duration_type = 'minus'
-                    else:
-                        record.duration_type = 'plus'
+                    # duration seconds
+                    duration_seconds_str = form.get(f'duration_seconds_{id}', None)
+                    duration_seconds_sign = form.get(f'duration_seconds_sign_{id}', None)
+                    duration_seconds = convert_time(duration_seconds_str, duration_seconds_sign)
                     record.duration_seconds = duration_seconds
-                    
+                    # over time
+                    overtime_str = form.get(f'overtime_{id}', None)
+                    overtime_sign = form.get(f'overtime_sign_{id}', None)
+                    overtime = convert_time(overtime_str, overtime_sign)
+                    record.overtime = overtime
+                    # normal_woring_time
+                    normal_working_time_str = form.get(f'normal_working_time_{id}', None)
+                    normal_working_time_sign = form.get(f'normal_working_time_sign_{id}', None)
+                    normal_working_time = convert_time(normal_working_time_str, normal_working_time_sign)
+                    record.normal_working_time = normal_working_time
+                    # holiday_time
+                    holiday_time_str = form.get(f'holiday_time_{id}', None)
+                    holiday_time_sign = form.get(f'holiday_time_sign_{id}', None)
+                    holiday_time = convert_time(holiday_time_str, holiday_time_sign)
+                    record.holiday_time = holiday_time
                 except:
-                    pass
+                    raise e
             record.save()
         
         # Add new records
-        new_vehicles = form.getlist('vehicle_new')
-        new_start_times = form.getlist('start_time_new')
-        new_end_times = form.getlist('start_time_new')
-        new_duration_seconds = form.getlist('duration_time_new')
-        new_driver_ids = form.getlist('driver_new')
-        new_duration_types = form.getlist('duration_type_new')
-        for i in range(0, len(new_vehicles)): # start from 1 because the first one is a template
-            try:
-                duration_time_str = new_duration_seconds[i]
-                hours, minutes, seconds = map(int, duration_time_str.split(":"))
-                total_seconds = hours * 3600 + minutes * 60 + seconds
-                duration_seconds = total_seconds
-                if duration_seconds == 0:
-                    continue
-            except:
-                continue
-            
-        
-            vehicle = new_vehicles[i]
-            driver_id = new_driver_ids[i]
+        vehicle_news = form.getlist('vehicle_new')
+        start_time_news = form.getlist('start_time_new')
+        driver_news = form.getlist('driver_new')
+        location_news = form.getlist('location_new')
 
-            if driver_id is None: 
-                continue
-            else:
-                # check if driver is not a int string
-                try:
-                    driver_id = int(driver_id)
-                    driver = DataDriver.objects.filter(pk=driver_id).first()
-                except:
-                    driver = None
+        duration_seconds_news = form.getlist('duration_seconds_new')
+        duration_seconds_sign_news = form.getlist('duration_seconds_sign_new')
+
+        overtime_news = form.getlist('overtime_new')
+        overtime_sign_news = form.getlist('overtime_sign_new')
+
+        normal_working_time_news = form.getlist('normal_working_time_new')
+        normal_working_time_sign_news = form.getlist('normal_working_time_sign_new')
+
+        holiday_time_news = form.getlist('holiday_time_new')
+        holiday_time_sign_news = form.getlist('holiday_time_sign_new')
+
+        fuel_allowance_news = form.getlist('fuel_allowance_new')
+        note_news = form.getlist('note_new')
+
+        for i in range(0, len(vehicle_news)): # start from 1 because the first one is a template
+            print( f'>>>> new: {i}' )
+            try:
+                # duration seconds
+                duration_seconds_str = duration_seconds_news[i]
+                duration_seconds_sign = duration_seconds_sign_news[i]
+                duration_seconds = convert_time(duration_seconds_str, duration_seconds_sign)
+
+                # over time
+                overtime_str = overtime_news[i]
+                overtime_sign = overtime_sign_news[i]
+                overtime = convert_time(overtime_str, overtime_sign)
+
+                # normal_woring_time
+                normal_working_time_str = normal_working_time_news[i]
+                normal_working_time_sign = normal_working_time_sign_news[i]
+                normal_working_time = convert_time(normal_working_time_str, normal_working_time_sign)
+
+                # holiday_time
+                holiday_time_str = holiday_time_news[i]
+                holiday_time_sign = holiday_time_sign_news[i]
+                holiday_time = convert_time(holiday_time_str, holiday_time_sign)
+            except Exception as e:
+                raise e
+        
+            vehicle = vehicle_news[i]   
+            driver = DataDriver.objects.filter(pk=get_valid_id(driver_news[i])).first()
+            location = Location.objects.filter(pk=get_valid_id(location_news[i])).first()
             
-            start_time = new_start_times[i]
+            start_time = start_time_news[i]
             # convert start time to datetime object
             start_time = datetime.strptime(start_time, '%d/%m/%Y')
             end_time = start_time
-
-            duration_type = new_duration_types[i]
-            if duration_type == 'minus':
-                record.duration_type = 'minus'
-            else:
-                record.duration_type = 'plus'
-
+            fuel_allowance = fuel_allowance_news[i]
+            note = note_news[i]
             new_record = VehicleOperationRecord.objects.create(
                 vehicle=vehicle,
                 start_time=start_time,
                 end_time=end_time,
                 duration_seconds=duration_seconds,
+                overtime=overtime,
+                normal_working_time=normal_working_time,
+                holiday_time=holiday_time,
+                fuel_allowance=fuel_allowance,
+                note=note,
                 source='manual',
-                duration_type=duration_type,
-                driver=driver
+                driver=driver,
+                location=location
             )
             ids.append(new_record.id)
 
         # Get records by ids
         group_by = form.get('group_by')
         records = VehicleOperationRecord.objects.filter(pk__in=ids)
+        
         html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by)
         html_message = render_message(request, message='Cập nhật thành công', message_type='green')
         html = html_message + html_display
@@ -543,8 +576,10 @@ def upload_project(request, project_id):
 
 def test(request):
     records = VehicleOperationRecord.objects.all()
-    for record in records:
-        record.save()
+    record = VehicleOperationRecord.objects.filter(pk='asda').first()
+    print(record)
+    # for record in records:
+    #     record.save()
     return HttpResponse('test')
 
 

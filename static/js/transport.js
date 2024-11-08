@@ -21,13 +21,13 @@ up.compiler('.transport-table', function (transportTable) {
     })
 
     // Listen to the save button, if it is clicked, hide the save button and show the edit button
-    saveButton.addEventListener('click', function (event) {
-        editButton.classList.remove('hidden');
-        saveButton.classList.add('hidden');
-        addButton.classList.add('hidden');
-        cancelButton.classList.add('hidden');
-        showDisplay();
-    })
+    // saveButton.addEventListener('click', function (event) {
+    //     editButton.classList.remove('hidden');
+    //     saveButton.classList.add('hidden');
+    //     addButton.classList.add('hidden');
+    //     cancelButton.classList.add('hidden');
+    //     showDisplay();
+    // })
 
     // Listen to the cancel button, if it is clicked, hide the save button and show the edit button
     cancelButton.addEventListener('click', function (event) {

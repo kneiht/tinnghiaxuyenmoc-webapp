@@ -247,3 +247,7 @@ th.sorted-desc::after {
 .minus {
   color: red;
 }
+
+.zero {
+  color: #bdbdbd;
+}

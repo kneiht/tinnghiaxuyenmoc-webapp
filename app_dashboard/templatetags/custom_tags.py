@@ -79,11 +79,19 @@ def calcate_operation_duration(vehicle_operation_records):
 
 
 
+@register.filter(name='get_value')
+def get_value(record, field):
+    return getattr(record, field)
 
 
 
-
-
+@register.filter(name='get_sign')
+def get_sign(record, field):
+    value = getattr(record, field)
+    if value >= 0:
+        return "+"
+    else:
+        return "-"
 
 @register.filter(name='format_display')
 def format_display(record, field):
@@ -96,11 +104,12 @@ def format_display(record, field):
     if value == None:
         return ""
 
-
     if field in ['duration_seconds','overtime','holiday_time', 'normal_working_time']:
         if value in [None,'',0]:
-            return "0"
-        # convert to hours, minutes, seconds
+            return "00:00:00"
+        if value < 0:
+            value = value * -1
+
         hours = value // 3600
         minutes = (value % 3600) // 60
         seconds = value % 60
@@ -109,9 +118,6 @@ def format_display(record, field):
     if field in {'unit_price', 'total_amount'}:
         return "{:,}".format(int(value))
     
-
-
-
     _type = type(value)
     if _type == date:
         return value.strftime("%d/%m/%Y")

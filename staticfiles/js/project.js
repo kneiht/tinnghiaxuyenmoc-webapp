@@ -49,103 +49,6 @@ up.compiler('#show-all-jobs', function () {
 });
 
 
-
-
-
-
-up.compiler('#check_date', function (element) {
-    let checkDate = element;
-    // check if there is check_date in params, if yes, set the value of checkDate to it
-    let urlParams = new URLSearchParams(window.location.search);
-    let check_date = urlParams.get('check_date');
-    if (check_date) {
-        checkDate.value = check_date;
-    }
-    else {
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString('en-CA'); // 'en-CA' gives the ISO-like format (YYYY-MM-DD)
-        checkDate.value = formattedDate;
-    }
-
-    checkDate.addEventListener('change', function () {
-        // let url = window.location.href.split('?')[0] + `?check_date=${checkDate.value}`;
-        // Get all input with class name check_date then change the value
-        date_inputs = document.getElementsByClassName('check_date');
-        for (let i = 0; i < date_inputs.length; i++) {
-            date_inputs[i].value = checkDate.value;
-        }
-
-        let showAllJobs = document.getElementById('show-all-jobs');
-        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showAllJobs.href
-            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
-        }
-
-        let showWeekplan = document.getElementById('show-weekplan');
-        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showWeekplan.href
-            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            console.log(url)
-            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
-        }
-
-
-    });
-});
-
-
-
-up.compiler('.select-date', function (selectDate) {
-    // If the link is pressed, set the value of check_date to the selected date
-    selectDate.addEventListener('click', function () {
-        // Get data date
-        let dataDate = selectDate.getAttribute('data-date');
-        // Set check_date to the selected date
-        let checkDate = document.getElementById('check_date');
-        checkDate.value = dataDate;
-
-        // Set check_date in url in href if tag <a> with id show-weekplan
-        let showWeekplan = document.getElementById('show-weekplan');
-        if (showWeekplan) {
-            let currentUrl = showWeekplan.href
-            let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
-            showWeekplan.href = url;
-        }
-
-        let showAllJobs = document.getElementById('show-all-jobs');
-        if (showAllJobs) {
-            let currentUrl = showAllJobs.href
-            let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
-            showAllJobs.href = url;
-        }
-        // up.render({ target: '#display-records', url: url })
-    });
-})
-
-
-
-
-up.compiler('.just-updated', function (justUpdatedRecord) {
-    // Get project id by data from the element project-id
-    let projectId = document.getElementById('project-id')
-    if (projectId) {
-        projectId = projectId.getAttribute('data-id');
-    }
-    let check_date = document.getElementById('check_date')
-    if (check_date) {
-        check_date = check_date.value
-    };
-    if (projectId && check_date) {
-        url = `/api/load-element/infor_bar/?page=page_each_project&project_id=${projectId}&check_date=${check_date}`
-        console.log(url)
-        up.render({ target: '#infor-bar', url: url })
-    }
-});
-
-
 // check file size of the upload file, the fuction will be call onchange in the input
 function checkFileSize(file) {
     if (file.size > 5 * 1024 * 1024) {
@@ -355,4 +258,104 @@ function drawGanttChart(tasks) {
     
 }
 
+
+
+
+
+
+
+
+up.compiler('#check_date', function (element) {
+    let checkDate = element;
+    // check if there is check_date in params, if yes, set the value of checkDate to it
+    let urlParams = new URLSearchParams(window.location.search);
+    let check_date = urlParams.get('check_date');
+    if (check_date) {
+        checkDate.value = check_date;
+    }
+    else {
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('en-CA'); // 'en-CA' gives the ISO-like format (YYYY-MM-DD)
+        checkDate.value = formattedDate;
+    }
+
+    checkDate.addEventListener('change', function () {
+        // let url = window.location.href.split('?')[0] + `?check_date=${checkDate.value}`;
+        // Get all input with class name check_date then change the value
+        date_inputs = document.getElementsByClassName('check_date');
+        for (let i = 0; i < date_inputs.length; i++) {
+            date_inputs[i].value = checkDate.value;
+        }
+
+        // Case 1: The table of all jobs is shown
+        let showAllJobs = document.getElementById('show-all-jobs');
+        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
+            let checkDate = document.getElementById('check_date').value;
+            let currentUrl = showAllJobs.href
+            let url = currentUrl + `&check_date=${checkDate}`;
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
+        }
+        // Case 2: The weekplan table is shown
+        let showWeekplan = document.getElementById('show-weekplan');
+        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
+            let checkDate = document.getElementById('check_date').value;
+            let currentUrl = showWeekplan.href
+            console.log(currentUrl)
+            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
+            console.log(url)
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
+        }
+
+
+    });
+});
+
+
+
+// up.compiler('.select-date', function (selectDate) {
+//     // If the link is pressed, set the value of check_date to the selected date
+//     selectDate.addEventListener('click', function () {
+//         // Get data date
+//         let dataDate = selectDate.getAttribute('data-date');
+//         // Set check_date to the selected date
+//         let checkDate = document.getElementById('check_date');
+//         checkDate.value = dataDate;
+
+//         // Set check_date in url in href if tag <a> with id show-weekplan
+//         let showWeekplan = document.getElementById('show-weekplan');
+//         if (showWeekplan) {
+//             let currentUrl = showWeekplan.href
+//             let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
+//             showWeekplan.href = url;
+//         }
+
+//         let showAllJobs = document.getElementById('show-all-jobs');
+//         if (showAllJobs) {
+//             let currentUrl = showAllJobs.href
+//             let url = currentUrl.split('?')[0] + `?check_date=${dataDate}`;
+//             showAllJobs.href = url;
+//         }
+//         // up.render({ target: '#display-records', url: url })
+//     });
+// })
+
+
+
+
+// up.compiler('.just-updated', function (justUpdatedRecord) {
+//     // Get project id by data from the element project-id
+//     let projectId = document.getElementById('project-id')
+//     if (projectId) {
+//         projectId = projectId.getAttribute('data-id');
+//     }
+//     let check_date = document.getElementById('check_date')
+//     if (check_date) {
+//         check_date = check_date.value
+//     };
+//     if (projectId && check_date) {
+//         url = `/api/load-element/infor_bar/?page=page_each_project&project_id=${projectId}&check_date=${check_date}`
+//         console.log(url)
+//         up.render({ target: '#infor-bar', url: url })
+//     }
+// });
 

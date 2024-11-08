@@ -116,6 +116,7 @@ def render_display_records(request, **kwargs):
     start_date = get_valid_date(params.get('start_date', ''))
     group_by = params.get('group_by', '')
     records = params.get('records', None)
+    tab = params.get('tab', '')
     # Check the page to render specific content
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
@@ -176,7 +177,8 @@ def render_display_records(request, **kwargs):
                'group_by': group_by,
                'project_id': project_id,
                'project': project,
-               'check_date': check_date
+               'check_date': check_date,
+               'tab': tab,
     }
     # print(context)
     return render_to_string(template, context, request)

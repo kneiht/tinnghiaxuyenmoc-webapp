@@ -21,13 +21,13 @@ up.compiler('.transport-table', function (transportTable) {
     })
 
     // Listen to the save button, if it is clicked, hide the save button and show the edit button
-    saveButton.addEventListener('click', function (event) {
-        editButton.classList.remove('hidden');
-        saveButton.classList.add('hidden');
-        addButton.classList.add('hidden');
-        cancelButton.classList.add('hidden');
-        showDisplay();
-    })
+    // saveButton.addEventListener('click', function (event) {
+    //     editButton.classList.remove('hidden');
+    //     saveButton.classList.add('hidden');
+    //     addButton.classList.add('hidden');
+    //     cancelButton.classList.add('hidden');
+    //     showDisplay();
+    // })
 
     // Listen to the cancel button, if it is clicked, hide the save button and show the edit button
     cancelButton.addEventListener('click', function (event) {
@@ -97,3 +97,40 @@ up.compiler('.transport-table', function (transportTable) {
 
 });
 
+
+
+
+up.compiler('#start_date', function (element) {
+    let startDate = element;
+    startDate.addEventListener('change', function () {
+        // Get the selected start date value
+        let newStartDate = startDate.value;
+
+        // Find all <a> tags in database-selection
+        let databaseSelection = document.getElementById('database-selection');
+        let aTags = databaseSelection.querySelectorAll('a');
+
+        // For each <a> tag
+        aTags.forEach(function (aTag) {
+            let currentUrl = new URL(aTag.href); // Convert href to URL object
+
+            // Check if 'start_date' exists in the query parameters
+            if (currentUrl.searchParams.has('start_date')) {
+                // If it exists, replace with new start_date
+                currentUrl.searchParams.set('start_date', newStartDate);
+            } else {
+                // If it doesn't exist, append the new start_date
+                currentUrl.searchParams.append('start_date', newStartDate);
+            }
+
+            // Update the href with the modified URL
+            aTag.href = currentUrl.toString();
+        });
+    });
+});
+
+
+
+
+let url = currentUrl + `&start_date=${startDate.value}`;
+aTag.href = url;
