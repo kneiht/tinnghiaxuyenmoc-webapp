@@ -61,7 +61,7 @@
                                 document.getElementById('search-button').click();
                             });
                         </script>
-                        {% elif page == 'page_transport_department' %}
+                        {% elif page == 'page_transport_department' and tab == 'vehicle_operation_data_by_date' %}
                             <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
                             <script>
                                 document.getElementById('start_date').addEventListener('change', function() {
@@ -69,7 +69,21 @@
                                     document.getElementById('search-button').click();
                                 });
                             </script>
-
+                        {% elif page == 'page_transport_department' %} {% if tab == 'driver_salary' or tab == 'vehicle_avenue' %}
+                            <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
+                            đến
+                            <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
+                            <script>
+                                document.getElementById('start_date').addEventListener('change', function() {
+                                    // Press search-button
+                                    document.getElementById('search-button').click();
+                                });
+                                document.getElementById('end_date').addEventListener('change', function() {
+                                    // Press search-button
+                                    document.getElementById('search-button').click();
+                                });
+                            </script>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

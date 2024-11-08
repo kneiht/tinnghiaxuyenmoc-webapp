@@ -217,10 +217,17 @@
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="text-lg font-semibold">{{ group }}</span>
-                            <span class="text-lg font-semibold text-green-600 dark:text-green-300">
-                                <i class="fa fa-clock mr-1"></i>
-                                    Total Operation Duration: {{ group|calcate_operation_duration }}
-                            </span>
+                            {% if tab == 'vehicle_operation_data_by_date' %}
+                                <span class="text-lg font-semibold text-green-600 dark:text-green-300">
+                                    <i class="fa fa-clock mr-1"></i>
+                                        Tổng thời gian xe hoạt động: {{ records|calcate_operation_duration }}
+                                </span>
+                            {% elif tab == 'driver_salary' %}
+                                <span class="text-lg font-semibold text-green-600 dark:text-green-300">
+                                    <i class="fa fa-money mr-1"></i>
+                                    Số ngày làm việc: {{ records|count_work_days }} / {{ end_date|count_days:start_date }}
+                                </span>
+                            {% endif %}
                         </div>
                         
                         <div class="flex gap-4">

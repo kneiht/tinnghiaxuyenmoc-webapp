@@ -51,6 +51,7 @@ def render_tool_bar(request, **kwargs):
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
+    end_date = get_valid_date(params.get('end_date', ''))
     group_by = params.get('group_by', '')
     tab = params.get('tab', '')
     # print(check_date)
@@ -61,6 +62,7 @@ def render_tool_bar(request, **kwargs):
         'project_id': project_id,
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d'),
         'start_date': start_date,
+        'end_date': end_date,
         'group_by': group_by,
         'tab': tab
     }
@@ -116,6 +118,7 @@ def render_display_records(request, **kwargs):
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
+    end_date = get_valid_date(params.get('end_date', ''))
     group_by = params.get('group_by', '')
     records = params.get('records', None)
     tab = params.get('tab', '')
@@ -128,7 +131,7 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.all()
         else:
             records = model_class.objects.filter(project=project)
-        records = filter_records(request, records, model_class)
+        records = filter_records(request, records, model_class, params)
 
     # Get fields to be displayed by using record meta
     # If there is get_display_fields method, use that method
@@ -180,6 +183,8 @@ def render_display_records(request, **kwargs):
                'project_id': project_id,
                'project': project,
                'check_date': check_date,
+               'start_date': start_date,
+               'end_date': end_date,
                'tab': tab,
     }
     # print(context)

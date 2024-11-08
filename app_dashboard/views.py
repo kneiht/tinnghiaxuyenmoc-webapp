@@ -480,7 +480,9 @@ def page_transport_department(request):
     params = request.GET.copy()
     if 'start_date' not in params:
         start_date = get_valid_date('')
-    context = {'start_date': start_date}
+    if 'end_date' not in params:
+        end_date = get_valid_date('')
+    context = {'start_date': start_date, 'end_date': end_date}
     return render(request, 'pages/page_transport_department.html', context)
 
 
@@ -746,9 +748,14 @@ def get_binhanh_service_operation_time(check_date):
     return operation_time
 
 
-
-
+#import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def save_vehicle_operation_record(request, check_date):
+    # only accept POST request
+    if request.method != 'POST':
+        return HttpResponse('Method not allowed')
+    
     check_date = get_valid_date(check_date)
     # convert check_date to datetime date
     check_date = datetime.strptime(check_date, '%Y-%m-%d').date()

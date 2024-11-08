@@ -54,21 +54,12 @@ def group(records, field):
     return unique_values
 
 
-@register.filter(name='filter_by_vehicle')
-def filter_by_vehicle(records, vehicle):
-    return records.filter(vehicle=vehicle)
 
-@register.filter(name='filter_by_driver')
-def filter_by_driver(records, driver):
-    return records.filter(driver=driver)
-
-
-
+# TAGS FOR VEHICLE OPERATION RECORD
 @register.filter(name='calcate_operation_duration')
 def calcate_operation_duration(vehicle_operation_records):
-    return "Tính toán sau"
     if vehicle_operation_records:
-        time_seconds = vehicle_operation_records.filter(source='gps').aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+        time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
         # convert to hours, minutes, seconds
         hours = time_seconds // 3600
         minutes = (time_seconds % 3600) // 60
@@ -76,6 +67,24 @@ def calcate_operation_duration(vehicle_operation_records):
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
     else:
         return "00:00:00"
+@register.filter(name='count_work_days')
+def count_work_days(vehicle_operation_records):
+    # Count the number of days that the driver works by getting the list of dates (from starttime)
+    if vehicle_operation_records:
+        dates = [record.start_time.date() for record in vehicle_operation_records]
+        return len(set(dates))
+    else:
+        return 0
+
+@register.filter(name='count_days')
+def count_days(end_date, start_date):
+    # date string convert to type date
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+    # Count the number of days between two dates
+    return (end_date - start_date).days
+
 
 
 

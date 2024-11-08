@@ -260,19 +260,26 @@ def progress_by_plan(record, check_date = None):
 
 
 
-def filter_records(request, records, model_class):
+def filter_records(request, records, model_class, params=None):
     # Get all query parameters except 'sort' as they are assumed to be field filters
     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
 
     if model_class == VehicleOperationRecord:
-        # set start_date = yesterday
-        start_date = timezone.now().date() - timedelta(days=1)
-        # print(start_date)
-        for k, v in query_params.items():
-            if k == 'start_date':
-                start_date = v[0]
-        records = records.filter(start_time__date=start_date)
 
+        # Add start_date and end_date form params to query_params if they are not present
+        if 'start_date' not in query_params:
+            start_date = get_valid_date(params.get('start_date', ''))
+        else:
+            start_date = query_params['start_date'][0]
+
+        if 'end_date' not in query_params:
+            end_date = get_valid_date(params.get('end_date', ''))
+        else:
+            end_date = query_params['end_date'][0]
+        print('>>>> start date and end date:',start_date, end_date)
+
+        # filter records which has start time between start_date and end_date
+        records = records.filter(start_time__range=[start_date, end_date])
 
     # Determine the fields to be used as filter options based on the selected page
     if model_class == Project:
