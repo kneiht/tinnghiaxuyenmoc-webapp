@@ -2,6 +2,8 @@ import time, re, io
 from django.db import models
 from django.contrib.auth.models import User
 
+from datetime import datetime, time, date
+from datetime import timedelta
 
 from django.utils import timezone
 
@@ -294,7 +296,6 @@ class Job(SecondaryIDMixin, BaseModel):
                 errors += ('- Khối lượng phải là số dương\n')
         except:
             errors += ('- Khối lượng phải là dạng số\n')
-
 
         if errors:
             raise ValidationError(errors)
@@ -630,7 +631,83 @@ class Location(BaseModel):
 
 
 
+class NormalWorkingTime(BaseModel):
+    # gotta get valid normal working time based on the valid date so that old data can be updated (from a button click manually)
+    class Meta:
+        ordering = ['-valid_from']
+    morning_start = models.TimeField(verbose_name="Bắt đầu ca sáng", default=time(7, 30))
+    morning_end = models.TimeField(verbose_name="Kết thúc ca sáng", default=time(11, 30))
+    afternoon_start = models.TimeField(verbose_name="Bắt đầu ca chiều", default=time(13, 0))
+    afternoon_end = models.TimeField(verbose_name="Kết thúc ca chiều", default=time(17, 0))
+    # Valid from
+    valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng")
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+    @classmethod
+    def get_display_fields(self):
+        fields = ['morning_start', 'morning_end', 'afternoon_start', 'afternoon_end', 'valid_from', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
+    @classmethod
+    def get_valid_normal_working_time(self):
+        # get the last valid working time
+        normal_working_time = NormalWorkingTime.objects.all().order_by('valid_from').last()
+        if normal_working_time:
+            return normal_working_time.morning_start, normal_working_time.morning_end, normal_working_time.afternoon_start, normal_working_time.afternoon_end
+        else:
+            # default working time
+            morning_start = time(7, 30)
+            morning_end = time(11, 30)
+            afternoon_start = time(13, 0)
+            afternoon_end = time(17, 0)
+            return morning_start, morning_end, afternoon_start, afternoon_end
+    def clean(self):
+        errors = ""
+        # if morning end is before morning start
+        if self.morning_end < self.morning_start:
+            errors += ('- Bắt đầu ca sáng phải nhỏ hơn hoặc bằng kết thúc ca sáng.\n')
+        # if afternoon end is before afternoon start
+        if self.afternoon_end < self.afternoon_start:
+            errors += ('- Bắt đầu ca chiều phải nhỏ hơn hoặc bằng kết thúc ca chiều.\n')
+        # if afternoon start is before morning end
+        if self.afternoon_start < self.morning_end:
+            errors += ('- Bắt đầu ca chiều phải nhỏ hơn hoặc bằng kết thúc ca sáng.\n')
+        if errors:
+            raise ValidationError(errors)
+
+
+
+
+
+
+class Holiday(BaseModel):  
+    class Meta:
+        ordering = ['-date']
+    date = models.DateField(verbose_name="Ngày lễ")
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+    @classmethod
+    def get_display_fields(self):
+        fields = ['date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    @classmethod
+    def is_holiday(self, date):
+        # check if the date is holiday
+        holiday = Holiday.objects.filter(date=date).first()
+        if holiday:
+            return True
+        else:
+            return False
+
+        
 
 
 class VehicleOperationRecord(models.Model):
@@ -656,15 +733,31 @@ class VehicleOperationRecord(models.Model):
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Địa điểm")
     overtime = models.IntegerField(verbose_name="Thời gian tăng ca", default=0)
     holiday_time = models.IntegerField(verbose_name="Thời gian làm ngày lễ", default=0)
+    normal_working_time = models.IntegerField(verbose_name="Thời gian làm bình thường", default=0)
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
     note = models.TextField(verbose_name="Ghi chú", default='')
     def __str__(self):
         return self.vehicle
+    
+    def save(self, *args, **kwargs):
+        if self.source == 'gps':
+            self.overtime = self.calculate_overtime()
+            if Holiday.is_holiday(self.start_time.date()):
+                self.normal_working_time = 0
+                self.holiday_time = self.duration_seconds - self.overtime
+            else:
+                self.holiday_time = 0
+                self.normal_working_time = self.duration_seconds - self.overtime
+            
+        super().save(*args, **kwargs)
+
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 'driver', 'location', 'overtime', 'holiday_time', 'fuel_allowance', 'image']
+        fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
+                  'driver', 'location', 'normal_working_time', 'overtime', 
+                  'holiday_time', 'fuel_allowance', 'image', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -676,5 +769,36 @@ class VehicleOperationRecord(models.Model):
         dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
         return dict_drivers
 
+    def get_location_choices(self):
+        locations = Location.objects.all()
+        # return a dict of choices with key id and name
+        dict_locations = [{'id': location.id, 'name':location.name} for location in locations]
+        return dict_locations
+
+
+    def calculate_overtime(self):
+        start_time = self.start_time
+        end_time = self.end_time
+        # Define the working hours
+        morning_start, morning_end, afternoon_start, afternoon_end = NormalWorkingTime.get_valid_normal_working_time()
+
+        # Initialize overtime duration
+        overtime = timedelta(0)
+
+        # Split the time into working and overtime for each period
+        # Morning session
+        if start_time.time() < morning_start:
+            overtime += min(end_time, datetime.combine(start_time.date(), morning_start)) - start_time
+
+        if end_time.time() > morning_end and start_time.time() < morning_end:
+            overtime += end_time - max(start_time, datetime.combine(start_time.date(), morning_end))
+
+        # Afternoon session
+        if start_time.time() < afternoon_start and end_time.time() > afternoon_start:
+            overtime += max(start_time, datetime.combine(start_time.date(), afternoon_start)) - start_time
+
+        if end_time.time() > afternoon_end:
+            overtime += end_time - datetime.combine(end_time.date(), afternoon_end)
+        return int(overtime.total_seconds())
 
 

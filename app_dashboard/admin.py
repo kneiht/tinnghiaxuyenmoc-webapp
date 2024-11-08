@@ -62,10 +62,34 @@ class VehicleOperationRecordAdmin(admin.ModelAdmin):
     search_fields = ('vehicle', 'driver__full_name')
     raw_id_fields = ('driver',)
 
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = Location.get_display_fields()
+    search_fields = ['name', 'address']
+    list_filter = ['type_of_location', 'created_at']
+    ordering = ['-created_at']
+
+@admin.register(NormalWorkingTime)
+class NormalWorkingTimeAdmin(admin.ModelAdmin):
+    list_display = NormalWorkingTime.get_display_fields()
+    search_fields = ['note']
+    list_filter = ['valid_from', 'created_at']
+    ordering = ['-valid_from']
+
+@admin.register(Holiday)
+class HolidayAdmin(admin.ModelAdmin):
+    list_display = Holiday.get_display_fields()
+    search_fields = ['note']
+    list_filter = ['date', 'created_at']
+    ordering = ['-date']
+
+
+
+
+
+
 admin.site.register(VehicleOperationRecord, VehicleOperationRecordAdmin)
-
 admin.site.register(UserExtra, UserExtraAdmin)
-
 
 admin.site.register(JobPlan, JobPlanAdmin)
 admin.site.register(DataVehicleTypeDetail, DataVehicleTypeDetailAdmin)

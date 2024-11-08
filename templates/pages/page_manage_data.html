@@ -62,9 +62,20 @@
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='Location' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
                     Dữ liệu địa điểm
-            
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='NormalWorkingTime' elements='tool_bar|display_records' %}"
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    Thời gian làm việc
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='Holiday' elements='tool_bar|display_records' %}"
+                    class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
+                    Ngày lễ
                 </a>
 
         </div>

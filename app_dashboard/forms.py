@@ -609,3 +609,73 @@ class LocationForm(forms.ModelForm):
             })
         }
 
+class NormalWorkingTimeForm(forms.ModelForm):
+    class Meta:
+        model = NormalWorkingTime
+        fields = ['morning_start', 'morning_end', 'afternoon_start', 'afternoon_end', 'valid_from', 'note']
+        labels = {
+            'morning_start': 'Bắt đầu ca sáng',
+            'morning_end': 'Kết thúc ca sáng',
+            'afternoon_start': 'Bắt đầu ca chiều',
+            'afternoon_end': 'Kết thúc ca chiều',
+            'valid_from': 'Ngày bắt đầu áp dụng',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'morning_start': forms.TimeInput(attrs={
+                'placeholder': 'Chọn giờ bắt đầu ca sáng',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'time'
+            }),
+            'morning_end': forms.TimeInput(attrs={
+                'placeholder': 'Chọn giờ kết thúc ca sáng',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'time'
+            }),
+            'afternoon_start': forms.TimeInput(attrs={
+                'placeholder': 'Chọn giờ bắt đầu ca chiều',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'time'
+            }),
+            'afternoon_end': forms.TimeInput(attrs={
+                'placeholder': 'Chọn giờ kết thúc ca chiều',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'time'
+            }),
+            'valid_from': forms.DateInput(attrs={
+                'placeholder': 'Chọn ngày bắt đầu áp dụng',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+        }
+
+class HolidayForm(forms.ModelForm):
+    class Meta:
+        model = Holiday
+        fields = ['date', 'note']
+        labels = {
+            'date': 'Ngày lễ',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'placeholder': 'Chọn ngày lễ',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+
+        }

@@ -5,7 +5,7 @@ from django.urls import reverse
 from app_dashboard.models import Thumbnail
 
 register = template.Library()
-import datetime
+from datetime import date, time, datetime
 from core import settings
 
 from ..models import *
@@ -21,7 +21,7 @@ import base64, json
 def encode_params(**kwargs):
     params = kwargs
     # Filter out keys with None or 'None' values
-    filtered_params = {key: str(value) if isinstance(value, datetime.date) else value for key, value in params.items() if value not in [None, 'None', '']}
+    filtered_params = {key: str(value) if isinstance(value, date) else value for key, value in params.items() if value not in [None, 'None', '']}
     # convert to json
     
     json_params = json.dumps(filtered_params)
@@ -96,9 +96,10 @@ def format_display(record, field):
     if value == None:
         return ""
 
-    
 
-    if field=='duration_seconds':
+    if field in ['duration_seconds','overtime','holiday_time', 'normal_working_time']:
+        if value in [None,'',0]:
+            return "0"
         # convert to hours, minutes, seconds
         hours = value // 3600
         minutes = (value % 3600) // 60
@@ -112,11 +113,11 @@ def format_display(record, field):
 
 
     _type = type(value)
-    if _type == datetime.date:
+    if _type == date:
         return value.strftime("%d/%m/%Y")
-    elif _type == datetime.time:
+    elif _type == time:
         return value.strftime("%H:%M:%S")
-    elif _type == datetime.datetime:
+    elif _type == datetime:
         return value.strftime("%d/%m/%Y %H:%M:%S")
     elif _type == int:
         return "{:,}".format(value)

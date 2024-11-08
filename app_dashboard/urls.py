@@ -19,7 +19,7 @@ urlpatterns = [
     path('transport-department/', views.page_transport_department, name='page_transport_department'),
 
 
-    path('api/save-vehicle-operation-record', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
+    path('api/save-vehicle-operation-record/<str:check_date>', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
 
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
@@ -38,7 +38,7 @@ urlpatterns = [
 
 
 
-
+    path('test', views.test, name='test'),
 
 
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),

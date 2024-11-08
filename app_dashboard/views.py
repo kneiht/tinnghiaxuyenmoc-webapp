@@ -90,7 +90,6 @@ def get_gantt_chart_data(request, project_id):
 
 @login_required
 def load_elements(request):
-    print('>>>>>>>>>> load_elements request:', request.GET)
     encoded_params = request.GET.get('q', '')
     params = json.loads(decode_params(encoded_params))
     for key, value in request.GET.items():
@@ -101,6 +100,7 @@ def load_elements(request):
     html = '<div id="load-elements" class"hidden"></div>'
     elements = params.get('elements', '')
     for element in elements.split('|'):
+        print('element:', element)
         element = element.strip()
         if element == 'title_bar':
             html_title_bar = render_title_bar(request, **params)
@@ -124,6 +124,7 @@ def load_elements(request):
             pass
         elif element == 'weekplan_table':
             html_weekplan_table = render_weekplan_table(request, **params)
+
     return HttpResponse(html)
 
 
@@ -281,54 +282,6 @@ def handle_date_report_form(request):
         html = render_message(request, message='Có lỗi: ' + str(e), message_type='red')
         return HttpResponse(html)
         
-
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
-def save_vehicle_operation_record(request):
-    if request.method != 'POST':
-        return HttpResponseForbidden()
-
-    try:
-        # Parse JSON data from the request body
-        data = json.loads(request.body)
-        for vehicle, other_values_list in data.items():
-            for other_values in other_values_list:
-                start_time = other_values.get('start_time')
-                end_time = other_values.get('end_time')
-                duration_seconds = other_values.get('duration_seconds')
-                
-                # get the date of the start_time
-                check_date = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S').date()
-                # check if the records which has start_time in the check_date
-                vehicle_operation_record = VehicleOperationRecord.objects.filter(
-                    vehicle=vehicle,
-                    start_time=start_time
-                ).first()
-
-                if vehicle_operation_record:
-                    vehicle_operation_record.end_time = end_time
-                    vehicle_operation_record.duration_seconds = duration_seconds
-                    vehicle_operation_record.save()
-                else:
-                    # Create and save the VehicleOperationRecord instance
-                    VehicleOperationRecord.objects.create(
-                        vehicle=vehicle,
-                        start_time=start_time,
-                        end_time=end_time,
-                        duration_seconds=duration_seconds
-                    )
-        # Process the data (for example, print it or save it to the database)
-        # Here, we will just return it in the response for demonstration
-        return JsonResponse({
-            'status': 'success',
-        }, status=200)
-
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Invalid JSON data'
-        }, status=400)
-
 
 
 def handle_vehicle_operation_form(request):
@@ -585,3 +538,209 @@ def upload_project(request, project_id):
         html_message = render_message(request, message="Cập nhật thành công", ok_button_function='reload')
         return HttpResponse(html_message)
 
+
+
+
+def test(request):
+    records = VehicleOperationRecord.objects.all()
+    for record in records:
+        record.save()
+    return HttpResponse('test')
+
+
+
+
+
+
+
+
+import requests, json
+from requests.auth import HTTPBasicAuth
+from bs4 import BeautifulSoup   
+
+
+def get_binhanh_service_operation_time(check_date):
+    # if check_date is None:
+    #     check_date = datetime.now()
+    
+    # # convert checkdate to string dd//mm/yyyy
+    # check_date_str = check_date.strftime("%d/%m/%Y")
+
+    # Get json data
+    def call_api(url, payload, auth):
+        response = requests.post(
+            url, 
+            json=payload, 
+            auth=auth
+        )
+        return response
+
+    def get_vehicle_list():
+        # get api type from params
+        
+        customer_code = '71735_6'
+        api_key = 'Ff$BkG1rAu'
+        auth=HTTPBasicAuth(customer_code, api_key)
+        url = 'http://api.gps.binhanh.vn/apiwba/gps/tracking'
+        payload = {
+            'IsFuel': True 
+        }
+        response = call_api(url, payload, auth)
+        if response.status_code == 200:
+            data = response.json()  
+            message_result = data.get('MessageResult')
+            if message_result == 'Success':
+                vehicles = data.get('Vehicles', [])
+                # Extracting PrivateCode values
+                private_codes = [vehicle["PrivateCode"] for vehicle in vehicles ]
+                return private_codes
+            else:
+                return []
+        else:
+            return []
+            
+    def get_operation_time(vehicles, start_date, end_date):
+        # URL for login
+        url = "https://gps.binhanh.vn"
+
+        # Start a session to persist cookies across requests
+        session = requests.Session()
+
+        # Headers for the request
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "DNT": "1",
+            "Origin": "https://gps.binhanh.vn",
+            "Referer": "https://gps.binhanh.vn/",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+            "sec-ch-ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"macOS"'
+        }
+
+        # Step 1: Get the initial login page to retrieve `__VIEWSTATE`, `__VIEWSTATEGENERATOR`, and `__EVENTVALIDATION`
+        response = session.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Extract the dynamic fields
+        viewstate = soup.find("input", {"name": "__VIEWSTATE"})["value"]
+        viewstate_generator = soup.find("input", {"name": "__VIEWSTATEGENERATOR"})["value"]
+        event_validation = soup.find("input", {"name": "__EVENTVALIDATION"})["value"]
+
+        # Step 2: Prepare the payload for login
+        data = {
+            "__LASTFOCUS": "",
+            "__EVENTTARGET": "",
+            "__EVENTARGUMENT": "",
+            "__VIEWSTATE": viewstate,
+            "__VIEWSTATEGENERATOR": viewstate_generator,
+            "__EVENTVALIDATION": event_validation,
+            "UserLogin1$txtLoginUserName": "tinnghiavt",
+            "UserLogin1$txtLoginPassword": "Tinnghia1234",
+            "UserLogin1$hdfPassword": "",
+            "UserLogin1$btnLogin": "Đăng nhập",
+            "UserLogin1$txtPhoneNumberOtp": "",
+            "UserLogin1$txtOTPClient": "",
+            "UserLogin1$hdfOTPServer": "",
+            "UserLogin1$hdfTimeoutOTP": ""
+        }
+        
+        # Step 3: Send the POST request to login
+        login_response = session.post(url, headers=headers, data=data)
+        # Step 4: Check if login was successful by verifying redirection or specific content in the response 01/05/2024
+        if login_response.ok and "OnlineM.aspx" in login_response.url:
+            print("Login successful!")
+            operation_time = {}
+            count = 0
+            for vehicle in vehicles:
+                url = 'https://gps.binhanh.vn/HttpHandlers/RouteHandler.ashx?method=getRouterByCarNumberLite&carNumber={}&fromDate={}%2000:00&toDate={}%2023:59&split=false&isItinerary=false'.format(vehicle, start_date, end_date)
+                response = session.get(url, headers=headers)
+                data = response.json().get("data")
+                count += 1
+                print('Vehicle {}/{}:'.format(count, len(vehicles)), vehicle)
+                # print(data)
+                # print('\n\n\n')
+                if data == []:
+                    operation_time[vehicle] = {}
+                    continue
+                df = pd.DataFrame(data)
+                # Select only columns 1 and 17 (index-based selection)
+                df = df.iloc[:, [1, 18]]
+                # Rename columns
+                df.columns = ["timestamp", "color"]
+
+                # Convert timestamp column to datetime for easier processing
+                df['timestamp'] = pd.to_datetime(df['timestamp'], format='%d/%m/%Y %H:%M:%S')
+
+                # Find the start and end of each consecutive color block
+                df['change'] = (df['color'] != df['color'].shift()).cumsum()
+
+                # Group by 'color' and 'change' to get periods of consecutive colors
+                summary = df.groupby(['color', 'change']).agg(start_time=('timestamp', 'first'), end_time=('timestamp', 'last')).reset_index()
+
+                # Filter to only include rows where color is "Blue"
+                blue_summary = summary[summary['color'] == 'Blue'].copy()  # Make an explicit copy
+                # Convert start_time and end_time columns to datetime
+                blue_summary['start_time'] = pd.to_datetime(blue_summary['start_time'])
+                blue_summary['end_time'] = pd.to_datetime(blue_summary['end_time'])
+                # Calculate duration in seconds
+                blue_summary['duration_seconds'] = (blue_summary['end_time'] - blue_summary['start_time']).dt.total_seconds()
+
+                # Convert start_time and end_time to string format for JSON serialization
+                blue_summary['start_time'] = blue_summary['start_time'].astype(str)
+                blue_summary['end_time'] = blue_summary['end_time'].astype(str)
+
+                operation_time[vehicle] = blue_summary.to_dict(orient="records")
+            return operation_time
+        else:
+            return []
+
+    
+    vehicles = get_vehicle_list()[0:5]
+    # start_date = '01/05/2024' 
+    # end_date = '01/05/2024'
+
+    # Get operation time
+    operation_time = get_operation_time(vehicles, check_date, check_date)
+    return operation_time
+
+
+
+
+def save_vehicle_operation_record(request, check_date):
+    check_date = get_valid_date(check_date)
+    # convert check_date to datetime date
+    check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+    # convert check_date to ddd/mm/yyyy
+    check_date = check_date.strftime('%d/%m/%Y')
+    data = get_binhanh_service_operation_time(check_date)
+    # Parse JSON data from the request body
+    for vehicle, other_values_list in data.items():
+        print(vehicle)
+        for other_values in other_values_list:
+            start_time = other_values.get('start_time')
+            start_time = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+            end_time = other_values.get('end_time')
+            end_time = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
+            duration_seconds = other_values.get('duration_seconds')
+            
+            # check if the records which has start_time in the check_date
+            vehicle_operation_record = VehicleOperationRecord.objects.filter(
+                vehicle=vehicle,
+                start_time=start_time
+            ).first()
+
+            if vehicle_operation_record:
+                vehicle_operation_record.end_time = end_time
+                vehicle_operation_record.duration_seconds = duration_seconds
+                vehicle_operation_record.save()
+            else:
+                # Create and save the VehicleOperationRecord instance
+                VehicleOperationRecord.objects.create(
+                    vehicle=vehicle,
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration_seconds=duration_seconds
+                )
+
+    return HttpResponse('ok')

@@ -64,7 +64,7 @@ def render_tool_bar(request, **kwargs):
     }
     if model not in ['Project', 'Job', 'VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
-    print(context)
+    # print(context)
     # Render 
     template = 'components/tool_bar.html'
     return render_to_string(template, context, request)
@@ -127,7 +127,6 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.filter(project=project)
         records = filter_records(request, records, model_class)
 
-
     # Get fields to be displayed by using record meta
     # If there is get_display_fields method, use that method
     fields = []
@@ -148,10 +147,29 @@ def render_display_records(request, **kwargs):
             record.progress_by_amount = progress_by_amount(record)
             record.progress_by_plan = progress_by_plan(record)
 
+    groups = {}
+    if group_by:
+        print('group_by:', group_by)
+        # get all values of the field
+        values = [getattr(record, group_by) for record in records]
+
+        # get unique values
+        group_keys = set(values)
+        # remove None values
+        group_keys = [value for value in group_keys if value != None]
+        # order
+        try:
+            group_keys = sorted(group_keys)
+        except Exception as e:
+            print(e)
+        for group_key in group_keys:
+            groups[group_key] = records.filter(**{group_by: group_key})
+
     # Render 
     template = 'components/display_records.html'
     context = {'model': model, 
                'records': records, 
+               'groups': groups,
                'fields': fields, 
                'headers': headers, 
                'update': update, 
@@ -160,6 +178,7 @@ def render_display_records(request, **kwargs):
                'project': project,
                'check_date': check_date
     }
+    # print(context)
     return render_to_string(template, context, request)
 
 
