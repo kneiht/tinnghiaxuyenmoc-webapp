@@ -27,6 +27,12 @@ def get_valid_id(id):
         id = 0
     return id
 
+def get_valid_int(value):
+    try:
+        value = int(value)
+    except:
+        value = 0
+    return value
 
 
 import base64, json

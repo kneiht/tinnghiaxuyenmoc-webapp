@@ -209,6 +209,7 @@
         <form id="form-group-{{ group }}" action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".group-{{ group }}" class="rounded-b-2xl">
             {% csrf_token %}
             <input type="hidden" name="group_by" value="vehicle" />
+            <input type="hidden" name="tab" value="{{ tab }}" />
             <div class="text-sm leading-normal text-theme rounded-t-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 <div colspan="100" class="px-6 py-3 text-left font-semibold">

@@ -286,13 +286,11 @@ def handle_date_report_form(request):
 
 def handle_vehicle_operation_form(request):
     def convert_time(time_str, time_sign):
-        print('time_str:', time_str, 'time_type:', time_sign)
         hours, minutes, seconds = map(int, time_str.split(":"))
         total_seconds = hours * 3600 + minutes * 60 + seconds
         duration_seconds = total_seconds
         if time_sign == 'minus':
             duration_seconds = -duration_seconds
-        print('duration_seconds:', duration_seconds)
         return duration_seconds
     
     if request.method != 'POST':
@@ -300,7 +298,6 @@ def handle_vehicle_operation_form(request):
     
     try:
         form = request.POST
-        print(form)
         # Get list of ids
         ids = form.getlist('id')
         for id in ids:
@@ -381,6 +378,7 @@ def handle_vehicle_operation_form(request):
                 holiday_time_str = holiday_time_news[i]
                 holiday_time_sign = holiday_time_sign_news[i]
                 holiday_time = convert_time(holiday_time_str, holiday_time_sign)
+        
             except Exception as e:
                 raise e
         
@@ -392,8 +390,15 @@ def handle_vehicle_operation_form(request):
             # convert start time to datetime object
             start_time = datetime.strptime(start_time, '%d/%m/%Y')
             end_time = start_time
-            fuel_allowance = fuel_allowance_news[i]
+            fuel_allowance = get_valid_int(fuel_allowance_news[i])
             note = note_news[i]
+
+
+            if duration_seconds == 0 and overtime == 0 and normal_working_time == 0 and holiday_time == 0 and fuel_allowance == 0:
+                print('>>>> skip')
+                continue
+
+
             new_record = VehicleOperationRecord.objects.create(
                 vehicle=vehicle,
                 start_time=start_time,
@@ -412,10 +417,11 @@ def handle_vehicle_operation_form(request):
 
         # Get records by ids
         group_by = form.get('group_by')
+        tab = form.get('tab')
         records = VehicleOperationRecord.objects.filter(pk__in=ids)
         
-        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by)
-        html_message = render_message(request, message='Cập nhật thành công', message_type='green')
+        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab)
+        html_message = render_message(request, message='Cập nhật thành công!\n\nLưu ý các dòng nhập tay nếu không có dữ liệu sẽ được xóa khỏi bảng dữ liệu!', message_type='green')
         html = html_message + html_display
         return HttpResponse(html)
     except Exception as e:
