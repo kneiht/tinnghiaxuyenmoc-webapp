@@ -144,10 +144,15 @@ def calculate_salary(vehicle_operation_records, start_date, end_date):
     result = ''
     result += f'Lương cơ bản: {format_number(driver.basic_salary)} VNĐ\n'
     result += f'1. Số ngày làm việc: {working_days_count}/{days_count} => Lương cơ bản nhận: {format_number(actual_basic_salary)} VNĐ\n' 
-    result += f'2. Lương giờ bình thường => {normal_working_time_salary['format_salary']} VNĐ\n'
-    result += f'3. Lương giờ tăng ca: {overtime_salary['format_salary']} VNĐ\n'
-    result += f'4. Lương giờ chủ nhật: {sunday_working_time_salary['format_salary']} VNĐ\n'
-    result += f'5. Lương giờ lễ: {holiday_time_salary['format_salary']} VNĐ\n'
+    temp = normal_working_time_salary['format_salary']
+    result += f'2. Lương giờ bình thường => {temp} VNĐ\n'
+    temp = overtime_salary['format_salary']
+    result += f'3. Lương giờ tăng ca: {temp} VNĐ\n'
+    temp = sunday_working_time_salary['format_salary']
+    result += f'4. Lương giờ chủ nhật: {temp} VNĐ\n'
+    temp = holiday_time_salary['format_salary']
+    result += f'5. Lương giờ lễ: {temp} VNĐ\n'
+
     result += f'6. Phụ cấp xăng: {format_number(fuel_allowance)} VNĐ\n'
     result += f'7. Phụ cấp cố định: {format_number(fixed_allowance)} VNĐ\n'
     result += f'8. BHXH: {format_number(insurance)} VNĐ\n'
