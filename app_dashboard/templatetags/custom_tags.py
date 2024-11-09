@@ -55,6 +55,9 @@ def group(records, field):
 
 
 
+
+
+
 # TAGS FOR VEHICLE OPERATION RECORD
 @register.filter(name='calcate_operation_duration')
 def calcate_operation_duration(vehicle_operation_records):
@@ -67,32 +70,95 @@ def calcate_operation_duration(vehicle_operation_records):
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
     else:
         return "00:00:00"
-@register.filter(name='count_work_days')
-def count_work_days(vehicle_operation_records):
-    # Count the number of days that the driver works by getting the list of dates (from starttime)
-    if vehicle_operation_records:
-        dates = [record.start_time.date() for record in vehicle_operation_records]
-        return len(set(dates))
-    else:
-        return 0
 
-@register.filter(name='count_days')
-def count_days(end_date, start_date):
+
+@register.simple_tag
+def calculate_salary(vehicle_operation_records, start_date, end_date):
+    def format_number(number):
+        return "{:,}".format(int(number))
+    
+    def calculate_fuel_allowance(records):
+        try:
+            fuel_allowance = records.aggregate(models.Sum('fuel_allowance'))['fuel_allowance__sum']
+            return fuel_allowance
+        except Exception as e:
+            return 0
+
+    def calculate_hourly_salary(records, time_string=None):
+        if time_string == 'normal_working_time':
+            percentage = 1
+        elif time_string == 'overtime':
+            percentage = driver.overtime_percentage
+        elif time_string == 'sunday_working_time':
+            percentage = driver.sunday_percentage
+        elif time_string == 'holiday_time':
+            percentage = driver.holiday_percentage
+        else:
+            return 1
+
+        try:
+            time_seconds = records.aggregate(models.Sum(time_string))[f'{time_string}__sum']
+            time_hours = time_seconds / 3600
+            salary = time_hours * driver.hourly_salary * percentage
+            format_salary = format_number(salary)
+            result = {
+                'hourly_salary': driver.hourly_salary,
+                'salary': salary,
+                'format_salary': format_salary,
+                'time_hours': time_hours,
+                'percentage': percentage}
+            return result
+        except Exception as e:
+            result = {
+                'hourly_salary': 0,
+                'salary': 0,
+                'format_salary': 0,
+                'time_hours': 0,
+                'percentage': 1}
+            return result
+
+    records = vehicle_operation_records
+    driver = records.first().driver
+    # Count days
     # date string convert to type date
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    days_count = (end_date - start_date).days + 1
 
-    # Count the number of days between two dates
-    return (end_date - start_date).days
+    # Count the number of days that the driver works by getting the list of dates (from starttime)
+    dates = [record.start_time.date() for record in records]
+    working_days_count = len(set(dates))
 
+    actual_basic_salary = driver.basic_salary * working_days_count / days_count
+    fuel_allowance = calculate_fuel_allowance(records)
+    fixed_allowance = driver.fixed_allowance * working_days_count/days_count
+    insurance = driver.insurance_amount * working_days_count/days_count
+    normal_working_time_salary = calculate_hourly_salary(records, 'normal_working_time')
+    overtime_salary = calculate_hourly_salary(records, 'overtime')
+    sunday_working_time_salary = calculate_hourly_salary(records, 'sunday_working_time')
+    holiday_time_salary = calculate_hourly_salary(records, 'holiday_time')
+    sum_salary = actual_basic_salary + normal_working_time_salary['salary'] + overtime_salary['salary'] + \
+        sunday_working_time_salary['salary'] + holiday_time_salary['salary'] + \
+        fuel_allowance + fixed_allowance - insurance
+
+    result = ''
+    result += f'Lương cơ bản: {format_number(driver.basic_salary)} VNĐ\n'
+    result += f'1. Số ngày làm việc: {working_days_count}/{days_count} => Lương cơ bản nhận: {format_number(actual_basic_salary)} VNĐ\n' 
+    result += f'2. Lương giờ bình thường => {normal_working_time_salary['format_salary']} VNĐ\n'
+    result += f'3. Lương giờ tăng ca: {overtime_salary['format_salary']} VNĐ\n'
+    result += f'4. Lương giờ chủ nhật: {sunday_working_time_salary['format_salary']} VNĐ\n'
+    result += f'5. Lương giờ lễ: {holiday_time_salary['format_salary']} VNĐ\n'
+    result += f'6. Phụ cấp xăng: {format_number(fuel_allowance)} VNĐ\n'
+    result += f'7. Phụ cấp cố định: {format_number(fixed_allowance)} VNĐ\n'
+    result += f'8. BHXH: {format_number(insurance)} VNĐ\n'
+    result += f'Tổng lương (1+2+3+4+5+6+7 - 8): {format_number(sum_salary)} VNĐ'
+    return result.strip()
 
 
 
 @register.filter(name='get_value')
 def get_value(record, field):
     return getattr(record, field)
-
-
 
 @register.filter(name='get_sign')
 def get_sign(record, field):
@@ -113,7 +179,7 @@ def format_display(record, field):
     if value == None:
         return ""
 
-    if field in ['duration_seconds','overtime','holiday_time', 'normal_working_time']:
+    if field in ['duration_seconds','overtime','holiday_time', 'normal_working_time', 'sunday_working_time']:
         if value in [None,'',0]:
             return "00:00:00"
         if value < 0:
@@ -146,25 +212,6 @@ def format_display(record, field):
 @register.filter
 def get_field_value(obj, field_name):
     return getattr(obj, field_name)
-
-
-
-@register.filter(name='format_vnd')
-def format_vnd(amount):
-    if amount is None:
-        return ""
-    # Convert the number to a string and reverse it
-    try:
-        amount_str = str(int(amount))[::-1]
-    except Exception as e:
-        return e
-
-    # Insert a dot every 3 digits
-    formatted_str = '.'.join(amount_str[i:i+3] for i in range(0, len(amount_str), 3))
-    # Reverse the string back and append the VND symbol
-    return formatted_str[::-1].replace('-.','-') + " VNĐ"
-
-
 
 
 

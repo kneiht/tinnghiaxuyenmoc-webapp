@@ -118,7 +118,7 @@ def render_display_records(request, **kwargs):
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
-    end_date = get_valid_date(params.get('end_date', ''))
+    end_date = get_valid_date(params.get('end_date', start_date))
     group_by = params.get('group_by', '')
     records = params.get('records', None)
     tab = params.get('tab', '')
@@ -126,12 +126,14 @@ def render_display_records(request, **kwargs):
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
     
+    print(start_date)
+    print(end_date)
     if not records:
         if not project_id:
             records = model_class.objects.all()
         else:
             records = model_class.objects.filter(project=project)
-        records = filter_records(request, records, model_class, params)
+        records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date)
 
     # Get fields to be displayed by using record meta
     # If there is get_display_fields method, use that method
@@ -172,6 +174,7 @@ def render_display_records(request, **kwargs):
             groups[group_key] = records.filter(**{group_by: group_key})
 
     # Render 
+
     template = 'components/display_records.html'
     context = {'model': model, 
                'records': records, 

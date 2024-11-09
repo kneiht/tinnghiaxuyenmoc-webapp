@@ -455,6 +455,11 @@ class DataDriver(BaseModel):
     hourly_salary = models.PositiveIntegerField(verbose_name="Lương theo giờ", default=0)
     trip_salary = models.PositiveIntegerField(verbose_name="Lương theo chuyến", default=0)
 
+    # Salary percentage
+    overtime_percentage = models.FloatField(verbose_name="Hệ số lương tăng ca", default=1)
+    sunday_percentage = models.FloatField(verbose_name="Hệ số lương chủ nhật", default=1)
+    holiday_percentage = models.FloatField(verbose_name="Hệ số lương ngày lễ", default=1)
+
     # Bank Information
     bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="")
     account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="")
@@ -472,9 +477,10 @@ class DataDriver(BaseModel):
     @classmethod
     def get_display_fields(self):
         fields = ['full_name', 'hire_date', 'identity_card', 'birth_year', 'status', 
-                  'basic_salary', 'hourly_salary', 'trip_salary',
-                  'bank_name', 'account_number', 'account_holder_name',
-                  'fixed_allowance', 'insurance_amount', 'phone_number', 'address']
+                  'basic_salary', 'hourly_salary', 'trip_salary', 'overtime_percentage', 
+                  'sunday_percentage', 'holiday_percentage',
+                  'fixed_allowance', 'insurance_amount', 'phone_number', 'address',
+                  'bank_name', 'account_number', 'account_holder_name',]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -733,6 +739,7 @@ class VehicleOperationRecord(models.Model):
     overtime = models.IntegerField(verbose_name="Thời gian tăng ca", default=0)
     holiday_time = models.IntegerField(verbose_name="Thời gian làm ngày lễ", default=0)
     normal_working_time = models.IntegerField(verbose_name="Thời gian làm bình thường", default=0)
+    sunday_working_time = models.IntegerField(verbose_name="Thời gian làm chủ nhật", default=0)
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
@@ -741,21 +748,28 @@ class VehicleOperationRecord(models.Model):
         return self.vehicle
     
     def save(self, *args, **kwargs):
+        SUNDAY = 6
         if self.source == 'gps':
             self.overtime = self.calculate_overtime()
             if Holiday.is_holiday(self.start_time.date()):
                 self.normal_working_time = 0
+                self.sunday_working_time = 0
                 self.holiday_time = self.duration_seconds - self.overtime
+
+            elif self.start_time.weekday() == SUNDAY:
+                self.normal_working_time = 0
+                self.holiday_time = 0
+                self.sunday_working_time = self.duration_seconds - self.overtime
             else:
                 self.holiday_time = 0
+                self.sunday_working_time = 0
                 self.normal_working_time = self.duration_seconds - self.overtime
-            
         super().save(*args, **kwargs)
 
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
-                  'driver', 'location', 'normal_working_time', 'overtime', 
+                  'driver', 'location', 'normal_working_time', 'overtime', 'sunday_working_time',
                   'holiday_time', 'fuel_allowance', 'image', 'note']
         # Check if the field is in the model
         for field in fields:
@@ -781,23 +795,32 @@ class VehicleOperationRecord(models.Model):
         # Define the working hours
         morning_start, morning_end, afternoon_start, afternoon_end = NormalWorkingTime.get_valid_normal_working_time()
 
-        # Initialize overtime duration
-        overtime = timedelta(0)
+        # get the set of seconds of the working hours
+        the_order_of_second_of_morning_start = morning_start.hour * 3600 + morning_start.minute * 60 + morning_start.second
+        the_order_of_second_of_morning_end = morning_end.hour * 3600 + morning_end.minute * 60 + morning_end.second
+        the_order_of_second_of_afternoon_start = afternoon_start.hour * 3600 + afternoon_start.minute * 60 + afternoon_start.second
+        the_order_of_second_of_afternoon_end = afternoon_end.hour * 3600 + afternoon_end.minute * 60 + afternoon_end.second
 
-        # Split the time into working and overtime for each period
-        # Morning session
-        if start_time.time() < morning_start:
-            overtime += min(end_time, datetime.combine(start_time.date(), morning_start)) - start_time
+        # The set of all seconds working hours
+        all_seconds_of_morning = set(range(the_order_of_second_of_morning_start, the_order_of_second_of_morning_end))
+        all_seconds_of_afternoon = set(range(the_order_of_second_of_afternoon_start, the_order_of_second_of_afternoon_end))
+        all_seconds_of_working_hours = all_seconds_of_morning | all_seconds_of_afternoon
 
-        if end_time.time() > morning_end and start_time.time() < morning_end:
-            overtime += end_time - max(start_time, datetime.combine(start_time.date(), morning_end))
+        # The set of all seconds from start_time to end_time
+        the_order_of_second_of_start_time = start_time.hour * 3600 + start_time.minute * 60 + start_time.second
+        the_order_of_second_of_end_time = end_time.hour * 3600 + end_time.minute * 60 + end_time.second
+        all_seconds_from_start_to_end = set(range(the_order_of_second_of_start_time, the_order_of_second_of_end_time))
 
-        # Afternoon session
-        if start_time.time() < afternoon_start and end_time.time() > afternoon_start:
-            overtime += max(start_time, datetime.combine(start_time.date(), afternoon_start)) - start_time
-
-        if end_time.time() > afternoon_end:
-            overtime += end_time - datetime.combine(end_time.date(), afternoon_end)
-        return int(overtime.total_seconds())
+        # The set of seconds that is overtime
+        overtime = all_seconds_from_start_to_end - all_seconds_of_working_hours
+        # print("the_order_of_second_of_morning_start", the_order_of_second_of_morning_start)
+        # print("the_order_of_second_of_morning_end", the_order_of_second_of_morning_end)
+        # print("overtime", len(overtime))
+        # print("all_seconds_of_working_hours", len(all_seconds_of_working_hours))
+        # count the number of seconds
+        if overtime:
+            return len(overtime)
+        else:
+            return 0
 
 

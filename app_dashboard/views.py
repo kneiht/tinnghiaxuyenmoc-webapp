@@ -5,6 +5,7 @@
 from core import settings
 import pandas as pd
 
+
 import json
 import os
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -298,6 +299,7 @@ def handle_vehicle_operation_form(request):
     
     try:
         form = request.POST
+        print(form)
         # Get list of ids
         ids = form.getlist('id')
         for id in ids:
@@ -331,6 +333,11 @@ def handle_vehicle_operation_form(request):
                     holiday_time_sign = form.get(f'holiday_time_sign_{id}', None)
                     holiday_time = convert_time(holiday_time_str, holiday_time_sign)
                     record.holiday_time = holiday_time
+                    # sunday_working_time
+                    sunday_working_time_str = form.get(f'sunday_working_time_{id}', None)
+                    sunday_working_time_sign = form.get(f'sunday_working_time_sign_{id}', None)
+                    sunday_working_time = convert_time(sunday_working_time_str, sunday_working_time_sign)
+                    record.sunday_working_time = sunday_working_time
                 except:
                     raise e
             record.save()
@@ -352,6 +359,9 @@ def handle_vehicle_operation_form(request):
 
         holiday_time_news = form.getlist('holiday_time_new')
         holiday_time_sign_news = form.getlist('holiday_time_sign_new')
+
+        sunday_working_time_news = form.getlist('sunday_working_time_new')
+        sunday_working_time_sign_news = form.getlist('sunday_working_time_sign_new')
 
         fuel_allowance_news = form.getlist('fuel_allowance_new')
         note_news = form.getlist('note_new')
@@ -378,6 +388,11 @@ def handle_vehicle_operation_form(request):
                 holiday_time_str = holiday_time_news[i]
                 holiday_time_sign = holiday_time_sign_news[i]
                 holiday_time = convert_time(holiday_time_str, holiday_time_sign)
+
+                # sunday_working_time
+                sunday_working_time_str = sunday_working_time_news[i]
+                sunday_working_time_sign = sunday_working_time_sign_news[i]
+                sunday_working_time = convert_time(sunday_working_time_str, sunday_working_time_sign)
         
             except Exception as e:
                 raise e
@@ -394,8 +409,14 @@ def handle_vehicle_operation_form(request):
             note = note_news[i]
 
 
+            print('duration_seconds:', duration_seconds)    
+            print('overtime:', overtime)
+            print('normal_working_time:', normal_working_time)
+            print('holiday_time:', holiday_time)
+            print('sunday_working_time:', sunday_working_time)
             if duration_seconds == 0 and overtime == 0 and normal_working_time == 0 and holiday_time == 0 and fuel_allowance == 0:
                 print('>>>> skip')
+
                 continue
 
 
@@ -407,6 +428,7 @@ def handle_vehicle_operation_form(request):
                 overtime=overtime,
                 normal_working_time=normal_working_time,
                 holiday_time=holiday_time,
+                sunday_working_time=sunday_working_time,
                 fuel_allowance=fuel_allowance,
                 note=note,
                 source='manual',
@@ -602,7 +624,7 @@ from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup   
 
 
-def get_binhanh_service_operation_time(check_date):
+def get_binhanh_service_operation_time(check_date, vehicles):
     # if check_date is None:
     #     check_date = datetime.now()
     
@@ -738,8 +760,10 @@ def get_binhanh_service_operation_time(check_date):
         else:
             return []
 
-    
-    vehicles = get_vehicle_list()
+
+    if vehicles == []:
+        vehicles = get_vehicle_list()
+
     # start_date = '01/05/2024' 
     # end_date = '01/05/2024'
 
@@ -751,20 +775,25 @@ def get_binhanh_service_operation_time(check_date):
 #import csrf_exempt
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
-def save_vehicle_operation_record(request, check_date):
+def save_vehicle_operation_record(request):
     # only accept POST request
     if request.method != 'POST':
         return HttpResponse('Method not allowed')
     
+    # get check_date from url
+    check_date = request.POST.get('check_date')
+    vehicles = request.POST.getlist('vehicle')
+
+
     check_date = get_valid_date(check_date)
     # convert check_date to datetime date
     check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
     # convert check_date to ddd/mm/yyyy
     check_date = check_date.strftime('%d/%m/%Y')
-    data = get_binhanh_service_operation_time(check_date)
+    data = get_binhanh_service_operation_time(check_date, vehicles)
     # Parse JSON data from the request body
+    result = ''
     for vehicle, other_values_list in data.items():
-        print(vehicle)
         for other_values in other_values_list:
             start_time = other_values.get('start_time')
             start_time = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
@@ -779,6 +808,7 @@ def save_vehicle_operation_record(request, check_date):
             ).first()
 
             if vehicle_operation_record:
+                print('re calculate')
                 vehicle_operation_record.end_time = end_time
                 vehicle_operation_record.duration_seconds = duration_seconds
                 vehicle_operation_record.save()
@@ -790,5 +820,5 @@ def save_vehicle_operation_record(request, check_date):
                     end_time=end_time,
                     duration_seconds=duration_seconds
                 )
-
-    return HttpResponse('ok')
+        result += vehicle + '\n'
+    return HttpResponse(result)

@@ -214,19 +214,20 @@
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 <div colspan="100" class="px-6 py-3 text-left font-semibold">
                     
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg font-semibold">{{ group }}</span>
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col items-start gap-3">
                             {% if tab == 'vehicle_operation_data_by_date' %}
+                                <span class="text-lg font-semibold">{{ group }}</span>
                                 <span class="text-lg font-semibold text-green-600 dark:text-green-300">
                                     <i class="fa fa-clock mr-1"></i>
                                         Tổng thời gian xe hoạt động: {{ records|calcate_operation_duration }}
                                 </span>
                             {% elif tab == 'driver_salary' %}
-                                <span class="text-lg font-semibold text-green-600 dark:text-green-300">
-                                    <i class="fa fa-money mr-1"></i>
-                                    Số ngày làm việc: {{ records|count_work_days }} / {{ end_date|count_days:start_date }}
+                                <span class="text-lg font-semibold">
+                                    Bảng lương chi tiết tài xế: {{ group }}
                                 </span>
+
+                                <span class="text-lg font-semibold text-green-600 dark:text-green-300 whitespace-pre-line px-10">{% calculate_salary records start_date end_date %}</span>
                             {% endif %}
                         </div>
                         
@@ -309,7 +310,7 @@
                                         <textarea name="note_{{ record.pk }}" class="form-input expand input hidden" style="width: 250px"
                                     >{{ record.note }}</textarea>
 
-                                    {% elif field == 'duration_seconds' or field == 'overtime' or field == 'holiday_time' or field == 'normal_working_time' %}
+                                    {% elif field == 'duration_seconds' or field == 'overtime' or field == 'holiday_time' or field == 'normal_working_time' or field == 'sunday_working_time' %}
                                         
                                         {% if record.source == 'manual' %}
                                             {% if record|get_value:field > 0  %}
@@ -342,7 +343,7 @@
                                                 </span>
 
                                             {% elif record|get_value:field == 0  %}
-                                                <span class="display zero">
+                                                <span class="zero">
                                                     {{ record|format_display:field }}
                                                 </span>
 
@@ -380,12 +381,12 @@
                             
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                 <div class="flex flex-row">
-                                    <select name="duration_seconds_sign_new" class="form-input input hidden" id="id_duration_seconds_sign_new" style="width: 130px;">
+                                    <select disabled name="duration_seconds_sign_new" class="form-input input hidden" id="id_duration_seconds_sign_new" style="width: 130px;">
                                         <option value="plus" {% if record|get_sign:'duration_seconds' == '+' %} selected {% endif %}>+ Cộng</option>
                                         <option value="minus" {% if record|get_sign:'duration_seconds' == '-' %} selected {% endif %}>- Trừ</option>
                                     </select>
                                 
-                                    <input type="time" step="1" id="id_duration_seconds_new" name="duration_seconds_new" class="form-input input hidden" value="00:00:00">
+                                    <input disabled type="time" step="1" id="id_duration_seconds_new" name="duration_seconds_new" class="form-input input hidden" value="00:00:00">
                                 </div>
                             </td>
                             
@@ -407,7 +408,7 @@
                             </td>
                             
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                <select name="location_new" class="form-input input hidden" id="id_location" style="width: 150px">
+                                <select disabled name="location_new" class="form-input input hidden" id="id_location" style="width: 150px">
                                     <option value="" selected">----------</option>
                                     {% for location in records.first.get_location_choices %}
                                         {% if location.id == record.location.id %}
@@ -421,52 +422,64 @@
 
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                 <div class="flex flex-row">
-                                    <select name="normal_working_time_sign_new" class="form-input input hidden" id="id_normal_working_time_sign_new" style="width: 130px;">
+                                    <select disabled name="normal_working_time_sign_new" class="form-input input hidden" id="id_normal_working_time_sign_new" style="width: 130px;">
                                         <option value="plus" {% if record|get_sign:'normal_working_time' == '+' %} selected {% endif %}>+ Cộng</option>
                                         <option value="minus" {% if record|get_sign:'normal_working_time' == '-' %} selected {% endif %}>- Trừ</option>
                                     </select>
                                 
-                                    <input type="time" step="1" id="id_normal_working_time_new" name="normal_working_time_new" class="form-input input hidden" value="00:00:00">
+                                    <input disabled type="time" step="1" id="id_normal_working_time_new" name="normal_working_time_new" class="form-input input hidden" value="00:00:00">
                                 </div>
                             </td>
 
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                 <div class="flex flex-row">
-                                    <select name="overtime_sign_new" class="form-input input hidden" id="id_overtime_sign_" style="width: 130px;">
+                                    <select disabled name="overtime_sign_new" class="form-input input hidden" id="id_overtime_sign_" style="width: 130px;">
                                         <option value="plus" {% if record|get_sign:'overtime' == '+' %} selected {% endif %}>+ Cộng</option>
                                         <option value="minus" {% if record|get_sign:'overtime' == '-' %} selected {% endif %}>- Trừ</option>
                                     </select>
                                 
-                                    <input type="time" step="1" id="id_overtime_new" name="overtime_new" class="form-input input hidden" value="00:00:00">
+                                    <input disabled type="time" step="1" id="id_overtime_new" name="overtime_new" class="form-input input hidden" value="00:00:00">
                                 </div>
                             </td>
 
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                 <div class="flex flex-row">
-                                    <select name="holiday_time_sign_new" class="form-input input hidden" id="id_holiday_time_sign_new" style="width: 130px;">
+                                    <select disabled name="sunday_working_time_sign_new" class="form-input input hidden" id="id_sunday_working_time_sign_new" style="width: 130px;">
+                                        <option value="plus" {% if record|get_sign:'sunday_working_time' == '+' %} selected {% endif %}>+ Cộng</option>
+                                        <option value="minus" {% if record|get_sign:'sunday_working_time' == '-' %} selected {% endif %}>- Trừ</option>
+                                    </select>
+                                
+                                    <input  disabled type="time" step="1" id="id_sunday_working_time_new" name="sunday_working_time_new" class="form-input input hidden" value="00:00:00">
+                                </div>
+                            </td>
+
+
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                                <div class="flex flex-row">
+                                    <select disabled name="holiday_time_sign_new" class="form-input input hidden" id="id_holiday_time_sign_new" style="width: 130px;">
                                         <option value="plus" {% if record|get_sign:'holiday_time' == '+' %} selected {% endif %}>+ Cộng</option>
                                         <option value="minus" {% if record|get_sign:'holiday_time' == '-' %} selected {% endif %}>- Trừ</option>
                                     </select>
                                 
-                                    <input type="time" step="1" id="id_holiday_time_new" name="holiday_time_new" class="form-input input hidden" value="00:00:00">
+                                    <input disabled type="time" step="1" id="id_holiday_time_new" name="holiday_time_new" class="form-input input hidden" value="00:00:00">
                                 </div>
                             </td>
 
+
+
+
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                <input type="number" name="fuel_allowance_new" class="form-input input hidden" value="0" step="any" style="width: 150px"/>
+                                <input disabled type="number" name="fuel_allowance_new" class="form-input input hidden" value="0" step="any" style="width: 150px"/>
                             </td>
-
-
 
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                 Chọn hình ảnh
                             </td>
 
                             <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                <textarea name="note_new" class="form-input expand input hidden" style="width: 250px"
+                                <textarea disabled name="note_new" class="form-input expand input hidden" style="width: 250px"
                                 ></textarea>
                             </td>
-
 
                         </tr>
                     </tbody>

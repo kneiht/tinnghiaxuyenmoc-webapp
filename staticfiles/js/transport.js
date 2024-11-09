@@ -59,7 +59,7 @@ up.compiler('.transport-table', function (transportTable) {
         // Replace the rowplate with the new row
         transportTable.querySelector('table').appendChild(newRow);
         // find all input and select elements in the new row and remove disabled
-        newRow.querySelectorAll('input, select').forEach(function (element) {
+        newRow.querySelectorAll('input, select, textarea').forEach(function (element) {
             element.removeAttribute('disabled');
         })
 
@@ -131,6 +131,31 @@ up.compiler('#start_date', function (element) {
 
 
 
+up.compiler('#end_date', function (element) {
+    let endDate = element;
+    endDate.addEventListener('change', function () {
+        // Get the selected start date value
+        let newendDate = endDate.value;
 
-let url = currentUrl + `&start_date=${startDate.value}`;
-aTag.href = url;
+        // Find all <a> tags in database-selection
+        let databaseSelection = document.getElementById('database-selection');
+        let aTags = databaseSelection.querySelectorAll('#driver_salary, #vehicle_avenue');
+
+        // For each <a> tag
+        aTags.forEach(function (aTag) {
+            let currentUrl = new URL(aTag.href); // Convert href to URL object
+
+            // Check if 'start_date' exists in the query parameters
+            if (currentUrl.searchParams.has('end_date')) {
+                // If it exists, replace with new start_date
+                currentUrl.searchParams.set('end_date', newendDate);
+            } else {
+                // If it doesn't exist, append the new start_date
+                currentUrl.searchParams.append('end_date', newendDate);
+            }
+
+            // Update the href with the modified URL
+            aTag.href = currentUrl.toString();
+        });
+    });
+});

@@ -189,15 +189,15 @@ class DataVehicleForm(forms.ModelForm):
                     'type': 'date'}),
         }
 
-
-
 from .models import DataDriver
+
 class DataDriverForm(forms.ModelForm):
     class Meta:
         model = DataDriver
         fields = [
             'full_name', 'status', 'hire_date', 'identity_card', 'birth_year',
-            'basic_salary', 'hourly_salary', 'trip_salary', 'bank_name', 'account_number',
+            'basic_salary', 'hourly_salary', 'trip_salary', 'overtime_percentage',
+            'sunday_percentage', 'holiday_percentage', 'bank_name', 'account_number',
             'account_holder_name', 'fixed_allowance', 'insurance_amount',
             'phone_number', 'address'
         ]
@@ -210,6 +210,10 @@ class DataDriverForm(forms.ModelForm):
             'birth_year': 'Ngày sinh',
             'basic_salary': 'Lương cơ bản',
             'hourly_salary': 'Lương theo giờ',
+            'trip_salary': 'Lương theo chuyến',
+            'overtime_percentage': 'Hệ số lương tăng ca',
+            'sunday_percentage': 'Hệ số lương chủ nhật',
+            'holiday_percentage': 'Hệ số lương ngày lễ',
             'bank_name': 'Ngân hàng',
             'account_number': 'Số tài khoản',
             'account_holder_name': 'Tên chủ tài khoản',
@@ -225,13 +229,10 @@ class DataDriverForm(forms.ModelForm):
                 'class': 'form-input',
                 'required': 'required'
             }),
-
             'status': forms.Select(attrs={
-                'class': 'form-input',  # Add select input for status
+                'class': 'form-input',
                 'required': 'required'
             }),
-
-
             'hire_date': forms.DateInput(attrs={
                 'class': 'form-input',
                 'type': 'date',
@@ -259,16 +260,30 @@ class DataDriverForm(forms.ModelForm):
                 'step': '0.01',
                 'required': 'required'
             }),
-
             'trip_salary': forms.NumberInput(attrs={
                 'placeholder': 'Nhập lương theo chuyến',
                 'class': 'form-input',
                 'step': '0.01',
                 'required': 'required'
             }),
-
-
-
+            'overtime_percentage': forms.NumberInput(attrs={
+                'placeholder': 'Hệ số lương tăng ca',
+                'class': 'form-input',
+                'step': '0.01',
+                'required': 'required'
+            }),
+            'sunday_percentage': forms.NumberInput(attrs={
+                'placeholder': 'Hệ số lương chủ nhật',
+                'class': 'form-input',
+                'step': '0.01',
+                'required': 'required'
+            }),
+            'holiday_percentage': forms.NumberInput(attrs={
+                'placeholder': 'Hệ số lương ngày lễ',
+                'class': 'form-input',
+                'step': '0.01',
+                'required': 'required'
+            }),
             'bank_name': forms.TextInput(attrs={
                 'placeholder': 'Nhập tên ngân hàng',
                 'class': 'form-input',

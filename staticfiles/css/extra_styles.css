@@ -251,3 +251,10 @@ th.sorted-desc::after {
 .zero {
   color: #bdbdbd;
 }
+
+
+.trimmed-text {
+  white-space: pre-line;
+  padding: 0.5em; /* Optional: Adjust padding to visually separate from container */
+  text-align: start; /* Ensures text is left-aligned without extra indentation */
+}

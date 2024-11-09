@@ -59,7 +59,7 @@ up.compiler('.transport-table', function (transportTable) {
         // Replace the rowplate with the new row
         transportTable.querySelector('table').appendChild(newRow);
         // find all input and select elements in the new row and remove disabled
-        newRow.querySelectorAll('input, select').forEach(function (element) {
+        newRow.querySelectorAll('input, select, textarea').forEach(function (element) {
             element.removeAttribute('disabled');
         })
 
@@ -139,7 +139,7 @@ up.compiler('#end_date', function (element) {
 
         // Find all <a> tags in database-selection
         let databaseSelection = document.getElementById('database-selection');
-        let aTags = databaseSelection.querySelectorAll('a');
+        let aTags = databaseSelection.querySelectorAll('#driver_salary, #vehicle_avenue');
 
         // For each <a> tag
         aTags.forEach(function (aTag) {
