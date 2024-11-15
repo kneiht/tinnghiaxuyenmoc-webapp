@@ -12,6 +12,17 @@ from .models import *
 def is_admin(user):
     return user.is_authenticated and user.is_active and user.is_staff and user.is_superuser
 
+
+import base64, json
+def encode_base64(input_string):
+    # Convert the string to bytes
+    byte_string = input_string.encode('utf-8')
+    # Encode to Base64
+    base64_bytes = base64.b64encode(byte_string)
+    # Convert Base64 bytes back to a string
+    base64_string = base64_bytes.decode('utf-8')
+    return base64_string
+
 def get_valid_date(date):
     try:
         date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -26,6 +37,9 @@ def get_valid_id(id):
     except:
         id = 0
     return id
+
+
+
 
 def get_valid_int(value):
     try:
@@ -262,8 +276,7 @@ def progress_by_plan(record, check_date = None):
 
 def filter_records(request, records, model_class, **kwargs):
     # Get all query parameters except 'sort' as they are assumed to be field filters
-    query_params = {k: v for k, v in request.GET.lists() if k != 'sort'}
-
+    query_params = {k: v for k, v in request.GET.lists() if k != 'sort'} 
     if model_class == VehicleOperationRecord:
 
         # Add start_date and end_date form params to query_params if they are not present
@@ -277,18 +290,22 @@ def filter_records(request, records, model_class, **kwargs):
             end_date = get_valid_date(kwargs.get('end_date', ''))
         else:
             end_date = query_params['end_date'][0]
-        print('>>>> start date and end date:',start_date, end_date)
+        # print('>>>> start date and end date:',start_date, end_date)
 
         # filter records which has start time 
         records = records.filter(start_time__date__range=[start_date, end_date])
+
+
 
     # Determine the fields to be used as filter options based on the selected page
     if model_class == Project:
         fields = ['all', 'name', 'description']
     elif model_class == Job:
         fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
-    elif model_class == DataDriver:
+    elif model_class == StaffData:
         fields = ['all', 'full_name', 'identity_card']
+    elif model_class == VehicleOperationRecord:
+        fields = ['all']
     else:
         # Get all fields except foreign key fields
         fields = [field.name for field in model_class._meta.get_fields() if not isinstance(field, models.ForeignKey)]
@@ -329,6 +346,5 @@ def filter_records(request, records, model_class, **kwargs):
     if request.GET.get('sort'):
         records = records.order_by(request.GET.get('sort'))
             
-    
     return records
 

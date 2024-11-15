@@ -9,7 +9,9 @@ from datetime import date, time, datetime
 from core import settings
 
 from ..models import *
+from ..utils import *
 
+from django.shortcuts import render
 
 @register.simple_tag
 def get_static_version():
@@ -35,13 +37,13 @@ def encode_params(**kwargs):
 
 
 
-
-
-
-@register.filter(name='group')
-def group(records, field):
+@register.filter(name='get_unique_values')
+def get_unique_values(model, group_by):
+    print(model, group_by)
+    # get model_class
+    model_class = globals()[model]
     # get all values of the field
-    values = [getattr(record, field) for record in records]
+    values = model_class.objects.values_list(group_by, flat=True)
     # get unique values
     unique_values = set(values)
     # remove None values
@@ -51,113 +53,10 @@ def group(records, field):
         unique_values = sorted(unique_values)
     except Exception as e:
         print(e)
+    print(unique_values)
     return unique_values
 
 
-
-
-
-
-# TAGS FOR VEHICLE OPERATION RECORD
-@register.filter(name='calcate_operation_duration')
-def calcate_operation_duration(vehicle_operation_records):
-    if vehicle_operation_records:
-        time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
-        # convert to hours, minutes, seconds
-        hours = time_seconds // 3600
-        minutes = (time_seconds % 3600) // 60
-        seconds = time_seconds % 60
-        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-    else:
-        return "00:00:00"
-
-
-@register.simple_tag
-def calculate_salary(vehicle_operation_records, start_date, end_date):
-    def format_number(number):
-        return "{:,}".format(int(number))
-    
-    def calculate_fuel_allowance(records):
-        try:
-            fuel_allowance = records.aggregate(models.Sum('fuel_allowance'))['fuel_allowance__sum']
-            return fuel_allowance
-        except Exception as e:
-            return 0
-
-    def calculate_hourly_salary(records, time_string=None):
-        if time_string == 'normal_working_time':
-            percentage = 1
-        elif time_string == 'overtime':
-            percentage = driver.overtime_percentage
-        elif time_string == 'sunday_working_time':
-            percentage = driver.sunday_percentage
-        elif time_string == 'holiday_time':
-            percentage = driver.holiday_percentage
-        else:
-            return 1
-
-        try:
-            time_seconds = records.aggregate(models.Sum(time_string))[f'{time_string}__sum']
-            time_hours = time_seconds / 3600
-            salary = time_hours * driver.hourly_salary * percentage
-            format_salary = format_number(salary)
-            result = {
-                'hourly_salary': driver.hourly_salary,
-                'salary': salary,
-                'format_salary': format_salary,
-                'time_hours': time_hours,
-                'percentage': percentage}
-            return result
-        except Exception as e:
-            result = {
-                'hourly_salary': 0,
-                'salary': 0,
-                'format_salary': 0,
-                'time_hours': 0,
-                'percentage': 1}
-            return result
-
-    records = vehicle_operation_records
-    driver = records.first().driver
-    # Count days
-    # date string convert to type date
-    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-    days_count = (end_date - start_date).days + 1
-
-    # Count the number of days that the driver works by getting the list of dates (from starttime)
-    dates = [record.start_time.date() for record in records]
-    working_days_count = len(set(dates))
-
-    actual_basic_salary = driver.basic_salary * working_days_count / days_count
-    fuel_allowance = calculate_fuel_allowance(records)
-    fixed_allowance = driver.fixed_allowance * working_days_count/days_count
-    insurance = driver.insurance_amount * working_days_count/days_count
-    normal_working_time_salary = calculate_hourly_salary(records, 'normal_working_time')
-    overtime_salary = calculate_hourly_salary(records, 'overtime')
-    sunday_working_time_salary = calculate_hourly_salary(records, 'sunday_working_time')
-    holiday_time_salary = calculate_hourly_salary(records, 'holiday_time')
-    sum_salary = actual_basic_salary + normal_working_time_salary['salary'] + overtime_salary['salary'] + \
-        sunday_working_time_salary['salary'] + holiday_time_salary['salary'] + \
-        fuel_allowance + fixed_allowance - insurance
-
-    result = ''
-    result += f'Lương cơ bản: {format_number(driver.basic_salary)} VNĐ\n'
-    result += f'1. Số ngày làm việc: {working_days_count}/{days_count} => Lương cơ bản nhận: {format_number(actual_basic_salary)} VNĐ\n' 
-    temp = normal_working_time_salary['format_salary']
-    result += f'2. Lương giờ bình thường => {temp} VNĐ\n'
-    temp = overtime_salary['format_salary']
-    result += f'3. Lương giờ tăng ca: {temp} VNĐ\n'
-    temp = sunday_working_time_salary['format_salary']
-    result += f'4. Lương giờ chủ nhật: {temp} VNĐ\n'
-    temp = holiday_time_salary['format_salary']
-    result += f'5. Lương giờ lễ: {temp} VNĐ\n'
-
-    result += f'6. Phụ cấp xăng: {format_number(fuel_allowance)} VNĐ\n'
-    result += f'7. Phụ cấp cố định: {format_number(fixed_allowance)} VNĐ\n'
-    result += f'8. BHXH: {format_number(insurance)} VNĐ\n'
-    result += f'Tổng lương (1+2+3+4+5+6+7 - 8): {format_number(sum_salary)} VNĐ'
-    return result.strip()
 
 
 
@@ -174,15 +73,18 @@ def get_sign(record, field):
         return "-"
 
 @register.filter(name='format_display')
-def format_display(record, field):
+def format_display(record, field=None):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
     
     if record == None:
         return ""
-    value = getattr(record, field)
-    if value == None:
-        return ""
+    if field != None:
+        value = getattr(record, field)
+        if value == None:
+            return ""
+    else:
+        value = record
 
     if field in ['duration_seconds','overtime','holiday_time', 'normal_working_time', 'sunday_working_time']:
         if value in [None,'',0]:
@@ -214,13 +116,18 @@ def format_display(record, field):
 
 
 
+
+@register.filter(name='format_money')
+def format_money(value):
+    numner = get_valid_int(value)
+    return "{:,}".format(numner)
+
+
+
+
 @register.filter
 def get_field_value(obj, field_name):
     return getattr(obj, field_name)
-
-
-
-
 
 
 
@@ -246,3 +153,332 @@ def get_thumbnail(image_url):
         thumbnail_url = 'no_thumbnail_found'
      
     return thumbnail_url
+
+
+
+
+# TAGS FOR VEHICLE OPERATION RECORD
+@register.filter(name='calculate_operation_duration')
+def calculate_operation_duration(vehicle_operation_records):
+    if vehicle_operation_records:
+        time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+        # convert to hours, minutes, seconds
+        hours = time_seconds // 3600
+        minutes = (time_seconds % 3600) // 60
+        seconds = time_seconds % 60
+        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    else:
+        return "00:00:00"   
+
+
+@register.inclusion_tag('components/calculate_driver_salary.html')
+def calculate_driver_salary(vehicle_operation_records, driver_name):
+    def get_vehicle_types(vehicle_operation_records):
+        records = vehicle_operation_records
+        if not records:
+            return []
+        gps_names = records.values_list('vehicle', flat=True).distinct()
+        vehicle_types = []
+        for gps_name in gps_names:
+            vehicle = VehicleDetail.objects.get(gps_name=gps_name)
+            #check if the vehicle_type is already in the list
+            if vehicle.vehicle_type not in vehicle_types:
+                vehicle_types.append(vehicle.vehicle_type)
+        return vehicle_types
+
+
+    def get_start_end_of_the_month(month, year):
+        # Start of the month
+        start_date_of_month = datetime(year, month, 1)
+        # Calculate the end of the month by moving to the next month and subtracting one day
+        if month == 12:
+            end_date_of_month = datetime(year + 1, 1, 1) - timedelta(days=1)
+        else:
+            end_date_of_month = datetime(year, month + 1, 1) - timedelta(days=1)
+        return start_date_of_month.date(), end_date_of_month.date()
+
+
+    def get_driver_salary_inputs(driver, vehicle_type):
+        records = vehicle_operation_records
+        # Get the date of the first record
+        start_time = records.first().start_time
+        # Start of the month
+        start_date_of_month = datetime(start_time.year, start_time.month, 1)
+        # Calculate the end of the month by moving to the next month and subtracting one day
+        if start_time.month == 12:
+            end_date_of_month = datetime(start_time.year + 1, 1, 1) - timedelta(days=1)
+        else:
+            end_date_of_month = datetime(start_time.year, start_time.month + 1, 1) - timedelta(days=1)
+
+        driver_salary_inputs = DriverSalaryInputs.objects.filter(driver=driver, vehicle_type=vehicle_type, valid_from__lte=end_date_of_month)
+        # get the latest
+        driver_salary_input = driver_salary_inputs.order_by('-valid_from').first()
+        return driver_salary_input
+
+
+    def calculate_monthly_salary(records, driver_salary_input):
+        if not records:
+            return {}
+        # Get the date of the first record
+        start_time = records.first().start_time
+        # Get the month of the first record
+        month = start_time.month
+        year = start_time.year
+
+        # Get list of all the dates from start_time of the records then remove duplicates
+        working_dates = list(set([record.start_time.date() for record in records]))
+        SUNDAY = 6
+        count_days_of_month = 0
+        count_sundays_of_month = 0
+
+        count_sunday_working_days = 0
+        count_holiday_working_days = 0
+        count_holiday_sunday_working_days = 0
+        count_normal_working_days = 0
+
+        count_working_days = 0
+
+        start_date, end_date = get_start_end_of_the_month(month, year)
+        # Loop through each day from start_date to end_date
+        current_date = start_date
+        while current_date <= end_date:
+            count_days_of_month += 1
+            if current_date.weekday() == SUNDAY:
+                count_sundays_of_month += 1
+            print(current_date)
+            if current_date in working_dates:
+                print('current day is in working dates')
+                count_working_days += 1
+                if current_date.weekday() == SUNDAY:
+                    if Holiday.is_holiday(current_date):
+                        count_holiday_sunday_working_days += 1
+                    else:
+                        count_sunday_working_days += 1
+                else: # Not sunday
+                    if Holiday.is_holiday(current_date):
+                        count_holiday_working_days += 1
+                    else:
+                        count_normal_working_days += 1
+            else: # not working day
+                if current_date.weekday() == SUNDAY:
+                    if Holiday.is_holiday(current_date):
+                        pass # Không tính gì cả
+                    else: # Not sunday
+                        pass # Không tính gì cả
+                else: # Not sunday
+                    if Holiday.is_holiday(current_date):
+                        count_normal_working_days += 1
+                    else:
+                        pass # Không tính gì cả
+
+            current_date += timedelta(days=1)
+
+
+        if driver_salary_input.calculation_method == 'type_1':
+            total_normal_working_days_salary = \
+                    driver_salary_input.basic_month_salary \
+                    * (count_normal_working_days / (count_days_of_month - count_sundays_of_month))
+            total_sunday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.sunday_month_salary_percentage \
+                    * (count_sunday_working_days / count_days_of_month) \
+                    
+            total_holiday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
+                    * (count_holiday_working_days / count_days_of_month) \
+                    
+            total_holiday_sunday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
+                    * (count_holiday_sunday_working_days / count_days_of_month) \
+            
+        elif driver_salary_input.calculation_method == 'type_2':
+            total_normal_working_days_salary = \
+                    driver_salary_input.basic_month_salary \
+                    * (count_normal_working_days / count_days_of_month)
+            
+            total_sunday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.sunday_month_salary_percentage \
+                    * (count_sunday_working_days / count_days_of_month) \
+                    
+            total_holiday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
+                    * (count_holiday_working_days / count_days_of_month) \
+                    
+            total_holiday_sunday_working_days_salary = \
+                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
+                    * (count_holiday_working_days / count_days_of_month) \
+            
+        total_monthly_salary = \
+                total_normal_working_days_salary \
+                + total_sunday_working_days_salary \
+                + total_holiday_working_days_salary \
+                + total_holiday_sunday_working_days_salary
+
+
+
+        result = {
+            'month': month,
+            'year': year,
+            '-----': '-------',
+            'basic_month_salary': driver_salary_input.basic_month_salary,
+            'sunday_month_salary_percentage': driver_salary_input.sunday_month_salary_percentage,
+            'holiday_month_salary_percentage': driver_salary_input.holiday_month_salary_percentage,
+            'calculation_method': driver_salary_input.calculation_method,
+            '------': '------',
+            'count_days_of_month': count_days_of_month,
+            'count_sundays_of_month': count_sundays_of_month,
+            'count_sunday_working_days': count_sunday_working_days,
+            'count_holiday_working_days': count_holiday_working_days,
+            'count_holiday_sunday_working_days': count_holiday_sunday_working_days,
+            'count_normal_working_days': count_normal_working_days,
+            'count_working_days': count_working_days,
+            '---': '---------',
+            'total_normal_working_days_salary': total_normal_working_days_salary,
+            'total_sunday_working_days_salary': total_sunday_working_days_salary,
+            'total_holiday_working_days_salary': total_holiday_working_days_salary,
+            'total_holiday_sunday_working_days_salary': total_holiday_sunday_working_days_salary,
+            'total_monthly_salary': total_monthly_salary,
+
+        }
+        return result
+
+    def calculate_fuel_allowance(records):
+        try:
+            fuel_allowance = records.aggregate(models.Sum('fuel_allowance'))['fuel_allowance__sum']
+            return fuel_allowance
+        except Exception as e:
+            return 0
+
+
+    
+    def calculate_hourly_salary(records, driver_salary_input):
+        total_normal_working_hours = 0
+        total_sunday_working_hours= 0
+        total_holiday_working_hours = 0
+        total_overtime_normal_working_hours = 0
+        total_overtime_sunday_working_hours = 0
+        total_overtime_holiday_working_hours = 0
+        SUNDAY = 6
+        for record in records:
+            total_normal_working_hours += record.normal_working_time
+            total_sunday_working_hours += record.sunday_working_time
+            total_holiday_working_hours += record.holiday_time
+            
+            date = record.start_time.date()
+            if Holiday.is_holiday(date):
+                total_overtime_holiday_working_hours += record.overtime
+            elif record.start_time.weekday() == SUNDAY:
+                total_overtime_sunday_working_hours += record.overtime
+            else:
+                total_overtime_normal_working_hours += record.overtime
+        total_normal_working_hours /= 3600
+        total_sunday_working_hours /= 3600
+        total_holiday_working_hours /= 3600
+        total_overtime_normal_working_hours /= 3600
+        total_overtime_sunday_working_hours /= 3600
+        total_overtime_holiday_working_hours /= 3600
+
+        total_normal_working_hours_salary = total_normal_working_hours * driver_salary_input.normal_hourly_salary
+        total_sunday_working_hours_salary = total_sunday_working_hours * driver_salary_input.sunday_hourly_salary
+        total_holiday_working_hours_salary = total_holiday_working_hours * driver_salary_input.holiday_hourly_salary
+        total_overtime_normal_working_hours_salary = total_overtime_normal_working_hours * driver_salary_input.normal_overtime_hourly_salary
+        total_overtime_sunday_working_hours_salary = total_overtime_sunday_working_hours * driver_salary_input.sunday_overtime_hourly_salary
+        total_overtime_holiday_working_hours_salary = total_overtime_holiday_working_hours * driver_salary_input.holiday_overtime_hourly_salary
+
+        total_hourly_salary = \
+            total_normal_working_hours_salary \
+            + total_sunday_working_hours_salary \
+            + total_holiday_working_hours_salary \
+            + total_overtime_normal_working_hours_salary \
+            + total_overtime_sunday_working_hours_salary \
+            + total_overtime_holiday_working_hours_salary
+
+        result = {
+            'normal_hourly_salary': driver_salary_input.normal_hourly_salary,
+            'normal_overtime_hourly_salary': driver_salary_input.normal_overtime_hourly_salary,
+            'sunday_hourly_salary': driver_salary_input.sunday_hourly_salary,
+            'sunday_overtime_hourly_salary': driver_salary_input.sunday_overtime_hourly_salary,
+            'holiday_hourly_salary': driver_salary_input.holiday_hourly_salary,
+            'holiday_overtime_hourly_salary': driver_salary_input.holiday_overtime_hourly_salary,
+            '-----': '-------',
+            'total_normal_working_hours': round(total_normal_working_hours, 3),
+            'total_sunday_working_hours': round(total_sunday_working_hours, 3),
+            'total_holiday_working_hours': round(total_holiday_working_hours, 3),
+            'total_overtime_normal_working_hours': round(total_overtime_normal_working_hours, 3),
+            'total_overtime_sunday_working_hours': round(total_overtime_sunday_working_hours, 3),
+            'total_overtime_holiday_working_hours': round(total_overtime_holiday_working_hours, 3),
+            'total_normal_working_hours_salary': round(total_normal_working_hours *  driver_salary_input.normal_hourly_salary, 3),
+            '-------': '-----',
+            'total_normal_working_hours_salary': total_normal_working_hours_salary,
+            'total_sunday_working_hours_salary': total_sunday_working_hours_salary,
+            'total_holiday_working_hours_salary': total_holiday_working_hours_salary,
+            'total_overtime_normal_working_hours_salary': total_overtime_normal_working_hours_salary,
+            'total_overtime_sunday_working_hours_salary': total_overtime_sunday_working_hours_salary,
+            'total_overtime_holiday_working_hours_salary': total_overtime_holiday_working_hours_salary,
+            
+            'total_hourly_salary': total_hourly_salary,
+        }
+        return result
+
+
+    if not vehicle_operation_records:
+        return {"success": "false",
+                "message": "Không tìm thấy dữ liệu tính toán lương cho tài xế.",
+                "driver_name": driver_name
+                }
+
+    driver = vehicle_operation_records.first().driver
+
+    vehicle_types = get_vehicle_types(vehicle_operation_records)
+    if len(vehicle_types) == 1:
+        vehicle_type = vehicle_types[0]
+    else:
+        return {"success": "false",
+                "message": "Tài xế này chạy nhiều loại xe, chưa tính toán trường hợp này.",
+                "driver_name": driver_name
+                }
+    
+    driver_salary_input = get_driver_salary_inputs(driver, vehicle_type)
+
+    if not driver_salary_input:
+        return {"success": "false",
+                "message": "Chưa có công thức tính lương phù hợp cho tài xế này.",
+                "driver_name": driver_name
+                }
+
+    data_hourly_salary = calculate_hourly_salary(vehicle_operation_records, driver_salary_input)
+    data_monthly_salary = calculate_monthly_salary(vehicle_operation_records, driver_salary_input)
+    total_fixed_allowance = \
+        driver_salary_input.fixed_allowance \
+        * min(1, data_monthly_salary['count_working_days'] / (data_monthly_salary['count_days_of_month'] - data_monthly_salary['count_sundays_of_month']))
+    total_fuel_allowance = calculate_fuel_allowance(vehicle_operation_records)
+
+
+    total_salary = data_monthly_salary['total_monthly_salary'] \
+        + data_hourly_salary['total_hourly_salary'] \
+        + total_fixed_allowance \
+        + total_fuel_allowance \
+        - driver_salary_input.insurance_amount
+
+
+
+    data =  {
+        'method': driver_salary_input.calculation_method,
+        'basic_salary': driver_salary_input.basic_month_salary,
+        'fixed_allowance': driver_salary_input.fixed_allowance,
+        'total_fixed_allowance': total_fixed_allowance,
+        'insurance_amount': driver_salary_input.insurance_amount,
+        'trip_salary': driver_salary_input.trip_salary,
+        'fuel_allowance': total_fuel_allowance,
+
+        'hourly_salary': data_hourly_salary,
+        'monthly_salary': data_monthly_salary,
+        'total_salary': total_salary,   
+    }
+    return {
+        'success': 'true',
+        'message': 'Tính toán lương thành công',
+        "driver_name": driver_name,
+        'data': data
+    }
+
+

@@ -27,25 +27,38 @@
                     });">
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicleTypeDetail' elements='tool_bar|display_records' %}"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleType' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
-                    Dữ liệu loại xe chi tiết
+                    Dữ liệu loại xe
+                </a>
 
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleRevenueInputs' elements='tool_bar|display_records' %}"
+                    class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                    Dữ liệu tính doanh thu theo loại xe
                 </a>
                 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicle' elements='tool_bar|display_records' %}"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleDetail' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
-                    Dữ liệu xe
+                    Dữ liệu chi tiết từng xe
                     
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataDriver' elements='tool_bar|display_records' %}"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='StaffData' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu tài xế
-                
+                    Dữ liệu nhân viên
                 </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DriverSalaryInputs' elements='tool_bar|display_records' %}"
+                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    Dữ liệu mức lương tài xế
+                </a>
+
+
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DumbTruckPayRate' elements='tool_bar|display_records' %}"
@@ -80,13 +93,12 @@
 
         </div>
 
-        <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DataVehicleTypeDetail' elements='tool_bar|display_records' %}">
+        <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleType' elements='tool_bar|display_records' %}">
             Loading content
         </div>
         <div up-hungry id="tool-bar"></div>
         <!-- <div up-hungry id="infor-bar"></div> -->
         <div up-hungry id="display-records"></div>
-        
     </main>
 {% endblock %}
 

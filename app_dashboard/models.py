@@ -365,21 +365,80 @@ class JobDateReport(BaseModel):
 
 
 
-class DataVehicleTypeDetail(BaseModel):
-    VEHICLE_TYPE_CHOICES = (
-        ('car', 'Xe con'),
-        ('dump_truck', 'Xe ben'),
-        ('excavator', 'Xe cuốc'),
-        ('road_roller', 'Xe lu'),
-        ('crane_truck', 'Xe cẩu'),
-        ('bulldozer', 'Xe ủi'),
-        ('loader', 'Xe xúc'),
+
+
+
+
+
+class VehicleType(BaseModel):
+    class Meta:
+        ordering = ['vehicle_type']
+
+    vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", unique=True)
+    note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return self.vehicle_type
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle_type', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+
+class StaffData(BaseModel):
+    STATUS_CHOICES = (
+        ('active', 'Đang làm việc'),
+        ('on_leave', 'Nghỉ phép'),
+        ('resigned', 'Đã thôi việc'),
+        ('terminated', 'Bị sa thải'),
     )
+    POSITION_CHOICES = (
+        ('manager', 'Quản lý'),
+        ('staff', 'Nhân viên'),
+        ('driver', 'Tài xế'),
+    )
+    # Driver Information Fields
+    full_name = models.CharField(max_length=255, verbose_name="Họ và tên")
+    hire_date = models.DateField(verbose_name="Ngày vào làm", default=timezone.now)
+    identity_card = models.CharField(max_length=255, verbose_name="CCCD", default="")
+    birth_year = models.DateField(verbose_name="Ngày sinh", default=timezone.now)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='active', verbose_name="Trạng thái")
+    position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='staff', verbose_name="Vị trí")
+    # Bank Information
+    bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="", blank=True)
+    account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="", blank=True)
+    account_holder_name = models.CharField(max_length=255, verbose_name="Tên chủ tài khoản", default="", blank=True)
+    # Contact Information
+    phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
+    address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.full_name}'
 
+    @classmethod
+    def get_display_fields(self):
+        fields = ['full_name', 'hire_date', 'status', 'position',
+                  'identity_card', 'birth_year', 
+                  'bank_name', 'account_number', 
+                  'account_holder_name', 'phone_number', 'address']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+
+
+class VehicleRevenueInputs(BaseModel):
+    class Meta:
+        ordering = ['vehicle_type']
     # Vehicle Information Fields
-    vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", choices=VEHICLE_TYPE_CHOICES)
-    vehicle_type_detail = models.CharField(max_length=255, verbose_name="Loại xe chi tiết")
-
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.CASCADE, verbose_name="Loại xe")
     # Revenue Information Fields
     revenue_per_8_hours = models.IntegerField(verbose_name="Đơn giá doanh thu", default=0, validators=[MinValueValidator(0)])
     # Resource Allocation Fields
@@ -391,7 +450,7 @@ class DataVehicleTypeDetail(BaseModel):
     police_fee = models.IntegerField(verbose_name="Định mức CA", default=0, validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.get_vehicle_type_display()} - {self.vehicle_type_detail}'
+        return f'{self.vehicle_type}'
 
     @classmethod
     def get_display_fields(self):
@@ -406,8 +465,66 @@ class DataVehicleTypeDetail(BaseModel):
     # todo: thêm fields chạy ngày, chạy đêm, tabo ngày, mỗi cái có đơn giá => tính phí vận chuyể
 
 
-class DataVehicle(BaseModel):
-    vehicle_type = models.ForeignKey(DataVehicleTypeDetail, on_delete=models.SET_NULL, null=True)
+class DriverSalaryInputs(BaseModel):
+    class Meta:
+        ordering = ['driver']
+
+
+    METHOD_CHOICES = (
+        ('type_1', 'Nghỉ chủ nhật và lễ, có hệ số lương ngày chủ nhật và lễ'),
+        ('type_2', 'Không nghỉ chủ nhật và lễ'),
+    )
+
+    driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
+                               limit_choices_to={'position': 'driver'}, null=True)
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.CASCADE, verbose_name="Loại xe", null=True)
+    
+    # Salary Fields 
+    basic_month_salary = models.PositiveIntegerField(verbose_name="Lương cơ bản tháng", default=0)
+    sunday_month_salary_percentage = models.FloatField(verbose_name="Hệ số lương tháng ngày chủ nhật", default=0.0)
+    holiday_month_salary_percentage = models.FloatField(verbose_name="Hệ số lương tháng ngày lễ", default=0.0)
+    calculation_method = models.CharField(max_length=10, choices=METHOD_CHOICES, verbose_name="Phương pháp tính lương", default='type_1')
+
+
+    normal_hourly_salary = models.IntegerField(verbose_name="Lương theo giờ ngày thường", default=0)
+    normal_overtime_hourly_salary = models.FloatField(verbose_name="Lương theo giờ tăng ca ngày thường", default=0)
+
+    sunday_hourly_salary = models.IntegerField(verbose_name="Lương theo giờ chủ nhật", default=0)
+    sunday_overtime_hourly_salary = models.FloatField(verbose_name="Lương theo giờ tăng ca chủ nhật", default=0)
+
+    holiday_hourly_salary = models.IntegerField(verbose_name="Lương theo giờ ngày lễ", default=0)
+    holiday_overtime_hourly_salary = models.FloatField(verbose_name="Lương theo giờ tăng ca ngày lễ", default=0)
+
+    trip_salary = models.IntegerField(verbose_name="Lương theo chuyến", default=0)
+
+    # Other Information
+    fixed_allowance = models.PositiveIntegerField(verbose_name="Phụ cấp cố định", default=0)
+    insurance_amount = models.PositiveIntegerField(verbose_name="Số tiền tham gia BHXH", default=0)
+
+    valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng", default=timezone.now)
+
+    note = models.CharField(max_length=255, verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    @classmethod
+    def get_display_fields(self):
+        fields = ['driver', 'vehicle_type', 'basic_month_salary', 'sunday_month_salary_percentage', 
+                  'holiday_month_salary_percentage', 'normal_hourly_salary', 'normal_overtime_hourly_salary', 
+                  'sunday_hourly_salary', 'sunday_overtime_hourly_salary', 'holiday_hourly_salary', 
+                  'holiday_overtime_hourly_salary', 'trip_salary', 'fixed_allowance', 'insurance_amount', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+ 
+
+
+
+
+class VehicleDetail(BaseModel):
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, verbose_name="Loại xe")
     license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="")
     vehicle_name = models.CharField(max_length=255, verbose_name="Tên nhận dạng xe", default="")
     gps_name = models.CharField(max_length=255, verbose_name="Tên trên định vị", default="")
@@ -429,66 +546,6 @@ class DataVehicle(BaseModel):
         return fields
 
 
-class DataDriver(BaseModel):
-    STATUS_CHOICES = (
-        ('active', 'Đang làm việc'),
-        ('on_leave', 'Nghỉ phép'),
-        ('resigned', 'Đã thôi việc'),
-        ('terminated', 'Bị sa thải'),
-    )
-
-
-    # Driver Information Fields
-    full_name = models.CharField(max_length=255, verbose_name="Họ và tên")
-    hire_date = models.DateField(verbose_name="Ngày vào làm", default=timezone.now)
-    identity_card = models.CharField(max_length=255, verbose_name="CCCD", default="")
-    birth_year = models.DateField(verbose_name="Ngày sinh", default=timezone.now)
-    status = models.CharField(
-        max_length=50,
-        choices=STATUS_CHOICES,
-        default='active',
-        verbose_name="Trạng thái"
-    )
-
-    # Salary Fields
-    basic_salary = models.PositiveIntegerField(verbose_name="Lương cơ bản", default=0)
-    hourly_salary = models.PositiveIntegerField(verbose_name="Lương theo giờ", default=0)
-    trip_salary = models.PositiveIntegerField(verbose_name="Lương theo chuyến", default=0)
-
-    # Salary percentage
-    overtime_percentage = models.FloatField(verbose_name="Hệ số lương tăng ca", default=1)
-    sunday_percentage = models.FloatField(verbose_name="Hệ số lương chủ nhật", default=1)
-    holiday_percentage = models.FloatField(verbose_name="Hệ số lương ngày lễ", default=1)
-
-    # Bank Information
-    bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="")
-    account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="")
-    account_holder_name = models.CharField(max_length=255, verbose_name="Tên chủ tài khoản", default="")
-
-    # Other Information
-    fixed_allowance = models.PositiveIntegerField(verbose_name="Phụ cấp cố định", default=0)
-    insurance_amount = models.PositiveIntegerField(verbose_name="Số tiền tham gia BHXH", default=0)
-    phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
-    address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
-    created_at = models.DateTimeField(default=timezone.now)
-    def __str__(self):
-        return f'{self.full_name}'
-
-    @classmethod
-    def get_display_fields(self):
-        fields = ['full_name', 'hire_date', 'identity_card', 'birth_year', 'status', 
-                  'basic_salary', 'hourly_salary', 'trip_salary', 'overtime_percentage', 
-                  'sunday_percentage', 'holiday_percentage',
-                  'fixed_allowance', 'insurance_amount', 'phone_number', 'address',
-                  'bank_name', 'account_number', 'account_holder_name',]
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-
-
-
 
 
 
@@ -498,7 +555,7 @@ class DataDriver(BaseModel):
 
 class DumbTruckPayRate(BaseModel):
     xe = models.ForeignKey(
-        DataVehicle,
+        VehicleDetail,
         on_delete=models.SET_NULL, 
         null=True,
         limit_choices_to={'vehicle_type__vehicle_type': 'dump_truck'},
@@ -731,10 +788,11 @@ class VehicleOperationRecord(models.Model):
         ordering = ['vehicle', '-start_time']
 
     vehicle = models.CharField(max_length=20, verbose_name="Xe")
+    driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
+                               limit_choices_to={'position': 'driver'}, null=True)
     start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
     end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
     duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động", default= 0)
-    driver = models.ForeignKey(DataDriver, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tài xế")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Địa điểm")
     overtime = models.IntegerField(verbose_name="Thời gian tăng ca", default=0)
     holiday_time = models.IntegerField(verbose_name="Thời gian làm ngày lễ", default=0)
@@ -777,7 +835,7 @@ class VehicleOperationRecord(models.Model):
                 fields.remove(field)
         return fields
     def get_driver_choices(self):
-        drivers = DataDriver.objects.all()
+        drivers = StaffData.objects.filter(position='driver')
         # return a dict of choices with key id and name
         dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
         return dict_drivers

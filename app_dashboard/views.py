@@ -101,7 +101,6 @@ def load_elements(request):
     html = '<div id="load-elements" class"hidden"></div>'
     elements = params.get('elements', '')
     for element in elements.split('|'):
-        print('element:', element)
         element = element.strip()
         if element == 'title_bar':
             html_title_bar = render_title_bar(request, **params)
@@ -304,7 +303,7 @@ def handle_vehicle_operation_form(request):
         ids = form.getlist('id')
         for id in ids:
             print('>>>> id:', id)
-            driver = DataDriver.objects.filter(pk=get_valid_id(form.get(f'driver_{id}', None))).first()
+            driver = StaffData.objects.filter(pk=get_valid_id(form.get(f'driver_{id}', None))).first()
             location = Location.objects.filter(pk=get_valid_id(form.get(f'location_{id}', None))).first()
             record = VehicleOperationRecord.objects.get(pk=id)
             record.driver = driver
@@ -398,7 +397,7 @@ def handle_vehicle_operation_form(request):
                 raise e
         
             vehicle = vehicle_news[i]   
-            driver = DataDriver.objects.filter(pk=get_valid_id(driver_news[i])).first()
+            driver = StaffData.objects.filter(pk=get_valid_id(driver_news[i])).first()
             location = Location.objects.filter(pk=get_valid_id(location_news[i])).first()
             
             start_time = start_time_news[i]
@@ -442,7 +441,8 @@ def handle_vehicle_operation_form(request):
         tab = form.get('tab')
         records = VehicleOperationRecord.objects.filter(pk__in=ids)
         
-        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab)
+        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab, update=True)
+
         html_message = render_message(request, message='Cập nhật thành công!\n\nLưu ý các dòng nhập tay nếu không có dữ liệu sẽ được xóa khỏi bảng dữ liệu!', message_type='green')
         html = html_message + html_display
         return HttpResponse(html)
@@ -511,6 +511,9 @@ def page_transport_department(request):
 
 
 def test(request):
+    records = VehicleOperationRecord.objects.all()
+    for record in records:
+        record.delete()
     return render(request, 'pages/test.html')
 
 
@@ -611,12 +614,6 @@ def test(request):
     # for record in records:
     #     record.save()
     return HttpResponse('test')
-
-
-
-
-
-
 
 
 import requests, json
@@ -783,13 +780,12 @@ def save_vehicle_operation_record(request):
     # get check_date from url
     check_date = request.POST.get('check_date')
     vehicles = request.POST.getlist('vehicle')
-
-
     check_date = get_valid_date(check_date)
     # convert check_date to datetime date
     check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
     # convert check_date to ddd/mm/yyyy
     check_date = check_date.strftime('%d/%m/%Y')
+
     data = get_binhanh_service_operation_time(check_date, vehicles)
     # Parse JSON data from the request body
     result = ''
@@ -821,4 +817,4 @@ def save_vehicle_operation_record(request):
                     duration_seconds=duration_seconds
                 )
         result += vehicle + '\n'
-    return HttpResponse(result)
+    return HttpResponse(check_date + ' => done')

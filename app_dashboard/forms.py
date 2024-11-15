@@ -151,192 +151,38 @@ class JobPlanForm(forms.ModelForm):
 
 
 
-
-
-
-class DataVehicleForm(forms.ModelForm):
+class VehicleTypeForm(forms.ModelForm):
     class Meta:
-        model = DataVehicle
-        fields = ['vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 'vehicle_inspection_number', 'vehicle_inspection_due_date']
-
+        model = VehicleType
+        fields = ['vehicle_type', 'note']
         labels = {
             'vehicle_type': 'Loại xe',
-            'license_plate': 'Biển kiểm soát',
-            'vehicle_name': 'Tên nhận dạng xe',
-            'gps_name': 'Tên trên định vị',
-            'vehicle_inspection_number': 'Số đăng kiểm',
-            'vehicle_inspection_due_date': 'Thời hạn đăng kiểm',
+            'note': 'Ghi chú',
         }
-    
         widgets = {
-            'vehicle_type': forms.Select(attrs={
+            'vehicle_type': forms.TextInput(attrs={
+                    'placeholder': 'Loại xe (điền chi tiết như "Xe ben 15 tấn")',
                     'class': 'form-input'}),
-            'license_plate': forms.TextInput(attrs={
-                    'placeholder': 'Nhập biển kiểm soát xe',
-                    'required': 'required',
-                    'class': 'form-input'}),
-            'vehicle_name': forms.TextInput(attrs={
-                    'placeholder': 'Tên nhận dạng xe',
-                    'class': 'form-input'}),
-            'gps_name': forms.TextInput(attrs={
-                    'placeholder': 'Tên trên định vị',
-                    'class': 'form-input'}),
-            'vehicle_inspection_number': forms.TextInput(attrs={
-                    'placeholder': 'Số đăng kiểm',
-                    'class': 'form-input'}),
-            'vehicle_inspection_due_date': forms.DateInput(attrs={
+            'note': forms.Textarea(attrs={
                     'class': 'form-input',
-                    'type': 'date'}),
+                    'rows': 2}),
         }
 
-from .models import DataDriver
 
-class DataDriverForm(forms.ModelForm):
+
+
+
+class VehicleRevenueInputsForm(forms.ModelForm):
     class Meta:
-        model = DataDriver
+        model = VehicleRevenueInputs
         fields = [
-            'full_name', 'status', 'hire_date', 'identity_card', 'birth_year',
-            'basic_salary', 'hourly_salary', 'trip_salary', 'overtime_percentage',
-            'sunday_percentage', 'holiday_percentage', 'bank_name', 'account_number',
-            'account_holder_name', 'fixed_allowance', 'insurance_amount',
-            'phone_number', 'address'
-        ]
-        
-        labels = {
-            'full_name': 'Họ và tên',
-            'status': 'Trang thái',
-            'hire_date': 'Ngày vào làm',
-            'identity_card': 'CCCD',
-            'birth_year': 'Ngày sinh',
-            'basic_salary': 'Lương cơ bản',
-            'hourly_salary': 'Lương theo giờ',
-            'trip_salary': 'Lương theo chuyến',
-            'overtime_percentage': 'Hệ số lương tăng ca',
-            'sunday_percentage': 'Hệ số lương chủ nhật',
-            'holiday_percentage': 'Hệ số lương ngày lễ',
-            'bank_name': 'Ngân hàng',
-            'account_number': 'Số tài khoản',
-            'account_holder_name': 'Tên chủ tài khoản',
-            'fixed_allowance': 'Phụ cấp cố định',
-            'insurance_amount': 'Số tiền tham gia BHXH',
-            'phone_number': 'Số điện thoại',
-            'address': 'Địa chỉ',
-        }
-
-        widgets = {
-            'full_name': forms.TextInput(attrs={
-                'placeholder': 'Nhập họ và tên',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'status': forms.Select(attrs={
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'hire_date': forms.DateInput(attrs={
-                'class': 'form-input',
-                'type': 'date',
-                'required': 'required'
-            }),
-            'identity_card': forms.TextInput(attrs={
-                'placeholder': 'Nhập CCCD',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'birth_year': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'basic_salary': forms.NumberInput(attrs={
-                'placeholder': 'Nhập lương cơ bản',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'hourly_salary': forms.NumberInput(attrs={
-                'placeholder': 'Nhập lương theo giờ',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'trip_salary': forms.NumberInput(attrs={
-                'placeholder': 'Nhập lương theo chuyến',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'overtime_percentage': forms.NumberInput(attrs={
-                'placeholder': 'Hệ số lương tăng ca',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'sunday_percentage': forms.NumberInput(attrs={
-                'placeholder': 'Hệ số lương chủ nhật',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'holiday_percentage': forms.NumberInput(attrs={
-                'placeholder': 'Hệ số lương ngày lễ',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'bank_name': forms.TextInput(attrs={
-                'placeholder': 'Nhập tên ngân hàng',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'account_number': forms.TextInput(attrs={
-                'placeholder': 'Nhập số tài khoản',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'account_holder_name': forms.TextInput(attrs={
-                'placeholder': 'Nhập tên chủ tài khoản',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'fixed_allowance': forms.NumberInput(attrs={
-                'placeholder': 'Nhập phụ cấp cố định',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'insurance_amount': forms.NumberInput(attrs={
-                'placeholder': 'Nhập số tiền tham gia BHXH',
-                'class': 'form-input',
-                'step': '0.01',
-                'required': 'required'
-            }),
-            'phone_number': forms.TextInput(attrs={
-                'placeholder': 'Nhập số điện thoại',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-            'address': forms.TextInput(attrs={
-                'placeholder': 'Nhập địa chỉ',
-                'class': 'form-input',
-                'required': 'required'
-            }),
-        }
-
-
-from .models import DataVehicleTypeDetail
-class DataVehicleTypeDetailForm(forms.ModelForm):
-    class Meta:
-        model = DataVehicleTypeDetail
-        fields = [
-            'vehicle_type', 'vehicle_type_detail', 'revenue_per_8_hours', 
+            'vehicle_type', 'revenue_per_8_hours', 
             'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 
             'road_fee_inspection', 'tire_wear', 'police_fee'
         ]
 
         labels = {
             'vehicle_type': 'Loại xe',
-            'vehicle_type_detail': 'Loại xe chi tiết',
             'revenue_per_8_hours': 'Đơn giá doanh thu/8 tiếng',
             'oil_consumption_per_hour': 'Định mức dầu 1 tiếng',
             'lubricant_consumption': 'Định mức nhớt',
@@ -399,6 +245,188 @@ class DataVehicleTypeDetailForm(forms.ModelForm):
                 'required': 'required'
             })
         }
+
+
+
+
+
+class VehicleDetailForm(forms.ModelForm):
+    class Meta:
+        model = VehicleDetail
+        fields = ['vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 'vehicle_inspection_number', 'vehicle_inspection_due_date']
+
+        labels = {
+            'vehicle_type': 'Loại xe',
+            'license_plate': 'Biển kiểm soát',
+            'vehicle_name': 'Tên nhận dạng xe',
+            'gps_name': 'Tên trên định vị',
+            'vehicle_inspection_number': 'Số đăng kiểm',
+            'vehicle_inspection_due_date': 'Thời hạn đăng kiểm',
+        }
+    
+        widgets = {
+            'vehicle_type': forms.Select(attrs={
+                    'class': 'form-input'}),
+            'license_plate': forms.TextInput(attrs={
+                    'placeholder': 'Nhập biển kiểm soát xe',
+                    'required': 'required',
+                    'class': 'form-input'}),
+            'vehicle_name': forms.TextInput(attrs={
+                    'placeholder': 'Tên nhận dạng xe',
+                    'class': 'form-input'}),
+            'gps_name': forms.TextInput(attrs={
+                    'placeholder': 'Tên trên định vị',
+                    'class': 'form-input'}),
+            'vehicle_inspection_number': forms.TextInput(attrs={
+                    'placeholder': 'Số đăng kiểm',
+                    'class': 'form-input'}),
+            'vehicle_inspection_due_date': forms.DateInput(attrs={
+                    'class': 'form-input',
+                    'type': 'date'}),
+        }
+
+
+class StaffDataForm(forms.ModelForm):
+    class Meta:
+        model = StaffData
+        fields = [
+            'full_name', 'status', 
+            'position',  'hire_date',
+            'identity_card', 'birth_year',
+            'bank_name', 'account_number',
+            'account_holder_name',
+            'phone_number', 'address',
+        ]
+        
+        labels = {
+            'full_name': 'Họ và tên',
+            'status': 'Trang thái',
+            'position': 'Chức vụ',
+            'hire_date': 'Ngày vào làm',
+            'identity_card': 'CCCD',
+            'birth_year': 'Ngày sinh',
+            'bank_name': 'Ngân hàng',
+            'account_number': 'Số tài khoản',
+            'account_holder_name': 'Tên chủ tài khoản',
+            'phone_number': 'Số điện thoại',
+            'address': 'Địa chỉ',
+        }
+
+        widgets = {
+            'full_name': forms.TextInput(attrs={
+                'placeholder': 'Nhập họ và tên',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'position': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required'
+            }),
+
+            'hire_date': forms.DateInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'required': 'required'
+            }),
+            'identity_card': forms.TextInput(attrs={
+                'placeholder': 'Nhập CCCD',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'birth_year': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'placeholder': 'Nhập tên ngân hàng',
+                'class': 'form-input',
+            }),
+            'account_number': forms.TextInput(attrs={
+                'placeholder': 'Nhập số tài khoản',
+                'class': 'form-input',
+            }),
+            'account_holder_name': forms.TextInput(attrs={
+                'placeholder': 'Nhập tên chủ tài khoản',
+                'class': 'form-input',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'placeholder': 'Nhập số điện thoại',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'address': forms.TextInput(attrs={
+                'placeholder': 'Nhập địa chỉ',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+        }
+
+
+
+
+from django import forms
+from .models import DriverSalaryInputs
+
+class DriverSalaryInputsForm(forms.ModelForm):
+    class Meta:
+        model = DriverSalaryInputs
+        fields = [
+            'driver', 'vehicle_type', 'calculation_method',
+            'basic_month_salary', 'sunday_month_salary_percentage', 'holiday_month_salary_percentage', 
+            'normal_hourly_salary', 'normal_overtime_hourly_salary', 'sunday_hourly_salary', 
+            'sunday_overtime_hourly_salary', 'holiday_hourly_salary', 'holiday_overtime_hourly_salary', 
+            'trip_salary', 'fixed_allowance', 'insurance_amount',
+            'valid_from', 'note'
+        ]
+
+        labels = {
+            'driver': 'Tài xế',
+            'vehicle_type': 'Loại xe',
+            'calculation_method': 'Cách tính',
+            'basic_month_salary': 'Lương cơ bản tháng',
+            'sunday_month_salary_percentage': 'Hệ số lương tháng ngày chủ nhật',
+            'holiday_month_salary_percentage': 'Hệ số lương tháng ngày lễ',
+            'normal_hourly_salary': 'Lương theo giờ ngày thường',
+            'normal_overtime_hourly_salary': 'Lương theo giờ tăng ca ngày thường',
+            'sunday_hourly_salary': 'Lương theo giờ chủ nhật',
+            'sunday_overtime_hourly_salary': 'Lương theo giờ tăng ca chủ nhật',
+            'holiday_hourly_salary': 'Lương theo giờ ngày lễ',
+            'holiday_overtime_hourly_salary': 'Lương theo giờ tăng ca ngày lễ',
+            'trip_salary': 'Lương theo chuyến',
+            'fixed_allowance': 'Phụ cấp cố định',
+            'insurance_amount': 'Số tiền tham gia BHXH',
+            'valid_from': 'Hiệu lực từ',
+            'note': 'Ghi chú',
+        }
+
+        widgets = {
+            'driver': forms.Select(attrs={'class': 'form-input', 'required': 'required'}),
+            'vehicle_type': forms.Select(attrs={'class': 'form-input'}),
+            'calculation_method': forms.Select(attrs={'class': 'form-input'}),
+            'basic_month_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương cơ bản'}),
+            'sunday_month_salary_percentage': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số ngày chủ nhật'}),
+            'holiday_month_salary_percentage': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số ngày lễ'}),
+            'normal_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương giờ ngày thường'}),
+            'normal_overtime_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số tăng ca ngày thường'}),
+            'sunday_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương giờ chủ nhật'}),
+            'sunday_overtime_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số tăng ca chủ nhật'}),
+            'holiday_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương giờ ngày lễ'}),
+            'holiday_overtime_hourly_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số tăng ca ngày lễ'}),
+            'trip_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương theo chuyến'}),
+            'fixed_allowance': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập phụ cấp cố định'}),
+            'insurance_amount': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập số tiền BHXH'}),
+            'valid_from': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'note': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nhập ghi chú'}),
+        }
+
+
+
+
 
 
 

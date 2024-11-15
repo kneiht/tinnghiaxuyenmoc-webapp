@@ -1,0 +1,96 @@
+{% load custom_tags %}
+
+{% if success == "true" %}
+<div class="text-lg font-semibold">
+    <span>Bảng lương tài xế </span>
+    <span class="text-blue-600 ">{{ driver_name }}</span>
+    
+    <span>- Tổng lương: </span>
+    <span class="text-blue-600 ">{{ data.total_salary|format_money }} VND</span>
+</div>
+<div id="salary-info-bar" class="flex flex-row items-start gap-5 w-fit text-nowrap text-green-600">
+    <!-- Basic Salary and Allowances -->
+    <div class="flex flex-col gap-2 text-center md:text-left">
+        <p class="text-sm font-bold text-theme">ĐỊNH MỨC LƯƠNG THÁNG</p>
+        <p class="text-sm">Lương cơ bản: {{ data.basic_salary|format_money }} VND</p>
+        <p class="text-sm">Hệ số lương ngày CN: {{ data.monthly_salary.total_sunday_working_days_salary|format_money }}</p>
+        <p class="text-sm">Hệ sống lương ngày lễ: {{ data.monthly_salary.total_holiday_working_days_salary|format_money }}</p>
+    <!-- Hourly Salary Details -->
+
+        <p class="text-sm font-bold text-theme mt-2">ĐỊNH MỨC PHỤ CẤP VÀ BHXH</p>
+        <p class="text-sm">Phụ cấp cố định: {{ data.fixed_allowance|format_money }} VND</p>
+        <p class="text-sm">Tham gia BHXH: {{ data.insurance_amount|format_money }} VND</p>
+    
+    </div>
+
+
+    <!-- Monthly Salary Details -->
+    <div class="flex flex-col gap-2 text-center md:text-left">
+        <p class="text-sm font-bold text-theme">NGÀY LÀM VIỆC</p>
+        <p class="text-sm">Số ngày trong tháng: {{ data.monthly_salary.count_days_of_month }}</p>
+        <p class="text-sm">Số CN trong tháng: {{ data.monthly_salary.count_sundays_of_month }}</p>
+        <p class="text-sm">Số ngày CN đi làm: {{ data.monthly_salary.count_sunday_working_days }}</p>
+        <p class="text-sm">Số ngày Lễ đi làm: {{ data.monthly_salary.count_holiday_working_days }}</p>
+        <p class="text-sm">Số ngày Lễ trùng CN đi làm: {{ data.monthly_salary.count_holiday_sunday_working_days }}</p>
+        <p class="text-sm">Số ngày thường đi làm: {{ data.monthly_salary.count_normal_working_days }}</p>
+    </div>
+
+    <!-- Monthly Salary Details -->
+    <div class="flex flex-col gap-2 text-center md:text-left">
+        <p class="text-sm font-bold text-theme">LƯƠNG THÁNG CHI TIẾT</p>
+        <p class="text-sm">Tổng lương chưa tính Lễ và CN: {{ data.monthly_salary.total_normal_working_days_salary|format_money }} VND</p>
+        <p class="text-sm">Tổng lương ngày CN: {{ data.monthly_salary.total_sunday_working_days_salary|format_money }} VND</p>
+        <p class="text-sm">Tổng lương ngày Lễ: {{ data.monthly_salary.total_holiday_working_days_salary|format_money }} VND</p>
+        <p class="text-sm">Tổng lương ngày Lễ trùng CN: {{ data.monthly_salary.total_holiday_sunday_working_days_salary|format_money }} VND</p>
+    
+        <p class="text-sm font-bold text-theme mt-2">PHỤ CẤP TRONG THÁNG</p>
+        <p class="text-sm">Phụ cấp cố định: {{ data.total_fixed_allowance|format_money }} VND</p>
+        <p class="text-sm">Phụ cấp xăng: {{ data.fuel_allowance|format_money }} VND</p>
+    </div>
+
+    <!-- Hourly Salary Details -->
+    <div class="flex flex-col gap-2 text-center md:text-left px-4">
+        <p class="text-sm font-bold text-theme">ĐỊNH MỨC LƯƠNG GIỜ</p>
+        <p class="text-sm">Ngày thường: {{ data.hourly_salary.normal_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày thường: {{ data.hourly_salary.normal_overtime_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày chủ nhật: {{ data.hourly_salary.sunday_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca chủ nhật: {{ data.hourly_salary.sunday_overtime_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày lễ: {{ data.hourly_salary.holiday_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày lễ: {{ data.hourly_salary.holiday_overtime_hourly_salary|format_money }} VND</p>
+    </div>
+
+    <!-- Hourly Salary Details -->
+    <div class="flex flex-col gap-2 text-center md:text-left px-4">
+        <p class="text-sm font-bold text-theme">TỔNG GIỜ LÀM CHI TIẾT</p>
+        <p class="text-sm">Tổng giờ làm ngày thường: {{ data.hourly_salary.total_normal_working_hours }} giờ</p>
+        <p class="text-sm">Tổng giờ tăng ca ngày thường: {{ data.hourly_salary.total_overtime_normal_working_hours }} giờ</p>
+        <p class="text-sm">Tổng giờ làm ngày CN: {{ data.hourly_salary.total_sunday_working_hours }} giờ</p>
+        <p class="text-sm">Tổng giờ tăng ca ngày CN: {{ data.hourly_salary.total_overtime_sunday_working_hours }} giờ</p>
+        <p class="text-sm">Tổng giờ làm ngày Lễ: {{ data.hourly_salary.total_holiday_working_hours }} giờ</p>
+        <p class="text-sm">Tổng giờ tăng ca ngày Lễ: {{ data.hourly_salary.total_overtime_holiday_working_hours }} giờ</p>
+        
+    </div>
+
+
+    <!-- Hourly Salary Details -->
+    <div class="flex flex-col gap-2 text-center md:text-left px-4">
+        <p class="text-sm font-bold text-theme">LƯƠNG GIỜ CHI TIẾT</p>
+        <p class="text-sm">Ngày thường: {{ data.hourly_salary.normal_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày thường: {{ data.hourly_salary.total_normal_overtime_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày chủ nhật: {{ data.hourly_salary.total_sunday_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca chủ nhật: {{ data.hourly_salary.total_sunday_overtime_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày lễ: {{ data.hourly_salary.total_holiday_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày lễ: {{ data.hourly_salary.total_holiday_overtime_hourly_salary|format_money }} VND</p>
+    </div>
+</div>
+
+{% else %}
+<span class="text-lg font-semibold">
+    Bảng lương tài xế
+    <span class="text-blue-600">{{ driver_name }}</span>
+    <span class="text-orange-600">{{ message }}</span>
+    
+</span>
+
+
+{% endif %}

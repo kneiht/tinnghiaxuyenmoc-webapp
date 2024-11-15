@@ -64,7 +64,8 @@ def render_tool_bar(request, **kwargs):
         'start_date': start_date,
         'end_date': end_date,
         'group_by': group_by,
-        'tab': tab
+        'tab': tab,
+        'lazy_load': params.get('lazy_load', False)
     }
     if model not in ['Project', 'Job', 'VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
@@ -112,6 +113,24 @@ def render_infor_bar(request, **kwargs):
 
 
 def render_display_records(request, **kwargs):
+    def get_unique_values(model_class, field):
+        # get all values of the field
+        values = model_class.objects.values_list(field, flat=True)
+        unique_values = set(values)
+        unique_values = [value for value in unique_values if value != None]
+        # get param "all" from request
+        keyword = request.GET.get('all', None)
+        if keyword:
+            # keep value which has the keyword
+            unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
+
+        # order
+        try:
+            unique_values = sorted(unique_values)
+        except Exception as e:
+            print(e)
+        return unique_values
+    
     params = kwargs
     model = params.get('model', '')
     update = params.get('update', False)
@@ -122,12 +141,12 @@ def render_display_records(request, **kwargs):
     group_by = params.get('group_by', '')
     records = params.get('records', None)
     tab = params.get('tab', '')
+    next = max(1, get_valid_id(params.get('next', None)))
+
     # Check the page to render specific content
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
-    
-    print(start_date)
-    print(end_date)
+
     if not records:
         if not project_id:
             records = model_class.objects.all()
@@ -135,11 +154,70 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.filter(project=project)
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date)
 
+    groups = []
+    if group_by:
+        GROUPS_PER_PAGE = 30
+        if records.count() == 0:
+            return '<div id="display-records" class="w-full overflow-scroll">Không có dữ liệu</div><div up-hungry id="load-more" class="hidden"></div>'
+        if model_class == VehicleOperationRecord:
+            if group_by == 'vehicle':
+                page = next
+                next = next + 1
+                if not update:
+                    group_names = get_unique_values(VehicleDetail, 'gps_name')
+                else:
+                    group_names = [records.first().vehicle]
+                if len(group_names) <= page*GROUPS_PER_PAGE:
+                    next = "stop"
+
+                page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
+                print('page_group_names:', page_group_names)
+                for group_name in page_group_names:
+                    vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
+                    records = records.filter(vehicle=vehicle.gps_name)
+                    groups.append({
+                        'group_id': vehicle.id,
+                        'group_name': group_name,
+                        'start_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
+                        'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
+                        'drivers': StaffData.objects.filter(position='driver'),
+                        'locations': Location.objects.all(),
+                        'records': records
+                    })
+            elif group_by == 'driver':
+                page = next
+                next = next + 1
+                if not update:
+                    group_names = get_unique_values(StaffData, 'full_name')
+                else:
+                    group_names = [records.first().driver.full_name]
+
+                # print('group_names:', group_names)
+                if len(group_names) <= page*GROUPS_PER_PAGE:
+                    next = "stop"
+
+                page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
+                # print('page_group_names:', page_group_names)
+                for group_name in page_group_names:
+                    driver = StaffData.objects.filter(full_name=group_name).first()
+                    records = records.filter(driver=driver)
+                    groups.append({
+                        'group_id': driver.id,
+                        'group_name': group_name,
+                        'start_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
+                        'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
+                        'drivers': StaffData.objects.filter(position='driver'),
+                        'locations': Location.objects.all(),
+                        'records': records
+                    })
+
+
     # Get fields to be displayed by using record meta
     # If there is get_display_fields method, use that method
     fields = []
     headers = []
     if hasattr(model_class, 'get_display_fields'):
+        
         for field in model_class.get_display_fields():
             fields.append(field)
             headers.append(model_class._meta.get_field(field).verbose_name)
@@ -155,25 +233,6 @@ def render_display_records(request, **kwargs):
             record.progress_by_amount = progress_by_amount(record)
             record.progress_by_plan = progress_by_plan(record)
 
-    groups = {}
-    if group_by:
-        print('group_by:', group_by)
-        # get all values of the field
-        values = [getattr(record, group_by) for record in records]
-
-        # get unique values
-        group_keys = set(values)
-        # remove None values
-        group_keys = [value for value in group_keys if value != None]
-        # order
-        try:
-            group_keys = sorted(group_keys)
-        except Exception as e:
-            print(e)
-        for group_key in group_keys:
-            groups[group_key] = records.filter(**{group_by: group_key})
-
-    # Render 
 
     template = 'components/display_records.html'
     context = {'model': model, 
@@ -189,9 +248,11 @@ def render_display_records(request, **kwargs):
                'start_date': start_date,
                'end_date': end_date,
                'tab': tab,
+               'next': next
     }
-    # print(context)
-    return render_to_string(template, context, request)
+    html = render_to_string(template, context, request)
+    return html
+
 
 
 

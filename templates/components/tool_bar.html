@@ -4,8 +4,8 @@
     <!-- Toolbar for database interactions -->
     <div class="flex flex-row items-end gap-5">
        
-        <form action="{% url 'load_elements' %}" up-target="#display-records">
-            <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id start_date=start_date group_by=group_by tab=tab elements='display_records|tool_bar' %}" />
+        <form action="{% url 'load_elements' %}" up-target="#display-records, #lazy-load:maybe">
+            <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id start_date=start_date group_by=group_by tab=tab  elements='display_records|tool_bar' %}" />
             <input type="hidden" name="check_date" value="{{ check_date }}" />
             <!-- Separate 2 sections of controls -->
             <div class="flex flex-wrap justify-between gap-4">
