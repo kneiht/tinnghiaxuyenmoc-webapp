@@ -8,7 +8,7 @@
     <span>- Tổng lương: </span>
     <span class="text-blue-600 ">{{ data.total_salary|format_money }} VND</span>
 </div>
-<div id="salary-info-bar" class="flex flex-row items-start gap-5 w-fit text-nowrap text-green-600">
+<div id="salary-info-bar" class="flex flex-row items-start gap-10 w-fit text-nowrap text-green-600">
     <!-- Basic Salary and Allowances -->
     <div class="flex flex-col gap-2 text-center md:text-left">
         <p class="text-sm font-bold text-theme">ĐỊNH MỨC LƯƠNG THÁNG</p>
@@ -27,12 +27,12 @@
     <!-- Monthly Salary Details -->
     <div class="flex flex-col gap-2 text-center md:text-left">
         <p class="text-sm font-bold text-theme">NGÀY LÀM VIỆC</p>
-        <p class="text-sm">Số ngày trong tháng: {{ data.monthly_salary.count_days_of_month }}</p>
-        <p class="text-sm">Số CN trong tháng: {{ data.monthly_salary.count_sundays_of_month }}</p>
+        <p class="text-sm">Số ngày thường đi làm: {{ data.monthly_salary.count_normal_working_days }}</p>
         <p class="text-sm">Số ngày CN đi làm: {{ data.monthly_salary.count_sunday_working_days }}</p>
         <p class="text-sm">Số ngày Lễ đi làm: {{ data.monthly_salary.count_holiday_working_days }}</p>
-        <p class="text-sm">Số ngày Lễ trùng CN đi làm: {{ data.monthly_salary.count_holiday_sunday_working_days }}</p>
-        <p class="text-sm">Số ngày thường đi làm: {{ data.monthly_salary.count_normal_working_days }}</p>
+        <p class="text-sm font-bold text-theme mt-2">SỐ NGÀY TRONG THÁNG</p>
+        <p class="text-sm">Số ngày trong tháng: {{ data.monthly_salary.count_days_of_month }}</p>
+        <p class="text-sm">Số CN trong tháng: {{ data.monthly_salary.count_sundays_of_month }}</p>
     </div>
 
     <!-- Monthly Salary Details -->
@@ -41,7 +41,6 @@
         <p class="text-sm">Tổng lương chưa tính Lễ và CN: {{ data.monthly_salary.total_normal_working_days_salary|format_money }} VND</p>
         <p class="text-sm">Tổng lương ngày CN: {{ data.monthly_salary.total_sunday_working_days_salary|format_money }} VND</p>
         <p class="text-sm">Tổng lương ngày Lễ: {{ data.monthly_salary.total_holiday_working_days_salary|format_money }} VND</p>
-        <p class="text-sm">Tổng lương ngày Lễ trùng CN: {{ data.monthly_salary.total_holiday_sunday_working_days_salary|format_money }} VND</p>
     
         <p class="text-sm font-bold text-theme mt-2">PHỤ CẤP TRONG THÁNG</p>
         <p class="text-sm">Phụ cấp cố định: {{ data.total_fixed_allowance|format_money }} VND</p>

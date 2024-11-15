@@ -233,7 +233,6 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
         count_sunday_working_days = 0
         count_holiday_working_days = 0
-        count_holiday_sunday_working_days = 0
         count_normal_working_days = 0
 
         count_working_days = 0
@@ -245,13 +244,12 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
             count_days_of_month += 1
             if current_date.weekday() == SUNDAY:
                 count_sundays_of_month += 1
-            print(current_date)
+                
             if current_date in working_dates:
-                print('current day is in working dates')
                 count_working_days += 1
                 if current_date.weekday() == SUNDAY:
                     if Holiday.is_holiday(current_date):
-                        count_holiday_sunday_working_days += 1
+                        count_holiday_working_days += 1
                     else:
                         count_sunday_working_days += 1
                 else: # Not sunday
@@ -286,10 +284,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
                     driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
                     * (count_holiday_working_days / count_days_of_month) \
                     
-            total_holiday_sunday_working_days_salary = \
-                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
-                    * (count_holiday_sunday_working_days / count_days_of_month) \
-            
+
         elif driver_salary_input.calculation_method == 'type_2':
             total_normal_working_days_salary = \
                     driver_salary_input.basic_month_salary \
@@ -303,17 +298,11 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
                     driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
                     * (count_holiday_working_days / count_days_of_month) \
                     
-            total_holiday_sunday_working_days_salary = \
-                    driver_salary_input.basic_month_salary * driver_salary_input.holiday_month_salary_percentage \
-                    * (count_holiday_working_days / count_days_of_month) \
-            
+
         total_monthly_salary = \
                 total_normal_working_days_salary \
                 + total_sunday_working_days_salary \
-                + total_holiday_working_days_salary \
-                + total_holiday_sunday_working_days_salary
-
-
+                + total_holiday_working_days_salary
 
         result = {
             'month': month,
@@ -328,14 +317,12 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
             'count_sundays_of_month': count_sundays_of_month,
             'count_sunday_working_days': count_sunday_working_days,
             'count_holiday_working_days': count_holiday_working_days,
-            'count_holiday_sunday_working_days': count_holiday_sunday_working_days,
             'count_normal_working_days': count_normal_working_days,
             'count_working_days': count_working_days,
             '---': '---------',
             'total_normal_working_days_salary': total_normal_working_days_salary,
             'total_sunday_working_days_salary': total_sunday_working_days_salary,
             'total_holiday_working_days_salary': total_holiday_working_days_salary,
-            'total_holiday_sunday_working_days_salary': total_holiday_sunday_working_days_salary,
             'total_monthly_salary': total_monthly_salary,
 
         }
