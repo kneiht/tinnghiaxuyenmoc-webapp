@@ -160,6 +160,7 @@ def get_thumbnail(image_url):
 # TAGS FOR VEHICLE OPERATION RECORD
 @register.filter(name='calculate_operation_duration')
 def calculate_operation_duration(vehicle_operation_records):
+    
     if vehicle_operation_records:
         time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
         # convert to hours, minutes, seconds
@@ -276,6 +277,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
             total_normal_working_days_salary = \
                     driver_salary_input.basic_month_salary \
                     * (count_normal_working_days / (count_days_of_month - count_sundays_of_month))
+            
             total_sunday_working_days_salary = \
                     driver_salary_input.basic_month_salary * driver_salary_input.sunday_month_salary_percentage \
                     * (count_sunday_working_days / count_days_of_month) \
@@ -357,6 +359,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
                 total_overtime_sunday_working_hours += record.overtime
             else:
                 total_overtime_normal_working_hours += record.overtime
+
         total_normal_working_hours /= 3600
         total_sunday_working_hours /= 3600
         total_holiday_working_hours /= 3600
@@ -370,6 +373,16 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         total_overtime_normal_working_hours_salary = total_overtime_normal_working_hours * driver_salary_input.normal_overtime_hourly_salary
         total_overtime_sunday_working_hours_salary = total_overtime_sunday_working_hours * driver_salary_input.sunday_overtime_hourly_salary
         total_overtime_holiday_working_hours_salary = total_overtime_holiday_working_hours * driver_salary_input.holiday_overtime_hourly_salary
+
+        print(
+            total_normal_working_hours_salary,
+            total_sunday_working_hours_salary,
+            total_holiday_working_hours_salary,
+            total_overtime_normal_working_hours_salary,
+            total_overtime_sunday_working_hours_salary,
+            total_overtime_holiday_working_hours_salary
+        )
+
 
         total_hourly_salary = \
             total_normal_working_hours_salary \
@@ -416,6 +429,10 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
     driver = vehicle_operation_records.first().driver
 
     vehicle_types = get_vehicle_types(vehicle_operation_records)
+    for vehicle_type in vehicle_types:
+        if vehicle_type.vehicle_type == "Không có xe":
+            vehicle_types.remove(vehicle_type)
+
     if len(vehicle_types) == 1:
         vehicle_type = vehicle_types[0]
     else:

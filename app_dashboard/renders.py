@@ -113,22 +113,55 @@ def render_infor_bar(request, **kwargs):
 
 
 def render_display_records(request, **kwargs):
-    def get_unique_values(model_class, field):
+    def get_unique_values(records, model_class, field):
+        if model_class == StaffData:
+            # get driver list from records
+            values = records.values_list('driver__full_name', flat=True)
+            # get unique values
+            contain_data_unique_values = set(values)
+            # remove None values
+            contain_data_unique_values = [value for value in contain_data_unique_values if value != None]
+        elif model_class == VehicleDetail:
+            # get vehicle list from records
+            values = records.values_list('vehicle', flat=True)
+            # get unique values
+            contain_data_unique_values = set(values)
+            # remove None values
+            contain_data_unique_values = [value for value in contain_data_unique_values if value != None]
+
+        # order
+        try:
+            contain_data_unique_values = sorted(contain_data_unique_values)
+        except Exception as e:
+            print(e)
+
+
         # get all values of the field
         values = model_class.objects.values_list(field, flat=True)
         unique_values = set(values)
         unique_values = [value for value in unique_values if value != None]
-        # get param "all" from request
-        keyword = request.GET.get('all', None)
-        if keyword:
-            # keep value which has the keyword
-            unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
 
         # order
         try:
             unique_values = sorted(unique_values)
         except Exception as e:
             print(e)
+
+        # put contain_data_unique_values in the first of the list
+        if contain_data_unique_values:
+            unique_values = contain_data_unique_values + [value for value in unique_values if value not in contain_data_unique_values]
+
+        # get param "all" from request
+        keyword = request.GET.get('all', None)
+        if keyword:
+            # keep value which has the keyword
+            unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
+
+        # if there is "XE ĐIỂM  DANH" in unique_values, remove it, and add it to the top
+        if 'XE ĐIỂM DANH' in unique_values:
+            unique_values.remove('XE ĐIỂM DANH')   
+            unique_values = ['XE ĐIỂM DANH'] + unique_values
+
         return unique_values
     
     params = kwargs
@@ -156,7 +189,7 @@ def render_display_records(request, **kwargs):
 
     groups = []
     if group_by:
-        GROUPS_PER_PAGE = 30
+        GROUPS_PER_PAGE = 10
         if records.count() == 0:
             return '<div id="display-records" class="w-full overflow-scroll">Không có dữ liệu</div><div up-hungry id="load-more" class="hidden"></div>'
         if model_class == VehicleOperationRecord:
@@ -164,17 +197,16 @@ def render_display_records(request, **kwargs):
                 page = next
                 next = next + 1
                 if not update:
-                    group_names = get_unique_values(VehicleDetail, 'gps_name')
+                    group_names = get_unique_values(records, VehicleDetail, 'gps_name')
                 else:
                     group_names = [records.first().vehicle]
                 if len(group_names) <= page*GROUPS_PER_PAGE:
                     next = "stop"
 
                 page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
-                print('page_group_names:', page_group_names)
                 for group_name in page_group_names:
                     vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
-                    records = records.filter(vehicle=vehicle.gps_name)
+                    group_records = records.filter(vehicle=vehicle.gps_name)
                     groups.append({
                         'group_id': vehicle.id,
                         'group_name': group_name,
@@ -182,13 +214,13 @@ def render_display_records(request, **kwargs):
                         'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
                         'drivers': StaffData.objects.filter(position='driver'),
                         'locations': Location.objects.all(),
-                        'records': records
+                        'records': group_records
                     })
             elif group_by == 'driver':
                 page = next
                 next = next + 1
                 if not update:
-                    group_names = get_unique_values(StaffData, 'full_name')
+                    group_names = get_unique_values(records, StaffData, 'full_name')
                 else:
                     group_names = [records.first().driver.full_name]
 
@@ -197,10 +229,10 @@ def render_display_records(request, **kwargs):
                     next = "stop"
 
                 page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
-                # print('page_group_names:', page_group_names)
                 for group_name in page_group_names:
                     driver = StaffData.objects.filter(full_name=group_name).first()
-                    records = records.filter(driver=driver)
+                    group_records = records.filter(driver=driver)
+
                     groups.append({
                         'group_id': driver.id,
                         'group_name': group_name,
@@ -208,7 +240,7 @@ def render_display_records(request, **kwargs):
                         'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
                         'drivers': StaffData.objects.filter(position='driver'),
                         'locations': Location.objects.all(),
-                        'records': records
+                        'records': group_records
                     })
 
 

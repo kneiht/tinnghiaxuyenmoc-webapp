@@ -13,8 +13,8 @@
     <div class="flex flex-col gap-2 text-center md:text-left">
         <p class="text-sm font-bold text-theme">ĐỊNH MỨC LƯƠNG THÁNG</p>
         <p class="text-sm">Lương cơ bản: {{ data.basic_salary|format_money }} VND</p>
-        <p class="text-sm">Hệ số lương ngày CN: {{ data.monthly_salary.total_sunday_working_days_salary|format_money }}</p>
-        <p class="text-sm">Hệ sống lương ngày lễ: {{ data.monthly_salary.total_holiday_working_days_salary|format_money }}</p>
+        <p class="text-sm">Hệ số lương ngày CN: {{ data.monthly_salary.sunday_month_salary_percentage }}</p>
+        <p class="text-sm">Hệ sống lương ngày lễ: {{ data.monthly_salary.holiday_month_salary_percentage }}</p>
     <!-- Hourly Salary Details -->
 
         <p class="text-sm font-bold text-theme mt-2">ĐỊNH MỨC PHỤ CẤP VÀ BHXH</p>
@@ -74,12 +74,12 @@
     <!-- Hourly Salary Details -->
     <div class="flex flex-col gap-2 text-center md:text-left px-4">
         <p class="text-sm font-bold text-theme">LƯƠNG GIỜ CHI TIẾT</p>
-        <p class="text-sm">Ngày thường: {{ data.hourly_salary.normal_hourly_salary|format_money }} VND</p>
-        <p class="text-sm">Tăng ca ngày thường: {{ data.hourly_salary.total_normal_overtime_hourly_salary|format_money }} VND</p>
-        <p class="text-sm">Ngày chủ nhật: {{ data.hourly_salary.total_sunday_hourly_salary|format_money }} VND</p>
-        <p class="text-sm">Tăng ca chủ nhật: {{ data.hourly_salary.total_sunday_overtime_hourly_salary|format_money }} VND</p>
-        <p class="text-sm">Ngày lễ: {{ data.hourly_salary.total_holiday_hourly_salary|format_money }} VND</p>
-        <p class="text-sm">Tăng ca ngày lễ: {{ data.hourly_salary.total_holiday_overtime_hourly_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày thường: {{ data.hourly_salary.total_normal_working_hours_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày thường: {{ data.hourly_salary.total_overtime_normal_working_hours_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày chủ nhật: {{ data.hourly_salary.total_sunday_working_hours_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca chủ nhật: {{ data.hourly_salary.total_overtime_sunday_working_hours_salary|format_money }} VND</p>
+        <p class="text-sm">Ngày lễ: {{ data.hourly_salary.total_holiday_working_hours_salary|format_money }} VND</p>
+        <p class="text-sm">Tăng ca ngày lễ: {{ data.hourly_salary.total_overtime_holiday_working_hours_salary|format_money }} VND</p>
     </div>
 </div>
 
