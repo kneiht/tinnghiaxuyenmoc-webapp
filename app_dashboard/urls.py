@@ -19,7 +19,8 @@ urlpatterns = [
     path('transport-department/', views.page_transport_department, name='page_transport_department'),
 
 
-    path('api/save-vehicle-operation-record', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
+
+
 
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
 
@@ -36,6 +37,10 @@ urlpatterns = [
 
 
 
+    path('api/save-vehicle-operation-record', views.save_vehicle_operation_record, name='save_vehicle_operation_record'),
+    path('api/get_vehicle_list_from_binhanh', views.get_vehicle_list_from_binhanh, name='get_vehicle_list_from_binhanh'),
+    path('api/get_trip_data_from_binhanh', views.get_trip_data_from_binhanh, name='get_trip_data_from_binhanh'),
+    
 
 
     path('test', views.test, name='test'),
