@@ -207,7 +207,7 @@ def render_display_records(request, **kwargs):
         else:
             records = model_class.objects.filter(project=project)
         
-        records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date)
+        records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
         print('>>>>>>>>',len(records))
 
     groups = []
@@ -304,6 +304,7 @@ def render_display_records(request, **kwargs):
                'check_date': check_date,
                'start_date': start_date,
                'end_date': end_date,
+               'check_month': check_month,    
                'tab': tab,
                'next': next
     }
