@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from io import BytesIO
 import pandas as pd
 from sqlalchemy import create_engine
@@ -130,7 +130,7 @@ def download_db_backup(request):
         excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     # name the db based on time
-    filename = f"db_{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
+    filename = f"tinnghiaxuyenmoc_{datetime.now().strftime('%Y_%m_%d')}.xlsx"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
 
@@ -203,4 +203,72 @@ def upload_db_backup(request):
 
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import *
 
+
+def db_table(request):
+    command = request.GET.get('command')
+    model_name = request.GET.get('model')
+    pk = request.GET.get('pk')
+    print(command, model_name, pk)
+
+    if command == 'get_model_list':
+        dict = {
+            'models': ['Project', 'ProjectUser', 'Job', 'JobPlan', 'JobDateReport', 
+                       'VehicleType', 'StaffData', 'VehicleRevenueInputs', 'DriverSalaryInputs', 'VehicleDetail',
+                       'DumbTruckPayRate', 'DumbTruckRevenueData', 'Location', 'NormalWorkingTime', 'Holiday']
+            
+        }
+        return JsonResponse(dict)
+
+    if command == 'crud':
+        # Get the model class based on the model name
+        Model = globals().get(model_name)
+        if not Model:
+            return JsonResponse({'error': 'Invalid model name'})
+
+        if request.method == 'GET':
+            if pk:
+                # Retrieve a single object
+                obj = get_object_or_404(Model, pk=pk)
+                return JsonResponse(model_to_dict(obj))
+            else:
+                # Retrieve all objects
+                objects = Model.objects.all()
+                return JsonResponse(list(objects.values()), safe=False)
+
+        elif request.method == 'POST':
+            # Create a new object
+            try:
+                data = json.loads(request.body)
+                obj = Model.objects.create(**data)
+                return JsonResponse(model_to_dict(obj))
+            except Exception as e:
+                return JsonResponse({'error': str(e)})
+
+        elif request.method == 'PUT' and pk:
+            # Update an existing object
+            try:
+                data = json.loads(request.body)
+                obj = get_object_or_404(Model, pk=pk)
+                for key, value in data.items():
+                    setattr(obj, key, value)
+                obj.save()
+                return JsonResponse(model_to_dict(obj))
+            except Exception as e:
+                return JsonResponse({'error': str(e)})
+
+        elif request.method == 'DELETE' and pk:
+            # Delete an object
+            try:
+                obj = get_object_or_404(Model, pk=pk)
+                obj.delete()
+                return JsonResponse({'message': 'Deleted successfully'})
+            except Exception as e:
+                return JsonResponse({'error': str(e)})
+
+        return JsonResponse({'error': 'Invalid request'})

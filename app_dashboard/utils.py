@@ -12,6 +12,15 @@ from .models import *
 def is_admin(user):
     return user.is_authenticated and user.is_active and user.is_staff and user.is_superuser
 
+def get_start_end_of_the_month(month, year):
+    # Start of the month
+    start_date_of_month = datetime(year, month, 1)
+    # Calculate the end of the month by moving to the next month and subtracting one day
+    if month == 12:
+        end_date_of_month = datetime(year + 1, 1, 1) - timedelta(days=1)
+    else:
+        end_date_of_month = datetime(year, month + 1, 1) - timedelta(days=1)
+    return start_date_of_month.date(), end_date_of_month.date()
 
 import base64, json
 def encode_base64(input_string):
@@ -30,6 +39,18 @@ def get_valid_date(date):
         date = timezone.now().date()
     date = date.strftime('%Y-%m-%d')
     return date
+
+def get_valid_month(date):
+    try:
+        date = datetime.strptime(date, '%Y-%m-%d').date()
+    except:
+        try:
+            date = datetime.strptime(date, '%Y-%m').date()
+        except:
+            date = timezone.now().date()
+    month = date.strftime('%Y-%m')
+    return month
+
 
 def get_valid_id(id):
     try:

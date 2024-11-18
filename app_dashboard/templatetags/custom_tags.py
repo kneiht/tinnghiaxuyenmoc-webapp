@@ -199,7 +199,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         return start_date_of_month.date(), end_date_of_month.date()
 
 
-    def get_driver_salary_inputs(driver, vehicle_type):
+    def get_driver_salary_inputs(driver):
         records = vehicle_operation_records
         # Get the date of the first record
         start_time = records.first().start_time
@@ -211,7 +211,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         else:
             end_date_of_month = datetime(start_time.year, start_time.month + 1, 1) - timedelta(days=1)
 
-        driver_salary_inputs = DriverSalaryInputs.objects.filter(driver=driver, vehicle_type=vehicle_type, valid_from__lte=end_date_of_month)
+        driver_salary_inputs = DriverSalaryInputs.objects.filter(driver=driver, valid_from__lte=end_date_of_month)
         # get the latest
         driver_salary_input = driver_salary_inputs.order_by('-valid_from').first()
         return driver_salary_input
@@ -228,6 +228,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
         # Get list of all the dates from start_time of the records then remove duplicates
         working_dates = list(set([record.start_time.date() for record in records]))
+        print('>>>> working_dates', working_dates)
         SUNDAY = 6
         count_days_of_month = 0
         count_sundays_of_month = 0
@@ -242,6 +243,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         # Loop through each day from start_date to end_date
         current_date = start_date
         while current_date <= end_date:
+            
             count_days_of_month += 1
             if current_date.weekday() == SUNDAY:
                 count_sundays_of_month += 1
@@ -271,7 +273,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
                         pass # Không tính gì cả
 
             current_date += timedelta(days=1)
-
+        print('>>>> count_normal_working_days', count_normal_working_days)
 
         if driver_salary_input.calculation_method == 'type_1':
             total_normal_working_days_salary = \
@@ -348,17 +350,18 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         total_overtime_holiday_working_hours = 0
         SUNDAY = 6
         for record in records:
-            total_normal_working_hours += record.normal_working_time
-            total_sunday_working_hours += record.sunday_working_time
-            total_holiday_working_hours += record.holiday_time
+            normal_working_seconds, overtime_seconds = record.calculate_working_time()
             
             date = record.start_time.date()
             if Holiday.is_holiday(date):
-                total_overtime_holiday_working_hours += record.overtime
+                total_overtime_holiday_working_hours += overtime_seconds
+                total_holiday_working_hours += normal_working_seconds
             elif record.start_time.weekday() == SUNDAY:
-                total_overtime_sunday_working_hours += record.overtime
+                total_overtime_sunday_working_hours += overtime_seconds
+                total_sunday_working_hours += normal_working_seconds
             else:
-                total_overtime_normal_working_hours += record.overtime
+                total_overtime_normal_working_hours += overtime_seconds
+                total_normal_working_hours += normal_working_seconds
 
         total_normal_working_hours /= 3600
         total_sunday_working_hours /= 3600
@@ -429,19 +432,24 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
     driver = vehicle_operation_records.first().driver
 
     vehicle_types = get_vehicle_types(vehicle_operation_records)
+    hasXeChamCong = False
     for vehicle_type in vehicle_types:
-        if vehicle_type.vehicle_type == "Không có xe":
+        if vehicle_type.vehicle_type == "XE CHẤM CÔNG":
             vehicle_types.remove(vehicle_type)
+            break
 
-    if len(vehicle_types) == 1:
-        vehicle_type = vehicle_types[0]
-    else:
+    if len(vehicle_types) == 0: # Ngoài xe chấm công, không còn xe nào khác
+        pass # vẫn xử lý lương
+
+    elif len(vehicle_types) >= 2: # Ngoài xe chấm công, tài xế còn chạy 2 loại xe khác
         return {"success": "false",
                 "message": "Tài xế này chạy nhiều loại xe, chưa tính toán trường hợp này.",
                 "driver_name": driver_name
                 }
-    
-    driver_salary_input = get_driver_salary_inputs(driver, vehicle_type)
+    else: # Chỉ có 1 loại xe
+        vehicle_type = vehicle_types[0]
+
+    driver_salary_input = get_driver_salary_inputs(driver)
 
     if not driver_salary_input:
         return {"success": "false",
@@ -466,7 +474,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
 
     data =  {
-        'method': driver_salary_input.calculation_method,
+        'method_display': driver_salary_input.get_calculation_method_display(),
         'basic_salary': driver_salary_input.basic_month_salary,
         'fixed_allowance': driver_salary_input.fixed_allowance,
         'total_fixed_allowance': total_fixed_allowance,

@@ -327,18 +327,13 @@ def handle_vehicle_operation_form(request):
                     normal_working_time_sign = form.get(f'normal_working_time_sign_{id}', None)
                     normal_working_time = convert_time(normal_working_time_str, normal_working_time_sign)
                     record.normal_working_time = normal_working_time
-                    # holiday_time
-                    holiday_time_str = form.get(f'holiday_time_{id}', None)
-                    holiday_time_sign = form.get(f'holiday_time_sign_{id}', None)
-                    holiday_time = convert_time(holiday_time_str, holiday_time_sign)
-                    record.holiday_time = holiday_time
-                    # sunday_working_time
-                    sunday_working_time_str = form.get(f'sunday_working_time_{id}', None)
-                    sunday_working_time_sign = form.get(f'sunday_working_time_sign_{id}', None)
-                    sunday_working_time = convert_time(sunday_working_time_str, sunday_working_time_sign)
-                    record.sunday_working_time = sunday_working_time
                 except:
                     raise e
+                
+                if not driver:
+                    # remove record
+                    record.delete()
+                    continue
             record.save()
         
         # Add new records
@@ -355,12 +350,6 @@ def handle_vehicle_operation_form(request):
 
         normal_working_time_news = form.getlist('normal_working_time_new')
         normal_working_time_sign_news = form.getlist('normal_working_time_sign_new')
-
-        holiday_time_news = form.getlist('holiday_time_new')
-        holiday_time_sign_news = form.getlist('holiday_time_sign_new')
-
-        sunday_working_time_news = form.getlist('sunday_working_time_new')
-        sunday_working_time_sign_news = form.getlist('sunday_working_time_sign_new')
 
         fuel_allowance_news = form.getlist('fuel_allowance_new')
         note_news = form.getlist('note_new')
@@ -383,16 +372,6 @@ def handle_vehicle_operation_form(request):
                 normal_working_time_sign = normal_working_time_sign_news[i]
                 normal_working_time = convert_time(normal_working_time_str, normal_working_time_sign)
 
-                # holiday_time
-                holiday_time_str = holiday_time_news[i]
-                holiday_time_sign = holiday_time_sign_news[i]
-                holiday_time = convert_time(holiday_time_str, holiday_time_sign)
-
-                # sunday_working_time
-                sunday_working_time_str = sunday_working_time_news[i]
-                sunday_working_time_sign = sunday_working_time_sign_news[i]
-                sunday_working_time = convert_time(sunday_working_time_str, sunday_working_time_sign)
-        
             except Exception as e:
                 raise e
         
@@ -407,17 +386,9 @@ def handle_vehicle_operation_form(request):
             fuel_allowance = get_valid_int(fuel_allowance_news[i])
             note = note_news[i]
 
-
-            print('duration_seconds:', duration_seconds)    
-            print('overtime:', overtime)
-            print('normal_working_time:', normal_working_time)
-            print('holiday_time:', holiday_time)
-            print('sunday_working_time:', sunday_working_time)
-            if duration_seconds == 0 and overtime == 0 and normal_working_time == 0 and holiday_time == 0 and fuel_allowance == 0:
+            if not driver:
                 print('>>>> skip')
-
                 continue
-
 
             new_record = VehicleOperationRecord.objects.create(
                 vehicle=vehicle,
@@ -426,8 +397,6 @@ def handle_vehicle_operation_form(request):
                 duration_seconds=duration_seconds,
                 overtime=overtime,
                 normal_working_time=normal_working_time,
-                holiday_time=holiday_time,
-                sunday_working_time=sunday_working_time,
                 fuel_allowance=fuel_allowance,
                 note=note,
                 source='manual',
@@ -443,11 +412,10 @@ def handle_vehicle_operation_form(request):
         
         html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab, update=True)
 
-        html_message = render_message(request, message='Cập nhật thành công!\n\nLưu ý các dòng nhập tay nếu không có dữ liệu sẽ được xóa khỏi bảng dữ liệu!', message_type='green')
+        html_message = render_message(request, message='Cập nhật thành công!\n\nLưu ý các dòng nhập tay nếu không có TÀI XẾ sẽ bị xóa', message_type='green')
         html = html_message + html_display
         return HttpResponse(html)
     except Exception as e:
-        raise e
         html = render_message(request, message='Có lỗi: ' + str(e), message_type='red') 
         return HttpResponse(html)
 
@@ -504,7 +472,9 @@ def page_transport_department(request):
         start_date = get_valid_date('')
     if 'end_date' not in params:
         end_date = get_valid_date('')
-    context = {'start_date': start_date, 'end_date': end_date}
+    if 'check_month' not in params:
+        check_month = get_valid_month('')
+    context = {'start_date': start_date, 'end_date': end_date, 'check_month': check_month}
     return render(request, 'pages/page_transport_department.html', context)
 
 
@@ -609,8 +579,10 @@ def upload_project(request, project_id):
 
 def test(request):
     records = VehicleOperationRecord.objects.all()
-    record = VehicleOperationRecord.objects.filter(pk='asda').first()
-    print(record)
+    for record in records:
+        print(record.id)
+        record.calculate_working_time()
+        record.save()
     # for record in records:
     #     record.save()
     return HttpResponse('test')

@@ -376,7 +376,7 @@ class DriverSalaryInputsForm(forms.ModelForm):
     class Meta:
         model = DriverSalaryInputs
         fields = [
-            'driver', 'vehicle_type', 'calculation_method',
+            'driver', 'calculation_method',
             'basic_month_salary', 'sunday_month_salary_percentage', 'holiday_month_salary_percentage', 
             'normal_hourly_salary', 'normal_overtime_hourly_salary', 'sunday_hourly_salary', 
             'sunday_overtime_hourly_salary', 'holiday_hourly_salary', 'holiday_overtime_hourly_salary', 
@@ -386,7 +386,6 @@ class DriverSalaryInputsForm(forms.ModelForm):
 
         labels = {
             'driver': 'Tài xế',
-            'vehicle_type': 'Loại xe',
             'calculation_method': 'Cách tính',
             'basic_month_salary': 'Lương cơ bản tháng',
             'sunday_month_salary_percentage': 'Hệ số lương tháng ngày chủ nhật',
@@ -406,7 +405,6 @@ class DriverSalaryInputsForm(forms.ModelForm):
 
         widgets = {
             'driver': forms.Select(attrs={'class': 'form-input', 'required': 'required'}),
-            'vehicle_type': forms.Select(attrs={'class': 'form-input'}),
             'calculation_method': forms.Select(attrs={'class': 'form-input'}),
             'basic_month_salary': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập lương cơ bản'}),
             'sunday_month_salary_percentage': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Nhập hệ số ngày chủ nhật'}),

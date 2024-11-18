@@ -471,14 +471,12 @@ class DriverSalaryInputs(BaseModel):
 
 
     METHOD_CHOICES = (
-        ('type_1', 'Nghỉ chủ nhật và lễ, có hệ số lương ngày chủ nhật và lễ'),
-        ('type_2', 'Không nghỉ chủ nhật và lễ'),
+        ('type_1', 'Nghỉ chủ nhật và lễ, nếu đi làm được tính thêm lương (xe lu)'),
+        ('type_2', 'Không được nghỉ chủ nhật và lễ (xe cuốc)'),
     )
 
     driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
                                limit_choices_to={'position': 'driver'}, null=True)
-    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.CASCADE, verbose_name="Loại xe", null=True)
-    
     # Salary Fields 
     basic_month_salary = models.PositiveIntegerField(verbose_name="Lương cơ bản tháng", default=0)
     sunday_month_salary_percentage = models.FloatField(verbose_name="Hệ số lương tháng ngày chủ nhật", default=0.0)
@@ -508,7 +506,7 @@ class DriverSalaryInputs(BaseModel):
     
     @classmethod
     def get_display_fields(self):
-        fields = ['driver', 'vehicle_type', 'basic_month_salary', 'sunday_month_salary_percentage', 
+        fields = ['driver', 'basic_month_salary', 'sunday_month_salary_percentage', 
                   'holiday_month_salary_percentage', 'normal_hourly_salary', 'normal_overtime_hourly_salary', 
                   'sunday_hourly_salary', 'sunday_overtime_hourly_salary', 'holiday_hourly_salary', 
                   'holiday_overtime_hourly_salary', 'trip_salary', 'fixed_allowance', 'insurance_amount', 'note']
@@ -795,9 +793,7 @@ class VehicleOperationRecord(models.Model):
     duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động", default= 0)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Địa điểm")
     overtime = models.IntegerField(verbose_name="Thời gian tăng ca", default=0)
-    holiday_time = models.IntegerField(verbose_name="Thời gian làm ngày lễ", default=0)
-    normal_working_time = models.IntegerField(verbose_name="Thời gian làm bình thường", default=0)
-    sunday_working_time = models.IntegerField(verbose_name="Thời gian làm chủ nhật", default=0)
+    normal_working_time = models.IntegerField(verbose_name="Thời gian làm hành chính", default=0)
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
@@ -805,30 +801,11 @@ class VehicleOperationRecord(models.Model):
     def __str__(self):
         return self.vehicle
     
-    def save(self, *args, **kwargs):
-        SUNDAY = 6
-        if self.source == 'gps':
-            self.overtime = self.calculate_overtime()
-            if Holiday.is_holiday(self.start_time.date()):
-                self.normal_working_time = 0
-                self.sunday_working_time = 0
-                self.holiday_time = self.duration_seconds - self.overtime
-
-            elif self.start_time.weekday() == SUNDAY:
-                self.normal_working_time = 0
-                self.holiday_time = 0
-                self.sunday_working_time = self.duration_seconds - self.overtime
-            else:
-                self.holiday_time = 0
-                self.sunday_working_time = 0
-                self.normal_working_time = self.duration_seconds - self.overtime
-        super().save(*args, **kwargs)
 
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
-                  'driver', 'location', 'normal_working_time', 'overtime', 'sunday_working_time',
-                  'holiday_time', 'fuel_allowance', 'image', 'note']
+                  'driver', 'location', 'normal_working_time', 'overtime', 'fuel_allowance', 'image', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -847,7 +824,10 @@ class VehicleOperationRecord(models.Model):
         return dict_locations
 
 
-    def calculate_overtime(self):
+    def calculate_working_time(self):
+        if self.source != 'gps':
+            return self.normal_working_time, self.overtime
+        
         start_time = self.start_time
         end_time = self.end_time
         # Define the working hours
@@ -877,8 +857,14 @@ class VehicleOperationRecord(models.Model):
         # print("all_seconds_of_working_hours", len(all_seconds_of_working_hours))
         # count the number of seconds
         if overtime:
-            return len(overtime)
+            normal_working_time = self.duration_seconds - len(overtime)
+            self.normal_working_time = normal_working_time
+            self.overtime = len(overtime)
+            return normal_working_time, len(overtime)
         else:
-            return 0
+            normal_working_time = self.duration_seconds
+            self.normal_working_time = normal_working_time
+            self.overtime = 0
+            return normal_working_time, 0
 
 

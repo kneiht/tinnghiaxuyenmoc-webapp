@@ -52,6 +52,15 @@ def render_tool_bar(request, **kwargs):
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
     end_date = get_valid_date(params.get('end_date', ''))
+    check_month = params.get('check_month', '')
+
+    if check_month != '':
+        check_month = get_valid_month(check_month)
+        year, month = check_month.split('-')
+        start_date, end_date = get_start_end_of_the_month(int(month), int(year))
+
+        print(check_month, start_date, end_date)
+
     group_by = params.get('group_by', '')
     tab = params.get('tab', '')
     # print(check_date)
@@ -63,6 +72,7 @@ def render_tool_bar(request, **kwargs):
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d'),
         'start_date': start_date,
         'end_date': end_date,
+        'check_month': check_month,
         'group_by': group_by,
         'tab': tab,
         'lazy_load': params.get('lazy_load', False)
@@ -158,9 +168,9 @@ def render_display_records(request, **kwargs):
             unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
 
         # if there is "XE ĐIỂM  DANH" in unique_values, remove it, and add it to the top
-        if 'XE ĐIỂM DANH' in unique_values:
-            unique_values.remove('XE ĐIỂM DANH')   
-            unique_values = ['XE ĐIỂM DANH'] + unique_values
+        if 'XE CHẤM CÔNG' in unique_values:
+            unique_values.remove('XE CHẤM CÔNG')   
+            unique_values = ['XE CHẤM CÔNG'] + unique_values
 
         return unique_values
     
@@ -171,6 +181,16 @@ def render_display_records(request, **kwargs):
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
     end_date = get_valid_date(params.get('end_date', start_date))
+
+    check_month = params.get('check_month', '')
+    if check_month != '':
+        check_month = get_valid_month(check_month)
+        year, month = check_month.split('-')
+        start_date, end_date = get_start_end_of_the_month(int(month), int(year))
+        # convert to str
+        start_date = start_date.strftime('%Y-%m-%d')
+        end_date = end_date.strftime('%Y-%m-%d')
+
     group_by = params.get('group_by', '')
     records = params.get('records', None)
     tab = params.get('tab', '')
@@ -207,6 +227,8 @@ def render_display_records(request, **kwargs):
                 for group_name in page_group_names:
                     vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
                     group_records = records.filter(vehicle=vehicle.gps_name)
+                    for record in group_records:
+                        record.calculate_working_time()
                     groups.append({
                         'group_id': vehicle.id,
                         'group_name': group_name,

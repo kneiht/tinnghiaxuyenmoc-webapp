@@ -102,7 +102,7 @@ class VehicleRevenueInputsAdmin(admin.ModelAdmin):
 
 @admin.register(DriverSalaryInputs)
 class DriverSalaryInputsAdmin(admin.ModelAdmin):
-    list_display = ('driver', 'vehicle_type', 'basic_month_salary', 'calculation_method', 'valid_from')
+    list_display = ('driver', 'basic_month_salary', 'calculation_method', 'valid_from')
     list_filter = ('calculation_method', 'valid_from')
     search_fields = ('driver__full_name', 'vehicle_type__name')
     ordering = ('driver',)

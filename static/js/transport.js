@@ -159,3 +159,20 @@ up.compiler('#end_date', function (element) {
         });
     });
 });
+
+
+
+up.compiler('.transport-table', function (table) {
+    // Get all the input which has class iput-driver
+    let inputs = table.querySelectorAll('.input-driver');
+    // Listen to it, if the value is changed, update all other inputs
+    inputs.forEach(function (input) {
+        input.addEventListener('change', function () {
+            inputs.forEach(function (otherInput) {
+                if (otherInput !== input && !otherInput.value) {
+                    otherInput.value = input.value;
+                }
+            });
+        });
+    });
+});

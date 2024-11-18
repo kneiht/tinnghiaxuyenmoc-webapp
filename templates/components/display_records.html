@@ -269,7 +269,7 @@
                                             {% elif field == 'driver' %}
                                                 <input type="hidden" name="id" value="{{ record.pk }}">
                                                 <span class="display">{{ record|format_display:field }}</span>
-                                                <select name="driver_{{ record.pk }}" class="form-input input hidden" id="id_driver" style="width: 150px">
+                                                <select name="driver_{{ record.pk }}" class="form-input input input-driver hidden" id="id_driver" style="width: 150px">
                                                     <option value="" selected">----------</option>
                                                     {% for driver in record.get_driver_choices %}
                                                         {% if driver.id == record.driver.id %}
@@ -303,7 +303,7 @@
                                                 <textarea name="note_{{ record.pk }}" class="form-input expand input hidden" style="width: 250px"
                                             >{{ record.note }}</textarea>
 
-                                            {% elif field == 'duration_seconds' or field == 'overtime' or field == 'holiday_time' or field == 'normal_working_time' or field == 'sunday_working_time' %}
+                                            {% elif field == 'duration_seconds' or field == 'overtime' or field == 'normal_working_time' %}
                                                 
                                                 {% if record.source == 'manual' %}
                                                     {% if record|get_value:field > 0  %}
@@ -388,7 +388,7 @@
                                     </td>
                                     
                                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                        <select disabled name="driver_new" class="form-input input hidden" id="id_driver" style="width: 150px">
+                                        <select disabled name="driver_new" class="form-input input input-driver hidden" id="id_driver" style="width: 150px">
                                             <option value="">----------</option>
                                             {% for driver in group.drivers %}
                                                     <option value="{{ driver.id }}">{{ driver.full_name }}</option>
@@ -427,31 +427,6 @@
                                         </div>
                                     </td>
 
-                                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                        <div class="flex flex-row">
-                                            <select disabled name="sunday_working_time_sign_new" class="form-input input hidden" id="id_sunday_working_time_sign_new" style="width: 130px;">
-                                                <option value="plus" selected>+ Cộng</option>
-                                                <option value="minus">- Trừ</option>
-                                            </select>
-                                        
-                                            <input  disabled type="time" step="1" id="id_sunday_working_time_new" name="sunday_working_time_new" class="form-input input hidden" value="00:00:00">
-                                        </div>
-                                    </td>
-
-
-                                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                        <div class="flex flex-row">
-                                            <select disabled name="holiday_time_sign_new" class="form-input input hidden" id="id_holiday_time_sign_new" style="width: 130px;">
-                                                <option value="plus" selected>+ Cộng</option>
-                                                <option value="minus">- Trừ</option>
-                                            </select>
-                                        
-                                            <input disabled type="time" step="1" id="id_holiday_time_new" name="holiday_time_new" class="form-input input hidden" value="00:00:00">
-                                        </div>
-                                    </td>
-
-
-
 
                                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                         <input disabled type="number" name="fuel_allowance_new" class="form-input input hidden" value="0" step="any" style="width: 150px"/>
@@ -476,7 +451,7 @@
     </div>
     {% if next and next != "stop" %}
         <div up-hungry class="flex justify-center mb-20 text-center" id="load-more" >
-            <a class="btn btn-primary px-40" up-target="#display-records:after, #load-more:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model start_date=start_date group_by=group_by tab=tab elements='tool_bar|display_records' next=next %}">
+            <a class="btn btn-primary px-40" up-preload="insert" up-target="#display-records:after, #load-more:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model start_date=start_date group_by=group_by tab=tab elements='tool_bar|display_records' next=next %}">
                 Tải thêm
             </a>
         </div>

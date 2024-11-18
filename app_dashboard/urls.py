@@ -44,4 +44,7 @@ urlpatterns = [
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),
     path('api/upload-project/<int:project_id>/', views.upload_project, name='upload_project'),
     
+
+    path('api/db_table/', views_backup.db_table, name='db_table'),
+
 ]
