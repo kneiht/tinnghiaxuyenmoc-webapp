@@ -59,7 +59,7 @@ def render_tool_bar(request, **kwargs):
         year, month = check_month.split('-')
         start_date, end_date = get_start_end_of_the_month(int(month), int(year))
 
-        print(check_month, start_date, end_date)
+
 
     group_by = params.get('group_by', '')
     tab = params.get('tab', '')
@@ -150,7 +150,8 @@ def render_display_records(request, **kwargs):
         values = model_class.objects.values_list(field, flat=True)
         unique_values = set(values)
         unique_values = [value for value in unique_values if value != None]
-
+        contain_data_unique_values = [value for value in contain_data_unique_values if value in unique_values]
+        
         # order
         try:
             unique_values = sorted(unique_values)
@@ -167,7 +168,7 @@ def render_display_records(request, **kwargs):
             # keep value which has the keyword
             unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
 
-        # if there is "XE ĐIỂM  DANH" in unique_values, remove it, and add it to the top
+        # if there is "XE CHẤM CÔNG" in unique_values, remove it, and add it to the top
         if 'XE CHẤM CÔNG' in unique_values:
             unique_values.remove('XE CHẤM CÔNG')   
             unique_values = ['XE CHẤM CÔNG'] + unique_values
@@ -205,7 +206,9 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.all()
         else:
             records = model_class.objects.filter(project=project)
+        
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date)
+        print('>>>>>>>>',len(records))
 
     groups = []
     if group_by:
@@ -226,8 +229,6 @@ def render_display_records(request, **kwargs):
                 page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
                 for group_name in page_group_names:
                     vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
-                    if not vehicle:
-                        continue
                     group_records = records.filter(vehicle=vehicle.gps_name)
                     for record in group_records:
                         record.calculate_working_time()

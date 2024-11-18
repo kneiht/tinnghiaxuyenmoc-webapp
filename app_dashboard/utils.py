@@ -300,17 +300,23 @@ def filter_records(request, records, model_class, **kwargs):
     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'} 
     if model_class == VehicleOperationRecord:
 
-        # Add start_date and end_date form params to query_params if they are not present
-        if 'start_date' not in query_params:
-            start_date = get_valid_date(kwargs.get('start_date', ''))
+        check_month = kwargs.get('start_date', '')
+        if check_month != '':
+            check_month = get_valid_month(check_month)
+            year, month = check_month.split('-')
+            start_date, end_date = get_start_end_of_the_month(int(month), int(year))
         else:
-            start_date = query_params['start_date'][0]
+            # Add start_date and end_date form params to query_params if they are not present
+            if 'start_date' not in query_params:
+                start_date = get_valid_date(kwargs.get('start_date', ''))
+            else:
+                start_date = query_params['start_date'][0]
 
 
-        if 'end_date' not in query_params:
-            end_date = get_valid_date(kwargs.get('end_date', ''))
-        else:
-            end_date = query_params['end_date'][0]
+            if 'end_date' not in query_params:
+                end_date = get_valid_date(kwargs.get('end_date', ''))
+            else:
+                end_date = query_params['end_date'][0]
         # print('>>>> start date and end date:',start_date, end_date)
 
         # filter records which has start time 
