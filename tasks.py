@@ -1,12 +1,12 @@
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 
-# import pandas as pd
-# import datetime
-
-# import requests, json
-# from requests.auth import HTTPBasicAuth
-# from bs4 import BeautifulSoup   
+import pandas as pd
+import requests
+from datetime import datetime
+import requests, json
+from requests.auth import HTTPBasicAuth
+from bs4 import BeautifulSoup   
 
 
 # # Create a post request to send data to the server
@@ -53,21 +53,83 @@
 #         f.write(response.text + "\n")
 
 
-from datetime import datetime, timedelta
-def get_start_end_of_the_month(month, year):
-    # Start of the month
-    start_date_of_month = datetime(year, month, 1)
-    # Calculate the end of the month by moving to the next month and subtracting one day
-    if month == 12:
-        end_date_of_month = datetime(year + 1, 1, 1) - timedelta(days=1)
+def call_api(url, payload):
+    customer_code = '71735_6'
+    api_key = 'Ff$BkG1rAu'
+    auth=HTTPBasicAuth(customer_code, api_key)
+
+    response = requests.post(
+        url, 
+        json=payload, 
+        auth=auth
+    )
+    return response
+
+
+
+def get_vehicle_list():
+    # get api type from params
+    url = 'http://api.gps.binhanh.vn/apiwba/gps/tracking'
+    payload = {
+        'IsFuel': True 
+    }
+    response = call_api(url, payload)
+    if response.status_code == 200:
+        data = response.json()  
+        message_result = data.get('MessageResult')
+        if message_result == 'Success':
+            vehicles = data.get('Vehicles', [])
+            # Extracting PrivateCode values
+            private_codes = [vehicle["PrivateCode"] for vehicle in vehicles ]
+            print(private_codes)
+            return private_codes
+        else:
+            return []
     else:
-        end_date_of_month = datetime(year, month + 1, 1) - timedelta(days=1)
-    return start_date_of_month, end_date_of_month
+        return []
+    
+def get_trip_data():
+    # Define the API endpoint
+    url = "http://api.gps.binhanh.vn/api/gps/route"
 
+    # Define the payload (parameters)
+    payload = {
+        "CustomerCode": "71735_6",  # Replace with your customer code
+        "key": "Ff$BkG1rAu",                # Replace with your API key
+        "vehiclePlate": "XECUOC14",             # Replace with the vehicle plate
+        "fromDate": "2024-11-18T07:30:00",    # Replace with the desired start date and time
+        "toDate": "2024-11-18T17:30:00"       # Replace with the desired end date and time
+    }
 
-start_date, end_date = get_start_end_of_the_month(5, 2024)
-# Loop through each day from start_date to end_date
-current_date = start_date
-while current_date <= end_date:
-    print(current_date)
-    current_date += timedelta(days=1)
+    # Define the headers (optional, if needed)
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    try:
+        # Make the POST request
+        response = requests.post(url, json=payload, headers=headers)
+        # Check the status code
+        if response.status_code == 200:
+            data = response.json()  
+            message_result = data.get('MessageResult')
+            if 'Success' in message_result :
+                routes = data.get('Routes', [])
+                # print(data)
+                # write to file
+                with open("routes.txt", "a") as f:
+                    f.write(str(data) + "\n")
+                return routes
+            else:
+                return []
+
+        else:
+            print("Request failed with status code:", response.status_code)
+            print("Response:", response.text)
+            routes = []
+
+    except requests.exceptions.RequestException as e:
+        print("An error occurred:", e)
+        routes = []
+    
+get_trip_data()

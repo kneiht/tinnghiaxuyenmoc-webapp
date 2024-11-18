@@ -300,7 +300,7 @@ def filter_records(request, records, model_class, **kwargs):
     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'} 
     if model_class == VehicleOperationRecord:
 
-        check_month = kwargs.get('start_date', '')
+        check_month = kwargs.get('check_month', '')
         if check_month != '':
             check_month = get_valid_month(check_month)
             year, month = check_month.split('-')
