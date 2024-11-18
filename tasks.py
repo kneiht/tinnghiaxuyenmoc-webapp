@@ -2,7 +2,7 @@
 
 
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests, json
 
 # Create a post request to send data to the server
@@ -37,27 +37,28 @@ def get_list_vehicles():
     return response.json()
 
 
-# vehicles = get_list_vehicles()
-# count = 0
-# for vehicle in vehicles:
-#     count += 1
-#     check_date = datetime.now().strftime("%Y-%m-%d")
-#     url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
-#     print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
-#     response = requests.get(url)
-#     print(response.text)
-
-
 vehicles = get_list_vehicles()
-for day in range(1,19):
-    count = 0
-    for vehicle in vehicles:
-        count += 1
-        check_date = '2024-11-' + str(day).zfill(2)
-        url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
-        print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
-        response = requests.get(url)
-        print(response.text)
+count = 0
+for vehicle in vehicles:
+    count += 1
+    yesterday = datetime.now() - timedelta(days=1)
+    check_date = yesterday.strftime("%Y-%m-%d")
+    url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
+    print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
+    response = requests.get(url)
+    print(response.text)
+
+
+# vehicles = get_list_vehicles()
+# for day in range(1,19):
+#     count = 0
+#     for vehicle in vehicles:
+#         count += 1
+#         check_date = '2024-11-' + str(day).zfill(2)
+#         url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
+#         print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
+#         response = requests.get(url)
+#         print(response.text)
 
 
 
