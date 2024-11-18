@@ -226,6 +226,8 @@ def render_display_records(request, **kwargs):
                 page_group_names = group_names[(page-1)*GROUPS_PER_PAGE:page*GROUPS_PER_PAGE]
                 for group_name in page_group_names:
                     vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
+                    if not vehicle:
+                        continue
                     group_records = records.filter(vehicle=vehicle.gps_name)
                     for record in group_records:
                         record.calculate_working_time()
