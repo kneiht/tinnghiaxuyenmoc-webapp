@@ -161,6 +161,8 @@ def get_thumbnail(image_url):
 @register.inclusion_tag('components/calculate_total_operation_time.html')
 def calculate_total_operation_time(vehicle_operation_records, gps_name):
     def format_time(time_seconds):
+        if time_seconds == None:
+            return "00:00:00"
         hours = time_seconds // 3600
         minutes = (time_seconds % 3600) // 60
         seconds = time_seconds % 60
