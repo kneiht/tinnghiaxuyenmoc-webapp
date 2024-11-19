@@ -37,16 +37,27 @@ def get_list_vehicles():
     return response.json()
 
 
+
+
 vehicles = get_list_vehicles()
+
 count = 0
 for vehicle in vehicles:
     count += 1
-    yesterday = datetime.now() - timedelta(days=1)
-    check_date = yesterday.strftime("%Y-%m-%d")
-    url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
-    print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
-    response = requests.get(url)
-    print(response.text)
+    while True:
+        # python anywhere time is 2 days later
+        yesterday = datetime.now() + timedelta(days=1)
+        check_date = yesterday.strftime("%Y-%m-%d")
+        url = base_url +  "api/get_trip_data_from_binhanh?gps_name=" + vehicle + "&check_date=" + check_date
+        print('\n>>>>>>>>>> ', count, '/', len(vehicles), ': ',vehicle, check_date)
+        response = requests.get(url)
+        print(response.text)
+        if "=> Success" not in response.text:
+            print("Fail getting data => Redo")
+        else:
+            break
+
+
 
 
 # vehicles = get_list_vehicles()

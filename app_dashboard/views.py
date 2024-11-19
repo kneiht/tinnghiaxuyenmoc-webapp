@@ -843,7 +843,7 @@ def get_trip_data_from_binhanh(request):
                         end_time=end_time,
                         duration_seconds=duration_seconds
                     )
-            result += vehicle + '=> Done\n'
+            result += vehicle + ' => Success\n'
         return result
 
     # get check_date from url
