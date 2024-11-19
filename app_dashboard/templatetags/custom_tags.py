@@ -158,18 +158,65 @@ def get_thumbnail(image_url):
 
 
 # TAGS FOR VEHICLE OPERATION RECORD
-@register.filter(name='calculate_operation_duration')
-def calculate_operation_duration(vehicle_operation_records):
-    
-    if vehicle_operation_records:
-        time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
-        # convert to hours, minutes, seconds
+@register.inclusion_tag('components/calculate_total_operation_time.html')
+def calculate_total_operation_time(vehicle_operation_records, gps_name):
+    def format_time(time_seconds):
         hours = time_seconds // 3600
         minutes = (time_seconds % 3600) // 60
         seconds = time_seconds % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-    else:
-        return "00:00:00"   
+    
+    if not vehicle_operation_records:
+        return {"success": "false",
+                "message": "Không tìm thấy dữ liệu",
+                "gps_name": gps_name
+                }
+    
+
+    total_vehicle_time_seconds = vehicle_operation_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+    # calculate total time which has driver
+    total_driver_time_seconds = vehicle_operation_records.filter(driver__isnull=False).aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+
+    # get the list of driver
+    drivers = vehicle_operation_records.filter(driver__isnull=False).values_list('driver', flat=True).distinct()
+    unique_values = set(drivers)
+    
+    driver_working_times = []
+    for driver in unique_values:
+        total_normal_woring_time = 0
+        total_overtime = 0
+        filtered_records = vehicle_operation_records.filter(driver=driver)
+        for filtered_record in filtered_records:
+            normal_woring_time, overtime = filtered_record.calculate_working_time()
+            print(normal_woring_time, overtime)
+            total_normal_woring_time += normal_woring_time
+            total_overtime += overtime
+        
+        driver_working_times.append({
+            'driver': StaffData.objects.get(pk=driver).full_name,
+            'total_normal_woring_time': format_time(total_normal_woring_time),
+            'total_overtime': format_time(total_overtime)
+        })
+        print('normal_woring_time', total_normal_woring_time, 'overtime', total_overtime)
+
+
+    data = {
+        "total_vehicle_time": format_time(total_vehicle_time_seconds),
+        "total_driver_time": format_time(total_driver_time_seconds),
+        "total_vehicle_time_seconds": total_vehicle_time_seconds,
+        "total_driver_time_seconds": total_driver_time_seconds,
+        "gps_name": gps_name,
+        "driver_working_times": driver_working_times
+    }
+    return {
+        'success': 'true',
+        'message': 'Tính toán thời gian thành công',
+        "gps_name": gps_name,
+        'data': data,
+        'drivers': drivers
+    }
+
+
 
 
 @register.inclusion_tag('components/calculate_driver_salary.html')

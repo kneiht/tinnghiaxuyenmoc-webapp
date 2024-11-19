@@ -214,11 +214,7 @@
                             <div class="flex justify-between items-start">
                                 <div class="flex flex-col items-start gap-3">
                                     {% if tab == 'vehicle_operation_data_by_date' %}
-                                        <span class="text-lg font-semibold">{{ group.group_name }}</span>
-                                        <span class="text-lg font-semibold text-green-600 dark:text-green-300">
-                                            <i class="fa fa-clock mr-1"></i>
-                                                Tổng thời gian xe hoạt động: {{ group.records|calculate_operation_duration }}
-                                        </span>
+                                        {% calculate_total_operation_time group.records group.group_name %}
                                     {% elif tab == 'driver_salary' %}
                                         {% calculate_driver_salary group.records group.group_name %}
                                     {% endif %}

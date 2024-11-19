@@ -1,0 +1,51 @@
+{% load custom_tags %}
+
+{% if success == "true" %}
+
+<div class="text-lg font-semibold">
+    <span class="text-blue-600">{{ gps_name }}</span>
+</div>
+<div id="operation-time-info-bar" class="flex flex-row items-start gap-10 w-fit text-nowrap text-green-600">
+
+    <div class="flex flex-col gap-2 text-center md:text-left">
+        <p class="text-sm font-bold text-theme">THỜI GIAN XE LÀM VIỆC</p>
+        <div class="flex flex-row gap-2 text-center md:text-left">
+            <p class="text-sm font-bold text-theme">Xe làm việc: </p>
+            <p class="text-sm">{{ data.total_vehicle_time }}</p>
+        </div>
+
+        <div class="flex flex-row gap-2 text-center md:text-left">
+            <p class="text-sm font-bold text-theme">Xe làm việc có tài xế: </p>
+            <p class="text-sm">{{ data.total_driver_time }}</p>
+        </div>
+    </div>
+
+    {% if data.driver_working_times|length != 0 %}
+        {% for driver_working_time in data.driver_working_times %}
+        <div class="flex flex-col gap-2 text-center md:text-left">
+            <p class="text-sm font-bold text-theme">THỜI GIAN TÀI XẾ
+                <span class="text-blue-600">{{ driver_working_time.driver }}
+                </span> LÀM VIỆC</p>
+            <div class="flex flex-row gap-2 text-center md:text-left">
+                <p class="text-sm font-bold text-theme">Giờ hành chính: </p>
+                <p class="text-sm">{{ driver_working_time.total_normal_woring_time }}</p>
+            </div>
+
+            <div class="flex flex-row gap-2 text-center md:text-left">
+                <p class="text-sm font-bold text-theme">Giờ tăng ca: </p>
+                <p class="text-sm">{{ driver_working_time.total_overtime }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+
+{% else %}
+<span class="text-lg font-semibold">
+    <span class="text-blue-600">{{ gps_name }}</span>
+    <span class="text-orange-600">{{ message }}</span>
+</span>
+
+
+{% endif %}
