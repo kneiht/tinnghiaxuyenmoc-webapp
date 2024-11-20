@@ -243,6 +243,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
             #check if the vehicle_type is already in the list
             if vehicle.vehicle_type not in vehicle_types:
                 vehicle_types.append(vehicle.vehicle_type)
+        
         return vehicle_types
 
 
@@ -494,6 +495,12 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
     vehicle_types = get_vehicle_types(vehicle_operation_records)
     hasXeChamCong = False
     for vehicle_type in vehicle_types:
+        if vehicle_type == None:
+            return {"success": "false",
+                    "message": "Không tìm thấy dữ liệu loại xe, vui lòng thêm loại xe trong bảng Dữ liệu chi tiết từng xe.",
+                    "driver_name": driver_name
+                    }
+
         if vehicle_type.vehicle_type == "XE CHẤM CÔNG":
             vehicle_types.remove(vehicle_type)
             break

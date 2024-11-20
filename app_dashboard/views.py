@@ -944,3 +944,8 @@ def save_vehicle_operation_record(request):
                 )
         result += vehicle + '\n'
     return HttpResponse(check_date + ' => done')
+
+
+
+
+
