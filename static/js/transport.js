@@ -53,17 +53,23 @@ up.compiler('.transport-table', function (transportTable) {
         event.preventDefault();
         // Get rowplate by coying the row name add-row-template
         var addRowTemplate = transportTable.querySelector('.add-row-template');
-        console.log(addRowTemplate);
+        var index = transportTable.querySelectorAll('.add-row-template').length;
+
         // Clone the rowplate and append it to the table    
         var newRow = addRowTemplate.cloneNode(true);
         // Replace the rowplate with the new row
         transportTable.querySelector('table').appendChild(newRow);
+
+        // count the number of add-row-template
+        var addRowTemplates = transportTable.querySelectorAll('.add-row-template');
+        
+
         // find all input and select elements in the new row and remove disabled
         newRow.querySelectorAll('input, select, textarea').forEach(function (element) {
             element.removeAttribute('disabled');
+            // Add index to the name attribute of the input element
+            element.name = element.name + '_' + index;
         })
-
-
         // unhide
         newRow.classList.remove('hidden');
     })

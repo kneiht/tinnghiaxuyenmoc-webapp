@@ -783,7 +783,7 @@ class VehicleOperationRecord(models.Model):
     ]
 
     class Meta:
-        ordering = ['vehicle', '-start_time']
+        ordering = ['vehicle', 'start_time']
 
     vehicle = models.CharField(max_length=20, verbose_name="Xe")
     driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
@@ -798,6 +798,11 @@ class VehicleOperationRecord(models.Model):
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
     note = models.TextField(verbose_name="Ghi chú", default='')
+    
+    # add over time
+    allow_overtime = models.BooleanField(verbose_name="Cho phép tính lương tăng ca", default=False)
+
+
     def __str__(self):
         return self.vehicle
     
@@ -805,7 +810,7 @@ class VehicleOperationRecord(models.Model):
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
-                  'driver', 'location', 'normal_working_time', 'overtime', 'fuel_allowance', 'image', 'note']
+                  'driver', 'location', 'normal_working_time', 'overtime', 'allow_overtime', 'fuel_allowance', 'image', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

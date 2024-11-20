@@ -97,6 +97,13 @@ def format_display(record, field=None):
         seconds = value % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
 
+    if field == 'allow_overtime':
+        if value:
+            return "Cho phép"
+        else:
+            return "Không cho phép"
+
+
     if field in {'unit_price', 'total_amount'}:
         return "{:,}".format(int(value))
     
@@ -190,7 +197,9 @@ def calculate_total_operation_time(vehicle_operation_records, gps_name):
         filtered_records = vehicle_operation_records.filter(driver=driver)
         for filtered_record in filtered_records:
             normal_woring_time, overtime = filtered_record.calculate_working_time()
-            print(normal_woring_time, overtime)
+            if not filtered_record.allow_overtime:
+                overtime = 0
+
             total_normal_woring_time += normal_woring_time
             total_overtime += overtime
         
@@ -400,7 +409,9 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         SUNDAY = 6
         for record in records:
             normal_working_seconds, overtime_seconds = record.calculate_working_time()
-            
+            if not record.allow_overtime:
+                overtime_seconds = 0
+
             date = record.start_time.date()
             if Holiday.is_holiday(date):
                 total_overtime_holiday_working_hours += overtime_seconds

@@ -310,6 +310,7 @@ def handle_vehicle_operation_form(request):
             record.location = location
             record.fuel_allowance = form.get(f'fuel_allowance_{id}', None)
             record.note = form.get(f'note_{id}', None)
+            record.allow_overtime = False if not form.get(f'allow_overtime_{id}', False) else True
             if record.source == 'manual':
                 try:
                     # duration seconds
@@ -335,56 +336,58 @@ def handle_vehicle_operation_form(request):
                     record.delete()
                     continue
             record.save()
-        
+            
         # Add new records
-        vehicle_news = form.getlist('vehicle_new')
-        start_time_news = form.getlist('start_time_new')
-        driver_news = form.getlist('driver_new')
-        location_news = form.getlist('location_new')
+        new_index = 0
+        while True:
+            new_index += 1
+            if not form.get(f'vehicle_new_{new_index}', None):
+                break
 
-        duration_seconds_news = form.getlist('duration_seconds_new')
-        duration_seconds_sign_news = form.getlist('duration_seconds_sign_new')
-
-        overtime_news = form.getlist('overtime_new')
-        overtime_sign_news = form.getlist('overtime_sign_new')
-
-        normal_working_time_news = form.getlist('normal_working_time_new')
-        normal_working_time_sign_news = form.getlist('normal_working_time_sign_new')
-
-        fuel_allowance_news = form.getlist('fuel_allowance_new')
-        note_news = form.getlist('note_new')
-
-        for i in range(0, len(vehicle_news)): # start from 1 because the first one is a template
-            print( f'>>>> new: {i}' )
+            vehicle_new = form.get(f'vehicle_new_{new_index}', None)
+            start_time_new = form.get(f'start_time_new_{new_index}', None)
+            driver_new = form.get(f'driver_new_{new_index}', None)
+            location_new = form.get(f'location_new_{new_index}', None)
+            duration_seconds_new = form.get(f'duration_seconds_new_{new_index}', None)
+            duration_seconds_sign_new = form.get(f'duration_seconds_sign_new_{new_index}', None)
+            overtime_new = form.get(f'overtime_new_{new_index}', None)
+            overtime_sign_new = form.get(f'overtime_sign_new_{new_index}', None)
+            normal_working_time_new = form.get(f'normal_working_time_new_{new_index}', None)
+            normal_working_time_sign_new = form.get(f'normal_working_time_sign_new_{new_index}', None)
+            fuel_allowance_new = form.get(f'fuel_allowance_new_{new_index}', None)
+            note_new = form.get(f'note_new_{new_index}', None)
+            allow_overtime_new = False if not form.get(f'allow_overtime_new_{new_index}', False) else True
+            print()
             try:
                 # duration seconds
-                duration_seconds_str = duration_seconds_news[i]
-                duration_seconds_sign = duration_seconds_sign_news[i]
+                duration_seconds_str = duration_seconds_new
+                duration_seconds_sign = duration_seconds_sign_new
                 duration_seconds = convert_time(duration_seconds_str, duration_seconds_sign)
 
                 # over time
-                overtime_str = overtime_news[i]
-                overtime_sign = overtime_sign_news[i]
+                overtime_str = overtime_new
+                overtime_sign = overtime_sign_new
                 overtime = convert_time(overtime_str, overtime_sign)
 
                 # normal_woring_time
-                normal_working_time_str = normal_working_time_news[i]
-                normal_working_time_sign = normal_working_time_sign_news[i]
+                normal_working_time_str = normal_working_time_new
+                normal_working_time_sign = normal_working_time_sign_new
                 normal_working_time = convert_time(normal_working_time_str, normal_working_time_sign)
 
             except Exception as e:
                 raise e
         
-            vehicle = vehicle_news[i]   
-            driver = StaffData.objects.filter(pk=get_valid_id(driver_news[i])).first()
-            location = Location.objects.filter(pk=get_valid_id(location_news[i])).first()
+            vehicle = vehicle_new   
+            driver = StaffData.objects.filter(pk=get_valid_id(driver_new)).first()
+            location = Location.objects.filter(pk=get_valid_id(location_new)).first()
             
-            start_time = start_time_news[i]
+            start_time = start_time_new
             # convert start time to datetime object
             start_time = datetime.strptime(start_time, '%d/%m/%Y')
             end_time = start_time
-            fuel_allowance = get_valid_int(fuel_allowance_news[i])
-            note = note_news[i]
+            fuel_allowance = get_valid_int(fuel_allowance_new)
+            note = note_new
+            allow_overtime = allow_overtime_new
 
             if not driver:
                 print('>>>> skip')
@@ -401,14 +404,15 @@ def handle_vehicle_operation_form(request):
                 note=note,
                 source='manual',
                 driver=driver,
-                location=location
+                location=location,
+                allow_overtime=allow_overtime
             )
             ids.append(new_record.id)
 
         # Get records by ids
         group_by = form.get('group_by')
         tab = form.get('tab')
-        records = VehicleOperationRecord.objects.filter(pk__in=ids)
+        records = VehicleOperationRecord.objects.filter(pk__in=ids).order_by('source', 'start_time')
         
         html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab, update=True)
 
