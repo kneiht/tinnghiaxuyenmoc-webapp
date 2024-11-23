@@ -62,6 +62,8 @@ def get_unique_values(model, group_by):
 
 @register.filter(name='get_value')
 def get_value(record, field):
+    if type(record) == dict:
+        return record.get(field)
     return getattr(record, field)
 
 @register.filter(name='get_sign')
@@ -561,3 +563,64 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
     }
 
 
+
+
+
+# TAGS FOR VEHICLE OPERATION RECORD
+@register.inclusion_tag('components/calculate_revenue_report.html')
+def calculate_revenue_report(vehicle_operation_records):
+    def format_time(time_seconds):
+        if time_seconds == None:
+            return "00:00:00"
+        hours = time_seconds // 3600
+        minutes = (time_seconds % 3600) // 60
+        seconds = time_seconds % 60
+        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    
+    # only keep records which has driver
+    vehicle_operation_records = vehicle_operation_records.filter(driver__isnull=False)
+    if not vehicle_operation_records:
+        return {"success": "false",
+                "message": "Không tìm thấy dữ liệu có tên tài xế",
+                }
+
+
+
+    # Get list of unique driver + vehicle together
+    unique_driver_vehicles = vehicle_operation_records.values_list('driver', 'vehicle', 'location')
+    unique_driver_vehicles = set(unique_driver_vehicles) 
+    print(unique_driver_vehicles)
+    rows = []
+    for driver, vehicle, location in unique_driver_vehicles:
+        driver_vehicle_records = vehicle_operation_records.filter(driver=driver, vehicle=vehicle)
+        # calculate total time which has driver
+        total_driver_time_seconds = driver_vehicle_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+        vehicle_instance = VehicleDetail.objects.get(gps_name=vehicle)
+        
+
+        rows.append({
+            "STT": len(rows) + 1,
+            "Tên nhận dạng khi mua": vehicle_instance.vehicle_name,
+            "Tài xế": StaffData.objects.get(id=driver).full_name,
+            "Tên GPS": vehicle,
+            "Nơi làm việc": location if location else "",
+            "Số giờ làm": format_time(total_driver_time_seconds),
+            "Doanh thu": "",
+            "Lít/tiếng": "",
+            "Dầu DO": "",   
+            "Nhớt": "",
+            "Sửa xe + mua vật tư": "",
+            "Khấu hao xe": "",
+            "Lãi ngân hàng": "",
+            "Lương cơ bản": "",
+            "Lương theo giờ": "",
+            "Tổng chi phí": "",
+            "Lợi  nhuận": "",
+            "Ghi chú": "",
+        })
+    return {
+        'success': 'true',
+        'message': 'Tính toán thời gian thành công',
+        'rows': rows,
+        'headers': rows[0].keys(),
+    }

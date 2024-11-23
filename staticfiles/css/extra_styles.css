@@ -252,6 +252,18 @@ th.sorted-desc::after {
   color: #bdbdbd;
 }
 
+.True {
+  color: green;
+  
+}
+
+.False {
+  color: red;
+}
+
+
+
+
 
 .trimmed-text {
   white-space: pre-line;

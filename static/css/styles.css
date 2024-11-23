@@ -1676,10 +1676,6 @@ select {
   margin-left: 1.25rem;
 }
 
-.mr-1 {
-  margin-right: 0.25rem;
-}
-
 .mr-2 {
   margin-right: 0.5rem;
 }
@@ -2905,11 +2901,6 @@ select {
 .dark\:text-gray-300:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(209 213 219 / var(--tw-text-opacity));
-}
-
-.dark\:text-green-300:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(134 239 172 / var(--tw-text-opacity));
 }
 
 .dark\:text-green-800:is(.dark *) {

@@ -27,7 +27,7 @@
                     });">
                 <a id="vehicle_operation_data_by_date" up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date group_by='vehicle' tab='vehicle_operation_data_by_date'  elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-lg rounded-e-none cursor-pointer text-theme">
+                    class="btn btn-outline-no-focus rounded-lg rounded-e-none cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
                     Dữ liệu hoạt động xe công trình theo ngày
                 </a>
                 <a id="driver_salary" up-preload="insert" up-target="#tool-bar, #display-records" 
@@ -37,7 +37,7 @@
                 </a>
 
                 <a id="vehicle_avenue" up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date group_by='vehicle' tab='vehicle_avenue' elements='tool_bar|display_records' %}"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_avenue' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-s-none cursor-pointer text-theme">
                     Bảng tính doanh thu xe
                 </a>
