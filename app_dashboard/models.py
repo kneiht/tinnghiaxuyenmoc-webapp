@@ -144,6 +144,7 @@ class UserExtra(BaseModel):
         return self.user.username
 
 
+
 class Task(BaseModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -199,8 +200,6 @@ class Project(BaseModel):
     def __str__(self):
         return self.name
 
-
-
     def get_number_of_jobs(self):
         return {
             'all': self.job_set.count(),
@@ -212,18 +211,17 @@ class Project(BaseModel):
 
 
 
+
 class ProjectUser(models.Model):
     ROLE_CHOICES = (
-        ('admin', 'Quản Lý Cao Cấp'),
         ('technician', 'Kỹ Thuật'),
         ('supervisor', 'Giám Sát'),
-        ('normal_staff', 'Nhân Viên'),
+        ('view_only', 'Chỉ xem'),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=255, default="Member")
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
-
 
 
 class Job(SecondaryIDMixin, BaseModel):
@@ -337,7 +335,6 @@ class JobPlan(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        self.status = 'wait_for_approval'
         self.plan_amount = self.plan_quantity * self.job.unit_price
         self.created_at = timezone.now()
         super().save(*args, **kwargs)  # Call the original save method

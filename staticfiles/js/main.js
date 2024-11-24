@@ -1,3 +1,27 @@
+
+function updateUrlParams(currentUrl, paramsToUpdate) {
+    console.log("Current URL:", currentUrl);
+    // Convert the current URL to a URL object if the url is not already a URL object
+    if (!(currentUrl instanceof URL)) {
+        currentUrl = new URL(currentUrl);
+    }
+
+    // Get the search parameters from the URL
+    const searchParams = new URLSearchParams(currentUrl.search);
+    // Update the parameters with the new values
+    for (const [key, value] of Object.entries(paramsToUpdate)) {
+        searchParams.set(key, value);
+    }
+    // Create the new URL with the updated parameters
+    const newUrl = `${currentUrl.origin}${currentUrl.pathname}?${searchParams.toString()}`;
+    // Log the new URL to the console
+    console.log("New URL:", newUrl);
+    // Return the new URL
+    return newUrl;
+}
+
+
+
 function changeUrl(newUrl) {
     // Create a new state object (it can be anything, or even null)
     var stateObj = { foo: "bar" };

@@ -287,25 +287,26 @@ up.compiler('#check_date', function (element) {
             date_inputs[i].value = checkDate.value;
         }
 
-        // Case 1: The table of all jobs is shown
+        let checkDate = document.getElementById('check_date').value;
         let showAllJobs = document.getElementById('show-all-jobs');
-        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showAllJobs.href
-            let url = currentUrl + `&check_date=${checkDate}`;
-            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
-        }
-        // Case 2: The weekplan table is shown
+        let showAllJobsUrl = showAllJobs.href;
+        showAllJobs.href = updateUrlParams(showAllJobsUrl, {'check_date': checkDate});
+
         let showWeekplan = document.getElementById('show-weekplan');
-        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
-            let checkDate = document.getElementById('check_date').value;
-            let currentUrl = showWeekplan.href
-            console.log(currentUrl)
-            let url = currentUrl.split('?')[0] + `?check_date=${checkDate}`;
-            console.log(url)
+        let showWeekplanUrl = showWeekplan.href;
+        showWeekplan.href = updateUrlParams(showWeekplanUrl, {'check_date': checkDate});
+
+        // Case 1: The table of all jobs is shown
+        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
+            let url = showAllJobs.href;
             up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
         }
 
+        // Case 2: The weekplan table is shown
+        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
+            let url = showWeekplan.href;
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url });
+        }
 
     });
 });

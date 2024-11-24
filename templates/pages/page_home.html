@@ -3,7 +3,7 @@
 
 
 {% block title %}
-    Trang của tôi
+Trang của tôi
 {% endblock %}
 
 
@@ -15,14 +15,18 @@
         border-collapse: collapse;
         margin-top: 20px;
     }
-    th, td {
+
+    th,
+    td {
         padding: 10px;
         border: 1px solid #ddd;
         text-align: left;
     }
+
     th {
         background-color: #f4f4f4;
     }
+
     tr:nth-child(even) {
         background-color: #f9f9f9;
     }
@@ -30,48 +34,25 @@
 {% endblock %}
 
 {% block content %}
-    <div up-hungry id="modal"></div>
-    <main>
-        {% include 'components/nav_bar.html' %}
-        Trang này sẽ dùng để hiển thị công việc được giao, công việc cần duyệt tùy theo title của nhân viên
-    
-        
+<div up-hungry id="modal"></div>
+<main>
+    {% include 'components/nav_bar.html' %}
+    {{ user.is_admin  }}
+    {% if user.is_admin %}
 
-        
-        <h1>Task List</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Task Name</th>
-                    <th>Description</th>
-                    <th>Ngày tạo</th>
+    <button class="btn btn-primary" type="button" id="assign-button">
+        <i class="fas fa-users me-3"></i>
+        Phân quyền
+    </button>
+    {% endif %}
 
-                    <th>Assigned To</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for approval_task in approval_tasks %}
-                <tr>
-                    <td>Phê duyệt báo cáo tuần</td>
-                    <td>Kế hoạch tuần dự án {{ approval_task.1 }} -  Trong tuần {{ jobplan.start_date }} - {{ jobplan.end_date }}</td>
-                    <td>{{ jobplan.created_at }}</td>
-                    <td>{{ jobplan.status }}</td>
-                    <td>2024-11-10</td>
-                    <td>Mới</td>
-                    <td>Mới</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
+
+
+
+    Trang này sẽ dùng để hiển thị công việc được giao, công việc cần duyệt tùy theo title của nhân viên
+
+</main>
 {% endblock %}
 
 {% block extra_script %}
 {% endblock %}
-
-
-
-

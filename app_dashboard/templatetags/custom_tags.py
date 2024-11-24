@@ -57,7 +57,12 @@ def get_unique_values(model, group_by):
     return unique_values
 
 
-
+@register.filter(name='get_project_role')
+def get_project_role(project, user):
+    project_user = ProjectUser.objects.filter(project=project, user=user).first()
+    if project_user == None:
+        return "normal_staff"
+    return project_user.role
 
 
 @register.filter(name='get_value')

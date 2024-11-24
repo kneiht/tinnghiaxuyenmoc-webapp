@@ -32,7 +32,6 @@ def handle_form(request, model, pk=0):
     if request.method != 'POST':
         return HttpResponseForbidden()
 
-
     # project_id
     project_id = get_valid_id(request.POST.get('project', 0))
     # Get form
@@ -148,52 +147,76 @@ def handle_weekplan_form(request):
         end_date = form.get('end_date')
         check_date = form.get('check_date')
         project_id = form.get('project_id')
+        project = Project.objects.get(pk=project_id)
+
 
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
-        for job in jobs:
-            note = form.get(f'note_{job.pk}')
-            quantity = form.get(f'plan_quantity_{job.pk}')
-            try:
-                quantity = float(quantity)
-            except ValueError as e:
-                quantity = 0
 
-            if type(note) != str: note = ''
+        weekplan_status = form.get('weekplan_status')
+        # print('weekplan_status:', weekplan_status)
+        user_role = ProjectUser.objects.filter(project=project, user=request.user).first() 
 
-            if quantity > job.quantity:
-                message = f'Lỗi khi nhập khối lượng kế hoạch cho công việc "{job.name}". Khối lượng kế hoạch phải nhỏ hơn khối lượng công việc ({str(job.quantity)}).'
-                html_message = render_message(request, message=message, message_type='red')
-                return HttpResponse(html_message)
-            
-            jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
-            if quantity == 0 and note.strip() == '':
+        print('user_role:', user_role.role)
+
+        if user_role.role == 'technician':
+            message = "Phê duyệt thành công"
+            for job in jobs:
+                jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
                 if jobplan:
-                    jobplan.delete()
-                    pass
-                continue
+                    jobplan.status = weekplan_status
+                    jobplan.save()
 
-            if jobplan:
-                jobplan.note = note
-                jobplan.plan_quantity = quantity
-                jobplan.save()
-                continue
-            else:
-                JobPlan(
-                    job=job,
-                    start_date=start_date,
-                    end_date=end_date,
-                    plan_quantity=quantity,
-                    note=note
-                ).save()
+        elif user_role.role == 'supervisor':
+            message = "Cập nhật kế hoạch tuần thành công. \n\nĐã chuyển kế hoạch đến người xét duyệt!"
+            weekplan_status = 'wait_for_approval'
+            for job in jobs:
+                note = form.get(f'note_{job.pk}')
+                quantity = form.get(f'plan_quantity_{job.pk}')
+                try:
+                    quantity = float(quantity)
+                except ValueError as e:
+                    quantity = 0
+
+                if type(note) != str: note = ''
+
+                if quantity > job.quantity:
+                    message = f'Lỗi khi nhập khối lượng kế hoạch cho công việc "{job.name}". Khối lượng kế hoạch phải nhỏ hơn khối lượng công việc ({str(job.quantity)}).'
+                    html_message = render_message(request, message=message, message_type='red')
+                    return HttpResponse(html_message)
+                
+                jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
+                if quantity == 0 and note.strip() == '':
+                    if jobplan:
+                        jobplan.delete()
+                        pass
+                    continue
+
+                if jobplan:
+                    jobplan.note = note
+                    jobplan.plan_quantity = quantity
+                    jobplan.status = weekplan_status
+                    jobplan.save()
+                    continue
+                else:
+                    JobPlan(
+                        job=job,
+                        start_date=start_date,
+                        end_date=end_date,
+                        plan_quantity=quantity,
+                        note=note,
+                        status=weekplan_status
+                    ).save()
+            
+        
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
-        html_infor_bar = render_infor_bar(request, 'page_each_project', project_id=project_id, check_date=check_date)
-        html_message = render_message(request, message='Cập nhật thông tin thành công.\n\nĐã chuyển đến bộ phận phê duyệt kế hoạch')
+        html_infor_bar = render_infor_bar(request, page = 'page_each_project', project_id=project_id, check_date=check_date)
+        html_message = render_message(request, message=message)
         return HttpResponse(html_message + html_weekplan_table + html_infor_bar)
 
     except Exception as e:
-        # raise e
-        html = render_message(request, message='Có lỗi: ' + str(e))
+        raise e
+        html = render_message(request, message='Có lỗi: ' + str(e), message_type='red')
         return HttpResponse(html)
         
 
@@ -217,13 +240,25 @@ def handle_date_report_form(request):
         # print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
-                    
+
+        has_jobplan = False
         for job in jobs:
             jobplan_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job=job).first()
-            if not jobplan_in_week:
-                html = render_message(request, message='Không cập nhật được báo cáo ngày.\n\nVui lòng chờ báo cáo tuần được phê duyệt trước.', message_type='red')
-                return HttpResponse(html)
-            
+            if jobplan_in_week:
+                if jobplan_in_week.status == 'wait_for_approval':
+                    html = render_message(request, message='Không cập nhật được báo cáo ngày.\n\nVui lòng chờ báo cáo tuần được phê duyệt trước.', message_type='red')
+                    return HttpResponse(html)
+                elif jobplan_in_week.status == 'rejected':
+                    html = render_message(request, message='Không cập nhật được báo cáo ngày.\n\nBáo cáo tuần đã bị từ chối, vui lòng cập nhật lại báo cáo tuần.', message_type='red')
+                    return HttpResponse(html)
+                elif jobplan_in_week.status == 'approved':
+                    has_jobplan = True
+        if not has_jobplan:
+            html = render_message(request, message='Không cập nhật được báo cáo ngày.\n\nChưa tạo báo cáo tuần.', message_type='red')
+            return HttpResponse(html)
+
+
+        for job in jobs:
             note = form.get(f'date_note_{job.pk}')
             quantity = form.get(f'date_quantity_{job.pk}')
             material = form.get(f'date_material_{job.pk}')
@@ -254,7 +289,8 @@ def handle_date_report_form(request):
                 if job_date_report:
                     job_date_report.delete()
                 continue
-            
+
+
             if job_date_report:
                 job_date_report.note = note
                 job_date_report.quantity = quantity
@@ -274,14 +310,15 @@ def handle_date_report_form(request):
 
         html_weekplan_table = render_weekplan_table(request, project_id, check_date=check_date)
         html_message = render_message(request, message='Cập nhật báo cáo thành công')
-        html_infor_bar = render_infor_bar(request, 'page_each_project', project_id=project_id, check_date=check_date)
+        html_infor_bar = render_infor_bar(request, page = 'page_each_project', project_id=project_id, check_date=check_date)
         return HttpResponse(html_message + html_weekplan_table + html_infor_bar) 
     
     except Exception as e:
-        # raise e
+        raise e
         html = render_message(request, message='Có lỗi: ' + str(e), message_type='red')
         return HttpResponse(html)
         
+
 
 
 def handle_vehicle_operation_form(request):
@@ -299,7 +336,7 @@ def handle_vehicle_operation_form(request):
     try:
         form = request.POST
         print(form)
-        # Get list of ids
+        # Get list of ids   
         ids = form.getlist('id')
         for id in ids:
             print('>>>> id:', id)

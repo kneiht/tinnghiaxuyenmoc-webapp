@@ -430,7 +430,8 @@ def render_weekplan_table(request, project_id, check_date=None):
                'sunday': sunday.strftime('%Y-%m-%d'), 
                'check_date': check_date.strftime('%Y-%m-%d'),
                'check_date_format': check_date.strftime('%d-%m-%Y'),
-               'project_id': project_id,}
+               'project_id': project_id,
+               'project': project}
 
     return render_to_string(template, context, request)
 

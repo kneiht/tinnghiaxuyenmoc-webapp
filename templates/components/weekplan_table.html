@@ -6,14 +6,16 @@
             class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         <thead>
             <tr class="text-md text-center leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-700
-            border border-slate-300 dark:border-slate-900 border-opacity-50">
+            border border-slate-300 dark:border-slate-900 border-opacity-50 text-nowrap">
                 <th colspan="100" class="px-6 py-3 text-left font-semibold">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-5">
                         <span>Kế hoạch tuần {{ week }}</span>
-                        <span class="{{ jobplans_in_week.first.status }} select-date btn rounded-full px-5">
-                            {{ jobplans_in_week.first|format_display:"status" }}
-                        </span>
-                        <div class="flex flex-wrap gap-4">
+                        {% if jobplans_in_week.first.status %}
+                            <span class="{{ jobplans_in_week.first.status }} select-date btn rounded-full px-5">
+                                {{ jobplans_in_week.first|format_display:"status" }}
+                            </span>
+                        {% endif %}
+                        <div class="flex flex-nowrap gap-4">
 
                             <a data-date="{{ monday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ monday }}" type="button" class="select-date btn btn-outline-no-focus
                             {% if check_date == monday %} bg-green-600 {% endif %}">
@@ -54,9 +56,8 @@
                         </div>
 
 
-
+                        {% if project|get_project_role:user == 'supervisor' %}
                         <div class="flex gap-4">
-
                             <button class="btn btn-success" 
                                     onclick="
                                         document.getElementById('weekplan-table').classList.add('hidden'); 
@@ -71,6 +72,43 @@
                                 Cập nhật KH tuần
                             </button>
                         </div>
+
+                        {% elif project|get_project_role:user == 'technician' %}
+                        <div class="flex gap-4">
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="weekplan_status_temp" value="wait_for_approval" class="mr-2"
+                                        {% if jobplans_in_week.first.status == 'wait_for_approval' %} checked {% endif %}>
+                                    CHỜ
+                                </label>
+                                <label class="flex items-center text-green-600">
+                                    <input type="radio" name="weekplan_status_temp" value="approved" class="mr-2"
+                                        {% if jobplans_in_week.first.status == 'approved' %} checked {% endif %}>
+                                    CHẤP NHẬN
+                                </label>
+                                <label class="flex items-center text-red-600">
+                                    <input type="radio" name="weekplan_status_temp" value="rejected" class="mr-2"
+                                        {% if jobplans_in_week.first.status == 'rejected' %} checked {% endif %}>
+                                    TỪ CHỐI
+                                </label>
+                            </div>
+                            
+                            <button class="btn btn-success" 
+                                    onclick="handleUpdateWeekplanStatus()">
+                                Duyệt báo cáo tuần
+                            </button>
+
+                            <script>
+                                function handleUpdateWeekplanStatus() {
+                                    var status = document.querySelector('input[name=\"weekplan_status_temp\"]:checked').value;
+                                    document.querySelector('input[name=\"weekplan_status\"]').value = status;
+                                    document.getElementById('submit-weekplan-form').click();
+                                }
+                            </script>
+
+                        </div>
+
+                        {% endif %}
                     </div>
                 </th>
                 
@@ -98,7 +136,6 @@
 
                         <th class="px-6 py-3 text-left font-semibold">Tiến độ tuần</th>
                     
-                    <th></th>
                 </tr>
         </thead>
         {% for record in jobplans_in_week %}
@@ -200,7 +237,7 @@
         <input type="date" name="start_date" value="{{ monday }}" class="hidden">
         <input type="date" name="end_date" value="{{ sunday }}" class="hidden">
         <input type="date" name="check_date" value="{{ check_date }}" class="hidden">
-
+        <input type="text" name="weekplan_status" value="" class="hidden">
         <input type="number" name="project_id" value="{{ project_id }}" class="hidden">
         <table id="weekplan-form-table"
             class="hidden table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
@@ -212,7 +249,7 @@
                             <span>Cập nhật kế hoạch tuần {{ week }}</span>
                             <div class="flex gap-5">
 
-                                <button type="submit" class="submit btn btn-success">Lưu kế hoạch</button>
+                                <button id="submit-weekplan-form" type="submit" class="submit btn btn-success">Lưu kế hoạch</button>
 
                                 <button type="button" class="btn btn-primary" 
                                         onclick="
@@ -254,7 +291,6 @@
                             <th class="px-6 py-3 text-left font-semibold">KL kế hoạch tuần</th>
                             <th class="px-6 py-3 text-left font-semibold">Ghi chú trong tuần</th>
                         
-                        <th></th>
                     </tr>
         
                 </thead>
@@ -370,7 +406,6 @@
                             
                             <th class="px-6 py-3 text-left font-semibold">Ghi chú trong ngày</th>
                         
-                        <th></th>
                     </tr>
         
                 </thead>
