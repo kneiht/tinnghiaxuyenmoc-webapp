@@ -236,7 +236,7 @@ def render_display_records(request, **kwargs):
                         'group_name': group_name,
                         'start_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
                         'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
-                        'drivers': StaffData.objects.filter(position='driver'),
+                        'drivers': StaffData.objects.filter(position__icontains='driver'),
                         'locations': Location.objects.all(),
                         'records': group_records
                     })
@@ -262,7 +262,7 @@ def render_display_records(request, **kwargs):
                         'group_name': group_name,
                         'start_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
                         'end_time': datetime.strptime(start_date, "%Y-%m-%d").date(),
-                        'drivers': StaffData.objects.filter(position='driver'),
+                        'drivers': StaffData.objects.filter(position__icontains='driver'),
                         'locations': Location.objects.all(),
                         'records': group_records
                     })

@@ -397,7 +397,12 @@ class StaffData(BaseModel):
     POSITION_CHOICES = (
         ('manager', 'Quản lý'),
         ('staff', 'Nhân viên'),
-        ('driver', 'Tài xế'),
+        ('driver', 'Tài xế (chưa phân loại)'),
+        ('driver_dumb_truck', 'Tài xế xe ben'),
+        ('driver_road_roller', 'Tài xế xe lu'),
+        ('driver_excavator', 'Tài xế xe cuốc'),
+        ('driver_construction', 'Tài xế xe cơ giới'),
+        
     )
     # Driver Information Fields
     full_name = models.CharField(max_length=255, verbose_name="Họ và tên")
@@ -416,6 +421,8 @@ class StaffData(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'{self.full_name}'
+
+
 
     @classmethod
     def get_display_fields(self):
@@ -473,7 +480,7 @@ class DriverSalaryInputs(BaseModel):
     )
 
     driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
-                               limit_choices_to={'position': 'driver'}, null=True)
+                               limit_choices_to={'position__icontains': 'driver'}, null=True)
     # Salary Fields 
     basic_month_salary = models.PositiveIntegerField(verbose_name="Lương cơ bản tháng", default=0)
     sunday_month_salary_percentage = models.FloatField(verbose_name="Hệ số lương tháng ngày chủ nhật", default=0.0)
@@ -784,7 +791,7 @@ class VehicleOperationRecord(models.Model):
 
     vehicle = models.CharField(max_length=20, verbose_name="Xe")
     driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
-                               limit_choices_to={'position': 'driver'}, null=True)
+                               limit_choices_to={'position__icontains': 'driver'}, null=True)
     start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
     end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
     duration_seconds = models.IntegerField(verbose_name="Thời gian hoạt động", default= 0)
@@ -814,7 +821,7 @@ class VehicleOperationRecord(models.Model):
                 fields.remove(field)
         return fields
     def get_driver_choices(self):
-        drivers = StaffData.objects.filter(position='driver')
+        drivers = StaffData.objects.filter(position__icontains='driver')
         # return a dict of choices with key id and name
         dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
         return dict_drivers
