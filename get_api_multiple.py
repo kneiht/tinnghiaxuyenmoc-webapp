@@ -70,12 +70,5 @@ for day in range(1,27):
                 break
 
 
-        
-
-
-
-
-
-
 
 

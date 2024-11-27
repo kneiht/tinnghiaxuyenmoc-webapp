@@ -17,3 +17,5 @@ db.sqlite3
 *.pyc
 log.txt
 .gitignore
+tasks.py
+get_api_multiple.py

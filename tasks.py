@@ -60,10 +60,3 @@ for vehicle in vehicles:
         else:
             break
 
-
-
-
-
-
-
-
