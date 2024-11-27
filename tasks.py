@@ -30,7 +30,7 @@ if DOMAIN == "localhost":
 else:
     base_url = 'https://www.tinnghiaxuyenmoc.com/'
 
-base_url = 'https://www.tinnghiaxuyenmoc.com/'
+# base_url = 'https://www.tinnghiaxuyenmoc.com/'
 def get_list_vehicles():
     url = base_url + 'api/get_vehicle_list_from_binhanh'
     response = requests.get(url)

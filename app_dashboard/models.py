@@ -401,7 +401,7 @@ class StaffData(BaseModel):
         ('driver_dumb_truck', 'Tài xế xe ben'),
         ('driver_road_roller', 'Tài xế xe lu'),
         ('driver_excavator', 'Tài xế xe cuốc'),
-        ('driver_construction', 'Tài xế xe cơ giới'),
+        ('driver_construction', 'Tài xế xe cơ giới khác'),
         
     )
     # Driver Information Fields

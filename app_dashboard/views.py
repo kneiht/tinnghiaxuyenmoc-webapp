@@ -859,6 +859,7 @@ def get_trip_data_from_binhanh(request):
         # Parse JSON data from the request body
         result = ''
         for vehicle, other_values_list in operation_time.items():
+            log_result_data = ''
             for other_values in other_values_list:
                 start_time = other_values.get('start_time')
                 start_time = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
@@ -876,6 +877,7 @@ def get_trip_data_from_binhanh(request):
                     vehicle_operation_record.end_time = end_time
                     vehicle_operation_record.duration_seconds = duration_seconds
                     vehicle_operation_record.save()
+                    log_result_data += f'- Update record with id {vehicle_operation_record.id}: ' + str(vehicle) + ' - ' + str(start_time) + ' - ' + str(end_time) + ' - ' + str(duration_seconds) + '\n'
                 else:
                     # Create and save the VehicleOperationRecord instance
                     VehicleOperationRecord.objects.create(
@@ -884,7 +886,8 @@ def get_trip_data_from_binhanh(request):
                         end_time=end_time,
                         duration_seconds=duration_seconds
                     )
-            result += vehicle + ' => Success\n'
+                    log_result_data += f'- Create record: ' + str(vehicle) + ' - ' + str(start_time) + ' - ' + str(end_time) + ' - ' + str(duration_seconds) + '\n'
+            result += vehicle + ' => Success - Details below:\n' + log_result_data + '\n'
         return result
 
     # get check_date from url
@@ -912,9 +915,11 @@ def get_trip_data_from_binhanh(request):
         # Check the status code
         if response.status_code == 200:
             data = response.json()
+            # return JsonResponse(data)
             operation_time = parse_operation_time(gps_name, data)
+            # return JsonResponse(operation_time, safe=False)
             result = save_operation_record(operation_time)
-            print(result)
+            # print(result)
             return HttpResponse(result)
         else:
             result = 'Request failed with status code: ' + str(response.status_code)
