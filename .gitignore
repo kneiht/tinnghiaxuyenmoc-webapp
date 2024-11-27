@@ -15,4 +15,5 @@
 env.json
 db.sqlite3
 *.pyc
-tasks.py
+log.txt
+.gitignore

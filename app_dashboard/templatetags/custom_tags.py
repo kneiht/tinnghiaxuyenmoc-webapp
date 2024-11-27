@@ -236,7 +236,6 @@ def calculate_total_operation_time(vehicle_operation_records, gps_name):
 
 
 
-
 @register.inclusion_tag('components/calculate_driver_salary.html')
 def calculate_driver_salary(vehicle_operation_records, driver_name):
     def get_vehicle_types(vehicle_operation_records):
