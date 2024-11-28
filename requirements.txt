@@ -1,8 +1,7 @@
-# requirements.txt
-
 annotated-types==0.6.0
 asgiref==3.7.2
 autoflake==2.2.1
+beautifulsoup4==4.12.3
 cachetools==5.3.2
 certifi==2023.11.17
 charset-normalizer==3.3.2
@@ -11,6 +10,7 @@ Django==5.0.1
 django-pwa==1.1.0
 django-qr-code==4.0.1
 django-ratelimit==4.1.0
+django-spreadsheet==1.2.1
 django-unicorn==0.58.1
 django-widget-tweaks==1.5.0
 djangorestframework==3.14.0
