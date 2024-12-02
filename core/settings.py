@@ -44,7 +44,8 @@ DOMAIN = env["domain"]
 
 if DOMAIN != "localhost":
     DEBUG = False
-    ALLOWED_HOSTS = ['minhthienk.pythonanywhere.com', 'tinnghiaxuyenmoc.com', 'www.tinnghiaxuyenmoc.com']
+    ALLOWED_HOSTS = ['minhthienk.pythonanywhere.com', 'tinnghiaxuyenmoc.com', 'www.tinnghiaxuyenmoc.com',
+    'test.tinnghiaxuyenmoc.com']
 
 else:
     DEBUG = True
