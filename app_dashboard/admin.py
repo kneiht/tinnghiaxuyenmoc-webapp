@@ -95,10 +95,12 @@ class StaffDataAdmin(admin.ModelAdmin):
 
 @admin.register(VehicleRevenueInputs)
 class VehicleRevenueInputsAdmin(admin.ModelAdmin):
-    list_display = ('vehicle_type', 'revenue_per_8_hours', 'oil_consumption_per_hour', 'insurance_fee')
+    list_display = ('vehicle_type', 'note', 'created_at')
     list_filter = ('vehicle_type',)
     search_fields = ('vehicle_type__name',)
     ordering = ('vehicle_type',)
+
+
 
 @admin.register(DriverSalaryInputs)
 class DriverSalaryInputsAdmin(admin.ModelAdmin):

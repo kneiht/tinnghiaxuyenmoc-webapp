@@ -588,38 +588,101 @@ def calculate_revenue_report(vehicle_operation_records):
                 "message": "Không tìm thấy dữ liệu có tên tài xế",
                 }
 
-
-
     # Get list of unique driver + vehicle together
     unique_driver_vehicles = vehicle_operation_records.values_list('driver', 'vehicle', 'location')
     unique_driver_vehicles = set(unique_driver_vehicles) 
     print(unique_driver_vehicles)
     rows = []
     for driver, vehicle, location in unique_driver_vehicles:
+        print(driver, vehicle, location)
         driver_vehicle_records = vehicle_operation_records.filter(driver=driver, vehicle=vehicle)
         # calculate total time which has driver
         total_driver_time_seconds = driver_vehicle_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+        total_driver_time_hours = total_driver_time_seconds/3600
         vehicle_instance = VehicleDetail.objects.get(gps_name=vehicle)
         
+        # get unique start_date
+        unique_start_dates = driver_vehicle_records.values_list('start_time', flat=True).distinct()
+        unique_start_dates = list(unique_start_dates)
+        # use map to get date only
+        unique_start_dates = list(map(lambda x: x.date(), unique_start_dates))
+        # get unique start_date
+        unique_start_dates = set(unique_start_dates)
+
+        revenue_base = 0
+        revenue = 0
+        fuel_cost_amount = 0
+        lube_cost_amount = 0
+        depreciation_amount = 0
+        bank_interest_amount = 0
+        maintenance_amount = 0
+        for start_date in unique_start_dates:
+            vehicle_revenue_inputs_record = VehicleRevenueInputs.objects.filter(vehicle_type=vehicle_instance.vehicle_type).first()
+            if not vehicle_revenue_inputs_record:
+                revenue = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
+                revenue_base = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
+                break
+
+            revenue_base += vehicle_revenue_inputs_record.revenue_day_price
+            revenue += (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*total_driver_time_hours
+            # calculate fuel cost
+            print("start_date: ", start_date)
+            fuel_records = AddFuelRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
+            # sum fuel cost
+            if fuel_records:
+                print("fuel_records: ",fuel_records)
+                fuel_cost_amount += fuel_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
+            # calculate lube cost
+            lube_records = AddLubeRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
+            # sum lube cost
+            if lube_records:
+                print("lube_records: ",lube_records)
+                lube_cost_amount += lube_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
+            # caculate VehicleDepreciation
+            vehicle_depreciation_record = VehicleDepreciationRecord.get_vehicle_depreciation(vehicle_instance, start_date)
+            if vehicle_depreciation_record:
+                depreciation_amount += vehicle_depreciation_record.depreciation_amount
+            # calculate bank interest
+            bank_interest_record = VehicleBankInterestRecord.get_vehicle_bank_interest(vehicle_instance, start_date)
+            if bank_interest_record:
+                bank_interest_amount += bank_interest_record.interest_amount
+            # maintenance_amount
+            maintenance_records = VehicleMaintenanceRecord.get_vehicle_maintenance_records(vehicle_instance, start_date)
+            if maintenance_records:
+                maintenance_amount += maintenance_records.aggregate(models.Sum('maintenance_amount'))['maintenance_amount__sum']
+                
+        # salary
+        salary_data = calculate_driver_salary(driver_vehicle_records, None)
+        if salary_data['success'] == 'false':
+            monthly_salary = salary_data['message']
+            hourly_salary = salary_data['message']
+        else:
+         
+            monthly_salary = salary_data['data']['monthly_salary']['total_monthly_salary']
+            hourly_salary = salary_data['data']['hourly_salary']['total_hourly_salary']
+
+        total_cost = fuel_cost_amount + lube_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount + monthly_salary + hourly_salary
+        total_revenue = revenue
 
         rows.append({
             "STT": len(rows) + 1,
             "Tên nhận dạng khi mua": vehicle_instance.vehicle_name,
             "Tài xế": StaffData.objects.get(id=driver).full_name,
             "Tên GPS": vehicle,
+            "Đơn giá": format_money(revenue_base),
             "Nơi làm việc": location if location else "",
             "Số giờ làm": format_time(total_driver_time_seconds),
-            "Doanh thu": "",
+            "Doanh thu": format_money(revenue),
             "Lít/tiếng": "",
-            "Dầu DO": "",   
-            "Nhớt": "",
-            "Sửa xe + mua vật tư": "",
-            "Khấu hao xe": "",
-            "Lãi ngân hàng": "",
-            "Lương cơ bản": "",
-            "Lương theo giờ": "",
-            "Tổng chi phí": "",
-            "Lợi  nhuận": "",
+            "Dầu DO": format_money(fuel_cost_amount),   
+            "Nhớt": format_money(lube_cost_amount),
+            "Sửa xe + mua vật tư": format_money(maintenance_amount),
+            "Khấu hao xe": format_money(depreciation_amount),
+            "Lãi ngân hàng": format_money(bank_interest_amount),
+            "Lương cơ bản": format_money(monthly_salary),
+            "Lương theo giờ": format_money(hourly_salary),
+            "Tổng chi phí": format_money(total_cost),
+            "Lợi  nhuận": format_money(total_revenue - total_cost),
             "Ghi chú": "",
         })
     return {

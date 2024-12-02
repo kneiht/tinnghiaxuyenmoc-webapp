@@ -30,10 +30,47 @@
                     class="btn btn-outline-no-focus rounded-lg rounded-e-none cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
                     Dữ liệu hoạt động xe công trình theo ngày
                 </a>
+
+
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='AddFuelRecord' elements='tool_bar|display_records' %}"
+                    class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                    Lịch sử đổ nhiên liệu
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='AddLubeRecord' elements='tool_bar|display_records' %}"
+                class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                Lịch sử đổ nhớt
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleMaintenanceRecord' elements='tool_bar|display_records' %}"
+                class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                Lịch sử sửa chữa
+                </a>
+
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleDepreciationRecord' elements='tool_bar|display_records' %}"
+                class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                Khấu hao
+                </a>
+
+                <a up-preload="insert" up-target="#tool-bar, #display-records" 
+                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleBankInterestRecord' elements='tool_bar|display_records' %}"
+                class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
+                Lãi ngân hàng
+                </a>
+
+
+
+
                 <a id="driver_salary" up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-none cursor-pointer text-theme">
-                    Bảng tính lương tài xế
+                    Bảng báo cáo P&L xe cơ giới
                 </a>
 
                 <a id="vehicle_avenue" up-preload="insert" up-target="#tool-bar, #display-records" 

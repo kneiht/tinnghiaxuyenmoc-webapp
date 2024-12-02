@@ -194,7 +194,11 @@ def render_display_records(request, **kwargs):
     group_by = params.get('group_by', '')
     records = params.get('records', None)
     tab = params.get('tab', '')
-    next = max(1, get_valid_id(params.get('next', None)))
+
+    if tab == 'vehicle_operation_data_by_date' or tab == 'driver_salary':
+        next = max(1, get_valid_id(params.get('next', None)))
+    else:
+        next = None
 
     # Check the page to render specific content
     model_class = globals()[model]

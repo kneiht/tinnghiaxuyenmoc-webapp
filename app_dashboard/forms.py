@@ -176,11 +176,11 @@ class VehicleRevenueInputsForm(forms.ModelForm):
     class Meta:
         model = VehicleRevenueInputs
         fields = [
-            'vehicle_type', 'revenue_per_8_hours', 
-            'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 
-            'road_fee_inspection', 'tire_wear', 'police_fee'
+            'vehicle_type', 'revenue_day_price', 'number_of_hours',
+            'oil_consumption_liters_per_hour', 'oil_consumption_per_hour',
+            'lubricant_consumption', 'insurance_fee', 'road_fee_inspection',
+            'tire_wear', 'police_fee', 'note', 'valid_from'
         ]
-
         labels = {
             'vehicle_type': 'Loại xe',
             'revenue_per_8_hours': 'Đơn giá doanh thu/8 tiếng',
@@ -192,60 +192,83 @@ class VehicleRevenueInputsForm(forms.ModelForm):
             'police_fee': 'Định mức CA'
         }
 
+
+        labels = {
+            'vehicle_type': 'Loại xe',
+            'revenue_day_price': 'Đơn giá doanh thu',
+            'number_of_hours': 'Số giờ tính doanh thu',
+            'oil_consumption_liters_per_hour': 'Số lít dầu 1 tiếng',
+            'oil_consumption_per_hour': 'Định mức dầu 1 tiếng',
+            'lubricant_consumption': 'Định mức nhớt',
+            'insurance_fee': 'Định mức bảo hiểm',
+            'road_fee_inspection': 'Định mức sử dụng đường bộ/Đăng kiểm',
+            'tire_wear': 'Định mức hao mòn lốp xe',
+            'police_fee': 'Định mức CA',
+            'valid_from': 'Ngày bắt đầu áp dụng',
+            'note': 'Ghi chú'
+        }
+
         widgets = {
             'vehicle_type': forms.Select(attrs={
                 'class': 'form-input',
                 'required': 'required'
             }),
-            'vehicle_type_detail': forms.TextInput(attrs={
-                'placeholder': 'Nhập loại xe chi tiết',
+            'revenue_day_price': forms.NumberInput(attrs={
+                'placeholder': 'Nhập đơn giá doanh thu',
+                'class': 'form-input',
+                'step': '0.01',
+                'required': 'required'
+            }),
+            'number_of_hours': forms.NumberInput(attrs={
+                'placeholder': 'Nhập số giờ tính doanh thu',
                 'class': 'form-input',
                 'required': 'required'
             }),
-            'revenue_per_8_hours': forms.NumberInput(attrs={
-                'placeholder': 'Nhập đơn giá doanh thu/8 tiếng',
+            'oil_consumption_liters_per_hour': forms.NumberInput(attrs={
+                'placeholder': 'Nhập số lít dầu 1 tiếng',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'oil_consumption_per_hour': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức dầu 1 tiếng',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'lubricant_consumption': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức nhớt',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'insurance_fee': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức bảo hiểm',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'road_fee_inspection': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức sử dụng đường bộ/Đăng kiểm',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'tire_wear': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức hao mòn lốp xe',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
             }),
             'police_fee': forms.NumberInput(attrs={
                 'placeholder': 'Nhập định mức CA',
                 'class': 'form-input',
-                'step': '0.01',
                 'required': 'required'
+            }),
+            'valid_from': forms.DateInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'required': 'required'
+            }),
+            'note': forms.TextInput(attrs={
+                'placeholder': 'Nhập ghi chú',
+                'class': 'form-input'
             })
         }
-
 
 
 
@@ -253,7 +276,8 @@ class VehicleRevenueInputsForm(forms.ModelForm):
 class VehicleDetailForm(forms.ModelForm):
     class Meta:
         model = VehicleDetail
-        fields = ['vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 'vehicle_inspection_number', 'vehicle_inspection_due_date']
+        fields = ['vehicle_type', 'license_plate', 'vehicle_name', 'gps_name', 
+        'vehicle_inspection_number', 'vehicle_inspection_due_date']
 
         labels = {
             'vehicle_type': 'Loại xe',
@@ -719,4 +743,211 @@ class HolidayForm(forms.ModelForm):
                     'rows': 2
             })
 
+        }
+
+
+class AddFuelRecordForm(forms.ModelForm):
+    class Meta:
+        model = AddFuelRecord
+        fields = ['vehicle', 'litter', 'unit_price','fill_date', 'note']
+        labels = {
+            'vehicle': 'Xe',
+            'litter': 'Số lít',
+            'unit_price': 'Đơn giá',
+            'fill_date': 'Ngày đổ nhiên liệu',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'litter': forms.NumberInput(attrs={
+                'placeholder': 'Số lít',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'placeholder': 'Đơn giá',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+
+            'fill_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày đổ nhiên liệu',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+        }
+
+class AddLubeRecordForm(forms.ModelForm):
+    class Meta:
+        model = AddLubeRecord
+        fields = ['vehicle', 'litter', 'unit_price', 'fill_date', 'note']
+        labels = {
+            'vehicle': 'Xe',
+            'litter': 'Số lít',
+            'unit_price': 'Đơn giá',
+            'fill_date': 'Ngày đổ nhớt',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'litter': forms.NumberInput(attrs={
+                'placeholder': 'Số lít',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'placeholder': 'Đơn giá',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'fill_date': forms.DateInput(attrs={
+                'placeholder': 'Chọn ngày đổ nhớt',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+        }
+
+
+class VehicleDepreciationRecordForm(forms.ModelForm):
+    class Meta:
+        model = VehicleDepreciationRecord
+        fields = ['vehicle', 'depreciation_amount', 'from_date', 'to_date', 'note']
+        labels = {
+            'vehicle': 'Xe',
+            'depreciation_amount': 'Khấu hao theo ngày',
+            'from_date': 'Ngày bắt đầu',
+            'to_date': 'Ngày kết thúc',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'depreciation_amount': forms.NumberInput(attrs={
+                'placeholder': 'Khấu hao theo ngày',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'from_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày bắt đầu',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'to_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày kết thúc',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+        }
+
+class VehicleBankInterestRecordForm(forms.ModelForm):
+    class Meta:
+        model = VehicleBankInterestRecord
+        fields = ['vehicle', 'interest_amount', 'from_date', 'to_date', 'note']
+        labels = {
+            'vehicle': 'Xe',
+            'interest_amount': 'Lãi suất theo ngày',
+            'from_date': 'Ngày bắt đầu',
+            'to_date': 'Ngày kết thúc',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'interest_amount': forms.NumberInput(attrs={
+                'placeholder': 'Lãi suất theo ngày',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'from_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày bắt đầu',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'to_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày kết thúc',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
+        }
+
+
+class VehicleMaintenanceRecordForm(forms.ModelForm):
+    class Meta:
+        model = VehicleMaintenanceRecord
+        fields = ['vehicle', 'maintenance_amount', 'maintenance_category', 'from_date', 'to_date', 'note']
+        labels = {
+            'vehicle': 'Xe',
+            'maintenance_amount': 'Chi phí',
+            'maintenance_category': 'Phân loại',
+            'from_date': 'Ngày giao xe',
+            'to_date': 'Ngày lấy xe',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'maintenance_amount': forms.NumberInput(attrs={
+                'placeholder': 'Chi phí',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'maintenance_category': forms.Select(attrs={
+                'placeholder': 'Chọn phân loại',
+                'class': 'form-input',
+            }, choices=VehicleMaintenanceRecord.MAINTENANCE_CATEGORY_CHOICES),
+            'from_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày giao xe',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'to_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày lấy xe',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+                    'rows': 2
+            })
         }

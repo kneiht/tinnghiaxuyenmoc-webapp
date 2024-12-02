@@ -22,6 +22,13 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 import pandas as pd
 
+def get_valid_date(date):
+    try:
+        date = datetime.strptime(date, '%Y-%m-%d').date()
+    except:
+        date = timezone.now().date()
+    date = date.strftime('%Y-%m-%d')
+    return date
 
 class BaseModel(models.Model):
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
@@ -444,7 +451,14 @@ class VehicleRevenueInputs(BaseModel):
     # Vehicle Information Fields
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.CASCADE, verbose_name="Loại xe")
     # Revenue Information Fields
-    revenue_per_8_hours = models.IntegerField(verbose_name="Đơn giá doanh thu", default=0, validators=[MinValueValidator(0)])
+    revenue_day_price = models.IntegerField(verbose_name="Đơn giá doanh thu", default=0, validators=[MinValueValidator(0)])
+    
+    # number of hours
+    number_of_hours = models.IntegerField(verbose_name="Số giờ tính doanh thu", default=0, validators=[MinValueValidator(0)])
+
+    # number of liters of oil per hour
+    oil_consumption_liters_per_hour = models.IntegerField(verbose_name="Số lít dầu 1 tiếng", default=0, validators=[MinValueValidator(0)])
+
     # Resource Allocation Fields
     oil_consumption_per_hour = models.IntegerField(verbose_name="Định mức dầu 1 tiếng", default=0, validators=[MinValueValidator(0)])
     lubricant_consumption = models.IntegerField(verbose_name="Định mức nhớt", default=0, validators=[MinValueValidator(0)])
@@ -452,21 +466,36 @@ class VehicleRevenueInputs(BaseModel):
     road_fee_inspection = models.IntegerField(verbose_name="Định mức sử dụng đường bộ/Đăng kiểm", default=0, validators=[MinValueValidator(0)])
     tire_wear = models.IntegerField(verbose_name="Định mức hao mòn lốp xe", default=0, validators=[MinValueValidator(0)])
     police_fee = models.IntegerField(verbose_name="Định mức CA", default=0, validators=[MinValueValidator(0)])
+
+    valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng", default=timezone.now)
+
+    note = models.CharField(max_length=255, verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+
+
     def __str__(self):
         return f'{self.vehicle_type}'
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_type', 'vehicle_type_detail', 'revenue_per_8_hours', 
-                  'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 
-                  'road_fee_inspection', 'tire_wear', 'police_fee']
+        fields = ['vehicle_type', 'revenue_day_price', 'number_of_hours', 'oil_consumption_liters_per_hour', 
+                  'oil_consumption_per_hour', 'lubricant_consumption', 'insurance_fee', 'road_fee_inspection', 
+                  'tire_wear', 'police_fee', 'valid_from', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
     # todo: thêm fields chạy ngày, chạy đêm, tabo ngày, mỗi cái có đơn giá => tính phí vận chuyể
+
+    @classmethod
+    def get_valid_record(self, date):
+        date = get_valid_date(date)
+        return VehicleRevenueInputs.objects.filter(valid_from__lte=date).order_by('-valid_from').first()
+
+
+
+
 
 
 class DriverSalaryInputs(BaseModel):
@@ -790,7 +819,7 @@ class VehicleOperationRecord(models.Model):
         ordering = ['vehicle', 'start_time']
 
     vehicle = models.CharField(max_length=20, verbose_name="Xe")
-    driver = models.ForeignKey(StaffData, on_delete=models.CASCADE, verbose_name="Tài xế",
+    driver = models.ForeignKey(StaffData, on_delete=models.SET_NULL, verbose_name="Tài xế",
                                limit_choices_to={'position__icontains': 'driver'}, null=True)
     start_time = models.DateTimeField(verbose_name="Thời điểm mở máy", null=True, blank=True)
     end_time = models.DateTimeField(verbose_name="Thời điểm tắt máy", null=True, blank=True)
@@ -877,3 +906,150 @@ class VehicleOperationRecord(models.Model):
             return normal_working_time, 0
 
 
+
+
+
+class AddFuelRecord(BaseModel):
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    litter = models.FloatField(verbose_name="Số lít")
+    unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
+    
+    fill_date = models.DateField(verbose_name="Ngày đổ nhiên liệu", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def save(self):
+        self.total_amount = self.litter * self.unit_price
+        super().save()
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return f'{self.vehicle} - {self.fill_date}'
+
+class AddLubeRecord(BaseModel):
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    litter = models.FloatField(verbose_name="Số lít")
+    unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
+    
+    fill_date = models.DateField(verbose_name="Ngày đổ nhớt", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def save(self):
+        self.total_amount = self.litter * self.unit_price
+        super().save()
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return f'{self.vehicle} - {self.fill_date}'
+
+class VehicleDepreciationRecord(BaseModel):
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    depreciation_amount = models.IntegerField(verbose_name="Khấu hao theo ngày", default=0, validators=[MinValueValidator(0)])
+    from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @classmethod
+    def get_vehicle_depreciation(cls, vehicle, date):
+        try:
+            records = cls.objects.filter(vehicle=vehicle, from_date__lte=date, to_date__gte=date)
+            # get the latest record
+            records.order_by('-created_at')
+            return records.first()
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'depreciation_amount', 'from_date', 'to_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+
+class VehicleBankInterestRecord(BaseModel):
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    interest_amount = models.IntegerField(verbose_name="Lãi suất theo ngày", default=0, validators=[MinValueValidator(0)])
+    from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @classmethod
+    def get_vehicle_bank_interest(cls, vehicle, date):
+        try:
+            records = cls.objects.filter(vehicle=vehicle, from_date__lte=date, to_date__gte=date)
+            # get the latest record
+            records.order_by('-created_at')
+            return records.first()
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'interest_amount', 'from_date', 'to_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+
+
+class VehicleMaintenanceRecord(BaseModel):
+    MAINTENANCE_CATEGORY_CHOICES = (
+        ('periodic_check', 'Kiểm tra định kì'),
+    )
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
+    maintenance_category = models.CharField(max_length=255, verbose_name="Phân loại", default="", null=True, blank=True)
+    from_date = models.DateField(verbose_name="Ngày giao xe", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày lấy xe", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @classmethod
+    def get_vehicle_maintenance_records(cls, vehicle, date):
+        try:
+            records = cls.objects.filter(vehicle=vehicle, to_date=date)
+            return records
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle', 'maintenance_amount', 'from_date', 'to_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return f'{self.vehicle} - {self.from_date} - {self.to_date}'

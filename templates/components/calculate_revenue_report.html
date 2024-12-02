@@ -1,5 +1,5 @@
 {% load custom_tags %}
-
+{% if success == "true" %}
 <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
     <thead>
         <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
@@ -8,6 +8,7 @@
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Tên nhận dạng khi mua</th>
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Tài xế</th>
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Tên GPS</th>
+            <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Đơn giá</th>
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Nơi làm việc</th>
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Số giờ làm</th>
             <th rowspan="2" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-left font-semibold">Doanh thu</th>
@@ -46,3 +47,8 @@
         </tbody>
     {% endfor %}
 </table>
+
+
+{% else %}
+    <p class="text-red-600">{{ message }}</p>
+{% endif %}

@@ -19,7 +19,8 @@ from .models import *
 from .renders import *
 from .utils import *
 
-
+from core.settings import DOMAIN
+from django.utils import timezone
 
 # HANDLE FORMS ===============================================================
 def handle_form(request, model, pk=0):
@@ -618,15 +619,6 @@ def upload_project(request, project_id):
 
 
 
-def test(request):
-    records = VehicleOperationRecord.objects.all()
-    for record in records:
-        print(record.id)
-        record.calculate_working_time()
-        record.save()
-    # for record in records:
-    #     record.save()
-    return HttpResponse('test')
 
 
 import requests, json
@@ -819,6 +811,12 @@ def get_vehicle_list_from_binhanh(request):
 def get_trip_data_from_binhanh(request):
     
     def parse_operation_time(vehicle, data):
+        if settings.DOMAIN == 'localhost':
+            with open('local/log_api.json', 'a') as f:
+                f.write("\n\n=========== vehicle: " + vehicle + "===========\n")
+                f.write("=========== run time:" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "===========\n")
+                json.dump(data, f, indent=4)
+
         operation_time = {}
         routes = data.get('Routes', [])
         if not routes:
@@ -867,12 +865,23 @@ def get_trip_data_from_binhanh(request):
                 end_time = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
                 duration_seconds = other_values.get('duration_seconds')
                 
+
                 # check if the records which has start_time in the check_date
                 vehicle_operation_record = VehicleOperationRecord.objects.filter(
                     vehicle=vehicle,
                     start_time=start_time
                 ).first()
 
+                # Use this to make sure the vehicle_operation_record is not None
+                if not vehicle_operation_record:
+                    vehicle_operation_records = VehicleOperationRecord.objects.filter(
+                        vehicle=vehicle,
+                        start_time__date=start_time.date()
+                    )
+                    for each_vehicle_operation_record in vehicle_operation_records:
+                        if each_vehicle_operation_record.start_time == start_time and each_vehicle_operation_record.vehicle == vehicle:
+                            vehicle_operation_record = each_vehicle_operation_record
+                    
                 if vehicle_operation_record:
                     vehicle_operation_record.end_time = end_time
                     vehicle_operation_record.duration_seconds = duration_seconds
@@ -990,4 +999,12 @@ def save_vehicle_operation_record(request):
 
 
 
+ 
 
+
+
+
+def test(request):
+    record = VehicleRevenueInputs.get_valid_record("20140-11-30")
+    print(record)
+    return HttpResponse('test')

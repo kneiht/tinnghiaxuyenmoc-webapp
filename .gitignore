@@ -18,3 +18,4 @@ db.sqlite3
 log.txt
 tasks.py
 get_api_multiple.py
+/local
