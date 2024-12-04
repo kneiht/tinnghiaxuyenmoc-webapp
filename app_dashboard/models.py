@@ -1053,3 +1053,15 @@ class VehicleMaintenanceRecord(BaseModel):
     
     def __str__(self):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+
+
+class VehicleExampleRecord(BaseModel):
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    service_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
+    from_date = models.DateField(verbose_name="Ngày giao xe", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày lấy xe", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.vehicle} - {self.from_date} - {self.to_date}'
