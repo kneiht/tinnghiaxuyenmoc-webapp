@@ -64,19 +64,16 @@
                 Lãi ngân hàng
                 </a>
 
-
-
-
                 <a id="driver_salary" up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-none cursor-pointer text-theme">
-                    Bảng báo cáo P&L xe cơ giới
+                    Bảng lương
                 </a>
 
                 <a id="vehicle_avenue" up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_avenue' elements='tool_bar|display_records' %}"
                     class="btn btn-outline-no-focus rounded-lg rounded-s-none cursor-pointer text-theme">
-                    Bảng tính doanh thu xe
+                    Bảng báo cáo P&L xe cơ giới
                 </a>
         </div>
 
