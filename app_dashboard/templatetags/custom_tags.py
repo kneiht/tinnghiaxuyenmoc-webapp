@@ -683,7 +683,7 @@ def calculate_revenue_report(vehicle_operation_records):
             "Tài xế": StaffData.objects.get(id=driver).full_name,
             "Tên GPS": vehicle,
             "Đơn giá": revenue_base,
-            "Nơi làm việc": location if location else "",
+            "Nơi làm việc": Location.objects.get(id=location).name if location else "",
             "Số giờ làm": format_time(total_driver_time_seconds),
             "Doanh thu": revenue,
             "Lít/tiếng": "",
