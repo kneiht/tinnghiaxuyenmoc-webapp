@@ -664,15 +664,28 @@ def calculate_revenue_report(vehicle_operation_records):
         total_cost = fuel_cost_amount + lube_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount + monthly_salary + hourly_salary
         total_revenue = revenue
 
+        if type(revenue_base) != str:
+            revenue_base = format_money(revenue_base)
+
+        if type(revenue) != str:
+            revenue = format_money(revenue)
+        
+        if type(total_revenue) != str: 
+            total_interest = format_money(total_revenue - total_cost)
+        else:
+            total_interest = total_revenue
+
+
+
         rows.append({
             "STT": len(rows) + 1,
             "Tên nhận dạng khi mua": vehicle_instance.vehicle_name,
             "Tài xế": StaffData.objects.get(id=driver).full_name,
             "Tên GPS": vehicle,
-            "Đơn giá": format_money(revenue_base),
+            "Đơn giá": revenue_base,
             "Nơi làm việc": location if location else "",
             "Số giờ làm": format_time(total_driver_time_seconds),
-            "Doanh thu": format_money(revenue),
+            "Doanh thu": revenue,
             "Lít/tiếng": "",
             "Dầu DO": format_money(fuel_cost_amount),   
             "Nhớt": format_money(lube_cost_amount),
@@ -682,7 +695,7 @@ def calculate_revenue_report(vehicle_operation_records):
             "Lương cơ bản": format_money(monthly_salary),
             "Lương theo giờ": format_money(hourly_salary),
             "Tổng chi phí": format_money(total_cost),
-            "Lợi  nhuận": format_money(total_revenue - total_cost),
+            "Lợi  nhuận": total_interest,
             "Ghi chú": "",
         })
     return {
