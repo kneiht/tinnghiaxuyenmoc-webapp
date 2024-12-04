@@ -746,9 +746,9 @@ class HolidayForm(forms.ModelForm):
         }
 
 
-class AddFuelRecordForm(forms.ModelForm):
+class FuelFillingRecordForm(forms.ModelForm):
     class Meta:
-        model = AddFuelRecord
+        model = FuelFillingRecord
         fields = ['vehicle', 'litter', 'unit_price','fill_date', 'note']
         labels = {
             'vehicle': 'Xe',
@@ -786,9 +786,9 @@ class AddFuelRecordForm(forms.ModelForm):
             })
         }
 
-class AddLubeRecordForm(forms.ModelForm):
+class LubeFillingRecordForm(forms.ModelForm):
     class Meta:
-        model = AddLubeRecord
+        model = LubeFillingRecord
         fields = ['vehicle', 'litter', 'unit_price', 'fill_date', 'note']
         labels = {
             'vehicle': 'Xe',
@@ -826,9 +826,9 @@ class AddLubeRecordForm(forms.ModelForm):
         }
 
 
-class VehicleDepreciationRecordForm(forms.ModelForm):
+class VehicleDepreciationForm(forms.ModelForm):
     class Meta:
-        model = VehicleDepreciationRecord
+        model = VehicleDepreciation
         fields = ['vehicle', 'depreciation_amount', 'from_date', 'to_date', 'note']
         labels = {
             'vehicle': 'Xe',
@@ -866,9 +866,9 @@ class VehicleDepreciationRecordForm(forms.ModelForm):
             })
         }
 
-class VehicleBankInterestRecordForm(forms.ModelForm):
+class VehicleBankInterestForm(forms.ModelForm):
     class Meta:
-        model = VehicleBankInterestRecord
+        model = VehicleBankInterest
         fields = ['vehicle', 'interest_amount', 'from_date', 'to_date', 'note']
         labels = {
             'vehicle': 'Xe',
@@ -907,9 +907,9 @@ class VehicleBankInterestRecordForm(forms.ModelForm):
         }
 
 
-class VehicleMaintenanceRecordForm(forms.ModelForm):
+class VehicleMaintenanceForm(forms.ModelForm):
     class Meta:
-        model = VehicleMaintenanceRecord
+        model = VehicleMaintenance
         fields = ['vehicle', 'maintenance_amount', 'maintenance_category', 'from_date', 'to_date', 'note']
         labels = {
             'vehicle': 'Xe',
@@ -933,7 +933,7 @@ class VehicleMaintenanceRecordForm(forms.ModelForm):
             'maintenance_category': forms.Select(attrs={
                 'placeholder': 'Chọn phân loại',
                 'class': 'form-input',
-            }, choices=VehicleMaintenanceRecord.MAINTENANCE_CATEGORY_CHOICES),
+            }, choices=VehicleMaintenance.MAINTENANCE_CATEGORY_CHOICES),
             'from_date': forms.DateInput(attrs={
                 'placeholder': 'Ngày giao xe',
                 'class': 'form-input',

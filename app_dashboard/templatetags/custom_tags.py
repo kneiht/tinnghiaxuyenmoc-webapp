@@ -627,27 +627,27 @@ def calculate_revenue_report(vehicle_operation_records):
             revenue += (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*total_driver_time_hours
             # calculate fuel cost
             print("start_date: ", start_date)
-            fuel_records = AddFuelRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
+            fuel_records = FuelFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
             # sum fuel cost
             if fuel_records:
                 print("fuel_records: ",fuel_records)
                 fuel_cost_amount += fuel_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
             # calculate lube cost
-            lube_records = AddLubeRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
+            lube_records = LubeFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
             # sum lube cost
             if lube_records:
                 print("lube_records: ",lube_records)
                 lube_cost_amount += lube_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
             # caculate VehicleDepreciation
-            vehicle_depreciation_record = VehicleDepreciationRecord.get_vehicle_depreciation(vehicle_instance, start_date)
+            vehicle_depreciation_record = VehicleDepreciation.get_vehicle_depreciation(vehicle_instance, start_date)
             if vehicle_depreciation_record:
                 depreciation_amount += vehicle_depreciation_record.depreciation_amount
             # calculate bank interest
-            bank_interest_record = VehicleBankInterestRecord.get_vehicle_bank_interest(vehicle_instance, start_date)
+            bank_interest_record = VehicleBankInterest.get_vehicle_bank_interest(vehicle_instance, start_date)
             if bank_interest_record:
                 bank_interest_amount += bank_interest_record.interest_amount
             # maintenance_amount
-            maintenance_records = VehicleMaintenanceRecord.get_vehicle_maintenance_records(vehicle_instance, start_date)
+            maintenance_records = VehicleMaintenance.get_vehicle_maintenance_records(vehicle_instance, start_date)
             if maintenance_records:
                 maintenance_amount += maintenance_records.aggregate(models.Sum('maintenance_amount'))['maintenance_amount__sum']
                 

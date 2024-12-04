@@ -909,7 +909,7 @@ class VehicleOperationRecord(models.Model):
 
 
 
-class AddFuelRecord(BaseModel):
+class FuelFillingRecord(BaseModel):
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     litter = models.FloatField(verbose_name="Số lít")
     unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
@@ -935,7 +935,7 @@ class AddFuelRecord(BaseModel):
     def __str__(self):
         return f'{self.vehicle} - {self.fill_date}'
 
-class AddLubeRecord(BaseModel):
+class LubeFillingRecord(BaseModel):
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     litter = models.FloatField(verbose_name="Số lít")
     unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
@@ -961,7 +961,7 @@ class AddLubeRecord(BaseModel):
     def __str__(self):
         return f'{self.vehicle} - {self.fill_date}'
 
-class VehicleDepreciationRecord(BaseModel):
+class VehicleDepreciation(BaseModel):
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     depreciation_amount = models.IntegerField(verbose_name="Khấu hao theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
@@ -991,7 +991,7 @@ class VehicleDepreciationRecord(BaseModel):
     def __str__(self):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
-class VehicleBankInterestRecord(BaseModel):
+class VehicleBankInterest(BaseModel):
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     interest_amount = models.IntegerField(verbose_name="Lãi suất theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
@@ -1022,7 +1022,7 @@ class VehicleBankInterestRecord(BaseModel):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
 
-class VehicleMaintenanceRecord(BaseModel):
+class VehicleMaintenance(BaseModel):
     MAINTENANCE_CATEGORY_CHOICES = (
         ('periodic_check', 'Kiểm tra định kì'),
     )
