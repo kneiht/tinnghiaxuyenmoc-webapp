@@ -79,7 +79,7 @@
 
     .btn-outline {
         @apply 
-            bg-transparent border border-theme border-opacity-50 text-theme
+            bg-transparent border border-theme dark:border-gray-600 border-opacity-50 text-theme
             shadow-none hover:shadow-none active:shadow-none focus:shadow-none
             hover:bg-slate-200 dark:hover:bg-slate-800 
             active:bg-slate-300 dark:active:bg-slate-700 
@@ -88,7 +88,7 @@
 
     .btn-outline-no-focus {
         @apply 
-            bg-transparent border border-theme border-opacity-50 text-theme
+            bg-transparent border border-theme dark:border-gray-600 border-opacity-20 text-theme
             shadow-none hover:shadow-none active:shadow-none focus:shadow-none;
     }
 

@@ -452,7 +452,12 @@ def handle_vehicle_operation_form(request):
         tab = form.get('tab')
         records = VehicleOperationRecord.objects.filter(pk__in=ids).order_by('source', 'start_time')
         
-        html_display = render_display_records(request, model='VehicleOperationRecord', records=records, group_by=group_by, tab=tab, update=True)
+        # Get start_date from start_time
+        
+        start_date = records.first().start_time.date()
+        end_date = records.last().end_time.date()
+        html_display = render_display_records(request, model='VehicleOperationRecord', 
+            start_date=start_date, end_date=end_date, records=records, group_by=group_by, tab=tab, update=True)
 
         html_message = render_message(request, message='Cập nhật thành công!\n\nLưu ý các dòng nhập tay nếu không có TÀI XẾ sẽ bị xóa', message_type='green')
         html = html_message + html_display

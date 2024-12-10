@@ -19,16 +19,16 @@
 
         <div id="database-selection" class="flex items-center m-auto mb-2 text-xs h-20" 
                 onclick="
-                    event.target.closest('a').classList.add('bg-slate-300', 'dark:active:bg-slate-700');
+                    event.target.closest('a').classList.add('bg-slate-300', 'dark:bg-slate-700');
                     document.querySelectorAll('#database-selection a').forEach((button) => {
                         if (button !== event.target.closest('a')) {
-                            button.classList.remove('bg-slate-300', 'dark:active:bg-slate-700');
+                            button.classList.remove('bg-slate-300', 'dark:bg-slate-700');
                         }
                     });">
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleType' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:active:bg-slate-700">
+                    class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:bg-slate-700">
                     Dữ liệu loại xe
                 </a>
 
