@@ -956,8 +956,9 @@ class VehicleMaintenanceForm(forms.ModelForm):
 class RepairPartForm(forms.ModelForm):
     class Meta:
         model = RepairPart
-        fields = ['part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
+        fields = ['vehicle_type', 'part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
         labels = {
+            'vehicle_type': 'Loại xe',
             'part_number': 'Mã danh mục',
             'part_name': 'Tên đầy đủ',
             'part_price': 'Đơn giá',
@@ -966,6 +967,12 @@ class RepairPartForm(forms.ModelForm):
             'note': 'Ghi chú'
         }
         widgets = {
+            'vehicle_type': forms.Select(attrs={
+                'placeholder': 'Chọn loại xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+
             'part_number': forms.TextInput(attrs={
                 'placeholder': 'Mã bộ phận',
                 'class': 'form-input',

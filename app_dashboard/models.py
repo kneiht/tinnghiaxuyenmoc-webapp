@@ -1057,6 +1057,9 @@ class VehicleMaintenance(BaseModel):
 
 
 class RepairPart(BaseModel):
+    class Meta:
+        ordering = ['vehicle_type', 'part_price']
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại xe")
     part_number = models.CharField(max_length=255, verbose_name="Mã danh mục")
     part_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
     part_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
@@ -1069,7 +1072,7 @@ class RepairPart(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['part_number', 'part_name', 'part_price', 'image', 'note', 'valid_from']
+        fields = ['vehicle_type', 'part_number', 'part_name', 'part_price', 'image', 'note', 'valid_from']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
