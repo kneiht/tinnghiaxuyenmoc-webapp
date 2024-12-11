@@ -55,7 +55,7 @@
                    <td colspan="99" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"> 
                     
                     <a class="text-green-700 px-40"
-                        up-target="#{{ row.row_id }}" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=row.start_date end_date=row.end_date tab='vehicle_avenue' elements='display_records' filter_driver=row.driver filter_vehicle=row.vehicle filter_location=row.location update='true' %}">
+                        up-target="#{{ row.row_id }}" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=row.start_date end_date=row.end_date tab='vehicle_revenue' elements='display_records' filter_driver=row.driver filter_vehicle=row.vehicle filter_location=row.location update='true' %}">
                         {{ row.vehicle }} - Đang tải dữ liệu, xin vui lòng chờ ...
                    </a>
                    </td>

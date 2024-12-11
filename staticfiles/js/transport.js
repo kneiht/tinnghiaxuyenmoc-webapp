@@ -145,7 +145,7 @@ up.compiler('#end_date', function (element) {
 
         // Find all <a> tags in database-selection
         let databaseSelection = document.getElementById('database-selection');
-        let aTags = databaseSelection.querySelectorAll('#driver_salary, #vehicle_avenue');
+        let aTags = databaseSelection.querySelectorAll('#driver_salary, #vehicle_revenue');
 
         // For each <a> tag
         aTags.forEach(function (aTag) {

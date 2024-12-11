@@ -211,7 +211,7 @@ def render_display_records(request, **kwargs):
         else:
             records = model_class.objects.filter(project=project)
         
-        if tab == 'vehicle_revenue' and update:
+        if tab == 'vehicle_revenue' and update=='true':
             filter_driver = params.get('filter_driver', None)
             if filter_driver == "None":
                 filter_driver = None
@@ -222,6 +222,9 @@ def render_display_records(request, **kwargs):
             if filter_location == "None":
                 filter_location = None
 
+            print('filter_driver:', filter_driver)
+            print('filter_vehicle:', filter_vehicle)
+            print('filter_location:', filter_location)
             filter_driver = StaffData.objects.filter(pk=filter_driver).first()
             records = records.filter(driver=filter_driver)
             records = records.filter(vehicle=filter_vehicle)
