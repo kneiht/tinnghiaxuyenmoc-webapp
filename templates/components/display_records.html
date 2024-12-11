@@ -457,10 +457,11 @@
                 </div>
             {% endfor %}
         {% else %}
-            {% calculate_revenue_report records %}
+            {% calculate_revenue_report records update=update %}
             
         {% endif %}
     </div>
+
     {% if next and next != "stop" %}
         <div up-hungry class="flex justify-center mb-20 text-center" id="load-more" >
             <div class="text-green-700 px-40" up-defer="reveal"

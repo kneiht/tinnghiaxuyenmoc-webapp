@@ -34,18 +34,35 @@
         </tr>
 
     </thead>
-    {% for row in rows %}
-        <tbody">
-            <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
-                {% for header in headers %}
-                <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                    {{ row|get_value:header }}
-                </td>
-                {% endfor %}
-            </tr>
-            
-        </tbody>
-    {% endfor %}
+    {% if update %}
+        {% for row in rows %}
+            <tbody up-hungry id="{{ row.row_id }}">
+                <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                    {% for header in headers %}
+                        {% if header != "row_id" %}
+                            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                                {{ row|get_value:header }}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </tbody>
+        {% endfor %}
+    {% else %}
+        {% for row in rows %}
+            <tbody up-hungry id="{{ row.row_id }}">
+                <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                   <td colspan="99" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"> 
+                    
+                    <div class="text-green-700 px-40" up-defer="insert"
+                        up-target="#{{ row.row_id }}" up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=row.start_date end_date=row.end_date tab='vehicle_avenue' elements='display_records' filter_driver=row.driver filter_vehicle=row.vehicle filter_location=row.location update='true' %}">
+                        {{ row.vehicle }} - Đang tải dữ liệu, xin vui lòng chờ ...
+                    </div>
+                   </td>
+                </tr>
+            </tbody>
+        {% endfor %}
+    {% endif %}
 </table>
 
 

@@ -204,14 +204,32 @@ def render_display_records(request, **kwargs):
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
 
+
     if not records:
         if not project_id:
             records = model_class.objects.all()
         else:
             records = model_class.objects.filter(project=project)
         
+        if tab == 'vehicle_revenue' and update:
+            filter_driver = params.get('filter_driver', None)
+            if filter_driver == "None":
+                filter_driver = None
+            filter_vehicle = params.get('filter_vehicle', None)
+            if filter_vehicle == "None":
+                filter_vehicle = None
+            filter_location = params.get('filter_location', None)
+            if filter_location == "None":
+                filter_location = None
+
+            filter_driver = StaffData.objects.filter(pk=filter_driver).first()
+            records = records.filter(driver=filter_driver)
+            records = records.filter(vehicle=filter_vehicle)
+            filter_location = Location.objects.filter(pk=filter_location).first()
+            records = records.filter(location=filter_location)
+
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
-        # print('>>>>>>>> len of records:',len(records))
+
 
     groups = []
     if group_by:
@@ -311,7 +329,7 @@ def render_display_records(request, **kwargs):
                'tab': tab,
                'next': next
     }
-    
+    print(">>>>> number of records:", records.count(),'\n')
     html = render_to_string(template, context, request)
     return html
 

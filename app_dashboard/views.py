@@ -97,7 +97,7 @@ def load_elements(request):
         if key != 'q':
             params[key] = value
 
-    # print('>>>>>>>>>> elements params:', params, '\n\n')
+    print('>>>>>>>>>> elements params:', params, '\n\n')
     html = '<div id="load-elements" class"hidden"></div>'
     elements = params.get('elements', '')
     for element in elements.split('|'):
