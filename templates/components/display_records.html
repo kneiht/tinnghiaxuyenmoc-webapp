@@ -463,9 +463,11 @@
     </div>
     {% if next and next != "stop" %}
         <div up-hungry class="flex justify-center mb-20 text-center" id="load-more" >
-            <a class="btn btn-primary px-40" up-preload="insert" up-target="#display-records:after, #load-more:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model start_date=start_date group_by=group_by tab=tab elements='tool_bar|display_records' next=next %}">
-                Tải thêm
-            </a>
+            <div class="text-green-700 px-40" up-defer="reveal"
+                up-intersect-margin='1000'
+                up-target="#display-records:after, #load-more:maybe" up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model start_date=start_date group_by=group_by tab=tab elements='tool_bar|display_records' next=next %}">
+                Dữ liệu đang được tự đông tải thêm, xin vui lòng chờ ...
+            </div>
         </div>
     {% else %}
         <div up-hungry id="load-more" class="hidden"></div>
@@ -500,6 +502,11 @@
                             
                         {% if field == 'status' %} 
                             <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                        
+                        {% elif field == 'image' %} 
+                            <div class="relative group">
+                                <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                            </div>
                         {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 

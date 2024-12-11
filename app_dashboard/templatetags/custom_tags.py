@@ -571,8 +571,10 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
 
 # TAGS FOR VEHICLE OPERATION RECORD
+import time
 @register.inclusion_tag('components/calculate_revenue_report.html')
 def calculate_revenue_report(vehicle_operation_records):
+    s = time.time()
     def format_time(time_seconds):
         if time_seconds == None:
             return "00:00:00"
@@ -703,6 +705,7 @@ def calculate_revenue_report(vehicle_operation_records):
             "Lợi  nhuận": total_interest,
             "Ghi chú": "",
         })
+    print("time: ", time.time() - s)
     return {
         'success': 'true',
         'message': 'Tính toán thời gian thành công',

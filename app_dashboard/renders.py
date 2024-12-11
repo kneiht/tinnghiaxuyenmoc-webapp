@@ -215,7 +215,7 @@ def render_display_records(request, **kwargs):
 
     groups = []
     if group_by:
-        GROUPS_PER_PAGE = 10
+        GROUPS_PER_PAGE = 5
         if records.count() == 0:
             return '<div id="display-records" class="w-full overflow-scroll">Không có dữ liệu</div><div up-hungry id="load-more" class="hidden"></div>'
         if model_class == VehicleOperationRecord:
