@@ -36,7 +36,7 @@
     </thead>
     {% if update %}
         {% for row in rows %}
-            <tbody up-hungry id="{{ row.row_id }}">
+            <tbody id="{{ row.row_id }}">
                 <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
                     {% for header in headers %}
                         {% if header != "row_id" %}
@@ -46,11 +46,22 @@
                         {% endif %}
                     {% endfor %}
                 </tr>
+                <script>
+                    (function() {
+                        const tbody = document.currentScript.closest('tbody'); // Find the parent tbody
+                        const allTbodies = Array.from(tbody.parentElement.querySelectorAll('tbody')); // Get all tbodies in the table
+                        const index = allTbodies.indexOf(tbody) + 1; // Calculate the order (1-based)
+                        const firstCell = tbody.querySelector('td'); // Select the first cell
+                        if (firstCell) {
+                            firstCell.textContent = index; // Set the order in the first cell
+                        }
+                    })();
+                </script>
             </tbody>
         {% endfor %}
     {% else %}
         {% for row in rows %}
-            <tbody up-hungry id="{{ row.row_id }}">
+            <tbody id="{{ row.row_id }}">
                 <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
                    <td colspan="99" class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"> 
                     
