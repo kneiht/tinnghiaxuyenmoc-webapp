@@ -650,19 +650,24 @@ def calculate_revenue_report(vehicle_operation_records):
             maintenance_records = VehicleMaintenance.get_vehicle_maintenance_records(vehicle_instance, start_date)
             if maintenance_records:
                 maintenance_amount += maintenance_records.aggregate(models.Sum('maintenance_amount'))['maintenance_amount__sum']
-                
+        
+        total_cost = fuel_cost_amount + lube_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
         # salary
         salary_data = calculate_driver_salary(driver_vehicle_records, None)
         if salary_data['success'] == 'false':
             monthly_salary = salary_data['message']
             hourly_salary = salary_data['message']
+
         else:
-         
             monthly_salary = salary_data['data']['monthly_salary']['total_monthly_salary']
             hourly_salary = salary_data['data']['hourly_salary']['total_hourly_salary']
-
-        total_cost = fuel_cost_amount + lube_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount + monthly_salary + hourly_salary
+            total_cost += monthly_salary + hourly_salary
+            monthly_salary = format_money(monthly_salary)
+            hourly_salary = format_money(hourly_salary)
+            
         total_revenue = revenue
+
+
 
         if type(revenue_base) != str:
             revenue_base = format_money(revenue_base)
@@ -692,8 +697,8 @@ def calculate_revenue_report(vehicle_operation_records):
             "Sửa xe + mua vật tư": format_money(maintenance_amount),
             "Khấu hao xe": format_money(depreciation_amount),
             "Lãi ngân hàng": format_money(bank_interest_amount),
-            "Lương cơ bản": format_money(monthly_salary),
-            "Lương theo giờ": format_money(hourly_salary),
+            "Lương cơ bản": monthly_salary,
+            "Lương theo giờ": hourly_salary,
             "Tổng chi phí": format_money(total_cost),
             "Lợi  nhuận": total_interest,
             "Ghi chú": "",

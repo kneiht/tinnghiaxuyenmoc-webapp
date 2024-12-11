@@ -1055,13 +1055,23 @@ class VehicleMaintenance(BaseModel):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
 
-class VehicleExampleRecord(BaseModel):
-    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
-    service_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
-    from_date = models.DateField(verbose_name="Ngày giao xe", default=timezone.now)
-    to_date = models.DateField(verbose_name="Ngày lấy xe", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
-    created_at = models.DateTimeField(default=timezone.now)
 
+class RepairPart(BaseModel):
+    part_number = models.CharField(max_length=255, verbose_name="Mã danh mục")
+    part_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
+    part_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    image = models.ImageField(verbose_name="Hình ảnh", default="", null=True, blank=True)
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+        return f'{self.part_number} - {self.part_name}'
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['part_number', 'part_name', 'part_price', 'image', 'note', 'valid_from']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields

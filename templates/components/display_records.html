@@ -466,18 +466,11 @@
             <a class="btn btn-primary px-40" up-preload="insert" up-target="#display-records:after, #load-more:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model start_date=start_date group_by=group_by tab=tab elements='tool_bar|display_records' next=next %}">
                 Tải thêm
             </a>
-            {{ next }}
         </div>
     {% else %}
         <div up-hungry id="load-more" class="hidden"></div>
     {% endif %}
     
-
-
-
-
-
-
 
 
 

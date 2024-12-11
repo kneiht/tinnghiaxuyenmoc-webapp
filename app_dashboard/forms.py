@@ -951,3 +951,46 @@ class VehicleMaintenanceForm(forms.ModelForm):
                     'rows': 2
             })
         }
+
+
+class RepairPartForm(forms.ModelForm):
+    class Meta:
+        model = RepairPart
+        fields = ['part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
+        labels = {
+            'part_number': 'Mã danh mục',
+            'part_name': 'Tên đầy đủ',
+            'part_price': 'Đơn giá',
+            'image': 'Hình ảnh',
+            'valid_from': 'Ngày áp dụng',
+            'note': 'Ghi chú'
+        }
+        widgets = {
+            'part_number': forms.TextInput(attrs={
+                'placeholder': 'Mã bộ phận',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'part_name': forms.TextInput(attrs={
+                'placeholder': 'Tên phần',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'part_price': forms.NumberInput(attrs={
+                'placeholder': 'Đơn giá',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-input-file',
+            }),
+            'valid_from': forms.DateInput(attrs={
+                'placeholder': 'Ngày áp dụng',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+            }),
+        }

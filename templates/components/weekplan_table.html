@@ -17,38 +17,38 @@
                         {% endif %}
                         <div class="flex flex-nowrap gap-4">
 
-                            <a data-date="{{ monday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ monday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ monday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ monday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == monday %} bg-green-600 {% endif %}">
                                 Thứ 2
                             </a>
 
-                            <a data-date="{{ tuesday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ tuesday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ tuesday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ tuesday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == tuesday %} bg-green-600 {% endif %}">
                                 Thứ 3
                             </a>
 
-                            <a data-date="{{ wednesday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ wednesday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ wednesday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ wednesday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == wednesday %} bg-green-600 {% endif %}"
                                         onclick="document.getElementById('#check_date').value = '{{ wednesday }}'";>
                                 Thứ 4
                             </a>
 
-                            <a data-date="{{ thursday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ thursday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ thursday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ thursday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == thursday %} bg-green-600 {% endif %}">
                                 Thứ 5
                             </a>   
 
-                            <a data-date="{{ friday }}" up-preload="insert"  up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ friday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ friday }}" up-preload="insert"  up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ friday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == friday %} bg-green-600 {% endif %}">
                                 Thứ 6
                             </a>
 
-                            <a data-date="{{ saturday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ saturday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ saturday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ saturday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == saturday %} bg-green-600 {% endif %}">
                                 Thứ 7
                             </a>
 
-                            <a data-date="{{ sunday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ sunday }}" type="button" class="select-date btn btn-outline-no-focus
+                            <a data-date="{{ sunday }}" up-preload="insert" up-target="#display-records" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ sunday }}" type="button" class="select-date btn btn-outline-no-focus text-nowrap
                             {% if check_date == sunday %} bg-green-600 {% endif %}">
                                 CN
                             </a>

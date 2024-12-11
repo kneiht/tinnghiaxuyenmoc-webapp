@@ -97,7 +97,7 @@ def load_elements(request):
         if key != 'q':
             params[key] = value
 
-    print('>>>>>>>>>> elements params:', params, '\n\n')
+    # print('>>>>>>>>>> elements params:', params, '\n\n')
     html = '<div id="load-elements" class"hidden"></div>'
     elements = params.get('elements', '')
     for element in elements.split('|'):
@@ -158,7 +158,7 @@ def handle_weekplan_form(request):
         # print('weekplan_status:', weekplan_status)
         user_role = ProjectUser.objects.filter(project=project, user=request.user).first() 
 
-        print('user_role:', user_role.role)
+        # print('user_role:', user_role.role)
 
         if user_role.role == 'technician':
             message = "Phê duyệt thành công"
@@ -336,11 +336,10 @@ def handle_vehicle_operation_form(request):
     
     try:
         form = request.POST
-        print(form)
+        # print(form)
         # Get list of ids   
         ids = form.getlist('id')
         for id in ids:
-            print('>>>> id:', id)
             driver = StaffData.objects.filter(pk=get_valid_id(form.get(f'driver_{id}', None))).first()
             location = Location.objects.filter(pk=get_valid_id(form.get(f'location_{id}', None))).first()
             record = VehicleOperationRecord.objects.get(pk=id)
@@ -395,7 +394,6 @@ def handle_vehicle_operation_form(request):
             fuel_allowance_new = form.get(f'fuel_allowance_new_{new_index}', None)
             note_new = form.get(f'note_new_{new_index}', None)
             allow_overtime_new = False if not form.get(f'allow_overtime_new_{new_index}', False) else True
-            print()
             try:
                 # duration seconds
                 duration_seconds_str = duration_seconds_new
@@ -428,7 +426,7 @@ def handle_vehicle_operation_form(request):
             allow_overtime = allow_overtime_new
 
             if not driver:
-                print('>>>> skip')
+                # print('>>>> skip')
                 continue
 
             new_record = VehicleOperationRecord.objects.create(

@@ -211,7 +211,7 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.filter(project=project)
         
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
-        print('>>>>>>>> len of records:',len(records))
+        # print('>>>>>>>> len of records:',len(records))
 
     groups = []
     if group_by:

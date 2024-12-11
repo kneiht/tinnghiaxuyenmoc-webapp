@@ -4,7 +4,7 @@
 
 
 {% block title %}
-    Quản lý dữ liệu nhập tay
+    Quản lý DL nhập tay
 {% endblock %}
 
 
@@ -17,7 +17,7 @@
     <main>
         {% include 'components/nav_bar.html' %}
 
-        <div id="database-selection" class="flex items-center m-auto mb-2 text-xs h-20" 
+        <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll" 
                 onclick="
                     event.target.closest('a').classList.add('bg-slate-300', 'dark:bg-slate-700');
                     document.querySelectorAll('#database-selection a').forEach((button) => {
@@ -28,66 +28,66 @@
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleType' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:bg-slate-700">
-                    Dữ liệu loại xe
+                    class="btn btn-outline-no-focus text-nowrap rounded-none rounded-s-lg cursor-pointer text-theme bg-slate-300 dark:bg-slate-700">
+                    DL loại xe
                 </a>
 
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleRevenueInputs' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
-                    Dữ liệu tính doanh thu theo loại xe
+                    class="btn btn-outline-no-focus text-nowrap rounded-none  cursor-pointer text-theme ">
+                    DL tính DT theo loại xe
                 </a>
                 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='VehicleDetail' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none  cursor-pointer text-theme ">
-                    Dữ liệu chi tiết từng xe
+                    class="btn btn-outline-no-focus text-nowrap rounded-none  cursor-pointer text-theme ">
+                    DL chi tiết từng xe
                     
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='StaffData' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu nhân viên
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
+                    DL nhân viên
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DriverSalaryInputs' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu mức lương tài xế
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
+                    DL mức lương tài xế
                 </a>
 
 
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DumbTruckPayRate' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu tính lương tài xế xe ben
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
+                    DL tính lương tài xế xe ben
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='DumbTruckRevenueData' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu tính doanh thu xe ben
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
+                    DL tính DT xe ben
                 
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='Location' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
-                    Dữ liệu địa điểm
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
+                    DL địa điểm
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='NormalWorkingTime' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none cursor-pointer text-theme">
+                    class="btn btn-outline-no-focus text-nowrap rounded-none cursor-pointer text-theme">
                     Thời gian làm việc
                 </a>
 
                 <a up-preload="insert" up-target="#tool-bar, #display-records" 
                     href="{% url 'load_elements' %}?q={% encode_params page='page_manage_data' model='Holiday' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus rounded-none rounded-e-lg cursor-pointer text-theme">
+                    class="btn btn-outline-no-focus text-nowrap rounded-none rounded-e-lg cursor-pointer text-theme">
                     Ngày lễ
                 </a>
 
