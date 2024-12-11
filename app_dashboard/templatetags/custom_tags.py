@@ -704,8 +704,9 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
                 "row_id": f"row-{driver}-{VehicleDetail.objects.get(gps_name=vehicle).pk}-{location}"
             })
     else:
-        min_start_date = vehicle_operation_records.aggregate(models.Min('start_time__date'))['start_time__date__min']
-        max_end_date = vehicle_operation_records.aggregate(models.Max('end_time__date'))['end_time__date__max']
+        vehicle_operation_records = vehicle_operation_records.order_by('start_time')
+        min_start_date = vehicle_operation_records.first().start_time.date()
+        max_end_date = vehicle_operation_records.last().end_time.date()
         print("min_start_date: ", min_start_date)
         print("max_end_date: ", max_end_date)
         for driver, vehicle, location in unique_driver_vehicles:
