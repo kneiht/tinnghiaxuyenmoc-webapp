@@ -85,11 +85,130 @@ def translate(text):
     translated_text = {
         'title_bar_page_projects': 'Trang quản lý các dự án',
         'Tiêu đề cho trang: page_projects': 'Trang quản lý các dự án',
+
         'Thêm Project': 'Thêm dự án',
-        'Thêm Job': 'Thêm CV',
-        'Tạo Project mới': 'Tạo dự án mới',
+        'Tạo Project mới': 'Tạo dự án',
         'Cập nhật Project': 'Cập nhật dự án',
+        
+        # UserExtra
+        'Thêm UserExtra': 'Thêm dữ liệu mới',
+        'Tạo UserExtra mới': 'Tạo thông tin tài khoản bổ sung',
+        'Cập nhật UserExtra': 'Cập nhật thông tin tài khoản bổ sung',
+
+        # Task
+        'Thêm Task': 'Thêm dữ liệu mới',
+        'Tạo Task mới': 'Tạo nhiệm vụ',
+        'Cập nhật Task': 'Cập nhật nhiệm vụ',
+
+        # TaskUser
+        'Thêm TaskUser': 'Thêm dữ liệu mới',
+        'Tạo TaskUser mới': 'Tạo người dùng nhiệm vụ',
+        'Cập nhật TaskUser': 'Cập nhật người dùng nhiệm vụ',
+
+        # ProjectUser
+        'Thêm ProjectUser': 'Thêm dữ liệu mới',
+        'Tạo ProjectUser mới': 'Tạo nhân sự dự án',
+        'Cập nhật ProjectUser': 'Cập nhật nhân sự dự án',
+
+        # Job
+        'Thêm Job': 'Thêm CV',
+        'Tạo Job mới': 'Tạo công việc',
+        'Cập nhật Job': 'Cập nhật công việc',
+
+        # JobPlan
+        'Thêm JobPlan': 'Thêm dữ liệu mới',
+        'Tạo JobPlan mới': 'Tạo kế hoạch CV mới',
+        'Cập nhật JobPlan': 'Cập nhật kế hoạch CV',
+
+        # JobDateReport
+        'Thêm JobDateReport': 'Thêm dữ liệu mới',
+        'Tạo JobDateReport mới': 'Tạo báo cáo ngày',
+        'Cập nhật JobDateReport': 'Cập nhật báo cáo ngày',
+
+        # VehicleType
+        'Thêm VehicleType': 'Thêm dữ liệu mới',
+        'Tạo VehicleType mới': 'Tạo loại xe',
+        'Cập nhật VehicleType': 'Cập nhật loại xe',
+
+        # StaffData
+        'Thêm StaffData': 'Thêm dữ liệu mới',
+        'Tạo StaffData mới': 'Tạo dữ liệu nhân viên',
+        'Cập nhật StaffData': 'Cập nhật dữ liệu nhân viên',
+
+        # VehicleRevenueInputs
+        'Thêm VehicleRevenueInputs': 'Thêm dữ liệu mới',
+        'Tạo VehicleRevenueInputs mới': 'Tạo dữ liệu tính doanh thu xe',
+        'Cập nhật VehicleRevenueInputs': 'Cập nhật dữ liệu doanh thu xe',
+
+        # DriverSalaryInputs
+        'Thêm DriverSalaryInputs': 'Thêm dữ liệu mới',
+        'Tạo DriverSalaryInputs mới': 'Tạo dữ liệu tính lương tài xế',
+        'Cập nhật DriverSalaryInputs': 'Cập nhật dữ liệu lương tài xế',
+
+        # VehicleDetail
+        'Thêm VehicleDetail': 'Thêm dữ liệu mới',
+        'Tạo VehicleDetail mới': 'Tạo dữ liệu xe chi tiết',
+        'Cập nhật VehicleDetail': 'Cập nhật dữ liệu xe chi tiết',
+
+        # DumbTruckPayRate
+        'Thêm DumbTruckPayRate': 'Thêm dữ liệu mới',
+        'Tạo DumbTruckPayRate mới': 'Tạo dữ liệu lương xe ben',
+        'Cập nhật DumbTruckPayRate': 'Cập nhật dữ liệu lương xe ben',
+
+        # DumbTruckRevenueData
+        'Thêm DumbTruckRevenueData': 'Thêm dữ liệu mới',
+        'Tạo DumbTruckRevenueData mới': 'Tạo dữ liệu doanh thu xe ben',
+        'Cập nhật DumbTruckRevenueData': 'Cập nhật dữ liệu doanh thu xe ben',
+
+        # Location
+        'Thêm Location': 'Thêm dữ liệu mới',
+        'Tạo Location mới': 'Tạo địa điểm',
+        'Cập nhật Location': 'Cập nhật địa điểm',
+
+        # NormalWorkingTime
+        'Thêm NormalWorkingTime': 'Thêm dữ liệu mới',
+        'Tạo NormalWorkingTime mới': 'Tạo thời gian làm việc',
+        'Cập nhật NormalWorkingTime': 'Cập nhật thời gian làm việc',
+
+        # Holiday
+        'Thêm Holiday': 'Thêm dữ liệu mới',
+        'Tạo Holiday mới': 'Tạo ngày lễ',
+        'Cập nhật Holiday': 'Cập nhật ngày lễ',
+
+        # VehicleOperationRecord
+        'Thêm VehicleOperationRecord': 'Thêm dữ liệu mới',
+        'Tạo VehicleOperationRecord mới': 'Tạo dữ liệu vận hành xe',
+        'Cập nhật VehicleOperationRecord': 'Cập nhật dữ liệu vận hành xe',
+
+        # FuelFillingRecord
+        'Thêm FuelFillingRecord': 'Thêm dữ liệu mới',
+        'Tạo FuelFillingRecord mới': 'Tạo phiếu đổ xăng',
+        'Cập nhật FuelFillingRecord': 'Cập nhật phiếu đổ xăng',
+
+        # LubeFillingRecord
+        'Thêm LubeFillingRecord': 'Thêm dữ liệu mới',
+        'Tạo LubeFillingRecord mới': 'Tạo phiếu đổ nhớt',
+        'Cập nhật LubeFillingRecord': 'Cập nhật phiếu đổ nhớt',
+
+        # VehicleDepreciation
+        'Thêm VehicleDepreciation': 'Thêm dữ liệu mới',
+        'Tạo VehicleDepreciation mới': 'Tạo khấu hao xe',
+        'Cập nhật VehicleDepreciation': 'Cập nhật khấu hao xe',
+
+        # VehicleBankInterest
+        'Thêm VehicleBankInterest': 'Thêm dữ liệu mới',
+        'Tạo VehicleBankInterest mới': 'Tạo lãi suất ngân hàng',
+        'Cập nhật VehicleBankInterest': 'Cập nhật lãi suất ngân hàng',
+
+        # VehicleMaintenance
+        'Thêm VehicleMaintenance': 'Thêm dữ liệu mới',
+        'Tạo VehicleMaintenance mới': 'Tạo phiếu sửa chữa',
         'Cập nhật VehicleMaintenance': 'Phiếu sửa chữa',
+
+        # RepairPart
+        'Thêm RepairPart': 'Thêm dữ liệu mới',
+        'Tạo RepairPart mới': 'Tạo phụ tùng sửa chữa',
+        'Cập nhật RepairPart': 'Cập nhật phụ tùng sửa chữa',
     }
 
     if text not in translated_text:
