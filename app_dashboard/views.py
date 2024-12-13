@@ -21,7 +21,7 @@ from .utils import *
 
 from core.settings import DOMAIN
 from django.utils import timezone
-
+from django.urls import reverse_lazy
 # HANDLE FORMS ===============================================================
 def handle_form(request, model, pk=0):
     # Todo: should have list of model that can be accessed
@@ -47,6 +47,30 @@ def handle_form(request, model, pk=0):
             # instance_form.user = request.user
             pass
         instance_form.save()
+
+        if model == 'VehicleMaintenance':
+            vehicle_maintenance = instance_form
+            # get the list of vehicle_parts VehicleMaintenanceRepairPart
+            vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance)
+            vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
+            # check if the id is in the list, if not delete it
+            print(vehicle_part_post_ids)
+            for vehicle_part in vehicle_parts:
+                if str(vehicle_part.id) not in vehicle_part_post_ids:
+                    vehicle_part.delete()
+
+            parts = request.POST.getlist('part')
+            quantities = request.POST.getlist('quantity')
+            for part, quantity in zip(parts, quantities):
+                if part == '' and quantity == '':
+                    continue
+                VehicleMaintenanceRepairPart.objects.create(
+                    vehicle_maintenance=vehicle_maintenance,
+                    repair_part_id=part,
+                    quantity=quantity,
+                )
+
+
         # Save the many to many field, if any
         # form.save_m2m()
         record = instance_form
@@ -471,20 +495,37 @@ def handle_vehicle_operation_form(request):
 
 # GENERAL PAGES ==============================================================
 @login_required
-def page_home(request):
-    user = request.user
-    jobplans = JobPlan.objects.filter(status='wait_for_approval')
-    # get dictionary of projects, start_date and end_date of the jobplans
-    approval_tasks = []
-    for jobplan in jobplans:
-        approval_tasks.append({
-            'project': jobplan.job.project,
-            'start_date': jobplan.start_date,
-            'end_date': jobplan.end_date
-        })
+def page_home(request, sub_page=None):
+    # user = request.user
+    # jobplans = JobPlan.objects.filter(status='wait_for_approval')
+    # # get dictionary of projects, start_date and end_date of the jobplans
+    # approval_tasks = []
+    # for jobplan in jobplans:
+    #     approval_tasks.append({
+    #         'project': jobplan.job.project,
+    #         'start_date': jobplan.start_date,
+    #         'end_date': jobplan.end_date
+    #     })
 
-    context = {'approval_tasks': approval_tasks}
+    # context = {'approval_tasks': approval_tasks}
+
+    if sub_page == None:
+        return redirect('page_home', sub_page='VehicleType')
+
+    display_name_dict = {
+        'Announcement': 'Thông báo',
+        'Task': 'Công việc',
+        'Permissions': 'Cấp quyền thao tác',
+
+    }
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+    }
     return render(request, 'pages/page_home.html', context)
+
 
 
 
@@ -506,20 +547,70 @@ def page_each_project(request, pk):
 
 
 @login_required
-def page_manage_data(request):
-    return render(request, 'pages/page_manage_data.html')
+def page_general_data(request, sub_page=None):
+    if sub_page == None:
+        return redirect('page_general_data', sub_page='VehicleType')
+
+    display_name_dict = {
+        'VehicleType': 'DL loại xe',
+        'VehicleRevenueInputs': 'DL tính DT theo loại xe',
+        'VehicleDetail': 'DL xe chi tiết',
+        'StaffData': 'DL nhân viên',
+        'DriverSalaryInputs': 'DL mức lương tài xế',
+        'DumbTruckPayRate': 'DL tính lương tài xế xe ben',
+        'DumbTruckRevenueData': 'DL tính DT xe ben',
+        'Location': 'DL địa điểm',
+        'NormalWorkingTime': 'Thời gian làm việc',
+        'Holiday': 'Ngày lễ',
+    }
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+    }
+    return render(request, 'pages/page_general_data.html', context)
 
 
 @login_required
-def page_transport_department(request):
+def page_transport_department(request, sub_page=None):
+    if sub_page == None:
+        return redirect('page_transport_department', sub_page='FuelFillingRecord')
+
+    display_name_dict = {
+        'FuelFillingRecord': 'LS đổ nhiên liệu',
+        'LubeFillingRecord': 'LS đổ nhớt',
+        'RepairPart': 'Danh mục sửa chữa',
+        'VehicleMaintenance': 'Phiếu sửa chữa',
+        'VehicleDepreciation': 'Khấu hao',
+        'VehicleBankInterest': 'Lãi ngân hàng',
+        'VehicleOperationRecord': 'DL HĐ xe công trình / ngày',
+        'ConstructionDriverSalary': 'Bảng lương',
+        'ConstructionReportPL': 'Bảng BC P&L xe cơ giới',
+    }
+
     params = request.GET.copy()
     if 'start_date' not in params:
         start_date = get_valid_date('')
+    else:
+        start_date = params['start_date']
     if 'end_date' not in params:
         end_date = get_valid_date('')
+    else:
+        end_date = params['end_date']
     if 'check_month' not in params:
         check_month = get_valid_month('')
-    context = {'start_date': start_date, 'end_date': end_date, 'check_month': check_month}
+    else:
+        check_month = params['check_month']
+
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+        'start_date': start_date, 
+        'end_date': end_date, 
+        'check_month': check_month}
     return render(request, 'pages/page_transport_department.html', context)
 
 

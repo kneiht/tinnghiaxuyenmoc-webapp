@@ -20,16 +20,19 @@
         <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll">
             {% for each_sub_page, display_name in display_name_dict.items %}
             <div>
-                <a up-preload="insert" href="{% url 'page_home' sub_page=each_sub_page %}"
+                <a up-preload="insert" href="{% url 'page_general_data' sub_page=each_sub_page %}"
                     class="btn btn-outline-no-focus text-nowrap cursor-pointer text-theme rounded-none
                     {% if each_sub_page == sub_page %} bg-slate-300 dark:bg-slate-700 {% endif %}">
                     {{ display_name }}
                 </a>
-                <a up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_home' model=each_sub_page elements='tool_bar|display_records' %}"></a>
+                <a up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=each_sub_page elements='tool_bar|display_records' %}"></a>
             </div>
             {% endfor %}
         </div>
 
+        <div id="load-elements" up-defer="insert" up-cache="True" up-href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=model elements='tool_bar|display_records' %}" class="w-full text-center">
+            <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
+        </div>
 
         <div up-hungry id="tool-bar"></div>
         <div up-hungry id="display-records"></div>

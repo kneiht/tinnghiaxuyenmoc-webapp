@@ -12,14 +12,18 @@ urlpatterns = [
     path('upload-db-backup/', views_backup.upload_db_backup, name='upload_db_backup'),
 
     path('', views.page_home, name='page_home'),
+    path('home', views.page_home, name='page_home'),
+    path('home/<str:sub_page>/', views.page_home, name='page_home'),
     
     path('projects', views.page_projects, name='page_projects'),
     path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),
-    path('manage-data/', views.page_manage_data, name='page_manage_data'),
+
+    path('general-data/', views.page_general_data, name='page_general_data'),
+    path('general-data/<str:sub_page>/', views.page_general_data, name='page_general_data'),
+
+
     path('transport-department/', views.page_transport_department, name='page_transport_department'),
-
-
-
+    path('transport-department/<str:sub_page>/', views.page_transport_department, name='page_transport_department'),
 
 
     path('api/handle-form/<str:model>/<int:pk>', views.handle_form, name='handle_form'),
@@ -28,8 +32,6 @@ urlpatterns = [
     path('api/gantt-chart-data/<int:project_id>/', views.get_gantt_chart_data, name='get_gantt_chart_data'),
 
     
-
-
     path('api/load-weekplan-table/<int:project_id>/', views.load_weekplan_table, name='load_weekplan_table'),
     path('api/handle-weekplan-form/', views.handle_weekplan_form, name='handle_weekplan_form'),
     path('api/handle-date-report-form/', views.handle_date_report_form, name='handle_date_report_form'),

@@ -501,10 +501,10 @@
                     {% for field in fields %}
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             
-                        {% if field == 'status' %} 
-                            <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                        {% if 'status' in field %} 
+                            <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
                         
-                        {% elif field == 'image' %} 
+                        {% elif field == 'image' and record.image %} 
                             <div class="relative group">
                                 <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
                             </div>

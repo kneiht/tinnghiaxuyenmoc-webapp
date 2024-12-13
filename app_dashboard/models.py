@@ -134,6 +134,16 @@ class BaseModel(models.Model):
                         setattr(thumbnail, 'thumbnail', thumbnail_image)
                         thumbnail.save()
 
+class Permission(BaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class UserPermission(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
 
 class UserExtra(BaseModel):
     ROLE_CHOICES = (
@@ -1026,11 +1036,41 @@ class VehicleMaintenance(BaseModel):
     MAINTENANCE_CATEGORY_CHOICES = (
         ('periodic_check', 'Kiểm tra định kì'),
     )
+    
+    APPROVAL_STATUS_CHOICES = (
+        ('wait_for_approval', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('need_update', 'Cần sửa lại'),
+        ('rejected', 'Từ chối'),
+    )
+
+    RECEIVED_STATUS_CHOICES = (
+        ('received', 'Đã nhận'),
+        ('not_received', 'Chưa nhận'),
+    )
+
+    PAID_STATUS_CHOICES = (
+        ('paid', 'Đã T.toán'),
+        ('not_paid', 'Chưa T.toán'),
+    )
+
+    DONE_STATUS_CHOICES = (
+        ('done', 'Xong'),
+        ('not_done', 'Chưa xong'),
+    )
+
+
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
-    maintenance_category = models.CharField(max_length=255, verbose_name="Phân loại", default="", null=True, blank=True)
-    from_date = models.DateField(verbose_name="Ngày giao xe", default=timezone.now)
-    to_date = models.DateField(verbose_name="Ngày lấy xe", default=timezone.now)
+    maintenance_category = models.CharField(max_length=255, choices=MAINTENANCE_CATEGORY_CHOICES, verbose_name="Phân loại", default="", null=True, blank=True)
+    from_date = models.DateField(verbose_name="Ngày nhận sửa chữa", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày xong sửa chữa", default=timezone.now)
+
+    approval_status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='wait_for_approval', verbose_name="Duyệt")
+    received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Nhận hàng")
+    paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Thanh toán")
+    done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Sửa chữa")
+
     note = models.TextField(verbose_name="Ghi chú", default="")
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -1042,9 +1082,19 @@ class VehicleMaintenance(BaseModel):
         except cls.DoesNotExist:
             return None
 
+    def get_vehicle_part_list(self):
+        vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self, repair_part__isnull=False)
+        return vehicle_parts
+
+    @classmethod
+    def get_repair_part_list(cls):
+        part_list = RepairPart.objects.all()
+        return part_list
+
+
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle', 'maintenance_amount', 'from_date', 'to_date', 'note']
+        fields = ['vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1078,3 +1128,27 @@ class RepairPart(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+
+
+class VehicleMaintenanceRepairPart(BaseModel):
+    RECEIVED_STATUS_CHOICES = (
+        ('received', 'Đã nhận'),
+        ('not_received', 'Chưa nhận'),
+    )
+
+    PAID_STATUS_CHOICES = (
+        ('paid', 'Đã T.toán'),
+        ('not_paid', 'Chưa T.toán'),
+    )
+
+    DONE_STATUS_CHOICES = (
+        ('done', 'Xong'),
+        ('not_done', 'Chưa xong'),
+    )
+
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    repair_part = models.ForeignKey(RepairPart, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Bộ phận")
+    quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
+    received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
+    paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Trạng thái thanh toán")
+    done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Trạng thái xong sửa chữa")

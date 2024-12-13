@@ -88,7 +88,8 @@ def translate(text):
         'Thêm Project': 'Thêm dự án',
         'Thêm Job': 'Thêm CV',
         'Tạo Project mới': 'Tạo dự án mới',
-        'Cập nhật Project': 'Cập nhật dự án'
+        'Cập nhật Project': 'Cập nhật dự án',
+        'Cập nhật VehicleMaintenance': 'Phiếu sửa chữa',
     }
 
     if text not in translated_text:

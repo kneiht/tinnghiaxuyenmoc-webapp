@@ -82,7 +82,7 @@ def get_sign(record, field):
 def format_display(record, field=None):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
-    
+        
     if record == None:
         return ""
     if field != None:

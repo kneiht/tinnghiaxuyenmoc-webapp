@@ -17,87 +17,62 @@
     <main>
         {% include 'components/nav_bar.html' %}
 
-        <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll" 
-                onclick="
-                    event.target.closest('a').classList.add('bg-slate-300', 'dark:bg-slate-700');
-                    document.querySelectorAll('#database-selection a').forEach((button) => {
-                        if (button !== event.target.closest('a')) {
-                            button.classList.remove('bg-slate-300', 'dark:bg-slate-700');
-                        }
-                    });">
-
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='FuelFillingRecord' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus  text-nowrap rounded-e-none cursor-pointer text-theme bg-slate-300 dark:bg-slate-700"
-                    onclick="document.getElementById('load-more').classList.add('hidden')">
-                    LS đổ nhiên liệu
+        <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll">
+            {% for each_sub_page, display_name in display_name_dict.items %}
+            <div>
+                <a up-preload="insert" href="{% url 'page_transport_department' sub_page=each_sub_page %}"
+                    class="btn btn-outline-no-focus text-nowrap cursor-pointer text-theme rounded-none
+                    {% if each_sub_page == sub_page %} bg-slate-300 dark:bg-slate-700 {% endif %}">
+                    {{ display_name }}
                 </a>
+                {% if each_sub_page == 'VehicleOperationRecord' %}
+                    <a up-preload="insert" up-cache="True"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date group_by='vehicle' tab='vehicle_operation_data_by_date' elements='tool_bar|display_records' %}"></a>
 
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='LubeFillingRecord' elements='tool_bar|display_records' %}"
-                class="btn btn-outline-no-focus  text-nowrap rounded-none  cursor-pointer text-theme "
-                onclick="document.getElementById('load-more').classList.add('hidden')">
-                LS đổ nhớt
-                </a>
+                {% elif each_sub_page == 'ConstructionDriverSalary' %}
+                    <a up-preload="insert" up-cache="True"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"></a>
 
+                {% elif each_sub_page == 'ConstructionReportPL' %}
+                    <a up-preload="insert" up-cache="True"
+                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_revenue' elements='tool_bar|display_records' %}"></a>
 
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='RepairPart' elements='tool_bar|display_records' %}"
-                class="btn btn-outline-no-focus  text-nowrap rounded-none  cursor-pointer text-theme "
-                onclick="document.getElementById('load-more').classList.add('hidden')">
-                Danh mục sửa chữa
-                </a>
-
-
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleMaintenance' elements='tool_bar|display_records' %}"
-                class="btn btn-outline-no-focus  text-nowrap rounded-none  cursor-pointer text-theme "
-                onclick="document.getElementById('load-more').classList.add('hidden')">
-                Phiếu sửa chữa
-                </a>
-
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleDepreciation' elements='tool_bar|display_records' %}"
-                class="btn btn-outline-no-focus  text-nowrap rounded-none  cursor-pointer text-theme "
-                onclick="document.getElementById('load-more').classList.add('hidden')">
-                Khấu hao
-                </a>
-
-                <a up-preload="insert" up-target="#tool-bar, #display-records" 
-                href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleBankInterest' elements='tool_bar|display_records' %}"
-                class="btn btn-outline-no-focus  text-nowrap rounded-none  cursor-pointer text-theme "
-                onclick="document.getElementById('load-more').classList.add('hidden')">
-                Lãi ngân hàng
-                </a>
-
-                <a id="vehicle_operation_data_by_date" up-cache=true up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date group_by='vehicle' tab='vehicle_operation_data_by_date'  elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus  text-nowrap rounded-lg rounded-none cursor-pointer text-theme">
-                    DL HĐ xe công trình / ngày
-                </a>
-
-                <a id="driver_salary" up-cache=true up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus  text-nowrap rounded-lg rounded-none cursor-pointer text-theme">
-                    Bảng lương
-                </a>
-
-                <a id="vehicle_revenue" up-cache=true up-preload="insert" up-target="#tool-bar, #display-records" 
-                    href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_revenue' elements='tool_bar|display_records' %}"
-                    class="btn btn-outline-no-focus  text-nowrap rounded-lg rounded-s-none cursor-pointer text-theme">
-                    Bảng BC P&L xe cơ giới
-                </a>
+                {% else %}
+                    <a up-preload="insert" up-cache="True" href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=each_sub_page elements='tool_bar|display_records' %}"></a>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
 
 
-        <div id="load-elements" up-defer 
-            href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='FuelFillingRecord' elements='tool_bar|display_records' %}">
-            Loading content
-        </div>
+        {% if sub_page == 'VehicleOperationRecord' %}
+            <div id="load-elements" up-defer="insert" up-cache="True"
+            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date group_by='vehicle' tab='vehicle_operation_data_by_date' elements='tool_bar|display_records' %}"
+            class="w-full text-center">
+                <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
+            </div>
 
-    <div up-hungry id="tool-bar"></div>
-    <div up-hungry id="display-records"></div>
-    <div up-hungry id="load-more" class="hidden"></div>
+        {% elif sub_page == 'ConstructionDriverSalary' %}
+            <div id="load-elements" up-defer="insert" up-cache="True"
+            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"
+                <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
+            </div>
+
+        {% elif sub_page == 'ConstructionReportPL' %}
+            <div id="load-elements" up-defer="insert" up-cache="True"
+            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_revenue' elements='tool_bar|display_records' %}"
+                <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
+            </div>
+
+        {% else %}
+            <div id="load-elements" up-defer="insert" up-cache="True" up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model=model elements='tool_bar|display_records' %}" class="w-full text-center">
+                <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
+            </div>
+        {% endif %}
+
+        <div up-hungry id="tool-bar"></div>
+        <div up-hungry id="display-records"></div>
+        <div up-hungry id="load-more" class="hidden"></div>
 
     </main>
 {% endblock %}

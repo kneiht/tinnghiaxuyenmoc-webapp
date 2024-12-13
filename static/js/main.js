@@ -77,7 +77,11 @@ up.compiler('#nav_bar', function(element) {
         });
 
         // Check if the item url equals to the current url => active the item
-        if (item.getAttribute('href') === window.location.pathname) {
+        const itemUrl = item.getAttribute('href');
+        const currentUrl = window.location.pathname;
+        const currentUrlParts = currentUrl.split('/');
+        const itemUrlParts = itemUrl.split('/');
+        if (itemUrlParts[1] === currentUrlParts[1]) {
             activeMenuItem(item);
         }
     });

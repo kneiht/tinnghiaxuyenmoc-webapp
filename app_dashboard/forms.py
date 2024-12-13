@@ -910,13 +910,14 @@ class VehicleBankInterestForm(forms.ModelForm):
 class VehicleMaintenanceForm(forms.ModelForm):
     class Meta:
         model = VehicleMaintenance
-        fields = ['vehicle', 'maintenance_amount', 'maintenance_category', 'from_date', 'to_date', 'note']
+        fields = ['vehicle', 'maintenance_amount', 'maintenance_category', 'from_date', 'to_date', 'approval_status', 'note']
         labels = {
             'vehicle': 'Xe',
             'maintenance_amount': 'Chi phí',
             'maintenance_category': 'Phân loại',
-            'from_date': 'Ngày giao xe',
-            'to_date': 'Ngày lấy xe',
+            'from_date': 'Ngày nhận sửa chữa',
+            'to_date': 'Ngày xong sửa chữa',
+            'approval_status': 'Duyệt',
             'note': 'Ghi chú'
         }
         widgets = {
@@ -924,30 +925,41 @@ class VehicleMaintenanceForm(forms.ModelForm):
                 'placeholder': 'Chọn xe',
                 'class': 'form-input',
                 'required': 'required',
+                'disabled': 'disabled',
             }),
             'maintenance_amount': forms.NumberInput(attrs={
                 'placeholder': 'Chi phí',
                 'class': 'form-input',
                 'required': 'required',
+                'disabled': 'disabled',
             }),
             'maintenance_category': forms.Select(attrs={
                 'placeholder': 'Chọn phân loại',
                 'class': 'form-input',
+                'disabled': 'disabled',
             }, choices=VehicleMaintenance.MAINTENANCE_CATEGORY_CHOICES),
             'from_date': forms.DateInput(attrs={
-                'placeholder': 'Ngày giao xe',
+                'placeholder': 'Ngày nhận sửa chữa',
                 'class': 'form-input',
                 'required': 'required',
-                'type': 'date'
+                'type': 'date',
+                'disabled': 'disabled'
             }),
             'to_date': forms.DateInput(attrs={
-                'placeholder': 'Ngày lấy xe',
+                'placeholder': 'Ngày xong sửa chữa',
                 'class': 'form-input',
                 'required': 'required',
-                'type': 'date'
+                'type': 'date',
+                'disabled': 'disabled'
             }),
+            'approval_status': forms.Select(attrs={
+                'placeholder': 'Chọn trang thái phê duyệt',
+                'class': 'form-input',
+                'disabled': 'disabled',
+            }, choices=VehicleMaintenance.APPROVAL_STATUS_CHOICES),
             'note': forms.Textarea(attrs={
-                    'class': 'form-input h-20', 
+                    'class': 'form-input h-20',
+                    'disabled': 'disabled',
                     'rows': 2
             })
         }
@@ -1001,3 +1013,4 @@ class RepairPartForm(forms.ModelForm):
                     'class': 'form-input h-20', 
             }),
         }
+

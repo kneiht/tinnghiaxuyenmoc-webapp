@@ -332,7 +332,6 @@ def render_display_records(request, **kwargs):
                'tab': tab,
                'next': next
     }
-    print(">>>>> number of records:", records.count(),'\n')
     html = render_to_string(template, context, request)
     return html
 
@@ -363,6 +362,7 @@ def render_form(request, **kwargs):
         'title': translate(f'Cập nhật {model}') if record else translate(f'Tạo {model} mới'),
         'form_url': reverse('handle_form', kwargs={'model': model, 'pk': pk}),
         'model': model,
+        'model_class': model_class,
         'project_id': project_id,
         'modal': modal,
         'form': form,

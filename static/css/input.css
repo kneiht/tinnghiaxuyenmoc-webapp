@@ -102,7 +102,7 @@
             text-sm text-theme
             focus:border-theme-600 focus:ring-1 focus:ring-theme-700 focus:outline-none
             bg-white dark:bg-slate-700
-            disabled:opacity-50 disabled:pointer-events-none;
+            disabled:opacity-100 disabled:pointer-events-none;
     }
 
     .form-input-file {
@@ -110,7 +110,7 @@
             block h-10 w-full cursor-pointer
             rounded-lg border border-slate-300 dark:border-slate-600
             focus:border-theme-600 focus:ring-1 focus:ring-theme-700 focus:outline-none
-            disabled:opacity-50 disabled:pointer-events-none
+            disabled:opacity-100 disabled:pointer-events-none
             placeholder-gray-400 text-sm dark:text-gray-400
             bg-white dark:bg-slate-700
             file:bg-slate-100 file:border-0 file:me-4
@@ -238,7 +238,10 @@
     ::-webkit-scrollbar {
       width: 5px;
     }
-
+    /* Width for horizontal scrollbar */
+    ::-webkit-scrollbar:horizontal {
+        height: 5px; /* Height of the horizontal scrollbar */
+    }
     /* Track */
     ::-webkit-scrollbar-track {
       border-radius: 10px;
@@ -252,11 +255,6 @@
     }
 
 }
-
-
-
-
-
 
 
 

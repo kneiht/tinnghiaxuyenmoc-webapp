@@ -1,10 +1,24 @@
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 .disabled {
   cursor: not-allowed;
   opacity: 0.5;
   text-decoration: none;
   pointer-events: none;
 }
-
 
 .truncate-start {
   direction: rtl;
@@ -259,6 +273,46 @@ th.sorted-desc::after {
 
 .False {
   color: red;
+}
+
+.wait_for_approval {
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
+}
+
+.approved {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.need_update {
+  background-image: linear-gradient(310deg, #ffa500 0%, #ffc107 100%);
+}
+
+.rejected {
+  background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
+}
+
+.received {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.not_received {
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
+}
+
+.paid {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.not_paid {
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
+}
+
+.done {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.not_done {
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
 }
 
 

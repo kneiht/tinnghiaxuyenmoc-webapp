@@ -164,3 +164,64 @@ class VehicleOperationRecordAdmin(admin.ModelAdmin):
     ordering = ['-start_time']
 
 
+
+from django.contrib import admin
+from .models import (
+    FuelFillingRecord,
+    LubeFillingRecord,
+    VehicleDepreciation,
+    VehicleBankInterest,
+    VehicleMaintenance,
+    RepairPart,
+    VehicleMaintenanceRepairPart,
+)
+
+# Register your models here.
+
+@admin.register(FuelFillingRecord)
+class FuelFillingRecordAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note')
+    search_fields = ('vehicle__name', 'fill_date')
+    list_filter = ('fill_date',)
+    ordering = ('-fill_date',)
+
+@admin.register(LubeFillingRecord)
+class LubeFillingRecordAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note')
+    search_fields = ('vehicle__name', 'fill_date')
+    list_filter = ('fill_date',)
+    ordering = ('-fill_date',)
+
+@admin.register(VehicleDepreciation)
+class VehicleDepreciationAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'depreciation_amount', 'from_date', 'to_date', 'note')
+    search_fields = ('vehicle__name', 'from_date', 'to_date')
+    list_filter = ('from_date', 'to_date')
+    ordering = ('-from_date',)
+
+@admin.register(VehicleBankInterest)
+class VehicleBankInterestAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'interest_amount', 'from_date', 'to_date', 'note')
+    search_fields = ('vehicle__name', 'from_date', 'to_date')
+    list_filter = ('from_date', 'to_date')
+    ordering = ('-from_date',)
+
+@admin.register(VehicleMaintenance)
+class VehicleMaintenanceAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'maintenance_amount', 'from_date', 'to_date', 'note')
+    search_fields = ('vehicle__name', 'from_date', 'to_date')
+    list_filter = ('from_date', 'to_date')
+    ordering = ('-from_date',)
+
+@admin.register(RepairPart)
+class RepairPartAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_type', 'part_number', 'part_name', 'part_price', 'valid_from')
+    search_fields = ('part_number', 'part_name')
+    list_filter = ('vehicle_type', 'valid_from')
+    ordering = ('-valid_from',)
+
+@admin.register(VehicleMaintenanceRepairPart)
+class VehicleMaintenanceRepairPartAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_maintenance', 'repair_part', 'quantity')
+    search_fields = ('vehicle_maintenance__vehicle__name', 'repair_part__part_name')
+    ordering = ('-vehicle_maintenance__from_date',)

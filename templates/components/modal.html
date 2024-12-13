@@ -1,12 +1,27 @@
-
+{% load custom_tags %}
 <div up-hungry id="modal">
-    <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
-        
+    <div id="modal-body" class="modal z-40 fixed inset-0 bg-slate-600 bg-opacity-60 h-full w-full flex justify-center overflow-auto">
         <!-- Modal Content -->
-        <div class="relative top-16 mb-10 mx-4 card h-fit w-full sm:w-fit">
-
+        <div class="relative top-16 mx-4 card h-fit w-full sm:w-fit mb-28  pb-8">
             <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ title }}</h3>
-            
+
+            <button id='cancel-modal' type="button" class="absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-body').remove();">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+
+
+            {% if modal == "modal_VehicleMaintenance" %}
+                <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm" onclick="this.closest('.modal').querySelectorAll('input, select, textarea').forEach(el => el.disabled = false); this.closest('.modal').querySelectorAll('.hidable').forEach(el => el.classList.remove('hidden')); this.classList.add('hidden'); document.getElementById('btn-view').classList.remove('hidden');">
+                    <i class="fas fa-eye me-3" style="font-size: 16px;"></i>
+                    Chỉ xem
+                </button>
+                <button id="btn-view" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm hidden" onclick="this.closest('.modal').querySelectorAll('input, select, textarea').forEach(el => el.disabled = true); this.closest('.modal').querySelectorAll('.hidable').forEach(el => el.classList.add('hidden')); this.classList.add('hidden'); document.getElementById('btn-edit').classList.remove('hidden');">
+
+
+                    <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
+                    Chỉnh sửa
+                </button>
+            {% endif %}
             <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
             <form enctype="multipart/form-data" method="post"
                    action="{{ form_url }}" up-submit
@@ -24,10 +39,10 @@
                 </div>  
                 {% endif %}
 
-                {% if form.fields|length >= 12 %}
-                <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[900px] gap-4 px-6">
+                {% if form.fields|length >= 12 or modal == 'modal_VehicleMaintenance' %}
+                <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[1100px] gap-4 px-6">
                 
-                    {% elif form.fields|length >= 5 and form.fields|length < 12 %}
+                {% elif form.fields|length >= 5 and form.fields|length < 12 %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[600px] gap-4 px-6">
 
                 {% else %}
@@ -41,7 +56,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'project' and field.name != 'description'%}
+                        {% if field.name != 'project' and field.name != 'description' and field.name != 'note' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -58,19 +73,127 @@
                         {% endif %}
                     {% endfor %}
 
+
                     {% if form.description.name == 'description' %}  
                     <div class="col-span-full">
                             <label for="description" class="text-theme">Mô tả</label>
                             {{ form.description }}    
                     </div>
                     {% endif %}
-
-
+                    {% if form.note.name == 'note' %}  
+                    <div class="col-span-full">
+                            <label for="description" class="text-theme">Ghi chú</label>
+                            {{ form.note }}    
+                    </div>
+                    {% endif %}
                 </div>
 
+                {% if modal == "modal_VehicleMaintenance" %}
+                    {% if record %}
+                        <div class="w-full pt-4 px-6 pt-5- pb-2">
+                            <div class="flex flex-row gap-5 items-end py-2">
+                                <label for="students" class="text-theme">Trạng thái phiếu sửa chữa</label>
+                            </div>
+                            <div class="form-input flex flex-col h-fit h-max-[300px] overflow-y-scroll">
+                                <div class="flex justify-between w-full font-semibold">
+                                    <span class="w-3/12 text-center"> Trạng thái duyệt </span>
+                                    <span class="w-3/12 text-center"> Trạng thái nhận hàng </span>
+                                    <span class="w-3/12 text-center"> Trạng thái thanh toán </span>
+                                    <span class="w-3/12 text-center"> Trạng thái sửa chữa </span>
+                                </div> 
+                                <div class="pt-3 pb-1 flex justify-between items-center w-full">
+                                    <div class="w-3/12 text-center">
+                                        <span class="{{ record|get_value:'approval_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'approval_status' }}</span>
+                                    </div>
+                                    <div class="w-3/12 text-center">
+                                        <span class="{{ record|get_value:'received_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'received_status' }}</span>
+                                    </div>
+                                    <div class="w-3/12 text-center">
+                                        <span class="{{ record|get_value:'paid_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'paid_status' }}</span>
+                                    </div>
+                                    <div class="w-3/12 text-center">
+                                        <span class="{{ record|get_value:'done_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'done_status' }}</span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endif %}
 
 
-                <div class="flex justify-center items-center gap-5 pt-8 pb-7">
+                    <div class="w-full pt-4 px-6 pt-5- pb-2">
+                        <div class="flex flex-row gap-5 items-end py-2">
+                            <label for="students" class="text-theme">Các bộ phận thay thế</label>
+                            <button class="btn btn-success h-7 hidable hidden" onclick="event.preventDefault(); var newPart = document.querySelector('.new-part').cloneNode(true); newPart.classList.remove('hidden'); newPart.classList.remove('new-part'); newPart.querySelectorAll('input').forEach(input => input.value = ''); document.querySelector('.new-part').parentNode.insertBefore(newPart, document.querySelector('.new-part').nextSibling);">
+                                <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+                                Thêm vào danh mục
+                            </button>
+                        </div>
+                        <div class="form-input flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
+                            <div class="border-b pb-0.5 flex w-full font-semibold">
+                                <span class="w-5/12"> Bộ phận </span>
+                                <span class="w-1/12 text-center"> Số lượng </span>
+                                <span class="w-2/12 text-center"> Nhận hàng </span>
+                                <span class="w-2/12 text-center"> Thanh toán </span>
+                                <span class="w-2/12 text-center"> Sửa chữa </span>
+                                <span class="text-center hidable hidden">
+                                    <i class="fas fa-trash-can" style="font-size: 16px; opacity: 0;"></i>
+                                </span>
+                            </div> 
+                            {% for vehice_part in record.get_vehicle_part_list %}
+                                <div class="border-b pb-2 flex items-center w-full">
+                                    <input type="hidden" name="vehicle_part_id" value="{{ vehice_part.pk }}">
+                                    <span class="w-5/12"> {{ vehice_part.repair_part.part_number }} - {{ vehice_part.repair_part.part_name }} - {{ vehice_part.repair_part.part_price|format_money }} VNĐ </span>
+                                    <span class="w-1/12 text-center"> {{ vehice_part.quantity }} </span>
+                                    <div class="w-2/12 text-center">
+                                        <span class="{{ vehice_part|get_value:'received_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'received_status' }}</span>
+                                    </div>
+                                    <div class="w-2/12 text-center">
+                                        <span class="{{ vehice_part|get_value:'paid_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'paid_status' }}</span>
+                                    </div>
+                                    <div class="w-2/12 text-center">
+                                        <span class="{{ vehice_part|get_value:'done_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'done_status' }}</span>
+                                    </div>
+                                    
+                                    <div class="text-end hidable hidden">
+                                        <button onclick="this.parentElement.parentElement.remove();">
+                                            <i class="fas fa-trash-can" style="font-size: 16px; color: red;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <div class="part-row border-b pb-0.5 flex justify-between items-center w-full new-part hidden">
+                                <select name="part" class="w-5/12 form-input input input-driver " id="id_part" >
+                                    <option value="" selected">Chọn bộ phận ...</option>
+                                    {% for part in model_class.get_repair_part_list %}
+                                        <option value="{{ part.id }}">{{ part.part_number }} - {{ part.part_name }} - {{ part.part_price|format_money }} VNĐ</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="w-2/12 flex justify-center text-center">
+                                    <input type="number" name="quantity" class="form-input input" id="id_quantity" style="width: 100px">
+                                </div>  
+
+                                <div class="w-2/12 text-center"></div>
+                                <div class="w-2/12 text-center"></div>
+                                <div class="w-2/12 text-center"></div>
+
+
+
+                                <div class="text-end hidable hidden">
+                                    <button onclick="this.parentElement.parentElement.remove();">
+                                        <i class="fas fa-trash-can" style="font-size: 16px; color: red;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                {%  endif %}
+
+                <div class="flex justify-center items-center gap-5 pt-8 hidable
+                {% if modal == "modal_VehicleMaintenance" %} hidden {% endif %}">
                     <button type="submit" class="submit btn btn-primary rounded-full w-36" onclick="this.form.delete.value = 'false';">
                         {{ submit_button_name }}
                     </button>
