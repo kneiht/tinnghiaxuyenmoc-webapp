@@ -238,7 +238,7 @@ def render_display_records(request, **kwargs):
     if group_by:
         GROUPS_PER_PAGE = 5
         if records.count() == 0:
-            return '<div id="display-records" class="w-full overflow-scroll">Không có dữ liệu</div><div up-hungry id="load-more" class="hidden"></div>'
+            return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy dữ liệu, vui lòng chọn ngày khác</p></div><div up-hungry id="load-more" class="hidden"></div>'
         if model_class == VehicleOperationRecord:
             if group_by == 'vehicle':
                 page = next

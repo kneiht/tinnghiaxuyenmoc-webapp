@@ -25,7 +25,7 @@
                     {% if each_sub_page == sub_page %} bg-slate-300 dark:bg-slate-700 {% endif %}">
                     {{ display_name }}
                 </a>
-                <a up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=each_sub_page elements='tool_bar|display_records' %}"></a>
+                <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=each_sub_page elements='tool_bar|display_records' %}"></a>
             </div>
             {% endfor %}
         </div>
