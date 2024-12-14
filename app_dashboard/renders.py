@@ -201,7 +201,10 @@ def render_display_records(request, **kwargs):
         next = None
 
     # Check the page to render specific content
-    model_class = globals()[model]
+    try:
+        model_class = globals()[model]
+    except:
+        return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy chức năng này, có thể chức năng này đang được phát triển!</p></div><div up-hungry id="load-more" class="hidden"></div>'
     project = Project.objects.filter(pk=project_id).first()
 
 
@@ -232,6 +235,7 @@ def render_display_records(request, **kwargs):
             records = records.filter(location=filter_location)
 
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
+
 
 
     groups = []

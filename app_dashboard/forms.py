@@ -971,7 +971,7 @@ class RepairPartForm(forms.ModelForm):
         fields = ['vehicle_type', 'part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
         labels = {
             'vehicle_type': 'Loại xe',
-            'part_number': 'Mã danh mục',
+            'part_number': 'Mã phụ tùng',
             'part_name': 'Tên đầy đủ',
             'part_price': 'Đơn giá',
             'image': 'Hình ảnh',
@@ -1014,3 +1014,60 @@ class RepairPartForm(forms.ModelForm):
             }),
         }
 
+
+class UserPermissionForm(forms.ModelForm):
+    class Meta:
+        model = UserPermission
+        fields = ['user', 'permission', 'note']
+        labels = {
+            'user': 'Tài khoản',
+            'permission': 'Quyền',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'user': forms.Select(attrs={
+                'placeholder': 'Chọn tài khoản',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'permission': forms.Select(attrs={
+                'placeholder': 'Chọn quyền',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=UserPermission.PERMISSION_CHOICES),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+            }),
+        }
+
+
+class ProjectUserForm(forms.ModelForm):
+    class Meta:
+        model = ProjectUser
+        fields = ['user', 'project', 'role', 'note']
+        labels = {
+            'user': 'Tài khoản',
+            'project': 'Dự án',
+            'role': 'Vị trí',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'user': forms.Select(attrs={
+                'placeholder': 'Chọn tài khoản',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'project': forms.Select(attrs={
+                'placeholder': 'Chọn dự án',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'role': forms.Select(attrs={
+                'placeholder': 'Chọn vị trí',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=ProjectUser.ROLE_CHOICES),
+            'note': forms.Textarea(attrs={
+                    'class': 'form-input h-20', 
+            }),
+        }

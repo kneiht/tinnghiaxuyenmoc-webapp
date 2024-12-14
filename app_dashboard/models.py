@@ -92,7 +92,6 @@ class BaseModel(models.Model):
 
         return output_imagefield
 
-
     def save(self, *args, **kwargs):
         # refine fields
         for field in self._meta.fields:
@@ -134,45 +133,6 @@ class BaseModel(models.Model):
                         setattr(thumbnail, 'thumbnail', thumbnail_image)
                         thumbnail.save()
 
-class Permission(BaseModel):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-
-class UserPermission(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
-
-class UserExtra(BaseModel):
-    ROLE_CHOICES = (
-        ('admin', 'Quản Lý Cao Cấp'),
-        ('technician', 'Kỹ Thuật'),
-        ('supervisor', 'Giám Sát'),
-        ('normal_staff', 'Nhân Viên'),
-    )
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
-    settings = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    def __str__(self):
-        return self.user.username
-
-
-
-class Task(BaseModel):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    due_date = models.DateField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-
-class TaskUser(BaseModel):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
 class Thumbnail(models.Model):
     reference_url = models.CharField(max_length=255, blank=True, null=True)
     thumbnail  = models.ImageField(upload_to='images/thumbnails/', blank=True, null=True)
@@ -190,6 +150,57 @@ class SecondaryIDMixin(models.Model):
                 ).aggregate(max_secondary_id=Max('secondary_id'))['max_secondary_id'] or 0
                 self.secondary_id = highest_id + 1
         super().save(*args, **kwargs)
+
+
+
+class UserPermission(BaseModel):
+    PERMISSION_CHOICES = (
+        ('create_vehicle_maintenance', 'Tạo phiếu sửa chữa'),
+    )
+    class Meta:
+        ordering = ['user', 'permission']
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Tài khoản", unique=True)
+    permission = models.CharField(max_length=255, choices=PERMISSION_CHOICES, verbose_name="Quyền")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    @classmethod
+    def get_display_fields(self):
+        fields = ['user', 'permission', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+class UserExtra(BaseModel):
+    ROLE_CHOICES = (
+        ('admin', 'Quản Lý Cao Cấp'),
+        ('technician', 'Kỹ Thuật'),
+        ('supervisor', 'Giám Sát'),
+        ('normal_staff', 'Nhân Viên'),
+    )
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
+    avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
+    settings = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return self.user.username
+
+
+
+
+class Task(BaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    due_date = models.DateField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class TaskUser(BaseModel):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
 
 
 class Project(BaseModel):
@@ -227,18 +238,26 @@ class Project(BaseModel):
         }
 
 
-
-
 class ProjectUser(models.Model):
     ROLE_CHOICES = (
+        ('view_only', 'Chỉ xem'),
         ('technician', 'Kỹ Thuật'),
         ('supervisor', 'Giám Sát'),
-        ('view_only', 'Chỉ xem'),
+        ('all', 'Cấp tất cả quyền trong dự án'),
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Tài khoản", unique=True)
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="view_only", verbose_name="Vị trí")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    @classmethod
+    def get_display_fields(self):
+        fields = ['user', 'project', 'role', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 
 class Job(SecondaryIDMixin, BaseModel):
@@ -422,7 +441,7 @@ class StaffData(BaseModel):
         
     )
     # Driver Information Fields
-    full_name = models.CharField(max_length=255, verbose_name="Họ và tên")
+    full_name = models.CharField(max_length=255, verbose_name="Họ và tên", unique=True)
     hire_date = models.DateField(verbose_name="Ngày vào làm", default=timezone.now)
     identity_card = models.CharField(max_length=255, verbose_name="CCCD", default="")
     birth_year = models.DateField(verbose_name="Ngày sinh", default=timezone.now)
@@ -504,14 +523,9 @@ class VehicleRevenueInputs(BaseModel):
         return VehicleRevenueInputs.objects.filter(valid_from__lte=date).order_by('-valid_from').first()
 
 
-
-
-
-
 class DriverSalaryInputs(BaseModel):
     class Meta:
         ordering = ['driver']
-
 
     METHOD_CHOICES = (
         ('type_1', 'Nghỉ chủ nhật và lễ, nếu đi làm được tính thêm lương (xe lu)'),
@@ -566,7 +580,7 @@ class DriverSalaryInputs(BaseModel):
 
 class VehicleDetail(BaseModel):
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, verbose_name="Loại xe")
-    license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="")
+    license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="",  unique=True)
     vehicle_name = models.CharField(max_length=255, verbose_name="Tên nhận dạng xe", default="")
     gps_name = models.CharField(max_length=255, verbose_name="Tên trên định vị", default="")
     vehicle_inspection_number = models.CharField(max_length=255, verbose_name="Số đăng kiểm")
@@ -791,7 +805,7 @@ class NormalWorkingTime(BaseModel):
 class Holiday(BaseModel):  
     class Meta:
         ordering = ['-date']
-    date = models.DateField(verbose_name="Ngày lễ")
+    date = models.DateField(verbose_name="Ngày lễ",  unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="")
     created_at = models.DateTimeField(default=timezone.now)
     @classmethod
@@ -1110,7 +1124,7 @@ class RepairPart(BaseModel):
     class Meta:
         ordering = ['vehicle_type', 'part_price']
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại xe")
-    part_number = models.CharField(max_length=255, verbose_name="Mã danh mục")
+    part_number = models.CharField(max_length=255, verbose_name="Mã phụ tùng", unique=True)
     part_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
     part_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
     image = models.ImageField(verbose_name="Hình ảnh", default="", null=True, blank=True)

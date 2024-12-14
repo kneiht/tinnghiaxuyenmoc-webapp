@@ -28,18 +28,19 @@ def handle_form(request, model, pk=0):
     # Convert model name to model class
     model_class = globals()[model]
     form_class = globals()[model + 'Form']
-
+    
     # check if not Post => return 404
     if request.method != 'POST':
         return HttpResponseForbidden()
-
+    
     # project_id
     project_id = get_valid_id(request.POST.get('project', 0))
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
+
     # print("instance:", instance)
-    # print("instance", form)
+   
     if form.is_valid():
         instance_form = form.save(commit=False)
         if instance is None:  # This is a new form
@@ -69,8 +70,6 @@ def handle_form(request, model, pk=0):
                     repair_part_id=part,
                     quantity=quantity,
                 )
-
-
         # Save the many to many field, if any
         # form.save_m2m()
         record = instance_form
@@ -80,6 +79,7 @@ def handle_form(request, model, pk=0):
         
         return HttpResponse(html_message + html_record)
     else:
+        print(form.errors)
 
         html_modal = render_form(request, model=model, pk=pk, form=form, project_id=project_id)
         return  HttpResponse(html_modal)
@@ -184,7 +184,7 @@ def handle_weekplan_form(request):
 
         # print('user_role:', user_role.role)
 
-        if user_role.role == 'technician':
+        if user_role.role == 'technician' or user_role.role == 'all':
             message = "Phê duyệt thành công"
             for job in jobs:
                 jobplan = JobPlan.objects.filter(job=job, start_date=start_date, end_date=end_date).first()
@@ -192,7 +192,7 @@ def handle_weekplan_form(request):
                     jobplan.status = weekplan_status
                     jobplan.save()
 
-        elif user_role.role == 'supervisor':
+        elif user_role.role == 'supervisor' or user_role.role == 'all':
             message = "Cập nhật kế hoạch tuần thành công. \n\nĐã chuyển kế hoạch đến người xét duyệt!"
             weekplan_status = 'wait_for_approval'
             for job in jobs:
@@ -510,12 +510,13 @@ def page_home(request, sub_page=None):
     # context = {'approval_tasks': approval_tasks}
 
     if sub_page == None:
-        return redirect('page_home', sub_page='VehicleType')
+        return redirect('page_home', sub_page='Announcement')
 
     display_name_dict = {
         'Announcement': 'Thông báo',
-        'Task': 'Công việc',
-        'Permissions': 'Cấp quyền thao tác',
+        'Taskzzz': 'Công việc',
+        'UserPermission': 'Cấp quyền quản lý dữ liệu',
+        'ProjectUser': 'Cấp quyền quản lý dự án',
 
     }
     context = {

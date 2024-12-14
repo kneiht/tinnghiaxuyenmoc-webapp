@@ -22,7 +22,9 @@
             <div>
                 <a up-preload="insert" href="{% url 'page_general_data' sub_page=each_sub_page %}"
                     class="btn btn-outline-no-focus text-nowrap cursor-pointer text-theme rounded-none
-                    {% if each_sub_page == sub_page %} bg-slate-300 dark:bg-slate-700 {% endif %}">
+                    {% if each_sub_page == sub_page %} bg-slate-300 dark:bg-slate-700 {% endif %}
+                    {% if forloop.first %} rounded-s-lg {% endif %}
+                    {% if forloop.last %} rounded-e-lg {% endif %}">
                     {{ display_name }}
                 </a>
                 <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=each_sub_page elements='tool_bar|display_records' %}"></a>
