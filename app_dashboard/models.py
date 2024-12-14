@@ -1,26 +1,22 @@
-import time, re, io
-from django.db import models
+# Standard library imports
+import io
+import re
+import time
+from datetime import date, datetime, time, timedelta
+
+# Django imports
 from django.contrib.auth.models import User
-
-from datetime import datetime, time, date
-from datetime import timedelta
-
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.validators import MinValueValidator
+from django.db import models, transaction
+from django.db.models import Max, Sum
+from django.db.models.fields.files import ImageFieldFile
 from django.utils import timezone
 
-from PIL import Image
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db.models.fields.files import ImageFieldFile
-
-from django.db.models import Max
-from django.db import transaction
-
-from django.db.models import Sum
-
-
-from django.core.validators import MinValueValidator
-
-from django.core.exceptions import ValidationError
+# Third-party library imports
 import pandas as pd
+from PIL import Image
 
 def get_valid_date(date):
     try:
@@ -30,8 +26,70 @@ def get_valid_date(date):
     date = date.strftime('%Y-%m-%d')
     return date
 
+def get_str_return(self):
+    if self.first_name in ('', None):
+        name = "Chưa cập nhật tên"
+    else:
+        name = self.first_name
+    return self.username + " (" + name +")"
+
+
+@classmethod
+def get_display_fields(self):
+    fields = ['username', 'first_name', 'email', 'is_superuser']
+    # Check if the field is in the model
+    for field in fields:
+        if not hasattr(self, field):
+            fields.remove(field)
+    return fields
+
+
+def check_permission(self, sub_page):
+    class Permission:
+        read = False
+        create = False
+        update = False
+        delete = False
+    return_permission = Permission()
+
+    if self.is_superuser:
+        return_permission.read = True
+        return_permission.create = True
+        return_permission.update = True
+        return_permission.delete = True
+
+    user_permissions = UserPermission.objects.filter(user=self, sub_page=sub_page)
+    # get all permission in user_permissions
+    for permission in user_permissions:
+        for item in  ['read', 'create', 'update', 'delete']:
+            if item in permission.permission:
+                setattr(return_permission, item, True)
+
+    return return_permission
+
+
+
+User.add_to_class("__str__", get_str_return)
+User.add_to_class("get_display_fields", get_display_fields)
+User.add_to_class("check_permission", check_permission)
+
+
+class NonArchivedManager(models.Manager):
+    archived = False
+    """
+    Custom manager to return only non-archived records.
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=self.archived)
+
+
 class BaseModel(models.Model):
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
+    archived = models.BooleanField(default=False)
+
+    # Use the custom manager
+    objects = NonArchivedManager()
+
     class Meta:
         abstract = True  # Specify this model as Abstract
 
@@ -60,7 +118,6 @@ class BaseModel(models.Model):
 
         # Create a Django InMemoryUploadedFile from the compressed image
         file_name = "%s_compressed.webp" % image_field.name.split('.')[0]
-        #print('\n\n\n>>>>>' , file_name)
         output_imagefield = InMemoryUploadedFile(output_io_stream, 'ImageField', 
                                                  file_name, 
                                                  'image/webp', output_io_stream.getbuffer().nbytes, None)
@@ -85,7 +142,6 @@ class BaseModel(models.Model):
 
         # Create a Django InMemoryUploadedFile from the compressed image
         file_name = "%s.thumbnail" % image_field.name.split('.')[0]
-        #print('>>>>>' , file_name)
         output_imagefield = InMemoryUploadedFile(output_io_stream, 'ImageField', 
                                                  file_name, 
                                                  'image/webp', output_io_stream.getbuffer().nbytes, None)
@@ -98,7 +154,6 @@ class BaseModel(models.Model):
             value = getattr(self, field.name)
             if isinstance(value, ImageFieldFile):
                 if value:  # If there's an image to compress
-                    #print('\n\ncompressed')
                     compressed_image = self.compress_image(value, 500)
                     setattr(self, field.name, compressed_image)
 
@@ -151,21 +206,53 @@ class SecondaryIDMixin(models.Model):
                 self.secondary_id = highest_id + 1
         super().save(*args, **kwargs)
 
-
-
 class UserPermission(BaseModel):
-    PERMISSION_CHOICES = (
-        ('create_vehicle_maintenance', 'Tạo phiếu sửa chữa'),
+    MODEL_PERMISSION_CHOICES = (
+        ('read', 'Đọc'),
+        ('read_create', 'Đọc - Tạo'),
+        ('read_create_update', 'Đọc - Tạo - Cập nhật'),
+        ('read_create_update_delete', 'Đọc - Tạo - Cập nhật - Xóa'),
     )
+    MODEL_CHOICES = (
+        # From the first dictionary
+        ('Announcement', 'Thông báo'),
+        ('Task', 'Công việc'),
+        ('User', 'Tài khoản nhân viên'),
+        ('UserPermission', 'Cấp quyền quản lý dữ liệu'),
+        ('ProjectUser', 'Cấp quyền quản lý dự án'),
+
+        ('VehicleType', 'DL loại xe'),
+        ('VehicleRevenueInputs', 'DL tính DT theo loại xe'),
+        ('VehicleDetail', 'DL xe chi tiết'),
+        ('StaffData', 'DL nhân viên'),
+        ('DriverSalaryInputs', 'DL mức lương tài xế'),
+        ('DumbTruckPayRate', 'DL tính lương tài xế xe ben'),
+        ('DumbTruckRevenueData', 'DL tính DT xe ben'),
+        ('Location', 'DL địa điểm'),
+        ('NormalWorkingTime', 'Thời gian làm việc'),
+        ('Holiday', 'Ngày lễ'),
+
+        ('FuelFillingRecord', 'LS đổ nhiên liệu'),
+        ('LubeFillingRecord', 'LS đổ nhớt'),
+        ('RepairPart', 'Danh mục sửa chữa'),
+        ('VehicleMaintenance', 'Phiếu sửa chữa'),
+        ('VehicleDepreciation', 'Khấu hao'),
+        ('VehicleBankInterest', 'Lãi ngân hàng'),
+        ('VehicleOperationRecord', 'DL HĐ xe công trình / ngày'),
+        ('ConstructionDriverSalary', 'Bảng lương'),
+        ('ConstructionReportPL', 'Bảng BC P&L xe cơ giới'),
+    )
+
     class Meta:
-        ordering = ['user', 'permission']
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Tài khoản", unique=True)
-    permission = models.CharField(max_length=255, choices=PERMISSION_CHOICES, verbose_name="Quyền")
+        ordering = ['user', 'sub_page', 'created_at']
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Tài khoản")
+    sub_page = models.CharField(max_length=255, choices=MODEL_CHOICES, verbose_name="Bảng dữ liệu", null=True, blank=True)
+    permission = models.CharField(max_length=255, choices=MODEL_PERMISSION_CHOICES, verbose_name="Cấp quyền", null=True, blank=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     @classmethod
     def get_display_fields(self):
-        fields = ['user', 'permission', 'note']
+        fields = ['user', 'sub_page', 'permission', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -238,7 +325,7 @@ class Project(BaseModel):
         }
 
 
-class ProjectUser(models.Model):
+class ProjectUser(BaseModel):
     ROLE_CHOICES = (
         ('view_only', 'Chỉ xem'),
         ('technician', 'Kỹ Thuật'),
@@ -395,12 +482,6 @@ class JobDateReport(BaseModel):
 
     def __str__(self):
         return f'progress of {self.job} on {self.date}'
-
-
-
-
-
-
 
 
 class VehicleType(BaseModel):
@@ -828,7 +909,7 @@ class Holiday(BaseModel):
         
 
 
-class VehicleOperationRecord(models.Model):
+class VehicleOperationRecord(BaseModel):
 
     SOURCE_CHOICES = [
         ('gps', 'GPS'),
@@ -913,10 +994,6 @@ class VehicleOperationRecord(models.Model):
 
         # The set of seconds that is overtime
         overtime = all_seconds_from_start_to_end - all_seconds_of_working_hours
-        # print("the_order_of_second_of_morning_start", the_order_of_second_of_morning_start)
-        # print("the_order_of_second_of_morning_end", the_order_of_second_of_morning_end)
-        # print("overtime", len(overtime))
-        # print("all_seconds_of_working_hours", len(all_seconds_of_working_hours))
         # count the number of seconds
         if overtime:
             normal_working_time = self.duration_seconds - len(overtime)

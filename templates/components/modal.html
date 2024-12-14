@@ -43,10 +43,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[1100px] gap-4 px-6">
                 
                 {% elif form.fields|length >= 5 and form.fields|length < 12 %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[600px] gap-4 px-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[700px] gap-4 px-6">
 
                 {% else %}
-                <div class="grid grid-cols-1 w-[400px]  gap-4 px-6">
+                <div class="grid grid-cols-1 w-[500px]  gap-4 px-6">
                 {% endif %}
 
                     {% if project_id and model != 'ProjectUser'  %}  
@@ -56,7 +56,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'project' and field.name != 'description' and field.name != 'note' or model == 'ProjectUser' %}
+                        {% if field.name != 'project' and field.name != 'description' and field.name != 'note' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -114,9 +114,7 @@
                                     <div class="w-3/12 text-center">
                                         <span class="{{ record|get_value:'done_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'done_status' }}</span>
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
                     {% endif %}
@@ -192,15 +190,34 @@
                     </div>
                 {%  endif %}
 
-                <div class="flex justify-center items-center gap-5 pt-8 hidable
+                <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable
                 {% if modal == "modal_VehicleMaintenance" %} hidden {% endif %}">
-                    <button type="submit" class="submit btn btn-primary rounded-full w-36">
-                        {{ submit_button_name }}
-                    </button>
-                    <button id='cancel-modal' type="button" class="btn btn-secondary rounded-full w-36" onclick="document.getElementById('modal-body').remove();">
-                        Hủy bỏ
-                    </button>
+                    {% if record and record.archived == False %}
+                        <button type="button" class="btn btn-danger rounded-full w-28 "
+                            onclick="if (confirm('Bạn có thực sự muốn bỏ dữ liệu này vào thùng rác không?\n\nLưu ý: dữ liệu sẽ không bị xóa hoàn toàn, bạn có thể xem lại trong mục Thùng rác.')) { 
+                                document.getElementById('archived').value='true';
+                                document.getElementById('submit-form').click();}">
+                            Xóa
+                            <input name="archived" id="archived" class="hidden">
+                        </button>
+                    {% elif record and record.archived == True %}
+                        <button type="button" class="btn btn-success rounded-full w-28 "
+                            onclick="if (confirm('Xác nhận khôi phục dữ liệu?')) { 
+                                document.getElementById('archived').value='false';
+                                document.getElementById('submit-form').click();}">
+                            Khôi phục
+                            <input name="archived" id="archived" class="hidden">
+                        </button>
+                    {% endif %}
 
+                    <div class="flex justify-center gap-3">
+                        <button type="submit" id="submit-form" class="submit btn btn-primary rounded-full w-28">
+                            {{ submit_button_name }}
+                        </button>
+                        <button id='cancel-modal' type="button" class="btn btn-secondary rounded-full w-28" onclick="document.getElementById('modal-body').remove();">
+                            Hủy bỏ
+                        </button>
+                    </div>
                 </div>
 
             </form>

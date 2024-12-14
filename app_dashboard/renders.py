@@ -9,10 +9,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 
+from django.contrib.auth.models import User
 from .forms import *
 from .models import *
-
 from .utils import *
+
+
 
 
 def render_title_bar(request, **kwargs):
@@ -59,12 +61,15 @@ def render_tool_bar(request, **kwargs):
         year, month = check_month.split('-')
         start_date, end_date = get_start_end_of_the_month(int(month), int(year))
 
-
-
     group_by = params.get('group_by', '')
     tab = params.get('tab', '')
-    # print(check_date)
     project = Project.objects.filter(pk=project_id).first()
+
+    if model in ['VehicleOperationRecord', 'User']:
+        display_trashcan = False
+    else:
+        display_trashcan = True
+
     context = {
         'page': page,
         'model': model,
@@ -75,16 +80,14 @@ def render_tool_bar(request, **kwargs):
         'check_month': check_month,
         'group_by': group_by,
         'tab': tab,
-        'lazy_load': params.get('lazy_load', False)
+        'lazy_load': params.get('lazy_load', False),
+        'display_trashcan':display_trashcan
     }
     if model not in ['Project', 'Job', 'VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
-    # print(context)
     # Render 
     template = 'components/tool_bar.html'
     return render_to_string(template, context, request)
-
-
 
 
 
@@ -175,12 +178,17 @@ def render_display_records(request, **kwargs):
         return unique_values
     
     params = kwargs
+
     model = params.get('model', '')
     update = params.get('update', False)
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
     start_date = get_valid_date(params.get('start_date', ''))
     end_date = get_valid_date(params.get('end_date', start_date))
+    search_phrase = request.GET.get('all', '')
+
+
+
 
     check_month = params.get('check_month', '')
     if check_month != '':
@@ -200,15 +208,20 @@ def render_display_records(request, **kwargs):
     else:
         next = None
 
-    # Check the page to render specific content
-    try:
-        model_class = globals()[model]
-    except:
-        return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy chức năng này, có thể chức năng này đang được phát triển!</p></div><div up-hungry id="load-more" class="hidden"></div>'
+    model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
+
+    
 
 
     if not records:
+        # Control the trashcan
+        if params.get('archived') == 'true':
+            model_class.objects.archived = True
+        else:
+            model_class.objects.archived = False
+
+        # Get the records
         if not project_id:
             records = model_class.objects.all()
         else:
@@ -225,9 +238,6 @@ def render_display_records(request, **kwargs):
             if filter_location == "None":
                 filter_location = None
 
-            print('filter_driver:', filter_driver)
-            print('filter_vehicle:', filter_vehicle)
-            print('filter_location:', filter_location)
             filter_driver = StaffData.objects.filter(pk=filter_driver).first()
             records = records.filter(driver=filter_driver)
             records = records.filter(vehicle=filter_vehicle)
@@ -235,8 +245,6 @@ def render_display_records(request, **kwargs):
             records = records.filter(location=filter_location)
 
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
-
-
 
     groups = []
     if group_by:
@@ -277,7 +285,6 @@ def render_display_records(request, **kwargs):
                 else:
                     group_names = [records.first().driver.full_name]
 
-                # print('group_names:', group_names)
                 if len(group_names) <= page*GROUPS_PER_PAGE:
                     next = "stop"
 
@@ -334,7 +341,8 @@ def render_display_records(request, **kwargs):
                'end_date': end_date,
                'check_month': check_month,    
                'tab': tab,
-               'next': next
+               'next': next,
+               'search_phrase': search_phrase
     }
     html = render_to_string(template, context, request)
     return html
@@ -385,8 +393,6 @@ def render_message(request, message, **kwargs):
     return render_to_string(template, context, request)
 
 
-
-
 def render_weekplan_table(request, project_id, check_date=None):
     project = Project.objects.filter(pk=project_id).first()
 
@@ -394,8 +400,6 @@ def render_weekplan_table(request, project_id, check_date=None):
         check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
     except:
         check_date = timezone.now().date()
-
-    # print('>>>>>>>>>>>>>> check_date', check_date, type(check_date))
     # Get monday and sunday dates of the week that contains check_date
     monday = check_date - timedelta(days=check_date.weekday())
     sunday = check_date + timedelta(days=6 - check_date.weekday())
@@ -403,9 +407,6 @@ def render_weekplan_table(request, project_id, check_date=None):
     week = f'{monday.strftime("%d-%m-%Y")} đến {sunday.strftime("%d-%m-%Y")}'
     jobplans_in_week = JobPlan.objects.filter(start_date__gte=monday, end_date__lte=sunday, job__project=project)
     job_date_reports = JobDateReport.objects.filter(date=check_date, job__project=project)
-
-
-    # print('>>>>>>> job_date_reports', job_date_reports)
 
     jobs = Job.objects.filter(project=project)
 

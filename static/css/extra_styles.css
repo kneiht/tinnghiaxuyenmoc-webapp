@@ -170,8 +170,33 @@
   }
 }
 
+.just-archived {
+  animation: just-archived 5s forwards;
+}
+@keyframes just-archived {
+  0% {
+    opacity: 1;
+  }
 
+  100% {
+    background-color: #c55353;
+    opacity: 1;
+  }
+}
 
+.just-restored {
+  animation: just-restored 5s forwards;
+}
+@keyframes just-restored {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    background-color: #17ad37;
+    opacity: 1;
+  }
+}
 
 
 /* STATUS STYLES */

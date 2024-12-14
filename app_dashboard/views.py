@@ -2,6 +2,10 @@
 # https://chat.openai.com/share/16295269-0f56-4c6a-8cd7-7ea903fdaf86
 # cần check truy cập trang cần đúng school_id and user
 
+import requests, json
+from requests.auth import HTTPBasicAuth
+from bs4 import BeautifulSoup   
+
 from core import settings
 import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
@@ -22,8 +26,64 @@ from .utils import *
 from core.settings import DOMAIN
 from django.utils import timezone
 from django.urls import reverse_lazy
+
+
+@login_required
+def decide_permission(request, action, params):
+    # CHECK PERMISSIONS
+    tab = params.get('tab', None)
+    if not tab:
+        model = params.get('model', None)
+        sub_page = model
+    elif tab=='vehicle_operation_data_by_date':
+        sub_page = 'VehicleOperationRecord'
+    elif tab=='driver_salary':
+        sub_page = 'ConstructionDriverSalary'
+    elif tab=='vehicle_revenue':
+        sub_page = 'ConstructionReportPL'
+
+    # FEATURES THAT ARE DEVELOPING
+    if sub_page in ("Task", "Announcement"):
+        message = 'Không tìm thấy chức năng này. \n Có thể chức năng này đang được phát triển!'
+        return render(request, 'components/message_page.html', {'message': message})
+
+    user = request.user
+    permission = user.check_permission(sub_page)
+    if action == 'read':
+        if not permission.read:
+            message = 'Bạn chưa được cấp quyền truy cập trang này. \n Vui lòng liên hệ admin cấp quyền.'
+            return render(request, 'components/message_page.html', {'message': message})
+        else:
+            return None
+    elif action == 'create':
+        if not permission.create:
+            message = 'Tạo dữ liệu không thành công vì chưa được cấp quyền. \n\n Vui lòng liên hệ admin cấp quyền.'
+            message_type = 'red'
+            return render_message(request, message=message, message_type=message_type)
+        else:
+            return None
+    elif action == 'update':
+        if not permission.update:
+            message = 'Cập nhật dữ liệu không thành công vì chưa được cấp quyền. \n\n Vui lòng liên hệ admin cấp quyền.'
+            message_type = 'red'
+            return render_message(request, message=message, message_type=message_type)
+        else:
+            return None
+
+    elif action == 'delete':
+        if not permission.delete:
+            message = 'Không thể xóa dữ liệu vì chưa được cấp quyền. \n\n Vui lòng liên hệ admin cấp quyền.'
+            message_type = 'red'
+            return render_message(request, message=message, message_type=message_type)
+        else:
+            return None
+    else:
+        return None
+
 # HANDLE FORMS ===============================================================
+@login_required
 def handle_form(request, model, pk=0):
+
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -39,23 +99,53 @@ def handle_form(request, model, pk=0):
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
 
-    # print("instance:", instance)
-   
+    # Delete and restore
+    if request.POST.get('archived')=='true':
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'delete', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        instance.archived = True
+        instance.save()
+        instance.style = 'just-archived'
+        html_message = render_message(request, message='Di chuyển dữ liệu vào thùng rác thành công.\n\nTải lại trang để cập nhật hiển thị.')
+        html_record = render_display_records(request, model=model, records=[instance], update='True', project_id=project_id)
+        return HttpResponse(html_message + html_record)
+    elif request.POST.get('archived')=='false':
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'update', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        instance.archived = False
+        instance.save()
+        instance.style = 'just-restored'
+        html_message = render_message(request, message='Khôi phục dữ liệu thành công.\n\nTải lại trang để cập nhật hiển thị.')
+        html_record = render_display_records(request, model=model, records=[instance], update='True', project_id=project_id)
+        return HttpResponse(html_message + html_record)
+
+
     if form.is_valid():
         instance_form = form.save(commit=False)
         if instance is None:  # This is a new form
             # Handle the case of the project is created and need to be assigned to a user
             # instance_form.user = request.user
-            pass
+            # CHECK PERMISSIONS
+            forbit_html = decide_permission(request, 'create', {'model': model})
+            if forbit_html:
+                return HttpResponse(forbit_html)
+        else: # update
+            # CHECK PERMISSIONS
+            forbit_html = decide_permission(request, 'update', {'model': model})
+            if forbit_html:
+                return HttpResponse(forbit_html)
+        
         instance_form.save()
-
         if model == 'VehicleMaintenance':
             vehicle_maintenance = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
             vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance)
             vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
             # check if the id is in the list, if not delete it
-            print(vehicle_part_post_ids)
             for vehicle_part in vehicle_parts:
                 if str(vehicle_part.id) not in vehicle_part_post_ids:
                     vehicle_part.delete()
@@ -76,11 +166,9 @@ def handle_form(request, model, pk=0):
         record.style = 'just-updated'
         html_message = render_message(request, message='Cập nhật thành công')
         html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
-        
         return HttpResponse(html_message + html_record)
     else:
         print(form.errors)
-
         html_modal = render_form(request, model=model, pk=pk, form=form, project_id=project_id)
         return  HttpResponse(html_modal)
 
@@ -120,9 +208,15 @@ def load_elements(request):
     for key, value in request.GET.items():
         if key != 'q':
             params[key] = value
-
-    print('>>>>>>>>>> elements params:', params, '\n\n')
+    print('\n>>>>>>>>>> elements params:', params)
     html = '<div id="load-elements" class"hidden"></div>'
+
+    # CHECK PERMISSIONS
+    forbit_html = decide_permission(request, 'read', params)
+    if forbit_html:
+        return HttpResponse(forbit_html)
+
+    # RENDER ELEMENTS
     elements = params.get('elements', '')
     for element in elements.split('|'):
         element = element.strip()
@@ -166,7 +260,7 @@ def handle_weekplan_form(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     form = request.POST
-    # print(form)
+
     try:
         start_date = form.get('start_date')
         end_date = form.get('end_date')
@@ -179,10 +273,7 @@ def handle_weekplan_form(request):
         jobs = Job.objects.filter(project_id=project_id)
 
         weekplan_status = form.get('weekplan_status')
-        # print('weekplan_status:', weekplan_status)
         user_role = ProjectUser.objects.filter(project=project, user=request.user).first() 
-
-        # print('user_role:', user_role.role)
 
         if user_role.role == 'technician' or user_role.role == 'all':
             message = "Phê duyệt thành công"
@@ -262,7 +353,6 @@ def handle_date_report_form(request):
     try:
         check_date = form.get('check_date')
         project_id = form.get('project_id')
-        # print('>>>>>>>>>>>>>>> checkdate and project:', check_date, project_id)
         # get all jobs of the project
         jobs = Job.objects.filter(project_id=project_id)
 
@@ -303,7 +393,7 @@ def handle_date_report_form(request):
 
             total_quantity_reported = progress_by_quantity(job)['total_quantity_reported'] - current_date_quantity
             total_quantity_left = job.quantity - total_quantity_reported
-            # print('>>>>>>>>>>>>>>> total_amount_reported:', total_quantity_reported, 'total_quantity_left:', total_quantity_left)
+            
             if int(quantity) > total_quantity_left:
                 message = f'Lỗi khi nhập khối lượng hoàn thành (đang nhập {quantity}) trong ngày cho công việc "{job.name}". Khối lượng hoàn thành phải nhỏ hơn khối lượng còn lại ({str(total_quantity_left)}).'
                 html_message = render_message(request, message=message, message_type='red')
@@ -345,7 +435,6 @@ def handle_date_report_form(request):
         
 
 
-
 def handle_vehicle_operation_form(request):
     def convert_time(time_str, time_sign):
         hours, minutes, seconds = map(int, time_str.split(":"))
@@ -360,7 +449,6 @@ def handle_vehicle_operation_form(request):
     
     try:
         form = request.POST
-        # print(form)
         # Get list of ids   
         ids = form.getlist('id')
         for id in ids:
@@ -450,7 +538,6 @@ def handle_vehicle_operation_form(request):
             allow_overtime = allow_overtime_new
 
             if not driver:
-                # print('>>>> skip')
                 continue
 
             new_record = VehicleOperationRecord.objects.create(
@@ -487,146 +574,6 @@ def handle_vehicle_operation_form(request):
     except Exception as e:
         html = render_message(request, message='Có lỗi: ' + str(e), message_type='red') 
         return HttpResponse(html)
-
-
-
-
-
-
-# GENERAL PAGES ==============================================================
-@login_required
-def page_home(request, sub_page=None):
-    # user = request.user
-    # jobplans = JobPlan.objects.filter(status='wait_for_approval')
-    # # get dictionary of projects, start_date and end_date of the jobplans
-    # approval_tasks = []
-    # for jobplan in jobplans:
-    #     approval_tasks.append({
-    #         'project': jobplan.job.project,
-    #         'start_date': jobplan.start_date,
-    #         'end_date': jobplan.end_date
-    #     })
-
-    # context = {'approval_tasks': approval_tasks}
-
-    if sub_page == None:
-        return redirect('page_home', sub_page='Announcement')
-
-    display_name_dict = {
-        'Announcement': 'Thông báo',
-        'Taskzzz': 'Công việc',
-        'UserPermission': 'Cấp quyền quản lý dữ liệu',
-        'ProjectUser': 'Cấp quyền quản lý dự án',
-
-    }
-    context = {
-        'sub_page': sub_page,
-        'model': sub_page,
-        'display_name_dict': display_name_dict,
-        'current_url': request.path,
-    }
-    return render(request, 'pages/page_home.html', context)
-
-
-
-
-@login_required
-def page_projects(request):
-    return render(request, 'pages/page_projects.html')
-
-
-
-
-@login_required
-def page_each_project(request, pk):
-    check_date = request.GET.get('check_date')
-    project_id = get_valid_id(pk)
-    project = get_object_or_404(Project, pk=project_id)
-    # Should check if the project is belong to the user
-    context = {'project_id': project_id, 'check_date': check_date, 'project':project}
-    return render(request, 'pages/page_each_project.html', context)
-
-
-@login_required
-def page_general_data(request, sub_page=None):
-    if sub_page == None:
-        return redirect('page_general_data', sub_page='VehicleType')
-
-    display_name_dict = {
-        'VehicleType': 'DL loại xe',
-        'VehicleRevenueInputs': 'DL tính DT theo loại xe',
-        'VehicleDetail': 'DL xe chi tiết',
-        'StaffData': 'DL nhân viên',
-        'DriverSalaryInputs': 'DL mức lương tài xế',
-        'DumbTruckPayRate': 'DL tính lương tài xế xe ben',
-        'DumbTruckRevenueData': 'DL tính DT xe ben',
-        'Location': 'DL địa điểm',
-        'NormalWorkingTime': 'Thời gian làm việc',
-        'Holiday': 'Ngày lễ',
-    }
-    context = {
-        'sub_page': sub_page,
-        'model': sub_page,
-        'display_name_dict': display_name_dict,
-        'current_url': request.path,
-    }
-    return render(request, 'pages/page_general_data.html', context)
-
-
-@login_required
-def page_transport_department(request, sub_page=None):
-    if sub_page == None:
-        return redirect('page_transport_department', sub_page='FuelFillingRecord')
-
-    display_name_dict = {
-        'FuelFillingRecord': 'LS đổ nhiên liệu',
-        'LubeFillingRecord': 'LS đổ nhớt',
-        'RepairPart': 'Danh mục sửa chữa',
-        'VehicleMaintenance': 'Phiếu sửa chữa',
-        'VehicleDepreciation': 'Khấu hao',
-        'VehicleBankInterest': 'Lãi ngân hàng',
-        'VehicleOperationRecord': 'DL HĐ xe công trình / ngày',
-        'ConstructionDriverSalary': 'Bảng lương',
-        'ConstructionReportPL': 'Bảng BC P&L xe cơ giới',
-    }
-
-    params = request.GET.copy()
-    if 'start_date' not in params:
-        start_date = get_valid_date('')
-    else:
-        start_date = params['start_date']
-    if 'end_date' not in params:
-        end_date = get_valid_date('')
-    else:
-        end_date = params['end_date']
-    if 'check_month' not in params:
-        check_month = get_valid_month('')
-    else:
-        check_month = params['check_month']
-
-    context = {
-        'sub_page': sub_page,
-        'model': sub_page,
-        'display_name_dict': display_name_dict,
-        'current_url': request.path,
-        'start_date': start_date, 
-        'end_date': end_date, 
-        'check_month': check_month}
-    return render(request, 'pages/page_transport_department.html', context)
-
-
-
-
-def test(request):
-    records = VehicleOperationRecord.objects.all()
-    for record in records:
-        record.delete()
-    return render(request, 'pages/test.html')
-
-
-
-
-
 
 
 @login_required
@@ -710,15 +657,6 @@ def upload_project(request, project_id):
             job.save()
         html_message = render_message(request, message="Cập nhật thành công", ok_button_function='reload')
         return HttpResponse(html_message)
-
-
-
-
-
-
-import requests, json
-from requests.auth import HTTPBasicAuth
-from bs4 import BeautifulSoup   
 
 
 def get_binhanh_service_operation_time(check_date, vehicles):
@@ -811,7 +749,6 @@ def get_binhanh_service_operation_time(check_date, vehicles):
         login_response = session.post(url, headers=headers, data=data)
         # Step 4: Check if login was successful by verifying redirection or specific content in the response 01/05/2024
         if login_response.ok and "OnlineM.aspx" in login_response.url:
-            print("Login successful!")
             operation_time = {}
             count = 0
             for vehicle in vehicles:
@@ -819,9 +756,8 @@ def get_binhanh_service_operation_time(check_date, vehicles):
                 response = session.get(url, headers=headers)
                 data = response.json().get("data")
                 count += 1
-                print('Vehicle {}/{}:'.format(count, len(vehicles)), vehicle)
-                # print(data)
-                # print('\n\n\n')
+                # print('Vehicle {}/{}:'.format(count, len(vehicles)), vehicle)
+
                 if data == []:
                     operation_time[vehicle] = {}
                     continue
@@ -1023,7 +959,6 @@ def get_trip_data_from_binhanh(request):
             operation_time = parse_operation_time(gps_name, data)
             # return JsonResponse(operation_time, safe=False)
             result = save_operation_record(operation_time)
-            # print(result)
             return HttpResponse(result)
         else:
             result = 'Request failed with status code: ' + str(response.status_code)
@@ -1035,13 +970,6 @@ def get_trip_data_from_binhanh(request):
         print("An error occurred:", e)
         result = 'An error occurred: ' + str(e)
         return HttpResponse(result)
-
-
-
-
-
-
-
 
 @csrf_exempt
 def save_vehicle_operation_record(request):
@@ -1076,7 +1004,6 @@ def save_vehicle_operation_record(request):
             ).first()
 
             if vehicle_operation_record:
-                print('re calculate')
                 vehicle_operation_record.end_time = end_time
                 vehicle_operation_record.duration_seconds = duration_seconds
                 vehicle_operation_record.save()
@@ -1094,12 +1021,118 @@ def save_vehicle_operation_record(request):
 
 
 
- 
+
+# PAGES ==============================================================
+@login_required
+def page_home(request, sub_page=None):
+    user = request.user
+
+    if sub_page == None:
+        return redirect('page_home', sub_page='Announcement')
+
+    display_name_dict = {
+        'Announcement': 'Thông báo',
+        'Task': 'Công việc',
+        'User': 'Tài khoản nhân viên',
+        'UserPermission': 'Cấp quyền quản lý dữ liệu',
+        'ProjectUser': 'Cấp quyền quản lý dự án',
+    }
+
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+    }
+    return render(request, 'pages/page_home.html', context)
 
 
+
+@login_required
+def page_general_data(request, sub_page=None):
+    if sub_page == None:
+        return redirect('page_general_data', sub_page='VehicleType')
+
+    display_name_dict = {
+        'VehicleType': 'DL loại xe',
+        'VehicleRevenueInputs': 'DL tính DT theo loại xe',
+        'VehicleDetail': 'DL xe chi tiết',
+        'StaffData': 'DL nhân viên',
+        'DriverSalaryInputs': 'DL mức lương tài xế',
+        'DumbTruckPayRate': 'DL tính lương tài xế xe ben',
+        'DumbTruckRevenueData': 'DL tính DT xe ben',
+        'Location': 'DL địa điểm',
+        'NormalWorkingTime': 'Thời gian làm việc',
+        'Holiday': 'Ngày lễ',
+    }
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+    }
+    return render(request, 'pages/page_general_data.html', context)
+
+
+@login_required
+def page_transport_department(request, sub_page=None):
+    if sub_page == None:
+        return redirect('page_transport_department', sub_page='FuelFillingRecord')
+
+    display_name_dict = {
+        'FuelFillingRecord': 'LS đổ nhiên liệu',
+        'LubeFillingRecord': 'LS đổ nhớt',
+        'RepairPart': 'Danh mục sửa chữa',
+        'VehicleMaintenance': 'Phiếu sửa chữa',
+        'VehicleDepreciation': 'Khấu hao',
+        'VehicleBankInterest': 'Lãi ngân hàng',
+        'VehicleOperationRecord': 'DL HĐ xe công trình / ngày',
+        'ConstructionDriverSalary': 'Bảng lương',
+        'ConstructionReportPL': 'Bảng BC P&L xe cơ giới',
+    }
+
+    params = request.GET.copy()
+    if 'start_date' not in params:
+        start_date = get_valid_date('')
+    else:
+        start_date = params['start_date']
+    if 'end_date' not in params:
+        end_date = get_valid_date('')
+    else:
+        end_date = params['end_date']
+    if 'check_month' not in params:
+        check_month = get_valid_month('')
+    else:
+        check_month = params['check_month']
+
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+        'start_date': start_date, 
+        'end_date': end_date, 
+        'check_month': check_month}
+    return render(request, 'pages/page_transport_department.html', context)
 
 
 def test(request):
-    record = VehicleRevenueInputs.get_valid_record("20140-11-30")
-    print(record)
-    return HttpResponse('test')
+    records = VehicleOperationRecord.objects.all()
+    for record in records:
+        record.delete()
+    return render(request, 'pages/test.html')
+
+
+@login_required
+def page_projects(request):
+    return render(request, 'pages/page_projects.html')
+
+
+@login_required
+def page_each_project(request, pk):
+    check_date = request.GET.get('check_date')
+    project_id = get_valid_id(pk)
+    project = get_object_or_404(Project, pk=project_id)
+    # Should check if the project is belong to the user
+    context = {'project_id': project_id, 'check_date': check_date, 'project':project}
+    return render(request, 'pages/page_each_project.html', context)

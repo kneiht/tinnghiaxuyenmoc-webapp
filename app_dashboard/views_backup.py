@@ -60,7 +60,6 @@ def reset_primary_key(table_name):
 
 
 def get_table_names():
-    #print('\n\n', connection.vendor)
     # Get a list of all table names for the current database
     if connection.vendor == 'mysql':
         # For MySQL
@@ -187,7 +186,6 @@ def upload_db_backup(request):
                 try:
                     # Read the Excel file into a DataFrame
                     df = pd.read_excel(excel_file, sheet_name=table_name)
-                    # print(df.head(5))
                     sql_table_name = 'app_dashboard_' + table_name if table_name != 'auth_user' else table_name
                     # Insert new rows into the specified table using df.to_sql
                     insert_rows_using_to_sql(df, sql_table_name)
@@ -218,7 +216,6 @@ def db_table(request):
     command = request.GET.get('command')
     model_name = request.GET.get('model')
     pk = request.GET.get('pk')
-    print(command, model_name, pk)
 
     if command == 'get_model_list':
         dict = {

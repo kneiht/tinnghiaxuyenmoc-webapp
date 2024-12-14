@@ -38,10 +38,9 @@ def register(request):
         else:
             if form.is_valid():            
                 form.save()
-                print('Tạo tài khoản thành công')
                 context['account_message'] = "Bạn đã tạo tài khoản thành công! Đăng nhập ngay!"
             else:
-                print("Tạo tài khoản thất bại!")
+                context['account_message'] = "Tạo tài khoản thất bại"
     else:
         form = RegistrationForm()
     context['form'] = form

@@ -79,10 +79,20 @@ def decode_params(encoded_params):
     # Convert bytes back to string
     return decoded_bytes.decode('utf-8')
 
-
+UserPermission
 
 def translate(text):
     translated_text = {
+        # User
+        'Thêm User': 'Thêm tài khoản mới',
+        'Tạo User mới': 'Tạo tài khoản mới',
+        'Cập nhật User': 'Cập nhật tài khoản',
+
+        'Thêm UserPermission': 'Cấp quyền mới',
+        'Tạo UserPermission mới': 'Cấp quyền cho tài khoản',
+        'Cập nhật UserPermission': 'Cấp quyền cho tài khoản',
+
+
         'title_bar_page_projects': 'Trang quản lý các dự án',
         'Tiêu đề cho trang: page_projects': 'Trang quản lý các dự án',
 
@@ -227,7 +237,6 @@ def progress_by_time(record, check_date=None):
     else:
         if type(check_date) == str:
             check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
-    # print('>>>>>>>>>>>>>>>>>>>> progress_by_time', check_date, type(check_date))
 
     duration = (record.end_date - record.start_date).days + 1
     if duration == 0:
@@ -419,8 +428,6 @@ def filter_records(request, records, model_class, **kwargs):
     # Get all query parameters except 'sort' as they are assumed to be field filters
     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'} 
     if model_class == VehicleOperationRecord:
-
-
         if 'check_month' not in query_params:
             check_month = kwargs.get('check_month', '')
         else:
@@ -442,7 +449,6 @@ def filter_records(request, records, model_class, **kwargs):
                 end_date = get_valid_date(kwargs.get('end_date', ''))
             else:
                 end_date = query_params['end_date'][0]
-        # print('>>>> start date and end date:',start_date, end_date)
 
         # filter records which has start time 
         records = records.filter(start_time__date__range=[start_date, end_date])
@@ -450,51 +456,40 @@ def filter_records(request, records, model_class, **kwargs):
 
 
     # Determine the fields to be used as filter options based on the selected page
-    if model_class == Project:
-        fields = ['all', 'name', 'description']
-    elif model_class == Job:
-        fields = ['all', 'name', 'status', 'category', 'unit', 'quantity', 'description']
-    elif model_class == StaffData:
-        fields = ['all', 'full_name', 'identity_card']
-    elif model_class == VehicleOperationRecord:
-        fields = ['all']
-    else:
-        # Get all fields except foreign key fields
-        fields = [field.name for field in model_class._meta.get_fields() if not isinstance(field, models.ForeignKey)]
-        fields.append('all')
+    fields = [field.name for field in model_class._meta.get_fields() if 
+                  isinstance(field, (models.CharField, models.TextField))]
 
-    if not query_params:
-        # Filter Discontinued and Archived
-        if hasattr(model_class, 'status'):
-            records = records.exclude(status__in=['archived'])
-            
+
+    # Construct Q objects for filtering
+    combined_query = Q()
+    if 'all' in query_params:
+        specified_fields = fields
+        all_fields_query = Q()
+        for value in query_params['all']:
+            if value == '':
+                continue
+            for specified_field in specified_fields:
+                if specified_field in [field.name for field in model_class._meta.get_fields()]:
+                    all_fields_query |= Q(**{f"{specified_field}__icontains": value})
+        combined_query &= all_fields_query
+        
     else:
-        # Construct Q objects for filtering
-        combined_query = Q()
-        if 'all' in query_params:
-            specified_fields = fields[1:]  # Exclude 'all' to get the specified fields
-            all_fields_query = Q()
-            for value in query_params['all']:
-                for specified_field in specified_fields:
-                    if specified_field in [field.name for field in model_class._meta.get_fields()]:
-                        all_fields_query |= Q(**{f"{specified_field}__icontains": value})
-            combined_query &= all_fields_query
-            
-        else:
-            for field, values in query_params.items():
-                if field in fields:
-                    try:
-                        model_class._meta.get_field(field)
-                        field_query = Q()
-                        for value in values:
-                            field_query |= Q(**{f"{field}__icontains": value})
-                        combined_query &= field_query
-                    except FieldDoesNotExist:
-                        print(f"Ignoring invalid field: {field}")
-        # Filter records based on the query
-        records = records.filter(combined_query)
-    
-    
+        for field, values in query_params.items():
+            if field in fields:
+                try:
+                    model_class._meta.get_field(field)
+                    field_query = Q()
+                    for value in values:
+                        if value == '':
+                            continue
+                        field_query |= Q(**{f"{field}__icontains": value})
+                    combined_query &= field_query
+                except FieldDoesNotExist:
+                    print(f"Ignoring invalid field: {field}")
+    # Filter records based on the query
+    records = records.filter(combined_query)
+
+
     if request.GET.get('sort'):
         records = records.order_by(request.GET.get('sort'))
             

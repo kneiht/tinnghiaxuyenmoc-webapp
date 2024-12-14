@@ -38,7 +38,6 @@ def encode_params(**kwargs):
 
 @register.filter(name='get_unique_values')
 def get_unique_values(model, group_by):
-    print(model, group_by)
     # get model_class
     model_class = globals()[model]
     # get all values of the field
@@ -52,7 +51,6 @@ def get_unique_values(model, group_by):
         unique_values = sorted(unique_values)
     except Exception as e:
         print(e)
-    print(unique_values)
     return unique_values
 
 
@@ -214,7 +212,6 @@ def calculate_total_operation_time(vehicle_operation_records, gps_name):
             'total_normal_woring_time': format_time(total_normal_woring_time),
             'total_overtime': format_time(total_overtime)
         })
-        print('normal_woring_time', total_normal_woring_time, 'overtime', total_overtime)
 
 
     data = {
@@ -292,7 +289,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
         # Get list of all the dates from start_time of the records then remove duplicates
         working_dates = list(set([record.start_time.date() for record in records]))
-        print('>>>> working_dates', working_dates)
+
         SUNDAY = 6
         count_days_of_month = 0
         count_sundays_of_month = 0
@@ -337,7 +334,6 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
                         pass # Không tính gì cả
 
             current_date += timedelta(days=1)
-        print('>>>> count_normal_working_days', count_normal_working_days)
 
         if driver_salary_input.calculation_method == 'type_1':
             total_normal_working_days_salary = \
@@ -442,16 +438,6 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
         total_overtime_normal_working_hours_salary = total_overtime_normal_working_hours * driver_salary_input.normal_overtime_hourly_salary
         total_overtime_sunday_working_hours_salary = total_overtime_sunday_working_hours * driver_salary_input.sunday_overtime_hourly_salary
         total_overtime_holiday_working_hours_salary = total_overtime_holiday_working_hours * driver_salary_input.holiday_overtime_hourly_salary
-
-        print(
-            total_normal_working_hours_salary,
-            total_sunday_working_hours_salary,
-            total_holiday_working_hours_salary,
-            total_overtime_normal_working_hours_salary,
-            total_overtime_sunday_working_hours_salary,
-            total_overtime_holiday_working_hours_salary
-        )
-
 
         total_hourly_salary = \
             total_normal_working_hours_salary \
@@ -591,7 +577,7 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
     unique_driver_vehicles = vehicle_operation_records.values_list('driver', 'vehicle', 'location')
     unique_driver_vehicles = set(unique_driver_vehicles) 
     rows = []
-    print('>>>>:' ,update)
+
     if update:
         for driver, vehicle, location in unique_driver_vehicles:
             driver_vehicle_records = vehicle_operation_records.filter(driver=driver, vehicle=vehicle)
@@ -625,17 +611,15 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
                 revenue_base += vehicle_revenue_inputs_record.revenue_day_price
                 revenue += (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*total_driver_time_hours
                 # calculate fuel cost
-                print("start_date: ", start_date)
+
                 fuel_records = FuelFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
                 # sum fuel cost
                 if fuel_records:
-                    print("fuel_records: ",fuel_records)
                     fuel_cost_amount += fuel_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
                 # calculate lube cost
                 lube_records = LubeFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
                 # sum lube cost
                 if lube_records:
-                    print("lube_records: ",lube_records)
                     lube_cost_amount += lube_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
                 # caculate VehicleDepreciation
                 vehicle_depreciation_record = VehicleDepreciation.get_vehicle_depreciation(vehicle_instance, start_date)
@@ -707,8 +691,7 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
         vehicle_operation_records = vehicle_operation_records.order_by('start_time')
         min_start_date = vehicle_operation_records.first().start_time.date()
         max_end_date = vehicle_operation_records.last().end_time.date()
-        print("min_start_date: ", min_start_date)
-        print("max_end_date: ", max_end_date)
+
         for driver, vehicle, location in unique_driver_vehicles:
             rows.append({
                 "driver": driver,

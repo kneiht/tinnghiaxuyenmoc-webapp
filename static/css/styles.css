@@ -1648,14 +1648,14 @@ select {
   margin-right: 1rem;
 }
 
-.my-3 {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
 .my-10 {
   margin-top: 2.5rem;
   margin-bottom: 2.5rem;
+}
+
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .mb-2 {
@@ -1879,10 +1879,6 @@ select {
   width: 300px;
 }
 
-.w-\[400px\] {
-  width: 400px;
-}
-
 .w-\[500px\] {
   width: 500px;
 }
@@ -2024,6 +2020,18 @@ select {
   gap: 1.5rem;
 }
 
+.gap-20 {
+  gap: 5rem;
+}
+
+.gap-28 {
+  gap: 7rem;
+}
+
+.gap-16 {
+  gap: 4rem;
+}
+
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
@@ -2136,9 +2144,9 @@ select {
   border-bottom-left-radius: 0.75rem;
 }
 
-.rounded-e-none {
-  border-start-end-radius: 0px;
-  border-end-end-radius: 0px;
+.rounded-e-lg {
+  border-start-end-radius: 0.5rem;
+  border-end-end-radius: 0.5rem;
 }
 
 .rounded-l-lg {
@@ -2156,9 +2164,9 @@ select {
   border-bottom-right-radius: 0px;
 }
 
-.rounded-s-none {
-  border-start-start-radius: 0px;
-  border-end-start-radius: 0px;
+.rounded-s-lg {
+  border-start-start-radius: 0.5rem;
+  border-end-start-radius: 0.5rem;
 }
 
 .rounded-t-2xl {
@@ -2169,16 +2177,6 @@ select {
 .rounded-t-xl {
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
-}
-
-.rounded-e-lg {
-  border-start-end-radius: 0.5rem;
-  border-end-end-radius: 0.5rem;
-}
-
-.rounded-s-lg {
-  border-start-start-radius: 0.5rem;
-  border-end-start-radius: 0.5rem;
 }
 
 .border {
@@ -3027,13 +3025,17 @@ select {
     width: 1100px;
   }
 
-  .sm\:w-\[600px\] {
-    width: 600px;
+  .sm\:w-\[800px\] {
+    width: 800px;
   }
 
   .sm\:w-fit {
     width: -moz-fit-content;
     width: fit-content;
+  }
+
+  .sm\:w-\[700px\] {
+    width: 700px;
   }
 
   .sm\:grid-cols-2 {

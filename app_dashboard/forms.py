@@ -5,16 +5,8 @@ from django.shortcuts import get_object_or_404
 
 
 from django.db.models import Exists, OuterRef
-
 from .models import *
-
-
 from django.core.exceptions import ValidationError
-
-
-def validate_username_length(value, min_length=6):
-    if len(value) < min_length:  # 7 because it should be more than 6 characters
-        raise ValidationError('Tên tài khoản phải dài ít nhất 7 ký tự')
 
 
 
@@ -1015,32 +1007,6 @@ class RepairPartForm(forms.ModelForm):
         }
 
 
-class UserPermissionForm(forms.ModelForm):
-    class Meta:
-        model = UserPermission
-        fields = ['user', 'permission', 'note']
-        labels = {
-            'user': 'Tài khoản',
-            'permission': 'Quyền',
-            'note': 'Ghi chú',
-        }
-        widgets = {
-            'user': forms.Select(attrs={
-                'placeholder': 'Chọn tài khoản',
-                'class': 'form-input',
-                'required': 'required',
-            }),
-            'permission': forms.Select(attrs={
-                'placeholder': 'Chọn quyền',
-                'class': 'form-input',
-                'required': 'required',
-            }, choices=UserPermission.PERMISSION_CHOICES),
-            'note': forms.Textarea(attrs={
-                    'class': 'form-input h-20', 
-            }),
-        }
-
-
 class ProjectUserForm(forms.ModelForm):
     class Meta:
         model = ProjectUser
@@ -1069,5 +1035,89 @@ class ProjectUserForm(forms.ModelForm):
             }, choices=ProjectUser.ROLE_CHOICES),
             'note': forms.Textarea(attrs={
                     'class': 'form-input h-20', 
+            }),
+        }
+
+
+
+
+
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UsernameField, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
+def validate_username_length(value, min_length=6):
+    if len(value) < min_length:  # 7 because it should be more than 6 characters
+        raise ValidationError('Tên tài khoản phải dài ít nhất 7 ký tự')
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'email', 'is_superuser']
+        labels = {
+            'username': 'Tên tài khoản',
+            'first_name': 'Tên',
+            'email': 'Email',
+            'is_superuser': 'Quyền admin',
+        }
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'placeholder': 'Tên tài khoản',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'first_name': forms.TextInput(attrs={
+                'placeholder': 'Tên',
+                'class': 'form-input',
+            }),
+            'last_name': forms.TextInput(attrs={
+                'placeholder': 'Họ',
+                'class': 'form-input',
+            }),
+            'email': forms.EmailInput(attrs={
+                'placeholder': 'Email',
+                'class': 'form-input',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox',
+            }),
+            'is_staff': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox',
+            }),
+            'is_superuser': forms.CheckboxInput(attrs={
+                'class': 'checkbox',
+            }),
+            'groups': forms.SelectMultiple(attrs={
+                'class': 'form-input',
+            }),
+        }
+
+
+class UserPermissionForm(forms.ModelForm):
+    class Meta:
+        model = UserPermission
+        fields = ['user', 'sub_page', 'permission', 'note']
+        labels = {
+            'user': 'Tài khoản',
+            'sub_page': 'Bảng dữ liệu',
+            'permission': 'Cấp quyền',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'user': forms.Select(attrs={
+                'placeholder': 'Chọn tài khoản',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'sub_page': forms.Select(attrs={
+                'placeholder': 'Chọn bảng dữ liệu',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=UserPermission.MODEL_CHOICES),
+            'permission': forms.Select(attrs={
+                'placeholder': 'Chọn cấp quyền',
+                'class': 'form-input',
+            }, choices=UserPermission.MODEL_PERMISSION_CHOICES),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
             }),
         }

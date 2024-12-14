@@ -92,15 +92,11 @@
                                         document.getElementById('search-button').click();
                                     });
                                 </script>
-
-
-
-
-
                         {% endif %}
                     </div>
                 </div>
             </div>
+            <input name="archived" id="archived" value="false" class="hidden">
         </form>
         <!-- Right controls for view toggle and information display -->
         {% if page == 'page_each_project' %}
@@ -114,6 +110,7 @@
                 </button>
                 <!-- Separate 2 sections of controls -->
             </div>
+            <input name="archived" id="archived" value="false" class="hidden">
         </form>
         {% endif %}
     </div>
@@ -125,6 +122,23 @@
             <span class="me-3"> {{ create_new_button_name }} </span>
         </a>
         {% endif %} 
+
+        {% if display_trashcan %}
+        <button id="archived-items" class="btn btn-outline text-nowrap" onclick="
+            var archivedInput = document.getElementById('archived');
+            var createNewButton = document.getElementById('create-new');
+            var searchButton = document.getElementById('search-button');
+            archivedInput.value = archivedInput.value === 'true' ? 'false' : 'true';
+            this.classList.toggle('btn-outline');
+            this.classList.toggle('btn-success');
+            this.querySelector('span').innerText = this.querySelector('span').innerText === 'Thùng rác (tắt)' ? 'Thùng rác (bật)' : 'Thùng rác (tắt)';
+            createNewButton.classList.toggle('hidden');
+            searchButton.click();
+        ">
+            <i class="fas fa-trash-can me-3" style="font-size: 16px;"></i>
+            <span class="me-3"> Thùng rác (tắt) </span>
+        </button>
+        {% endif %}
     </div>
 
 </div>
