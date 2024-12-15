@@ -99,6 +99,23 @@ def handle_form(request, model, pk=0):
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
 
+    # Delete and restore
+    if request.POST.get('archived')=='true':
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'delete', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        html_message = render_message(request, message='Xóa dữ liệu thất bại.\n\nChức năng này đang thử nghiệm.', message_type='red')
+        return HttpResponse(html_message)
+    elif request.POST.get('archived')=='false':
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'update', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        html_message = render_message(request, message='Xóa dữ liệu thất bại.\n\nChức năng này đang thử nghiệm.', message_type='red')
+        return HttpResponse(html_message + html_record)
+
+
     if form.is_valid():
         instance_form = form.save(commit=False)
         if instance is None:  # This is a new form
