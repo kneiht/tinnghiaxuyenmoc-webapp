@@ -245,7 +245,7 @@ class UserPermission(BaseModel):
 
     class Meta:
         ordering = ['user', 'sub_page', 'created_at']
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Tài khoản")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Tài khoản")
     sub_page = models.CharField(max_length=255, choices=MODEL_CHOICES, verbose_name="Bảng dữ liệu", null=True, blank=True)
     permission = models.CharField(max_length=255, choices=MODEL_PERMISSION_CHOICES, verbose_name="Cấp quyền", null=True, blank=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
