@@ -2000,6 +2000,10 @@ select {
   gap: 2.5rem;
 }
 
+.gap-16 {
+  gap: 4rem;
+}
+
 .gap-2 {
   gap: 0.5rem;
 }
@@ -2018,18 +2022,6 @@ select {
 
 .gap-6 {
   gap: 1.5rem;
-}
-
-.gap-20 {
-  gap: 5rem;
-}
-
-.gap-28 {
-  gap: 7rem;
-}
-
-.gap-16 {
-  gap: 4rem;
 }
 
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
@@ -3025,17 +3017,13 @@ select {
     width: 1100px;
   }
 
-  .sm\:w-\[800px\] {
-    width: 800px;
+  .sm\:w-\[700px\] {
+    width: 700px;
   }
 
   .sm\:w-fit {
     width: -moz-fit-content;
     width: fit-content;
-  }
-
-  .sm\:w-\[700px\] {
-    width: 700px;
   }
 
   .sm\:grid-cols-2 {

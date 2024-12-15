@@ -99,31 +99,6 @@ def handle_form(request, model, pk=0):
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
 
-    # Delete and restore
-    if request.POST.get('archived')=='true':
-        # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, 'delete', {'model': model})
-        if forbit_html:
-            return HttpResponse(forbit_html)
-        instance.archived = True
-        instance.save()
-        instance.style = 'just-archived'
-        html_message = render_message(request, message='Di chuyển dữ liệu vào thùng rác thành công.\n\nTải lại trang để cập nhật hiển thị.')
-        html_record = render_display_records(request, model=model, records=[instance], update='True', project_id=project_id)
-        return HttpResponse(html_message + html_record)
-    elif request.POST.get('archived')=='false':
-        # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, 'update', {'model': model})
-        if forbit_html:
-            return HttpResponse(forbit_html)
-        instance.archived = False
-        instance.save()
-        instance.style = 'just-restored'
-        html_message = render_message(request, message='Khôi phục dữ liệu thành công.\n\nTải lại trang để cập nhật hiển thị.')
-        html_record = render_display_records(request, model=model, records=[instance], update='True', project_id=project_id)
-        return HttpResponse(html_message + html_record)
-
-
     if form.is_valid():
         instance_form = form.save(commit=False)
         if instance is None:  # This is a new form

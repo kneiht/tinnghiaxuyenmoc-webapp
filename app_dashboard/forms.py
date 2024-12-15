@@ -351,12 +351,10 @@ class StaffDataForm(forms.ModelForm):
             'identity_card': forms.TextInput(attrs={
                 'placeholder': 'Nhập CCCD',
                 'class': 'form-input',
-                'required': 'required'
             }),
             'birth_year': forms.DateInput(attrs={
                 'type': 'date',
                 'class': 'form-input',
-                'required': 'required'
             }),
             'bank_name': forms.TextInput(attrs={
                 'placeholder': 'Nhập tên ngân hàng',
@@ -373,12 +371,10 @@ class StaffDataForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={
                 'placeholder': 'Nhập số điện thoại',
                 'class': 'form-input',
-                'required': 'required'
             }),
             'address': forms.TextInput(attrs={
                 'placeholder': 'Nhập địa chỉ',
                 'class': 'form-input',
-                'required': 'required'
             }),
         }
 

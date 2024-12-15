@@ -74,21 +74,11 @@ User.add_to_class("get_display_fields", get_display_fields)
 User.add_to_class("check_permission", check_permission)
 
 
-class NonArchivedManager(models.Manager):
-    archived = False
-    """
-    Custom manager to return only non-archived records.
-    """
-    def get_queryset(self):
-        return super().get_queryset().filter(archived=self.archived)
 
 
 class BaseModel(models.Model):
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
     archived = models.BooleanField(default=False)
-
-    # Use the custom manager
-    objects = NonArchivedManager()
 
     class Meta:
         abstract = True  # Specify this model as Abstract
