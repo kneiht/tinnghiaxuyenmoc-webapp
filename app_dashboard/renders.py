@@ -171,12 +171,13 @@ def render_display_records(request, **kwargs):
             unique_values = [value for value in unique_values if keyword.lower() in value.lower()]
 
         # if there is "XE CHẤM CÔNG" in unique_values, remove it, and add it to the top
-        if 'XE CHẤM CÔNG' in unique_values:
-            unique_values.remove('XE CHẤM CÔNG')   
+        if model_class == VehicleDetail:
+            if 'XE CHẤM CÔNG' in unique_values:
+                unique_values.remove('XE CHẤM CÔNG')   
             unique_values = ['XE CHẤM CÔNG'] + unique_values
 
         return unique_values
-    
+
     params = kwargs
 
     model = params.get('model', '')
@@ -186,9 +187,6 @@ def render_display_records(request, **kwargs):
     start_date = get_valid_date(params.get('start_date', ''))
     end_date = get_valid_date(params.get('end_date', start_date))
     search_phrase = request.GET.get('all', '')
-
-
-
 
     check_month = params.get('check_month', '')
     if check_month != '':
@@ -211,16 +209,7 @@ def render_display_records(request, **kwargs):
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
 
-    
-
-
     if not records:
-        # Control the trashcan
-        if params.get('archived') == 'true':
-            model_class.objects.archived = True
-        else:
-            model_class.objects.archived = False
-
         # Get the records
         if not project_id:
             records = model_class.objects.all()
@@ -249,8 +238,8 @@ def render_display_records(request, **kwargs):
     groups = []
     if group_by:
         GROUPS_PER_PAGE = 5
-        if records.count() == 0:
-            return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy dữ liệu, vui lòng chọn ngày khác</p></div><div up-hungry id="load-more" class="hidden"></div>'
+        # if records.count() == 0:
+        #     return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy dữ liệu, vui lòng chọn ngày khác</p></div><div up-hungry id="load-more" class="hidden"></div>'
         if model_class == VehicleOperationRecord:
             if group_by == 'vehicle':
                 page = next

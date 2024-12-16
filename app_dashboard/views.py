@@ -112,7 +112,7 @@ def handle_form(request, model, pk=0):
         forbit_html = decide_permission(request, 'update', {'model': model})
         if forbit_html:
             return HttpResponse(forbit_html)
-        html_message = render_message(request, message='Xóa dữ liệu thất bại.\n\nChức năng này đang thử nghiệm.', message_type='red')
+        html_message = render_message(request, message='Khôi phục dữ liệu thất bại.\n\nChức năng này đang thử nghiệm.', message_type='red')
         return HttpResponse(html_message + html_record)
 
 
