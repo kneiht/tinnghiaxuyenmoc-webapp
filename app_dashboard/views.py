@@ -77,13 +77,23 @@ def decide_permission(request, action, params):
             return render_message(request, message=message, message_type=message_type)
         else:
             return None
+
+    elif action == 'approve':
+        if not permission.delete:
+            message = 'Không thể thay đổi trạng thái duyệt, vì chưa được cấp quyền. \n\n Vui lòng liên hệ admin cấp quyền.'
+            message_type = 'red'
+            return render_message(request, message=message, message_type=message_type)
+        else:
+            return None
+
+
     else:
         return None
 
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-
+    print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -116,23 +126,113 @@ def handle_form(request, model, pk=0):
         return HttpResponse(html_message + html_record)
 
 
+    if instance is None:  # This is a new form
+        # Handle the case of the project is created and need to be assigned to a user
+        # instance_form.user = request.user
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'create', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+
+        if model == 'VehicleMaintenance':
+            # set approval status to make sure there no injection hacking
+            form.instance.approval_status = 'scratch'
+    else: # update
+        # CHECK PERMISSIONS
+        forbit_html = decide_permission(request, 'update', {'model': model})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        
+        # check if the use have the right to modify approval status
+        if model == 'VehicleMaintenance':
+            current_approval_status = model_class.objects.filter(pk=pk).first().approval_status
+            form_approval_status = request.POST.get('approval_status')
+
+            # CHECK PERMISSIONS
+            forbit_html = decide_permission(request, 'approve', {'model': model})
+            # Need to update => all users who has update permission can update
+            if current_approval_status=='scratch':
+                if form_approval_status not in ('scratch','wait_for_approval'):
+                    message = 'Chỉ có thể cập nhật dữ liệu và gửi phê duyệt'
+                    html_message = render_message(request, message=message, message_type='red')
+                    return HttpResponse(html_message)
+
+            elif current_approval_status=='wait_for_approval':
+                if forbit_html:
+                    message = 'Không thể cập nhật dữ liệu khi đang chờ phê duyệt'
+                    html_message = render_message(request, message=message, message_type='red')
+                    return HttpResponse(html_message)
+                else:
+                    if form_approval_status not in ('wait_for_approval', 'need_update', 'approved', 'rejected'):
+                        message = 'Không thể chọn lại trạng thái "Bảng nháp"'
+                        html_message = render_message(request, message=message, message_type='red')
+                        return HttpResponse(html_message)
+
+            elif current_approval_status=='need_update':
+                if form_approval_status not in ('need_update','wait_for_approval'):
+                    message = 'Chỉ có thể cập nhật dữ liệu và gửi phê duyệt'
+                    html_message = render_message(request, message=message, message_type='red')
+                    return HttpResponse(html_message)
+
+            elif current_approval_status=='approved':
+                if forbit_html:
+                    if form_approval_status in ('approved'):
+                        # Update status up each VehicleMaintenanceRepairPart
+                        vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
+                        for vehicle_part_id in vehicle_part_post_ids:
+                            vehicle_part = VehicleMaintenanceRepairPart.objects.filter(id=vehicle_part_id).first()
+                            # Get fields
+                            vehicle_part.received_status = request.POST.get(f'received_status_{vehicle_part_id}')
+                            vehicle_part.paid_status = request.POST.get(f'paid_status_{vehicle_part_id}')
+                            vehicle_part.done_status = request.POST.get(f'done_status_{vehicle_part_id}')
+                            vehicle_part.save()
+                        record = instance
+                        record.save()
+                        record.style = 'just-updated'
+                        html_message = render_message(request, message='Cập nhật thành công')
+                        html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
+                        return HttpResponse(html_message + html_record)
+                    else:
+                        return HttpResponse(forbit_html)
+
+                else:
+                    if form_approval_status in ('need_update', 'approved', 'rejected'):
+                        # Update status up each VehicleMaintenanceRepairPart
+                        vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
+                        print("vehicle_part_post_ids", vehicle_part_post_ids)
+                        for vehicle_part_id in vehicle_part_post_ids:
+                            vehicle_part = VehicleMaintenanceRepairPart.objects.filter(id=vehicle_part_id).first()
+                            # Get fields
+                            vehicle_part.received_status = request.POST.get(f'received_status_{vehicle_part_id}')
+                            vehicle_part.paid_status = request.POST.get(f'paid_status_{vehicle_part_id}')
+                            vehicle_part.done_status = request.POST.get(f'done_status_{vehicle_part_id}')
+                            print(vehicle_part.received_status, vehicle_part.paid_status, vehicle_part.done_status)
+                            vehicle_part.save()
+                        
+                        record = instance
+                        record.save()
+                        record.style = 'just-updated'
+                        html_message = render_message(request, message='Cập nhật thành công')
+                        html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
+                        return HttpResponse(html_message + html_record)
+                    else:
+                        message = 'Chỉ có thể chọn trạng thái duyệt "Cần sửa lại" hoặc "Từ chối"'
+                        html_message = render_message(request, message=message, message_type='red')
+                        return HttpResponse(html_message)
+            elif current_approval_status=='rejected':
+                if forbit_html:
+                    return HttpResponse(forbit_html)
+                else:
+                    if form_approval_status not in ('need_update'):
+                        message = 'Chỉ có thể chọn trạng thái duyệt "Cần sửa lại"'
+                        html_message = render_message(request, message=message, message_type='red')
+                        return HttpResponse(html_message)
+
     if form.is_valid():
         instance_form = form.save(commit=False)
-        if instance is None:  # This is a new form
-            # Handle the case of the project is created and need to be assigned to a user
-            # instance_form.user = request.user
-            # CHECK PERMISSIONS
-            forbit_html = decide_permission(request, 'create', {'model': model})
-            if forbit_html:
-                return HttpResponse(forbit_html)
-        else: # update
-            # CHECK PERMISSIONS
-            forbit_html = decide_permission(request, 'update', {'model': model})
-            if forbit_html:
-                return HttpResponse(forbit_html)
-        
         instance_form.save()
         if model == 'VehicleMaintenance':
+            # Update the  list of VehicleMaintenanceRepairPart
             vehicle_maintenance = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
             vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance)
@@ -152,6 +252,8 @@ def handle_form(request, model, pk=0):
                     repair_part_id=part,
                     quantity=quantity,
                 )
+        instance_form.save()
+        
         # Save the many to many field, if any
         # form.save_m2m()
         record = instance_form

@@ -9,18 +9,96 @@
                 <i class="fa fa-times" aria-hidden="true"></i>
             </button>
 
-
+        
             {% if modal == "modal_VehicleMaintenance" %}
-                <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm" onclick="this.closest('.modal').querySelectorAll('input, select, textarea').forEach(el => el.disabled = false); this.closest('.modal').querySelectorAll('.hidable').forEach(el => el.classList.remove('hidden')); this.classList.add('hidden'); document.getElementById('btn-view').classList.remove('hidden');">
+                <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                        onclick="toggleModalEdit(this)">
                     <i class="fas fa-eye me-3" style="font-size: 16px;"></i>
                     Chỉ xem
                 </button>
-                <button id="btn-view" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm hidden" onclick="this.closest('.modal').querySelectorAll('input, select, textarea').forEach(el => el.disabled = true); this.closest('.modal').querySelectorAll('.hidable').forEach(el => el.classList.add('hidden')); this.classList.add('hidden'); document.getElementById('btn-edit').classList.remove('hidden');">
-
-
+                <button id="btn-view" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm hidden"
+                        onclick="toggleModalEdit(this)">
                     <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
                     Chỉnh sửa
                 </button>
+                
+                {% if not record or record.approval_status == "scratch" or record.approval_status == "need_update" %}
+                    <script>
+                    function toggleModalEdit(button) {
+                        const modal = button.closest('.modal');
+                        const hideables = modal.querySelectorAll('.hidable');
+                        const autoFields = modal.querySelectorAll('.auto-field');
+                        const approveHideables = modal.querySelectorAll('.approve-hidable');
+                        hideables.forEach(el => el.classList.toggle('hidden'));
+                        autoFields.forEach(el => el.disabled = !el.disabled);
+                        document.getElementById('btn-view').classList.toggle('hidden');
+                        document.getElementById('btn-edit').classList.toggle('hidden');
+                    }
+                    </script>
+                {% elif record.approval_status == "wait_for_approval" %}
+                    {% if permissions.approve %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            const modal = button.closest('.modal');
+                            const hideables = modal.querySelectorAll('.hidable');
+                            const autoFields = modal.querySelectorAll('.auto-field');
+                            const approveHideables = modal.querySelectorAll('.approve-hidable');
+                            hideables.forEach(el => el.classList.toggle('hidden'));
+                            autoFields.forEach(el => el.disabled = !el.disabled);
+                            document.getElementById('btn-view').classList.toggle('hidden');
+                            document.getElementById('btn-edit').classList.toggle('hidden');
+                        }
+                    </script>
+                    {% else %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            alert("Không thể chỉnh sửa khi đang chờ phê duyệt")
+                        }
+                    </script>
+                    {% endif %}
+
+                {% elif record.approval_status == "approved" %}
+                    {% if permissions.approve %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            const modal = button.closest('.modal');
+                            const approveHideables = modal.querySelectorAll('.approve-hidable');
+                            approveHideables.forEach(el => el.classList.toggle('hidden'));
+                            document.getElementById('btn-view').classList.toggle('hidden');
+                            document.getElementById('btn-edit').classList.toggle('hidden');
+                        }
+                    </script>
+                    {% else %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            const modal = button.closest('.modal');
+                            const approveHideables = modal.querySelectorAll('.approve-hidable');
+                            approveHideables.forEach(el => el.classList.toggle('hidden'));
+                            document.getElementById('btn-view').classList.toggle('hidden');
+                            document.getElementById('btn-edit').classList.toggle('hidden');
+                        }
+                    </script>
+                    {% endif %}
+                {% elif record.approval_status == "rejected" %}
+                    {% if permissions.approve %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            const modal = button.closest('.modal');
+                            const approveHideables = modal.querySelectorAll('.approve-hidable');
+                            approveHideables.forEach(el => el.classList.toggle('hidden'));
+                            document.getElementById('btn-view').classList.toggle('hidden');
+                            document.getElementById('btn-edit').classList.toggle('hidden');
+                        }
+                    </script>
+                    {% else %}
+                    <script>
+                        function toggleModalEdit(button) {
+                            alert("Không thể chỉnh sửa khi phiếu bị từ chối phê duyệt.")
+                        }
+                    </script>
+                    {% endif %}
+                {% endif %}
+                
             {% endif %}
             <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
             <form enctype="multipart/form-data" method="post"
@@ -56,7 +134,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'project' and field.name != 'description' and field.name != 'note' %}
+                        {% if field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -89,7 +167,7 @@
                 </div>
 
                 {% if modal == "modal_VehicleMaintenance" %}
-                    {% if record %}
+            
                         <div class="w-full pt-4 px-6 pt-5- pb-2">
                             <div class="flex flex-row gap-5 items-end py-2">
                                 <label for="students" class="text-theme">Trạng thái phiếu sửa chữa</label>
@@ -102,9 +180,66 @@
                                     <span class="w-3/12 text-center"> Trạng thái sửa chữa </span>
                                 </div> 
                                 <div class="pt-3 pb-1 flex justify-between items-center w-full">
-                                    <div class="w-3/12 text-center">
-                                        <span class="{{ record|get_value:'approval_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'approval_status' }}</span>
+                                    <div class="w-3/12 flex justify-center">
+                                        {% if record %}
+                                            <span class="{{ record|get_value:'approval_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">{{ record|format_display:'approval_status' }}</span>
+                                
+                                            {% if not permissions.approve %}
+                                            <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                                                {% if record.approval_status == "scratch" %}
+                                                    <option selected value="scratch">Bảng nháp</option>
+                                                    <option value="wait_for_approval">Chờ duyệt</option>
+                                                    
+                                                {% elif record.approval_status == "wait_for_approval" %}
+                                                    <option selected value="wait_for_approval">Chờ duyệt</option>
+                                                    
+                                                {% elif record.approval_status == "approved" %}
+                                                    <option selected value="approved">Đã duyệt</option>
+
+                                                {% elif record.approval_status == "need_update" %}
+                                                    <option value="wait_for_approval">Chờ duyệt</option>
+                                                    <option selected value="need_update">Cần sửa lại</option>
+
+                                                {% elif record.approval_status == "rejected" %}
+                                                    <option value="rejected">Từ chối</option>
+                                                {% endif %}
+                                            </select>
+                                            {% else %}
+                                            <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                                                {% if record.approval_status == "scratch" %}
+                                                    <option selected value="scratch">Bảng nháp</option>
+                                                    <option value="wait_for_approval">Chờ duyệt</option>
+
+                                                {% elif record.approval_status == "wait_for_approval" %}
+                                                    <option selected value="wait_for_approval">Chờ duyệt</option>
+                                                    <option value="approved">Đã duyệt</option>
+                                                    <option value="need_update">Cần sửa lại</option>
+                                                    <option value="rejected">Từ chối</option>
+
+                                                {% elif record.approval_status == "approved" %}
+                                                    <option selected value="approved">Đã duyệt</option>
+                                                    <option value="need_update">Cần sửa lại</option>
+
+                                                {% elif record.approval_status == "need_update" %}
+                                                    <option value="wait_for_approval">Chờ duyệt</option>
+                                                    <option selected value="need_update">Cần sửa lại</option>
+
+                                                {% elif record.approval_status == "rejected" %}
+                                                    <option value="need_update">Cần sửa lại</option>
+                                                    <option selected value="rejected">Từ chối</option>
+                                                {% endif %}
+                                            
+                                            </select>
+                                            {% endif %}
+                                            {% else %}
+                                                <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                                                    
+                                                    <option selected value="scratch">Bảng nháp</option>
+                                                </select>
+                                                    <span class="scratch text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">Bản nháp</span>
+                                            {% endif %}
                                     </div>
+                                    {% if record %}
                                     <div class="w-3/12 text-center">
                                         <span class="{{ record|get_value:'received_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'received_status' }}</span>
                                     </div>
@@ -114,19 +249,31 @@
                                     <div class="w-3/12 text-center">
                                         <span class="{{ record|get_value:'done_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'done_status' }}</span>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                    {% endif %}
 
 
                     <div class="w-full pt-4 px-6 pt-5- pb-2">
-                        <div class="flex flex-row gap-5 items-end py-2">
-                            <label for="students" class="text-theme">Các bộ phận thay thế</label>
-                            <button class="btn btn-success h-7 hidable hidden" onclick="event.preventDefault(); var newPart = document.querySelector('.new-part').cloneNode(true); newPart.classList.remove('hidden'); newPart.classList.remove('new-part'); newPart.querySelectorAll('input').forEach(input => input.value = ''); document.querySelector('.new-part').parentNode.insertBefore(newPart, document.querySelector('.new-part').nextSibling);">
-                                <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-                                Thêm vào danh mục
-                            </button>
+                        <div class="flex flex-row justify-between gap-5 items-end py-2">
+                            <div>
+                                <label for="students" class="text-theme">Các bộ phận thay thế</label>
+                                <button class="btn btn-success h-7 hidable hidden" onclick="event.preventDefault(); var newPart = document.querySelector('.new-part').cloneNode(true); newPart.classList.remove('hidden'); newPart.classList.remove('new-part'); newPart.querySelectorAll('input').forEach(input => input.value = ''); document.querySelector('.new-part').parentNode.insertBefore(newPart, document.querySelector('.new-part').nextSibling);">
+                                    <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+                                    Thêm vào danh mục
+                                </button>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-end">
+                                    <span class="font-semibold text-xl text-theme mr-2">Tổng cộng (tự động tính sau khi cập nhật): </span>
+                                    <span class="font-semibold text-xl text-green-600" id="total-amount">
+                                        {{ record.maintenance_amount|format_money }} VND
+                                    </span>
+                                </div>
+                            
+                                
+                            </div>
                         </div>
                         <div class="form-input flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
                             <div class="border-b pb-0.5 flex w-full font-semibold">
@@ -141,17 +288,52 @@
                             </div> 
                             {% for vehice_part in record.get_vehicle_part_list %}
                                 <div class="border-b pb-2 flex items-center w-full">
+                                    {% if record %}
                                     <input type="hidden" name="vehicle_part_id" value="{{ vehice_part.pk }}">
+                                    {% endif %}
                                     <span class="w-5/12"> {{ vehice_part.repair_part.part_number }} - {{ vehice_part.repair_part.part_name }} - {{ vehice_part.repair_part.part_price|format_money }} VNĐ </span>
                                     <span class="w-1/12 text-center"> {{ vehice_part.quantity }} </span>
-                                    <div class="w-2/12 text-center">
-                                        <span class="{{ vehice_part|get_value:'received_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'received_status' }}</span>
+                                    <div class="w-2/12 flex justify-center">
+                                        <span class="{{ vehice_part|get_value:'received_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap approve-hidable">{{ vehice_part|format_display:'received_status' }}</span>
+                                        {% if record.approval_status == "approved" %}
+                                            <select name="received_status_{{ vehice_part.pk }}" class="form-input hidable approve-hidable hidden" id="id_received_status" style="width: 150px">
+                                                {% if vehice_part.received_status == "received" %}
+                                                <option selected value="received">Đã nhận</option>
+                                                <option value="not_received">Chưa nhận</option>
+                                                {% else %}
+                                                <option value="received">Đã nhận</option>
+                                                <option selected value="not_received">Chưa nhận</option>
+                                                {% endif %}
+                                            </select>
+                                        {% endif %}
                                     </div>
-                                    <div class="w-2/12 text-center">
-                                        <span class="{{ vehice_part|get_value:'paid_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'paid_status' }}</span>
+                                    <div class="w-2/12 flex justify-center">
+                                        <span class="{{ vehice_part|get_value:'paid_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap approve-hidable">{{ vehice_part|format_display:'paid_status' }}</span>
+                                        {% if record.approval_status == "approved" %}
+                                        <select name="paid_status_{{ vehice_part.pk }}" class="form-input hidable approve-hidable hidden" id="id_paid_status" style="width: 150px">
+                                            {% if vehice_part.paid_status == "paid" %}
+                                                <option selected value="paid">Đã thanh toán</option>
+                                                <option value="not_paid">Chưa thanh toán</option>
+                                            {% else %}
+                                                <option value="paid">Đã thanh toán</option>
+                                                <option selected value="not_paid">Chưa thanh toán</option>
+                                            {% endif %}
+                                        </select>
+                                    {% endif %}
                                     </div>
-                                    <div class="w-2/12 text-center">
-                                        <span class="{{ vehice_part|get_value:'done_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ vehice_part|format_display:'done_status' }}</span>
+                                    <div class="w-2/12 flex justify-center">
+                                        <span class="{{ vehice_part|get_value:'done_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap approve-hidable">{{ vehice_part|format_display:'done_status' }}</span>
+                                        {% if record.approval_status == "approved" %}
+                                        <select name="done_status_{{ vehice_part.pk }}" class="form-input hidable approve-hidable hidden" id="id_done_status" style="width: 150px">
+                                            {% if vehice_part.done_status == "done" %}
+                                                <option selected value="done">Xong</option>
+                                                <option value="not_done">Chưa xong</option>
+                                            {% else %}
+                                                <option value="done">Xong</option>
+                                                <option selected value="not_done">Chưa xong</option>
+                                            {% endif %}
+                                        </select>
+                                    {% endif %}
                                     </div>
                                     
                                     <div class="text-end hidable hidden">
@@ -190,7 +372,7 @@
                     </div>
                 {%  endif %}
 
-                <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable
+                <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable approve-hidable
                 {% if modal == "modal_VehicleMaintenance" %} hidden {% endif %}">
                     {% if record and record.archived == False %}
                         <button type="button" class="btn btn-danger rounded-full w-28 "

@@ -370,6 +370,10 @@ def render_form(request, **kwargs):
         'record': record
     }
 
+    if model == 'VehicleMaintenance':
+        permissions = request.user.check_permission('VehicleMaintenance')
+        context['permissions'] = permissions
+
     template = 'components/modal.html'
     return render_to_string(template, context, request)
 

@@ -68,6 +68,7 @@ def get_value(record, field):
         return record.get(field)
     return getattr(record, field)
 
+
 @register.filter(name='get_sign')
 def get_sign(record, field):
     value = getattr(record, field)

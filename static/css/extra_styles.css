@@ -300,6 +300,11 @@ th.sorted-desc::after {
   color: red;
 }
 
+.scratch{
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
+  opacity: 50%;
+}
+
 .wait_for_approval {
   background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
 }

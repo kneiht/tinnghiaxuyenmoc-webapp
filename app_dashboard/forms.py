@@ -898,8 +898,9 @@ class VehicleBankInterestForm(forms.ModelForm):
 class VehicleMaintenanceForm(forms.ModelForm):
     class Meta:
         model = VehicleMaintenance
-        fields = ['vehicle', 'maintenance_amount', 'maintenance_category', 'from_date', 'to_date', 'approval_status', 'note']
+        fields = ['repair_code', 'vehicle', 'maintenance_category', 'from_date', 'to_date', 'approval_status', 'note']
         labels = {
+            'repair_code': 'Mã phiếu sửa chữa',
             'vehicle': 'Xe',
             'maintenance_amount': 'Chi phí',
             'maintenance_category': 'Phân loại',
@@ -909,33 +910,39 @@ class VehicleMaintenanceForm(forms.ModelForm):
             'note': 'Ghi chú'
         }
         widgets = {
+            'repair_code': forms.TextInput(attrs={
+                'placeholder': 'Tạo tự động sau khi lưu',
+                'class': 'form-input',
+                'readonly': 'readonly',
+            }),
+
             'vehicle': forms.Select(attrs={
                 'placeholder': 'Chọn xe',
-                'class': 'form-input',
+                'class': 'form-input auto-field',
                 'required': 'required',
                 'disabled': 'disabled',
             }),
             'maintenance_amount': forms.NumberInput(attrs={
                 'placeholder': 'Chi phí',
-                'class': 'form-input',
+                'class': 'form-input auto-field',
                 'required': 'required',
                 'disabled': 'disabled',
             }),
             'maintenance_category': forms.Select(attrs={
                 'placeholder': 'Chọn phân loại',
-                'class': 'form-input',
+                'class': 'form-input auto-field',
                 'disabled': 'disabled',
             }, choices=VehicleMaintenance.MAINTENANCE_CATEGORY_CHOICES),
             'from_date': forms.DateInput(attrs={
                 'placeholder': 'Ngày nhận sửa chữa',
-                'class': 'form-input',
+                'class': 'form-input auto-field',
                 'required': 'required',
                 'type': 'date',
                 'disabled': 'disabled'
             }),
             'to_date': forms.DateInput(attrs={
                 'placeholder': 'Ngày xong sửa chữa',
-                'class': 'form-input',
+                'class': 'form-input auto-field',
                 'required': 'required',
                 'type': 'date',
                 'disabled': 'disabled'
@@ -946,7 +953,7 @@ class VehicleMaintenanceForm(forms.ModelForm):
                 'disabled': 'disabled',
             }, choices=VehicleMaintenance.APPROVAL_STATUS_CHOICES),
             'note': forms.Textarea(attrs={
-                    'class': 'form-input h-20',
+                    'class': 'form-input h-20 auto-field',
                     'disabled': 'disabled',
                     'rows': 2
             })
@@ -1097,6 +1104,9 @@ class UserPermissionForm(forms.ModelForm):
             'sub_page': 'Bảng dữ liệu',
             'permission': 'Cấp quyền',
             'note': 'Ghi chú',
+        }
+        help_texts = {
+            'permission': 'Quyền "Duyệt" chỉ có hiệu lực ở các chức năng yêu cầu phê duyệt hành động như "Phiếu sửa chữa"',
         }
         widgets = {
             'user': forms.Select(attrs={

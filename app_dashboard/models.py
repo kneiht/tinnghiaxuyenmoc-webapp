@@ -50,6 +50,8 @@ def check_permission(self, sub_page):
         create = False
         update = False
         delete = False
+        approve = False
+
     return_permission = Permission()
 
     if self.is_superuser:
@@ -57,13 +59,16 @@ def check_permission(self, sub_page):
         return_permission.create = True
         return_permission.update = True
         return_permission.delete = True
+        return_permission.approve = True
 
     user_permissions = UserPermission.objects.filter(user=self, sub_page=sub_page)
     # get all permission in user_permissions
-    for permission in user_permissions:
-        for item in  ['read', 'create', 'update', 'delete']:
-            if item in permission.permission:
-                setattr(return_permission, item, True)
+    if user_permissions:
+        for permission in user_permissions:
+            if permission.permission:
+                for item in  ['read', 'create', 'update', 'delete', 'approve']:
+                    if item in permission.permission:
+                        setattr(return_permission, item, True)
 
     return return_permission
 
@@ -202,7 +207,9 @@ class UserPermission(BaseModel):
         ('read_create', 'Đọc - Tạo'),
         ('read_create_update', 'Đọc - Tạo - Cập nhật'),
         ('read_create_update_delete', 'Đọc - Tạo - Cập nhật - Xóa'),
+        ('read_create_update_delete_approve', 'Đọc - Tạo - Cập nhật - Xóa - Duyệt'),
     )
+
     MODEL_CHOICES = (
         # From the first dictionary
         ('Announcement', 'Thông báo'),
@@ -1116,9 +1123,11 @@ class VehicleBankInterest(BaseModel):
 class VehicleMaintenance(BaseModel):
     MAINTENANCE_CATEGORY_CHOICES = (
         ('periodic_check', 'Kiểm tra định kì'),
+        ('repair', 'Sửa chữa hư hỏng'),
     )
     
     APPROVAL_STATUS_CHOICES = (
+        ('scratch', 'Bảng nháp'),
         ('wait_for_approval', 'Chờ duyệt'),
         ('approved', 'Đã duyệt'),
         ('need_update', 'Cần sửa lại'),
@@ -1140,20 +1149,49 @@ class VehicleMaintenance(BaseModel):
         ('not_done', 'Chưa xong'),
     )
 
-
+    repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu sửa chữa", default="", null=True, blank=True)
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
     maintenance_category = models.CharField(max_length=255, choices=MAINTENANCE_CATEGORY_CHOICES, verbose_name="Phân loại", default="", null=True, blank=True)
     from_date = models.DateField(verbose_name="Ngày nhận sửa chữa", default=timezone.now)
     to_date = models.DateField(verbose_name="Ngày xong sửa chữa", default=timezone.now)
 
-    approval_status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='wait_for_approval', verbose_name="Duyệt")
+    approval_status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='scratch', verbose_name="Duyệt")
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Nhận hàng")
     paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Thanh toán")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Sửa chữa")
 
     note = models.TextField(verbose_name="Ghi chú", default="")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
+
+    def save(self):
+        super().save()
+        self.repair_code = datetime.now().strftime('%d/%m/%Y') + '_' + str(self.pk).zfill(4)
+        # Get all related vehicle parts
+        vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
+        # Calculate the total maintenance amount
+        total_amount = 0
+        for vehicle_part in vehicle_parts:
+            part_amount = vehicle_part.repair_part.part_price * vehicle_part.quantity
+            total_amount += part_amount
+
+        self.maintenance_amount = total_amount
+        # Check if all parts are received, if yes => received_status = 'received'
+        if vehicle_parts.filter(received_status='not_received').count() == 0:
+            self.received_status = 'received'
+        else:
+            self.received_status = 'not_received'
+        # Check if all parts are paid, if yes => paid_status = 'paid'
+        if vehicle_parts.filter(paid_status='not_paid').count() == 0:
+            self.paid_status = 'paid'
+        else:
+            self.paid_status = 'not_paid'
+        # Check if all parts are done, if yes => done_status = 'done'
+        if vehicle_parts.filter(done_status='not_done').count() == 0:
+            self.done_status = 'done'
+        else:
+            self.done_status = 'not_done'
+        super().save()
 
     @classmethod
     def get_vehicle_maintenance_records(cls, vehicle, date):
@@ -1175,7 +1213,7 @@ class VehicleMaintenance(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date']
+        fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date', 'created_at']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
