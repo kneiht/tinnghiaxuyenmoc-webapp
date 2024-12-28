@@ -4,7 +4,6 @@
 
 
 @layer components {
-
     .extra-css {
         @apply
             bg-red-600
