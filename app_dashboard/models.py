@@ -484,7 +484,6 @@ class JobDateReport(BaseModel):
 class VehicleType(BaseModel):
     class Meta:
         ordering = ['vehicle_type']
-
     vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", unique=True)
     note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
     created_at = models.DateTimeField(default=timezone.now)
@@ -1203,7 +1202,15 @@ class VehicleMaintenance(BaseModel):
 
     def get_vehicle_part_list(self):
         vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self, repair_part__isnull=False)
-        return vehicle_parts
+        # Put into dict of groups of providers
+        print(vehicle_parts)
+        vehicle_parts_dict = {}
+        for vehicle_part in vehicle_parts:
+            if vehicle_part.repair_part.part_provider not in vehicle_parts_dict:
+                vehicle_parts_dict[vehicle_part.repair_part.part_provider] = []
+            vehicle_parts_dict[vehicle_part.repair_part.part_provider].append(vehicle_part)
+        print(vehicle_parts_dict)
+        return vehicle_parts_dict
 
     @classmethod
     def get_repair_part_list(cls):
@@ -1224,16 +1231,47 @@ class VehicleMaintenance(BaseModel):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
 
+class PartProvider(BaseModel):
+    # Driver Information Fields
+    name = models.CharField(max_length=255, verbose_name="Tên nhà cung cấp", unique=True)
+    # Bank Information
+    bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="", blank=True)
+    account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="", blank=True)
+    account_holder_name = models.CharField(max_length=255, verbose_name="Tên chủ tài khoản", default="", blank=True)
+
+    # Fianance
+    total_purchase_amount = models.IntegerField(verbose_name="Tổng tiền mua", default=0, validators=[MinValueValidator(0)])
+    total_transferred_amount = models.IntegerField(verbose_name="Tổng thanh toán", default=0, validators=[MinValueValidator(0)])
+    total_outstanding_debt = models.IntegerField(verbose_name="Tổng dư nợ", default=0, validators=[MinValueValidator(0)])
+    
+    # Contact Information
+    phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
+    address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.name}'
+    @classmethod
+    def get_display_fields(self):
+        fields = ['name', 'phone_number', 'address', 'bank_name', 'account_number', 'account_holder_name', 
+            'total_purchase_amount', 'total_transferred_amount', 'total_outstanding_debt' ,'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 class RepairPart(BaseModel):
     class Meta:
         ordering = ['vehicle_type', 'part_price']
+    part_provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại xe")
     part_number = models.CharField(max_length=255, verbose_name="Mã phụ tùng", unique=True)
     part_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
     part_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    unit = models.CharField(max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True)
     image = models.ImageField(verbose_name="Hình ảnh", default="", null=True, blank=True)
-    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    note = models.TextField(verbose_name="Mô tả", default="", null=True, blank=True)
     valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
@@ -1241,7 +1279,7 @@ class RepairPart(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_type', 'part_number', 'part_name', 'part_price', 'image', 'note', 'valid_from']
+        fields = ['part_provider', 'part_number', 'part_name', 'part_price', 'image', 'note', 'valid_from']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

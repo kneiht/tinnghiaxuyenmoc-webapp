@@ -295,7 +295,29 @@ up.compiler('.expand', function(expand) {
 // });
 
 
+function formatNumber(number) {
+    // Check if the number is a valid number
+    if (number === '' || isNaN(parseFloat(number))) {
+        return '';
+    }
+
+    // Convert the number to a float, just in case it's passed as a string
+    let num = parseFloat(number);
+
+    // Convert the number to a string with two decimal places
+    let parts = num.toString().split('.');
+        
+    // Add thousand separators (dots) to the integer part
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Join the integer and fractional parts with a comma
+    return parts.join('.');
+}
 up.compiler('.form-input', function(inputfield) {
+    if (inputfield.classList.contains('no-readable')) {
+        return;
+    }
+
     // Check if the input field is a number field by getting the input type
     if (inputfield.type !== 'number') {
         return;

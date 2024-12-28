@@ -236,22 +236,30 @@ def handle_form(request, model, pk=0):
             vehicle_maintenance = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
             vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance)
-            vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
+            part_ids = request.POST.getlist('part_id')
+            print(request.POST)
             # check if the id is in the list, if not delete it
             for vehicle_part in vehicle_parts:
-                if str(vehicle_part.id) not in vehicle_part_post_ids:
+                if str(vehicle_part.repair_part.id) not in part_ids:
                     vehicle_part.delete()
 
-            parts = request.POST.getlist('part')
-            quantities = request.POST.getlist('quantity')
-            for part, quantity in zip(parts, quantities):
-                if part == '' and quantity == '':
-                    continue
-                VehicleMaintenanceRepairPart.objects.create(
-                    vehicle_maintenance=vehicle_maintenance,
-                    repair_part_id=part,
-                    quantity=quantity,
-                )
+            for part_id in part_ids:
+                # get the instance VehicleMaintenanceRepairPart which has the repair_part.part_id == part_id
+                part = RepairPart.objects.filter(id=part_id).first()
+                if part:
+                    vehicle_part = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance, repair_part=part).first()
+                # Update
+                if vehicle_part: # Update quantity
+                    vehicle_part.quantity = request.POST.get(f'part_quantity_{part_id}')
+                    vehicle_part.save()
+                else: # create new
+                    if part:
+                        VehicleMaintenanceRepairPart.objects.create(
+                            vehicle_maintenance=vehicle_maintenance,
+                            repair_part=part,
+                            quantity=request.POST.get(f'part_quantity_{part_id}'),
+                        )
+
         instance_form.save()
         
         # Save the many to many field, if any
@@ -1113,6 +1121,15 @@ def save_vehicle_operation_record(request):
     return HttpResponse(check_date + ' => done')
 
 
+def form_repair_parts(request):
+    # Get the list of repair parts
+    repair_parts = RepairPart.objects.all()
+
+    context = {
+        'repair_parts': repair_parts
+    }
+    return render(request, 'components/modal_repair_parts.html', context)
+
 
 
 
@@ -1176,6 +1193,7 @@ def page_transport_department(request, sub_page=None):
     display_name_dict = {
         'FuelFillingRecord': 'LS đổ nhiên liệu',
         'LubeFillingRecord': 'LS đổ nhớt',
+        'PartProvider': 'Nhà cung cấp phụ tùng',
         'RepairPart': 'Danh mục sửa chữa',
         'VehicleMaintenance': 'Phiếu sửa chữa',
         'VehicleDepreciation': 'Khấu hao',

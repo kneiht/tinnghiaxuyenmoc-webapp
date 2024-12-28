@@ -255,14 +255,21 @@
                         </div>
 
 
-                    <div class="w-full pt-4 px-6 pt-5- pb-2">
-                        <div class="flex flex-row justify-between gap-5 items-end py-2">
-                            <div>
+                    <div class="w-full pt-4 px-6">
+                        <div class="flex flex-row justify-between gap-5 items-center py-1">
+                            <div class="flex flex-row gap-5 items-end py-2">
                                 <label for="students" class="text-theme">Các bộ phận thay thế</label>
-                                <button class="btn btn-success h-7 hidable hidden" onclick="event.preventDefault(); var newPart = document.querySelector('.new-part').cloneNode(true); newPart.classList.remove('hidden'); newPart.classList.remove('new-part'); newPart.querySelectorAll('input').forEach(input => input.value = ''); document.querySelector('.new-part').parentNode.insertBefore(newPart, document.querySelector('.new-part').nextSibling);">
+                                <!-- <button class="btn btn-success h-7 hidable hidden" onclick="event.preventDefault(); var newPart = document.querySelector('.new-part').cloneNode(true); newPart.classList.remove('hidden'); newPart.classList.remove('new-part'); newPart.querySelectorAll('input').forEach(input => input.value = ''); document.querySelector('.new-part').parentNode.insertBefore(newPart, document.querySelector('.new-part').nextSibling);">
                                     <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
                                     Thêm vào danh mục
-                                </button>
+                                </button> -->
+
+                                <a href="{% url 'form_repair_parts' %}?maintenance={{ record.pk }}" class="btn btn-success h-7 hidable hidden"
+                                    up-preload="insert" up-target="#modal-repair-parts">
+                                    <i class="fas fa-plus me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                                    <span class="me-3"> Chọn phụ tùng </span>
+                                </a>
+
                             </div>
                             <div>
                                 <div class="flex items-center justify-end">
@@ -271,8 +278,6 @@
                                         {{ record.maintenance_amount|format_money }} VND
                                     </span>
                                 </div>
-                            
-                                
                             </div>
                         </div>
                         <div class="form-input flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
@@ -282,14 +287,20 @@
                                 <span class="w-2/12 text-center"> Nhận hàng </span>
                                 <span class="w-2/12 text-center"> Thanh toán </span>
                                 <span class="w-2/12 text-center"> Sửa chữa </span>
-                                <span class="text-center hidable hidden">
-                                    <i class="fas fa-trash-can" style="font-size: 16px; opacity: 0;"></i>
-                                </span>
                             </div> 
-                            {% for vehice_part in record.get_vehicle_part_list %}
-                                <div class="border-b pb-2 flex items-center w-full">
+                            <div id="vehicle_parts">
+                            {% for provider, vehice_parts in record.get_vehicle_part_list.items %}
+                                <div class="font-bold border-b pt-3 pb-1">
+                                    {{ provider }} - 
+                                    <span class="text-red-600"> {{ vehice_parts|calculate_vehicle_part_total_purchase }} VNÐ
+                                    </span>
+                                </div>
+                                {% for vehice_part in vehice_parts %}
+                                <div  class="vehice_part border-b py-2 flex items-center w-full" data-part-id="{{ vehice_part.repair_part.pk }}" data-part-quantity="{{ vehice_part.quantity }}">
                                     {% if record %}
+                                    <input type="hidden" name="part_id" value="{{ vehice_part.repair_part.pk }}">
                                     <input type="hidden" name="vehicle_part_id" value="{{ vehice_part.pk }}">
+                                    <input type="hidden" name="part_quantity_{{ vehice_part.repair_part.pk }}" value="{{ vehice_part.quantity }}">
                                     {% endif %}
                                     <span class="w-5/12"> {{ vehice_part.repair_part.part_number }} - {{ vehice_part.repair_part.part_name }} - {{ vehice_part.repair_part.part_price|format_money }} VNĐ </span>
                                     <span class="w-1/12 text-center"> {{ vehice_part.quantity }} </span>
@@ -336,37 +347,11 @@
                                     {% endif %}
                                     </div>
                                     
-                                    <div class="text-end hidable hidden">
-                                        <button onclick="this.parentElement.parentElement.remove();">
-                                            <i class="fas fa-trash-can" style="font-size: 16px; color: red;"></i>
-                                        </button>
-                                    </div>
                                 </div>
-                            {% endfor %}
-
-                            <div class="part-row border-b pb-0.5 flex justify-between items-center w-full new-part hidden">
-                                <select name="part" class="w-5/12 form-input input input-driver " id="id_part" >
-                                    <option value="" selected">Chọn bộ phận ...</option>
-                                    {% for part in model_class.get_repair_part_list %}
-                                        <option value="{{ part.id }}">{{ part.part_number }} - {{ part.part_name }} - {{ part.part_price|format_money }} VNĐ</option>
-                                    {% endfor %}
-                                </select>
-                                <div class="w-2/12 flex justify-center text-center">
-                                    <input type="number" name="quantity" class="form-input input" id="id_quantity" style="width: 100px">
-                                </div>  
-
-                                <div class="w-2/12 text-center"></div>
-                                <div class="w-2/12 text-center"></div>
-                                <div class="w-2/12 text-center"></div>
-
-
-
-                                <div class="text-end hidable hidden">
-                                    <button onclick="this.parentElement.parentElement.remove();">
-                                        <i class="fas fa-trash-can" style="font-size: 16px; color: red;"></i>
-                                    </button>
-                                </div>
+                                {% endfor %}   
+                            {% endfor %}    
                             </div>
+                            
 
                         </div>
                     </div>

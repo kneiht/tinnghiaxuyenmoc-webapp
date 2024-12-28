@@ -963,17 +963,24 @@ class VehicleMaintenanceForm(forms.ModelForm):
 class RepairPartForm(forms.ModelForm):
     class Meta:
         model = RepairPart
-        fields = ['vehicle_type', 'part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
+        fields = ['part_provider', 'part_number', 'part_name', 'part_price', 'image', 'valid_from', 'note']
         labels = {
+            'part_provider': 'Nhà cung cấp',
             'vehicle_type': 'Loại xe',
             'part_number': 'Mã phụ tùng',
             'part_name': 'Tên đầy đủ',
             'part_price': 'Đơn giá',
             'image': 'Hình ảnh',
             'valid_from': 'Ngày áp dụng',
-            'note': 'Ghi chú'
+            'note': 'Mô tả'
         }
         widgets = {
+            'part_provider': forms.Select(attrs={
+                'placeholder': 'Chọn nhà cung cấp',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+
             'vehicle_type': forms.Select(attrs={
                 'placeholder': 'Chọn loại xe',
                 'class': 'form-input',
@@ -1123,6 +1130,52 @@ class UserPermissionForm(forms.ModelForm):
                 'placeholder': 'Chọn cấp quyền',
                 'class': 'form-input',
             }, choices=UserPermission.MODEL_PERMISSION_CHOICES),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+
+
+
+class PartProviderForm(forms.ModelForm):
+    class Meta:
+        model = PartProvider
+        fields = ['name', 'bank_name', 'account_number', 'account_holder_name', 'phone_number', 'address', 'note']
+        labels = {
+            'name': 'Tên nhà cung cấp',
+            'bank_name': 'Ngân hàng',
+            'account_number': 'Số tài khoản',
+            'account_holder_name': 'Tên chủ tài khoản',
+            'phone_number': 'Số điện thoại',
+            'address': 'Địa chỉ',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Tên nhà cung cấp',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'placeholder': 'Ngân hàng',
+                'class': 'form-input',
+            }),
+            'account_number': forms.TextInput(attrs={
+                'placeholder': 'Số tài khoản',
+                'class': 'form-input',
+            }),
+            'account_holder_name': forms.TextInput(attrs={
+                'placeholder': 'Tên chủ tài khoản',
+                'class': 'form-input',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'placeholder': 'Số điện thoại',
+                'class': 'form-input',
+            }),
+            'address': forms.TextInput(attrs={
+                'placeholder': 'Địa chỉ',
+                'class': 'form-input',
+            }),
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',
             }),

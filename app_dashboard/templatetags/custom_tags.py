@@ -127,6 +127,12 @@ def format_display(record, field=None):
         return value
 
 
+@register.filter
+def calculate_vehicle_part_total_purchase(vehice_parts):
+    total = 0
+    for vehice_part in vehice_parts:
+        total += vehice_part.quantity * vehice_part.repair_part.part_price
+    return format_money(total)
 
 
 @register.filter(name='format_money')
@@ -484,29 +490,30 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
     driver = vehicle_operation_records.first().driver
 
-    vehicle_types = get_vehicle_types(vehicle_operation_records)
-    hasXeChamCong = False
-    for vehicle_type in vehicle_types:
-        if vehicle_type == None:
-            return {"success": "false",
-                    "message": "Không tìm thấy dữ liệu loại xe, vui lòng thêm loại xe trong bảng Dữ liệu chi tiết từng xe.",
-                    "driver_name": driver_name
-                    }
+    # TẠM THỜI TẮT TÍNH NĂNG KIỂM TRA LOẠI XE, MẶC ĐỊNH TÀI XẾ CHẠY 1 LOẠI XE, 1 LOẠI TÍNH LƯƠNG
+    # vehicle_types = get_vehicle_types(vehicle_operation_records)
+    # hasXeChamCong = False
+    # for vehicle_type in vehicle_types:
+    #     if vehicle_type == None:
+    #         return {"success": "false",
+    #                 "message": "Không tìm thấy dữ liệu loại xe, vui lòng thêm loại xe trong bảng Dữ liệu chi tiết từng xe.",
+    #                 "driver_name": driver_name
+    #                 }
 
-        if vehicle_type.vehicle_type == "XE CHẤM CÔNG":
-            vehicle_types.remove(vehicle_type)
-            break
+    #     if vehicle_type.vehicle_type == "XE CHẤM CÔNG":
+    #         vehicle_types.remove(vehicle_type)
+    #         break
 
-    if len(vehicle_types) == 0: # Ngoài xe chấm công, không còn xe nào khác
-        pass # vẫn xử lý lương
+    # if len(vehicle_types) == 0: # Ngoài xe chấm công, không còn xe nào khác
+    #     pass # vẫn xử lý lương
 
-    elif len(vehicle_types) >= 2: # Ngoài xe chấm công, tài xế còn chạy 2 loại xe khác
-        return {"success": "false",
-                "message": "Tài xế này chạy nhiều loại xe, chưa tính toán trường hợp này.",
-                "driver_name": driver_name
-                }
-    else: # Chỉ có 1 loại xe
-        vehicle_type = vehicle_types[0]
+    # elif len(vehicle_types) >= 2: # Ngoài xe chấm công, tài xế còn chạy 2 loại xe khác
+    #     return {"success": "false",
+    #             "message": "Tài xế này chạy nhiều loại xe, chưa tính toán trường hợp này.",
+    #             "driver_name": driver_name
+    #             }
+    # else: # Chỉ có 1 loại xe
+    #     vehicle_type = vehicle_types[0]
 
     driver_salary_input = get_driver_salary_inputs(driver)
 
