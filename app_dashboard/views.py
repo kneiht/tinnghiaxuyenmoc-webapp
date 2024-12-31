@@ -1195,6 +1195,7 @@ def page_transport_department(request, sub_page=None):
         'LubeFillingRecord': 'LS đổ nhớt',
         'PartProvider': 'Nhà cung cấp phụ tùng',
         'RepairPart': 'Danh mục sửa chữa',
+        'PaymentRecord': 'LS thanh toán',
         'VehicleMaintenance': 'Phiếu sửa chữa',
         'VehicleDepreciation': 'Khấu hao',
         'VehicleBankInterest': 'Lãi ngân hàng',

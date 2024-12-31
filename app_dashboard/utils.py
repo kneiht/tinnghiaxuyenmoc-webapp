@@ -454,7 +454,7 @@ def filter_records(request, records, model_class, **kwargs):
         records = records.filter(start_time__date__range=[start_date, end_date])
 
 
-
+    
     # Determine the fields to be used as filter options based on the selected page
     fields = [field.name for field in model_class._meta.get_fields() if 
                   isinstance(field, (models.CharField, models.TextField))]
@@ -487,8 +487,15 @@ def filter_records(request, records, model_class, **kwargs):
                 except FieldDoesNotExist:
                     print(f"Ignoring invalid field: {field}")
     # Filter records based on the query
-    records = records.filter(combined_query)
+    records_filtered = records.filter(combined_query)
 
+    # Fix bug no records when searching driver because driver must be searched in full_name
+    if model_class == VehicleOperationRecord:
+        driver_name = request.GET.get('all', [''])
+        records_have_driver = records.filter(driver__full_name__icontains=driver_name)
+        records = records_filtered | records_have_driver
+    else:
+        records = records_filtered
 
     if request.GET.get('sort'):
         records = records.order_by(request.GET.get('sort'))

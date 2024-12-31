@@ -134,6 +134,7 @@ def render_display_records(request, **kwargs):
             contain_data_unique_values = set(values)
             # remove None values
             contain_data_unique_values = [value for value in contain_data_unique_values if value != None]
+
         elif model_class == VehicleDetail:
             # get vehicle list from records
             values = records.values_list('vehicle', flat=True)
@@ -153,6 +154,7 @@ def render_display_records(request, **kwargs):
         unique_values = set(values)
         unique_values = [value for value in unique_values if value != None]
         contain_data_unique_values = [value for value in contain_data_unique_values if value in unique_values]
+
         
         # order
         try:
@@ -199,6 +201,8 @@ def render_display_records(request, **kwargs):
 
     group_by = params.get('group_by', '')
     records = params.get('records', None)
+
+
     tab = params.get('tab', '')
 
     if tab == 'vehicle_operation_data_by_date' or tab == 'driver_salary':
@@ -292,7 +296,7 @@ def render_display_records(request, **kwargs):
                         'records': group_records
                     })
 
-
+    
     # Get fields to be displayed by using record meta
     # If there is get_display_fields method, use that method
     fields = []
@@ -333,6 +337,7 @@ def render_display_records(request, **kwargs):
                'next': next,
                'search_phrase': search_phrase
     }
+
     html = render_to_string(template, context, request)
     return html
 

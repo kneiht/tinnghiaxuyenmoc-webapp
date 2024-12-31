@@ -1180,3 +1180,36 @@ class PartProviderForm(forms.ModelForm):
                 'class': 'form-input h-20',
             }),
         }
+
+
+class PaymentRecordForm(forms.ModelForm):
+    class Meta:
+        model = PaymentRecord
+        fields = ['vehicle_maintenance', 'payment_date', 'amount', 'note']
+        labels = {
+            'vehicle_maintenance': 'Phiếu sửa chữa',
+            'payment_date': 'Ngày thanh toán',
+            'amount': 'Tiền thanh toán',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'vehicle_maintenance': forms.Select(attrs={
+                'placeholder': 'Chọn phiếu sửa chữa',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'payment_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'amount': forms.NumberInput(attrs={
+                'placeholder': 'Tiền thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }

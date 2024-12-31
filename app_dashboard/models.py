@@ -231,7 +231,9 @@ class UserPermission(BaseModel):
 
         ('FuelFillingRecord', 'LS đổ nhiên liệu'),
         ('LubeFillingRecord', 'LS đổ nhớt'),
+        ('PartProvider', 'Nhà cung cấp phụ tùng'),
         ('RepairPart', 'Danh mục sửa chữa'),
+        ('PaymentRecord', 'Lịch sử thanh toán'),
         ('VehicleMaintenance', 'Phiếu sửa chữa'),
         ('VehicleDepreciation', 'Khấu hao'),
         ('VehicleBankInterest', 'Lãi ngân hàng'),
@@ -640,7 +642,7 @@ class DriverSalaryInputs(BaseModel):
     
     @classmethod
     def get_display_fields(self):
-        fields = ['driver', 'basic_month_salary', 'sunday_month_salary_percentage', 
+        fields = ['driver', 'valid_from','basic_month_salary', 'sunday_month_salary_percentage', 
                   'holiday_month_salary_percentage', 'normal_hourly_salary', 'normal_overtime_hourly_salary', 
                   'sunday_hourly_salary', 'sunday_overtime_hourly_salary', 'holiday_hourly_salary', 
                   'holiday_overtime_hourly_salary', 'trip_salary', 'fixed_allowance', 'insurance_amount', 'note']
@@ -1242,7 +1244,7 @@ class PartProvider(BaseModel):
     # Fianance
     total_purchase_amount = models.IntegerField(verbose_name="Tổng tiền mua", default=0, validators=[MinValueValidator(0)])
     total_transferred_amount = models.IntegerField(verbose_name="Tổng thanh toán", default=0, validators=[MinValueValidator(0)])
-    total_outstanding_debt = models.IntegerField(verbose_name="Tổng dư nợ", default=0, validators=[MinValueValidator(0)])
+    total_outstanding_debt = models.IntegerField(verbose_name="Tổng công nợ", default=0, validators=[MinValueValidator(0)])
     
     # Contact Information
     phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
@@ -1309,3 +1311,21 @@ class VehicleMaintenanceRepairPart(BaseModel):
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
     paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Trạng thái thanh toán")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Trạng thái xong sửa chữa")
+
+class PaymentRecord(BaseModel):
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)
+    amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.vehicle_maintenance} - {self.payment_date} - {self.amount}'
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['vehicle_maintenance', 'payment_date', 'amount', 'note', 'created_at']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
