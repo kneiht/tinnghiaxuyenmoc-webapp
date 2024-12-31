@@ -1185,9 +1185,10 @@ class PartProviderForm(forms.ModelForm):
 class PaymentRecordForm(forms.ModelForm):
     class Meta:
         model = PaymentRecord
-        fields = ['vehicle_maintenance', 'payment_date', 'amount', 'note']
+        fields = ['vehicle_maintenance', 'provider', 'payment_date', 'amount', 'note']
         labels = {
             'vehicle_maintenance': 'Phiếu sửa chữa',
+            'provider': 'Nhà cung cấp',
             'payment_date': 'Ngày thanh toán',
             'amount': 'Tiền thanh toán',
             'note': 'Ghi chú',
@@ -1198,6 +1199,13 @@ class PaymentRecordForm(forms.ModelForm):
                 'class': 'form-input',
                 'required': 'required',
             }),
+            'provider': forms.Select(attrs={
+                'placeholder': 'Chọn nhà cung cấp',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+
+
             'payment_date': forms.DateInput(attrs={
                 'placeholder': 'Ngày thanh toán',
                 'class': 'form-input',

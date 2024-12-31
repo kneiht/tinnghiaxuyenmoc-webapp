@@ -256,6 +256,7 @@
 
 
                     <div class="w-full pt-4 px-6">
+                        <p class="text-center text-theme"> Lưu ý: các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật </p>
                         <div class="flex flex-row justify-between gap-5 items-center py-1">
                             <div class="flex flex-row gap-5 items-end py-2">
                                 <label for="students" class="text-theme">Các bộ phận thay thế</label>
@@ -266,17 +267,17 @@
 
                                 <a href="{% url 'form_repair_parts' %}?maintenance={{ record.pk }}" class="btn btn-success h-7 hidable hidden"
                                     up-preload="insert" up-target="#modal-repair-parts">
-                                    <i class="fas fa-plus me-3" style="font-size: 16px;" aria-hidden="true"></i>
                                     <span class="me-3"> Chọn phụ tùng </span>
                                 </a>
 
                             </div>
                             <div>
-                                <div class="flex items-center justify-end">
-                                    <span class="font-semibold text-xl text-theme mr-2">Tổng cộng (tự động tính sau khi cập nhật): </span>
-                                    <span class="font-semibold text-xl text-green-600" id="total-amount">
-                                        {{ record.maintenance_amount|format_money }} VND
-                                    </span>
+                                <div class="flex items-center justify-end font-semibold gap-3">
+                                    {% with record|calculate_total_payment_state as state %}
+                                        <span class="text-blue-600">Tổng {{ state.total_purchase_amount|format_money }} VNÐ</span>
+                                        <span class="text-green-600"> Thanh toán {{ state.total_transferred_amount|format_money }} VNÐ</span>
+                                        <span class="text-red-600"> Nợ {{ state.total_debt_amount|format_money }} VNÐ</span>
+                                    {% endwith %}
                                 </div>
                             </div>
                         </div>
@@ -290,11 +291,14 @@
                             </div> 
                             <div id="vehicle_parts">
                             {% for provider, vehice_parts in record.get_vehicle_part_list.items %}
-                                <div class="font-bold border-b pt-3 pb-1">
-                                    {{ provider }} - 
-                                    <span class="text-red-600"> {{ vehice_parts|calculate_vehicle_part_total_purchase }} VNÐ
-                                    </span>
-                                </div>
+                                {% with record.calculate_all_provider_payment_states|get_value:provider.pk as payment_state %}
+                                    <div class="font-bold border-b pt-3 pb-1">
+                                        {{ provider }} - 
+                                        <span class="text-blue-600">Tổng {{ payment_state.purchase_amount|format_money }} VNÐ</span>
+                                        <span class="text-green-600"> - Thanh toán {{ payment_state.transferred_amount|format_money }} VNÐ</span>
+                                        <span class="text-red-600"> - Nợ {{ payment_state.debt_amount|format_money }} VNÐ</span>
+                                    </div>
+                                {% endwith %}
                                 {% for vehice_part in vehice_parts %}
                                 <div  class="vehice_part border-b py-2 flex items-center w-full" data-part-id="{{ vehice_part.repair_part.pk }}" data-part-quantity="{{ vehice_part.quantity }}">
                                     {% if record %}

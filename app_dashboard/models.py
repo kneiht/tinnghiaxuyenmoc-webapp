@@ -1121,6 +1121,7 @@ class VehicleBankInterest(BaseModel):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
 
+
 class VehicleMaintenance(BaseModel):
     MAINTENANCE_CATEGORY_CHOICES = (
         ('periodic_check', 'Kiểm tra định kì'),
@@ -1194,6 +1195,38 @@ class VehicleMaintenance(BaseModel):
             self.done_status = 'not_done'
         super().save()
 
+    def calculate_all_provider_payment_states(self):
+        # get all the parts in this vehicle maintenance
+        vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
+        # get all the providers in this vehicle maintenance
+        provider_ids = vehicle_parts.values_list('repair_part__part_provider', flat=True).distinct()
+        provider_ids = set(provider_ids)
+        all_provider_payment_state = {}
+        for provider_id in provider_ids:
+            provider = PartProvider.objects.get(pk=provider_id)
+            # calculate the purchase amount
+            purchase_amount = 0
+            provider_vehicle_parts = vehicle_parts.filter(repair_part__part_provider=provider)
+            for provider_vehicle_part in provider_vehicle_parts:
+                purchase_amount += provider_vehicle_part.repair_part.part_price * provider_vehicle_part.quantity
+
+            # calculate the transferred amount
+            transferred_amount = 0
+            payment_records = PaymentRecord.objects.filter(vehicle_maintenance=self, provider=provider)
+            for payment_record in payment_records:
+                transferred_amount += payment_record.amount
+
+            # calculate the debt amount
+            debt_amount = purchase_amount - transferred_amount
+
+            state = {
+                'purchase_amount': purchase_amount,
+                'transferred_amount': transferred_amount,
+                'debt_amount': debt_amount
+            }
+            all_provider_payment_state[provider.id] = state
+        return all_provider_payment_state
+
     @classmethod
     def get_vehicle_maintenance_records(cls, vehicle, date):
         try:
@@ -1230,7 +1263,7 @@ class VehicleMaintenance(BaseModel):
         return fields
     
     def __str__(self):
-        return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+        return f'{self.repair_code} - {self.vehicle}'
 
 
 class PartProvider(BaseModel):
@@ -1251,6 +1284,8 @@ class PartProvider(BaseModel):
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     note = models.TextField(verbose_name="Ghi chú", default="")
     created_at = models.DateTimeField(default=timezone.now)
+
+
     def __str__(self):
         return f'{self.name}'
     @classmethod
@@ -1314,6 +1349,7 @@ class VehicleMaintenanceRepairPart(BaseModel):
 
 class PaymentRecord(BaseModel):
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
     payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)
     amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
@@ -1323,7 +1359,7 @@ class PaymentRecord(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_maintenance', 'payment_date', 'amount', 'note', 'created_at']
+        fields = ['vehicle_maintenance', 'provider', 'payment_date', 'amount', 'note', 'created_at']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

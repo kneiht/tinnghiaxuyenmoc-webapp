@@ -717,3 +717,32 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
         'headers': rows[0].keys(),
         'update': update
     }
+
+
+@register.filter(name='calculate_total_payment_state')
+def calculate_total_payment_state(maintenance_record):
+    if maintenance_record == None:
+        return {
+            'total_purchase_amount': 0,
+            'total_transferred_amount': 0,
+            'total_debt_amount': 0
+        }
+    states = maintenance_record.calculate_all_provider_payment_states()
+    print(states)
+    total_purchase_amount = 0
+    total_transferred_amount = 0
+    total_debt_amount = 0
+    for state in states.values():
+        total_purchase_amount += state['purchase_amount']
+        total_transferred_amount += state['transferred_amount']
+        total_debt_amount += state['debt_amount']
+        print(total_purchase_amount)
+        print(total_transferred_amount)
+        print(total_debt_amount)
+    return {
+        'total_purchase_amount': total_purchase_amount,
+        'total_transferred_amount': total_transferred_amount,
+        'total_debt_amount': total_debt_amount
+    }
+    
+    
