@@ -45,6 +45,9 @@ urlpatterns = [
     
     path('api/form_repair_parts', views.form_repair_parts, name='form_repair_parts'),
 
+    path('api/form_maintenance_images/<int:maintenance_id>/', views.form_maintenance_images, name='form_maintenance_images'),
+
+
     path('test', views.test, name='test'),
 
 

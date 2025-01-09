@@ -93,7 +93,7 @@ def decide_permission(request, action, params):
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-    print(request.POST)
+    # print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -199,17 +199,16 @@ def handle_form(request, model, pk=0):
                     if form_approval_status in ('need_update', 'approved', 'rejected'):
                         # Update status up each VehicleMaintenanceRepairPart
                         vehicle_part_post_ids = request.POST.getlist('vehicle_part_id')
-                        print("vehicle_part_post_ids", vehicle_part_post_ids)
                         for vehicle_part_id in vehicle_part_post_ids:
                             vehicle_part = VehicleMaintenanceRepairPart.objects.filter(id=vehicle_part_id).first()
                             # Get fields
                             vehicle_part.received_status = request.POST.get(f'received_status_{vehicle_part_id}')
                             vehicle_part.paid_status = request.POST.get(f'paid_status_{vehicle_part_id}')
                             vehicle_part.done_status = request.POST.get(f'done_status_{vehicle_part_id}')
-                            print(vehicle_part.received_status, vehicle_part.paid_status, vehicle_part.done_status)
                             vehicle_part.save()
                         
                         record = instance
+                        record.approval_status = form_approval_status
                         record.save()
                         record.style = 'just-updated'
                         html_message = render_message(request, message='Cập nhật thành công')
@@ -227,7 +226,14 @@ def handle_form(request, model, pk=0):
                         message = 'Chỉ có thể chọn trạng thái duyệt "Cần sửa lại"'
                         html_message = render_message(request, message=message, message_type='red')
                         return HttpResponse(html_message)
-
+                    else:
+                        record = instance
+                        record.approval_status = form_approval_status
+                        record.save()
+                        record.style = 'just-updated'
+                        html_message = render_message(request, message='Cập nhật thành công')
+                        html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
+                        return HttpResponse(html_message + html_record)
     if form.is_valid():
         instance_form = form.save(commit=False)
         instance_form.save()
@@ -1130,8 +1136,37 @@ def form_repair_parts(request):
     }
     return render(request, 'components/modal_repair_parts.html', context)
 
-
-
+def form_maintenance_images(request, maintenance_id):
+    # If Get
+    if request.method == 'GET':
+        vehicle_maintenance = VehicleMaintenance.objects.get(pk=maintenance_id)
+        # Get the list of images for the maintenance record
+        maintenance_images = MaintenanceImage.objects.filter(vehicle_maintenance=vehicle_maintenance)
+        print(">>> maintenance_images: ", maintenance_images)
+        
+        context = {
+            'maintenance_id': maintenance_id,
+            'maintenance_images': maintenance_images
+        }
+        return render(request, 'components/modal_gallery.html', context)
+    # If Post
+    elif request.method == 'POST':
+        images = []
+        try :
+            # Save images to the database
+            for image in request.FILES.getlist('images[]'):
+                maintenance_image = MaintenanceImage.objects.create(
+                    vehicle_maintenance_id=maintenance_id,
+                    image=image
+                )
+                images.append({
+                    'id': maintenance_image.id,
+                    'url': maintenance_image.image.url
+                })
+            return JsonResponse({'success': True, 'images': images})
+        except:
+            return JsonResponse({'success': False}) 
+        
 
 # PAGES ==============================================================
 @login_required

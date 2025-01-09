@@ -1,0 +1,127 @@
+{% load custom_tags %}
+<div up-hungry id="modal-sub">
+    <div id="modal-sub-body" class="modal z-40 fixed inset-0 h-screen w-full flex justify-center overflow-auto bg-slate-600 bg-opacity-60">
+        <!-- Modal Content -->
+        <div class="relative top-10 mx-4 card h-12/12 w-11/12 mb-28">
+                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Hình ảnh liên quan đến phiếu sửa chữa</h3>
+
+                <button id='cancel-modal' type="button" class="cancel-modal absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-sub-body').remove();">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+
+                <div class="h-full">
+                    
+                    <div class="flex flex-col h-full justify-between gap-5 text-sm text-theme">
+                        
+                        <p id="no-images" class="hidden text-center mt-14 text-xl text-red-600">Chưa có hình ảnh nào được tải lên.</p>
+                        <div id="card_images" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
+                            {% for maintenance_image in maintenance_images %}
+                            <div class="relative card-image card-image-{{ maintenance_image.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl">
+
+                                <div style="height: 20rem;">
+                                    {% if maintenance_image.image %}
+                                    <img src="{{ maintenance_image.image.url }}" alt="Hình ảnh"
+                                        class="rounded-2xl border border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex flex-col justify-center gap-5">
+                            <div class="flex justify-center gap-5">
+                                <button type="button" id="submit-selections" class="submit btn btn-primary rounded-full w-28">
+                                    <i class="fa fa-upload me-3" aria-hidden="true"></i>
+                                    Tải lên
+                                </button>
+                                {% csrf_token %}
+                                <input type="file" id="file-input" accept="image/*" style="display:none" multiple onchange="uploadImages(event)">
+                                <input type="hidden" id="maintenance_id" value="{{ maintenance_id }}">
+                                <button id='cancel-modal' type="button" class="cancel-modal btn btn-secondary rounded-full w-28" onclick="document.getElementById('modal-sub-body').remove();">
+                                    Hủy bỏ
+                                </button>
+                            </div>
+                            <div class="h-14"></div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script>
+    // Hide modal
+    document.getElementById('modal').classList.add('hidden');
+    document.querySelectorAll('.cancel-modal').forEach(el => {
+        el.addEventListener('click', function(){
+            document.getElementById('modal').classList.remove('hidden');
+        })
+    })
+    showNoImages();
+    
+    function showNoImages() {
+        const cardImages = document.getElementById('card_images');
+        if (cardImages.childElementCount == 0) {
+            const noImages = document.getElementById('no-images');
+            noImages.classList.remove('hidden');
+        } else {
+            const noImages = document.getElementById('no-images');
+            noImages.classList.add('hidden');
+        }
+    }
+
+
+    document.getElementById('submit-selections').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
+
+    function uploadImages(event) {
+        const files = event.target.files;
+        const formData = new FormData();
+
+        // Append files to FormData
+        for (let i = 0; i < files.length; i++) {
+            formData.append('images[]', files[i]);
+        }
+
+        const maintenance_id = document.getElementById('maintenance_id').value;
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        // Make the request to the endpoint
+        fetch(`/api/form_maintenance_images/${maintenance_id}/`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+            
+                // Add uploaded images to #card_images
+                const cardImagesContainer = document.getElementById('card_images');
+                data.images.forEach(image => {
+                    const imageCard = document.createElement('div');
+                    imageCard.className = `relative card-image card-image-${image.id} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl`;
+                    imageCard.innerHTML = `
+                        <div style="height: 20rem;">
+                            <img src="${image.url}" alt="Hình ảnh"
+                                class="rounded-2xl border border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                        </div>
+                    `;
+                    cardImagesContainer.appendChild(imageCard);
+                });
+                showNoImages();
+                alert('Tải lên thành công');
+            } else {
+                alert('Có lỗi xảy ra khi tải lên.');
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading images:', error);
+            alert('Đã xảy ra lỗi khi tải lên hình ảnh.');
+        });
+    }
+
+    </script>
+</div>
+
+

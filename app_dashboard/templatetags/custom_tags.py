@@ -583,17 +583,14 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
 
     # Get list of unique driver + vehicle together
     unique_driver_vehicles = vehicle_operation_records.values_list('driver', 'vehicle', 'location')
-    unique_driver_vehicles = set(unique_driver_vehicles) 
+    unique_driver_vehicles = set(unique_driver_vehicles)
+    # Order the unique_driver_vehicles by vehicle => driver
+    unique_driver_vehicles = sorted(unique_driver_vehicles, key=lambda x: (x[1], x[0]))
     rows = []
 
     if update:
         for driver, vehicle, location in unique_driver_vehicles:
             driver_vehicle_records = vehicle_operation_records.filter(driver=driver, vehicle=vehicle)
-            # calculate total time which has driver
-            total_driver_time_seconds = driver_vehicle_records.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
-            total_driver_time_hours = total_driver_time_seconds/3600
-            vehicle_instance = VehicleDetail.objects.get(gps_name=vehicle)
-            
             # get unique start_date
             unique_start_dates = driver_vehicle_records.values_list('start_time', flat=True).distinct()
             unique_start_dates = list(unique_start_dates)
@@ -609,39 +606,65 @@ def calculate_revenue_report(vehicle_operation_records, update=False):
             depreciation_amount = 0
             bank_interest_amount = 0
             maintenance_amount = 0
+
+            # Because the revenue is different for each day, so we need to calculate revenue for each day
             for start_date in unique_start_dates:
+                driver_vehicle_records_for_date = driver_vehicle_records.filter(start_time__date=start_date)
+                # calculate total time which has driver
+                total_driver_time_seconds = driver_vehicle_records_for_date.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+                total_driver_time_hours = total_driver_time_seconds/3600
+                vehicle_instance = VehicleDetail.objects.get(gps_name=vehicle)
+
+
                 vehicle_revenue_inputs_record = VehicleRevenueInputs.objects.filter(vehicle_type=vehicle_instance.vehicle_type).first()
                 if not vehicle_revenue_inputs_record:
                     revenue = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
                     revenue_base = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
                     break
 
-                revenue_base += vehicle_revenue_inputs_record.revenue_day_price
+                # Đơn giá gần nhất
+                revenue_base = vehicle_revenue_inputs_record.revenue_day_price
                 revenue += (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*total_driver_time_hours
-                # calculate fuel cost
+                print(">>>>>>>>>>>>>>>>>>> date:", start_date)
+                
+                print(">>>>>>>>>>>>>>>>>>> revenue:", revenue)
 
-                fuel_records = FuelFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
-                # sum fuel cost
-                if fuel_records:
-                    fuel_cost_amount += fuel_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
-                # calculate lube cost
-                lube_records = LubeFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date=start_date)
-                # sum lube cost
-                if lube_records:
-                    lube_cost_amount += lube_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
-                # caculate VehicleDepreciation
-                vehicle_depreciation_record = VehicleDepreciation.get_vehicle_depreciation(vehicle_instance, start_date)
+            # Use vehicle_operation_records to get 2 capped dates
+            vehicle_operation_records = vehicle_operation_records.order_by('start_time')
+            min_start_date = vehicle_operation_records.first().start_time.date()
+            max_end_date = vehicle_operation_records.last().end_time.date()
+            # calculate fuel cost
+            fuel_records = FuelFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
+            # sum fuel cost
+            if fuel_records:
+                fuel_cost_amount = fuel_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
+            # calculate lube cost
+            lube_records = LubeFillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
+            # sum lube cost
+            if lube_records:
+                lube_cost_amount = lube_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
+            # caculate VehicleDepreciation
+            for n in range(int ((max_end_date - min_start_date).days)+1):
+                d = min_start_date + timedelta(n)
+                vehicle_depreciation_record = VehicleDepreciation.get_vehicle_depreciation(vehicle_instance, d)
                 if vehicle_depreciation_record:
                     depreciation_amount += vehicle_depreciation_record.depreciation_amount
+
                 # calculate bank interest
-                bank_interest_record = VehicleBankInterest.get_vehicle_bank_interest(vehicle_instance, start_date)
+                bank_interest_record = VehicleBankInterest.get_vehicle_bank_interest(vehicle_instance, d)
                 if bank_interest_record:
                     bank_interest_amount += bank_interest_record.interest_amount
-                # maintenance_amount
-                maintenance_records = VehicleMaintenance.get_vehicle_maintenance_records(vehicle_instance, start_date)
-                if maintenance_records:
-                    maintenance_amount += maintenance_records.aggregate(models.Sum('maintenance_amount'))['maintenance_amount__sum']
-            
+
+            # maintenance_amount
+            maintenance_records = VehicleMaintenance.get_vehicle_maintenance_records(vehicle_instance, start_date)
+            print(">>>>>>>>>>>>>>>>>> maintenance_records:", maintenance_records)
+            for maintenance_record in maintenance_records:
+                maintenance_amount += maintenance_record.maintenance_amount
+
+
+
+
+
             total_cost = fuel_cost_amount + lube_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
             # salary
             salary_data = calculate_driver_salary(driver_vehicle_records, None)

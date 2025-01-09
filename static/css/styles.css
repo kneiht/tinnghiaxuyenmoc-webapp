@@ -1569,6 +1569,10 @@ select {
   inset: 0px;
 }
 
+.left-36 {
+  left: 9rem;
+}
+
 .left-4 {
   left: 1rem;
 }
@@ -1829,6 +1833,10 @@ select {
 
 .h-screen {
   height: 100vh;
+}
+
+.h-14 {
+  height: 3.5rem;
 }
 
 .min-h-full {

@@ -49,6 +49,8 @@ def render_title_bar(request, **kwargs):
 def render_tool_bar(request, **kwargs):
     params = kwargs
     page = params.get('page', '')
+    sub_page = params.get('sub_page', '')
+    print(sub_page)
     model = params.get('model', '')
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
@@ -72,6 +74,7 @@ def render_tool_bar(request, **kwargs):
 
     context = {
         'page': page,
+        'sub_page': sub_page,
         'model': model,
         'project_id': project_id,
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d'),

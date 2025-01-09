@@ -34,7 +34,7 @@
                         </div>
 
                         {% if page == 'page_each_project' %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border border-theme border-opacity-50">
+                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
                             <option value="" selected>Sắp xếp ...</option>
                             <option value="name">Tên công việc - (A → Z)</option>
                             <option value="-name">Tên công việc - (Z → A)</option>
@@ -54,6 +54,35 @@
                             <option value="end_date">Ngày kết thúc - (Tăng)</option>
                             <option value="-end_date">Ngày kết thúc - (Giảm)</option>
                         </select>
+                        
+                        <script>
+                            document.getElementById('sort-select').addEventListener('change', function() {
+                                // Press search-button
+                                document.getElementById('search-button').click();
+                            });
+                        </script>
+
+                        {% elif page == 'page_transport_department' and model == 'VehicleMaintenance' %}
+                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                            <option value="-created_at" selected>Ngày tạo phiếu (gần nhất trước)</option>
+                            <option value="repair_code">Mã phiếu - (A → Z)</option>
+                            <option value="-repair_code">Mã phiếu - (Z → A)</option>
+                            <option value="from_date">Ngày nhận sửa chữa - (xa nhất trước)</option>
+                            <option value="-from_date">Ngày nhận sửa chữa - (gần nhất trước)</option>
+                        </select>
+                        
+                        <script>
+                            document.getElementById('sort-select').addEventListener('change', function() {
+                                // Press search-button
+                                document.getElementById('search-button').click();
+                            });
+                        </script>
+
+                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' %}
+                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                            <option value="-fill_date" selected>Ngày đổ (gần nhất trước)</option>
+                            <option value="fill_date">Ngày đổ (xa nhất trước)</option>
+                        </select>
 
                         <script>
                             document.getElementById('sort-select').addEventListener('change', function() {
@@ -61,6 +90,9 @@
                                 document.getElementById('search-button').click();
                             });
                         </script>
+
+
+
                         {% elif page == 'page_transport_department' and tab == 'vehicle_operation_data_by_date' %}
                             <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
                             <script>

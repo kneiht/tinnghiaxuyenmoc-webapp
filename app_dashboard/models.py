@@ -878,9 +878,6 @@ class NormalWorkingTime(BaseModel):
 
 
 
-
-
-
 class Holiday(BaseModel):  
     class Meta:
         ordering = ['-date']
@@ -942,7 +939,6 @@ class VehicleOperationRecord(BaseModel):
     def __str__(self):
         return self.vehicle
     
-
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
@@ -1151,6 +1147,9 @@ class VehicleMaintenance(BaseModel):
         ('not_done', 'Chưa xong'),
     )
 
+    class Meta:
+        ordering = ['-created_at']
+
     repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu sửa chữa", default="", null=True, blank=True)
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
@@ -1178,6 +1177,8 @@ class VehicleMaintenance(BaseModel):
             total_amount += part_amount
 
         self.maintenance_amount = total_amount
+
+        
         # Check if all parts are received, if yes => received_status = 'received'
         if vehicle_parts.filter(received_status='not_received').count() == 0:
             self.received_status = 'received'
@@ -1252,7 +1253,6 @@ class VehicleMaintenance(BaseModel):
         part_list = RepairPart.objects.all()
         return part_list
 
-
     @classmethod
     def get_display_fields(self):
         fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date', 'created_at']
@@ -1265,6 +1265,12 @@ class VehicleMaintenance(BaseModel):
     def __str__(self):
         return f'{self.repair_code} - {self.vehicle}'
 
+class MaintenanceImage(BaseModel):
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    image = models.ImageField(upload_to='maintenance/', verbose_name="Hình ảnh", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.vehicle_maintenance}'
 
 class PartProvider(BaseModel):
     # Driver Information Fields
@@ -1297,6 +1303,30 @@ class PartProvider(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+
+    def calculate_payment_states(self):
+        # Get all VehicleMaintenanceRepairPart
+        repair_parts = VehicleMaintenanceRepairPart.objects.filter(repair_part__part_provider=self)
+        # Calculate the purchase amount
+        purchase_amount = 0
+        for repair_part in repair_parts:
+            purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
+
+        # Calculate the transferred amount
+        transferred_amount = 0
+        payment_records = PaymentRecord.objects.filter(provider=self)
+        for payment_record in payment_records:
+            transferred_amount += payment_record.amount
+
+        # Calculate the debt amount
+        debt_amount = purchase_amount - transferred_amount
+
+        self.total_purchase_amount = purchase_amount
+        self.total_transferred_amount = transferred_amount
+        self.total_outstanding_debt = debt_amount
+        self.save()
+
+
 
 class RepairPart(BaseModel):
     class Meta:
@@ -1346,6 +1376,11 @@ class VehicleMaintenanceRepairPart(BaseModel):
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
     paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Trạng thái thanh toán")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Trạng thái xong sửa chữa")
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        provider = self.repair_part.part_provider
+        provider.calculate_payment_states()
+
 
 class PaymentRecord(BaseModel):
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
@@ -1365,3 +1400,7 @@ class PaymentRecord(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.provider.calculate_payment_states()

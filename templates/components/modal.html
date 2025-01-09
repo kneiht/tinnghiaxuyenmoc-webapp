@@ -20,8 +20,13 @@
                         onclick="toggleModalEdit(this)">
                     <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
                     Chỉnh sửa
-                </button>
-                
+                </button>   
+                {% if record %}
+                <a href="{% url 'form_maintenance_images' record.pk %}" class="absolute top-5 left-36 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                    up-preload="insert" up-target="#modal-sub:maybe">
+                    Xem hình ảnh
+                </a>
+                {% endif %}
                 {% if not record or record.approval_status == "scratch" or record.approval_status == "need_update" %}
                     <script>
                     function toggleModalEdit(button) {
@@ -266,7 +271,7 @@
                                 </button> -->
 
                                 <a href="{% url 'form_repair_parts' %}?maintenance={{ record.pk }}" class="btn btn-success h-7 hidable hidden"
-                                    up-preload="insert" up-target="#modal-repair-parts:maybe">
+                                    up-preload="insert" up-target="#modal-sub:maybe">
                                     <span class="me-3"> Chọn phụ tùng </span>
                                 </a>
 
@@ -390,6 +395,7 @@
                         </button>
                     </div>
                 </div>
+
 
             </form>
         </div>
