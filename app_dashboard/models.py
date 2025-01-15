@@ -1278,7 +1278,7 @@ class VehicleMaintenance(BaseModel):
 
 
         # Create or update payment records
-        if self.approval_status == 'approved':
+        if self.approval_status == 'approved' or True:
             all_provider_payment_state = self.calculate_all_provider_payment_states()
             
             # Get all payment records which has vehicle_maintenance = self and provider_id = provider_id
@@ -1295,6 +1295,7 @@ class VehicleMaintenance(BaseModel):
                     purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
                     for payment_record in payment_records:
                         total_transferred_amount += previous_record.transferred_amount if previous_record else 0
+                        previous_record = payment_record
                         previous_debt = purchase_amount - total_transferred_amount
                         payment_record.previous_debt = previous_debt
                         payment_record.purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
