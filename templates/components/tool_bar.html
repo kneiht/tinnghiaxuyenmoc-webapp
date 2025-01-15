@@ -78,7 +78,7 @@
                             });
                         </script>
 
-                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' %}
+                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' or model == 'FillingRecord'%}
                         <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
                             <option value="-fill_date" selected>Ngày đổ (gần nhất trước)</option>
                             <option value="fill_date">Ngày đổ (xa nhất trước)</option>
@@ -148,7 +148,8 @@
     </div>
     
     <div class="flex flex-row items-end gap-5">
-        {% if create_new_button_name %}
+
+        {% if create_new_button_name and model != "PaymentRecord" %}
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target=":none" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="me-3"> {{ create_new_button_name }} </span>

@@ -4,8 +4,7 @@ up.compiler('.transport-table', function (transportTable) {
     var saveButton = transportTable.querySelector('#save');
     var cancelButton = transportTable.querySelector('#cancel');
     var addButton = transportTable.querySelector('#add');
-    var inputs = transportTable.querySelectorAll('.input');
-    var displays = transportTable.querySelectorAll('.display');
+
 
 
 
@@ -77,6 +76,8 @@ up.compiler('.transport-table', function (transportTable) {
 
     // Write function find and hide or show element with class display and input
     function showDisplay() {
+        var inputs = transportTable.querySelectorAll('.input');
+        var displays = transportTable.querySelectorAll('.display');
         // Show all display elements
         inputs.forEach(function (input) {
             input.classList.add('hidden');
@@ -89,6 +90,8 @@ up.compiler('.transport-table', function (transportTable) {
     }
 
     function showInput() {
+        var inputs = transportTable.querySelectorAll('.input');
+        var displays = transportTable.querySelectorAll('.display');
         // Show all input elements
         displays.forEach(function (display) {
             display.classList.add('hidden');
@@ -177,6 +180,11 @@ up.compiler('.transport-table', function (table) {
             inputs.forEach(function (otherInput) {
                 if (otherInput !== input && !otherInput.value) {
                     otherInput.value = input.value;
+                    // Also find ".select-wrapper" below the input element and update the text
+                    let selectWrapper = otherInput.parentNode.querySelector('.select-wrapper');
+                    if (selectWrapper) {
+                        selectWrapper.querySelector('.selected-option').textContent = input.options[input.selectedIndex].text;
+                    }   
                 }
             });
         });

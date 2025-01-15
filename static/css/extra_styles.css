@@ -348,7 +348,21 @@ th.sorted-desc::after {
   background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
 }
 
+.not_requested {
+  background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
+}
 
+.requested {
+  background-image: linear-gradient(310deg, #b54d0d 0%, #ff9c4b 100%);
+}
+
+.paid {
+  background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
+}
+
+.partial_paid {
+  background-image: linear-gradient(310deg, #1773ad 0%, #2da6ec 100%);
+}
 
 
 

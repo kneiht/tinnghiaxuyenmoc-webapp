@@ -267,7 +267,7 @@ def handle_form(request, model, pk=0):
                         )
 
         instance_form.save()
-        
+
         # Save the many to many field, if any
         # form.save_m2m()
         record = instance_form
@@ -1130,11 +1130,10 @@ def save_vehicle_operation_record(request):
 def form_repair_parts(request):
     # Get the list of repair parts
     repair_parts = RepairPart.objects.all()
-
-    context = {
-        'repair_parts': repair_parts
-    }
+    context = {'repair_parts': repair_parts}
     return render(request, 'components/modal_repair_parts.html', context)
+
+
 
 def form_maintenance_images(request, maintenance_id):
     # If Get
@@ -1167,6 +1166,26 @@ def form_maintenance_images(request, maintenance_id):
         except:
             return JsonResponse({'success': False}) 
         
+def form_maintenance_payment_request(request):
+    # If Get
+    if request.method == 'GET':
+        # Get all PaymentRecord
+        payments = PaymentRecord.objects.all()
+        # put them into group of payments with the keys are vehicle_maintenance and provider
+        groups = {}
+        for payment in payments:
+            key = (payment.vehicle_maintenance_id, payment.provider_id)
+            if key in groups:
+                groups[key].append(payment)
+            else:
+                groups[key] = [payment]
+
+        context = {'groups': groups}
+        print('>>>>>>>>>>> context:', context)
+        return render(request, 'components/maintenance_payment_request.html', context)
+    # If Post
+    elif request.method == 'POST':
+        return JsonResponse({'success': True})
 
 # PAGES ==============================================================
 @login_required
@@ -1226,8 +1245,8 @@ def page_transport_department(request, sub_page=None):
         return redirect('page_transport_department', sub_page='FuelFillingRecord')
 
     display_name_dict = {
-        'FuelFillingRecord': 'LS đổ nhiên liệu',
-        'LubeFillingRecord': 'LS đổ nhớt',
+        'LiquidUnitPrice': 'Bảng đơn giá nhiên liệu/nhớt',
+        'FillingRecord': 'LS đổ nhiên liệu/nhớt',
         'PartProvider': 'Nhà cung cấp phụ tùng',
         'RepairPart': 'Danh mục sửa chữa',
         'PaymentRecord': 'LS thanh toán',

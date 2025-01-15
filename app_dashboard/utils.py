@@ -458,7 +458,13 @@ def filter_records(request, records, model_class, **kwargs):
     # Determine the fields to be used as filter options based on the selected page
     fields = [field.name for field in model_class._meta.get_fields() if 
                   isinstance(field, (models.CharField, models.TextField))]
-
+    # Add fields from forein keys
+    for field in model_class._meta.get_fields():
+        if isinstance(field, models.ForeignKey):
+            # iterate all fields in foreign key,check if it is a CharField or TextField
+            for foreign_field in field.related_model._meta.get_fields():
+                if isinstance(foreign_field, (models.CharField, models.TextField)):
+                    fields.append(f"{field.name}__{foreign_field.name}")
 
     # Construct Q objects for filtering
     combined_query = Q()
@@ -469,8 +475,7 @@ def filter_records(request, records, model_class, **kwargs):
             if value == '':
                 continue
             for specified_field in specified_fields:
-                if specified_field in [field.name for field in model_class._meta.get_fields()]:
-                    all_fields_query |= Q(**{f"{specified_field}__icontains": value})
+                all_fields_query |= Q(**{f"{specified_field}__icontains": value})
         combined_query &= all_fields_query
         
     else:
@@ -488,6 +493,8 @@ def filter_records(request, records, model_class, **kwargs):
                     print(f"Ignoring invalid field: {field}")
     # Filter records based on the query
     records_filtered = records.filter(combined_query)
+
+
 
     # Fix bug no records when searching driver because driver must be searched in full_name
     if model_class == VehicleOperationRecord:

@@ -43,14 +43,14 @@ function getCookie(name) {
         }
     }
     return cookieValue;
-}   
+}
 const csrftoken = getCookie('csrftoken');
 
 
 
 
 // NAVIGATION BAR ITEMS =========================================
-up.compiler('#nav_bar', function(element) {
+up.compiler('#nav_bar', function (element) {
 
     function activeMenuItem(item) {
         // Remove specific classes from all <a> elements within #nav_bar_left
@@ -72,7 +72,7 @@ up.compiler('#nav_bar', function(element) {
 
     // Add event listener to each navigation item
     document.querySelectorAll('#nav_bar_left a').forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             activeMenuItem(item);
         });
 
@@ -90,9 +90,9 @@ up.compiler('#nav_bar', function(element) {
 
 
 // THEME CHANGE =========================================
-up.compiler('#theme-toggle', function(element) {
+up.compiler('#theme-toggle', function (element) {
     const themeToggles = document.querySelectorAll('#theme-toggle');
-    const storedTheme = localStorage.getItem('theme'); 
+    const storedTheme = localStorage.getItem('theme');
     console.log(storedTheme);
     function updateTheme(isDark) {
         const sunIcon = document.getElementById('sun-icon');
@@ -102,7 +102,7 @@ up.compiler('#theme-toggle', function(element) {
 
         // Update data-theme attribute of the tag html
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        
+
 
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
@@ -131,7 +131,7 @@ up.compiler('#theme-toggle', function(element) {
 
 
 // DROPDOWN MENUS =========================================
-up.compiler('.menu', function(element) {
+up.compiler('.menu', function (element) {
     // Function to show a menu
     function showHideMenu(menu, action) {
         var dropdownMenu = menu.querySelector('.dropdown-menu');
@@ -148,18 +148,18 @@ up.compiler('.menu', function(element) {
         }
     }
     // Attach click event listeners to menu buttons
-    element.querySelector('.menu-button').addEventListener('click', function() {
-            showHideMenu(element, 'toggle')
-            // Hide all other menus when click to a menu
-            document.querySelectorAll('.menu').forEach(menu => {
-                if (menu !== element) {
-                    showHideMenu(menu, 'hide')
-                }
-            })
+    element.querySelector('.menu-button').addEventListener('click', function () {
+        showHideMenu(element, 'toggle')
+        // Hide all other menus when click to a menu
+        document.querySelectorAll('.menu').forEach(menu => {
+            if (menu !== element) {
+                showHideMenu(menu, 'hide')
+            }
+        })
     });
 
     // Hide menus when clicking outside of them
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (!element.contains(event.target)) {
             showHideMenu(element, 'hide')
         }
@@ -174,7 +174,7 @@ up.compiler('.menu', function(element) {
 
 
 // RESPONSIVE ELEMENTS ON RESIZE =========================================
-up.compiler('.display-cards', function(element) {
+up.compiler('.display-cards', function (element) {
     // count the number of cards in display-cards then put in the element with id "count"
     const displayCards = element;
     const count = displayCards.children.length;
@@ -228,39 +228,39 @@ up.compiler('.display-cards', function(element) {
 
 
 
-up.compiler('#record-edit', function(recordEdit) {
+up.compiler('#record-edit', function (recordEdit) {
     function getClosestRecordElement() {
         let closestRecord = recordEdit.closest('[id*="record_"]');
-        closestRecord.addEventListener('dblclick', function() {
+        closestRecord.addEventListener('dblclick', function () {
             recordEdit.click();
         });
-    
+
     }
     getClosestRecordElement();
 });
 
 
-up.compiler('.expand', function(expand) {
+up.compiler('.expand', function (expand) {
     // Add event listener to the document
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         // If the target is not the expand element, then remove the style height
         if (event.target !== expand) {
             expand.style.height = '';
         }
     });
     // Add event listener to the document
-    document.addEventListener('focus', function(event) {
+    document.addEventListener('focus', function (event) {
         // If the target is not the expand element, then remove the style height
         if (event.target !== expand) {
             expand.style.height = '';
         }
     });
     // Add event listener to the expand element
-    expand.addEventListener('click', function() {
+    expand.addEventListener('click', function () {
         // Add style height 100px
         expand.style.height = '150px';
     });
-    expand.addEventListener('focus', function() {
+    expand.addEventListener('focus', function () {
         // Add style height 100px
         expand.style.height = '150px';
     });
@@ -274,7 +274,7 @@ up.compiler('.expand', function(expand) {
 //         // Set the input type to 'text' for flexible formatting
 //         inputfield.type = 'text';
 //     }
-    
+
 //     // Function to format the number with commas
 //     function formatNumber(value) {
 //         var n = parseInt(value.replace(/\D/g, ''), 10);
@@ -306,14 +306,14 @@ function formatNumber(number) {
 
     // Convert the number to a string with two decimal places
     let parts = num.toString().split('.');
-        
+
     // Add thousand separators (dots) to the integer part
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
+
     // Join the integer and fractional parts with a comma
     return parts.join('.');
 }
-up.compiler('.form-input', function(inputfield) {
+up.compiler('.form-input', function (inputfield) {
     if (inputfield.classList.contains('no-readable')) {
         return;
     }
@@ -334,10 +334,10 @@ up.compiler('.form-input', function(inputfield) {
 
         // Convert the number to a string with two decimal places
         let parts = num.toString().split('.');
-            
+
         // Add thousand separators (dots) to the integer part
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        
+
         // Join the integer and fractional parts with a comma
         return parts.join(',');
     }
@@ -349,86 +349,219 @@ up.compiler('.form-input', function(inputfield) {
 
 
     // Event listener for focus
-    inputfield.addEventListener('focus', function() {
+    inputfield.addEventListener('focus', function () {
 
         // Initialize the field value if present
-         popup.innerText = formatNumber(inputfield.value);
+        popup.innerText = formatNumber(inputfield.value);
 
         // Insert the popup after the input field
         inputfield.parentNode.insertBefore(popup, inputfield.nextSibling);
-        
+
         // Optionally, remove the popup on blur or some other event
-        inputfield.addEventListener('blur', function() {
+        inputfield.addEventListener('blur', function () {
             popup.remove();
         });
     });
 
     // Add keyup event listener to format the value and update tooltip
-    inputfield.addEventListener('keyup', function() {
+    inputfield.addEventListener('keyup', function () {
         popup.innerText = formatNumber(inputfield.value);
 
     });
 
 });
 
+function handleNewSelectElement(select) {
+    // If there are only about 5 options, don't create the wrapper
+    if (select.options.length <= 6) {
+        return;
+    }
+    // Check if there an element ".select-wrapper" below the select element => return
+    if (select.parentNode.querySelector('.select-wrapper')) {
+        // delete the element ".select-wrapper" below the select element
+        select.parentNode.querySelector('.select-wrapper').remove();
+    }   
+    // Create the wrapper div for card and dropdown
+    const wrapper = document.createElement('div');
+    const width = select.style.width;
+    if (width) {
+        wrapper.style.width = width;
+    }
+    wrapper.classList.add('select-wrapper', 'relative'); // Add TailwindCSS classes for positioning and spacing
+
+
+    // Create the card element
+    const card = document.createElement('div');
+    Array.from(select.classList).forEach(c => {
+         card.classList.add(c);
+    });
+    card.classList.add('form-input', 'cursor-pointer');
+    card.innerHTML = `
+      <div class="card-body flex items-center justify-between">
+        <span class="selected-option text-nowrap overflow-hidden">${select.options[select.selectedIndex]?.text || 'Select an option'}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </div>
+    `;
+
+    if (select.hasAttribute('readonly')) {
+        // Hide the arror icon
+        card.querySelector('svg').style.display = 'none';
+    }
+
+    // Create the dropdown element
+    const dropdown = document.createElement('div');
+    dropdown.classList.add(
+        'dropdown',
+        'hidden',
+        'absolute',
+        'left-0',
+        'right-0',
+        'bg-white',
+        'dark:bg-gray-900',
+        'border',
+        'dark:border-gray-700',
+        'rounded-md',
+        'shadow-lg',
+        'mt-1',
+        'z-10',
+    );
+
+    // Create the input for filtering
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Tìm ...';
+    input.classList.add(
+        'text-sm',
+        'w-full',
+        'p-2',
+        'border-b',
+        'border-slate-300',
+        'dark:border-slate-600',
+        'outline-none',
+        'dark:bg-gray-800',
+        'dark:text-white',
+        'rounded-t-md',
+        'focus:border-theme-600',
+        'focus:ring-1',
+        'focus:ring-theme-700',
+        'focus:outline-none',
+    );
+    // Add input to dropdown
+    dropdown.appendChild(input);
+
+    // Add options to dropdown
+    const optionsContainer = document.createElement('div');
+    optionsContainer.classList.add(
+        'overflow-y-auto',
+        'max-h-64',
+
+    );
+    Array.from(select.options).forEach(option => {
+        const optionDiv = document.createElement('div');
+        optionDiv.textContent = option.text;
+        optionDiv.dataset.value = option.value;
+        optionDiv.classList.add(
+            'p-2',
+            'hover:bg-gray-100',
+            'dark:hover:bg-gray-700',
+            'cursor-pointer',
+            'text-gray-800',
+            'dark:text-gray-300'
+        );
+        optionsContainer.appendChild(optionDiv);
+    });
+    dropdown.appendChild(optionsContainer);
+
+    // Append card and dropdown to the wrapper
+    wrapper.appendChild(card);
+    wrapper.appendChild(dropdown);
+
+    // Insert the wrapper into the DOM
+    select.parentNode.insertBefore(wrapper, select.nextSibling);
+    select.style.display = 'none'; // Hide the original select
+
+    // Toggle dropdown on card click
+    card.addEventListener('click', () => {
+        if (!select.hasAttribute('readonly')) {
+            dropdown.classList.toggle('hidden');
+            input.focus();
+        }
+    });
+
+    // Filter options on input
+    input.addEventListener('input', () => {
+        const filter = input.value.toLowerCase();
+        Array.from(optionsContainer.children).forEach(optionDiv => {
+            optionDiv.classList.toggle('hidden', !optionDiv.textContent.toLowerCase().includes(filter));
+        });
+    });
+
+    // Handle option selection
+    optionsContainer.addEventListener('click', event => {
+        if (event.target.dataset.value) {
+            select.value = event.target.dataset.value;
+            // Manually trigger the change event
+            const eventSelect = new Event('change', { bubbles: true });
+            select.dispatchEvent(eventSelect);
+
+
+            card.querySelector('.selected-option').textContent = event.target.textContent;
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', event => {
+        if (!wrapper.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+
+    // Add if the select value change the wrapper change too
+    select.addEventListener('change', () => {
+        console.log('change');
+        card.querySelector('.selected-option').textContent = select.options[select.selectedIndex]?.text || 'Select an option';
+    }); 
+}
+
+
+
+// Set up a MutationObserver
+const observer = new MutationObserver((mutationsList) => {
+    for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            // Check added nodes
+            mutation.addedNodes.forEach((node) => {
+                // If it's a <select> element
+                if (node.nodeType === 1 && node.tagName.toLowerCase() === 'select') {
+                    handleNewSelectElement(node)
+                }
+
+                // If a container with nested <select> elements
+                if (node.nodeType === 1) {
+                    const nestedSelects = node.querySelectorAll('select');
+                    nestedSelects.forEach((nestedSelect) => handleNewSelectElement(nestedSelect));
+                }
+            });
+        }
+    }
+});
+
+// Start observing the document body for changes
+observer.observe(document.body, { childList: true, subtree: true });
 
 
 
 
-// up.compiler('.table-auto', function(table) {
-//     const headers = table.querySelectorAll('th');
-//     let sortOrder = 1;  // 1 for ascending, -1 for descending
-//     let activeColumnIndex = null;  // Track the currently sorted column
-
-//     headers.forEach((header, index) => {
-//         header.addEventListener('click', function() {
-//             // Remove existing sort classes from all headers
-//             headers.forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
-
-//             // Set the active column index and sort order
-//             if (activeColumnIndex === index) {
-//                 // If clicking the same column, toggle the sort order
-//                 sortOrder = -sortOrder;
-//             } else {
-//                 // If clicking a new column, reset to ascending order
-//                 sortOrder = 1;
-//                 activeColumnIndex = index;
-//             }
-
-//             // Add appropriate class to indicate sort direction
-//             header.classList.add(sortOrder === 1 ? 'sorted-asc' : 'sorted-desc');
-
-//             // Sort the table by the clicked column
-//             sortTableByColumn(table, index);
-//         });
-//     });
-
-//     function sortTableByColumn(table, columnIndex) {
-//         const rowsArray = Array.from(table.querySelectorAll('tbody'));
-//         const type = getColumnType(rowsArray, columnIndex);
-
-//         rowsArray.sort((rowA, rowB) => {
-//             const cellA = rowA.children[columnIndex].innerText;
-//             const cellB = rowB.children[columnIndex].innerText;
-
-//             if (type === 'number') {
-//                 return sortOrder * (parseFloat(cellA) - parseFloat(cellB));
-//             } else {
-//                 return sortOrder * cellA.localeCompare(cellB);
-//             }
-//         });
-
-//         rowsArray.forEach(row => table.appendChild(row));
-//     }
-
-//     function getColumnType(rows, columnIndex) {
-//         // Check if the column contains only numbers
-//         for (const row of rows) {
-//             const cellValue = row.children[columnIndex].innerText;
-//             if (isNaN(cellValue)) {
-//                 return 'string';
-//             }
-//         }
-//         return 'number';
-//     }
-// });
+// Reload the page for special case
+up.compiler('.just-updated', function (update) {
+    // If the page url has "PaymentRecord"
+    if (window.location.href.includes('PaymentRecord')) {
+        // Click the search button "search-button"
+        document.getElementById('search-button').click();
+        console.log('update');
+    }
+});

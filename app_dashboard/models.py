@@ -229,6 +229,8 @@ class UserPermission(BaseModel):
         ('NormalWorkingTime', 'Thời gian làm việc'),
         ('Holiday', 'Ngày lễ'),
 
+        ('LiquidUnitPrice', 'Bảng đơn giá nhiên liệu/nhớt'),
+        ('FillingRecord', 'LS đổ nhiên liệu/nhớt'),
         ('FuelFillingRecord', 'LS đổ nhiên liệu'),
         ('LubeFillingRecord', 'LS đổ nhớt'),
         ('PartProvider', 'Nhà cung cấp phụ tùng'),
@@ -1001,7 +1003,84 @@ class VehicleOperationRecord(BaseModel):
             return normal_working_time, 0
 
 
+class LiquidUnitPrice(BaseModel):
+    TYPE_OF_LOCATION_CHOICES = [
+        ('diesel', 'Dầu diesel (lít)'),
+        ('lubricant_10', 'Nhớt 10 (lít)'),
+        ('lubricant_engine', 'Nhớt máy (lít)'),
+        ('gasoline', 'Xăng (lít)'),
+        ('coolant', 'Nước làm mát (lít)'),
+    ]
+    liquid_type = models.CharField(max_length=100, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại")
+    unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return f"{self.liquid_type}"
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['liquid_type', 'unit_price', 'unit', 'valid_from', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+    @classmethod
+    def get_unit_price(self, liquid_type, date):
+        liquid_unit_price = LiquidUnitPrice.objects.filter(liquid_type=liquid_type, valid_from__lte=date).order_by('-valid_from').first()
+        return liquid_unit_price
+
+    def save(self):
+        super().save()
+        # recalculate all FillingRecord which liquid_type = liquid_type
+        filling_records = FillingRecord.objects.filter(liquid_type=self.liquid_type)
+        for filling_record in filling_records:
+            filling_record.calculate_total_amount()
+            filling_record.save()
+
+
+
+class FillingRecord(BaseModel):
+    TYPE_OF_LOCATION_CHOICES = [
+        ('diesel', 'Dầu diesel (lít)'),
+        ('lubricant_10', 'Nhớt 10 (lít)'),
+        ('lubricant_engine', 'Nhớt máy (lít)'),
+        ('gasoline', 'Xăng (lít)'),
+        ('coolant', 'Nước làm mát (lít)'),
+    ]
+    liquid_type = models.CharField(max_length=100, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại")
+    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
+    quantity = models.FloatField(verbose_name="Số lượng")
+    total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
+    fill_date = models.DateField(verbose_name="Ngày đổ", default=timezone.now)
+    note = models.TextField(verbose_name="Ghi chú", default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def save(self):
+        self.calculate_total_amount()
+        super().save()
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['liquid_type', 'vehicle', 'quantity', 'total_amount', 'fill_date', 'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+    def calculate_total_amount(self):
+        # Get Unit Price
+        unit_price = LiquidUnitPrice.get_unit_price(self.liquid_type, self.fill_date)
+        print(unit_price)
+        if unit_price:
+            self.total_amount = self.quantity * unit_price.unit_price
+        else:
+            self.total_amount = 0
 
 
 class FuelFillingRecord(BaseModel):
@@ -1167,7 +1246,7 @@ class VehicleMaintenance(BaseModel):
 
     def save(self):
         super().save()
-        self.repair_code = datetime.now().strftime('%d/%m/%Y') + '_' + str(self.pk).zfill(4)
+        self.repair_code = "SC" + str(self.pk).zfill(4)
         # Get all related vehicle parts
         vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
         # Calculate the total maintenance amount
@@ -1196,6 +1275,37 @@ class VehicleMaintenance(BaseModel):
             self.done_status = 'not_done'
         super().save()
 
+
+
+        # Create or update payment records
+        if self.approval_status == 'approved':
+            all_provider_payment_state = self.calculate_all_provider_payment_states()
+            
+            # Get all payment records which has vehicle_maintenance = self and provider_id = provider_id
+            for provider_id in all_provider_payment_state:
+                payment_records = PaymentRecord.objects.filter(vehicle_maintenance=self, provider_id=provider_id).order_by('id')
+                if len(payment_records) == 0:
+                    payment_record, created = PaymentRecord.objects.get_or_create(vehicle_maintenance=self, provider_id=provider_id)
+                    payment_record.previous_debt = all_provider_payment_state[provider_id]['debt_amount']
+                    payment_record.purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
+                    payment_record.save()
+                else:
+                    total_transferred_amount = 0
+                    previous_record = None
+                    purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
+                    for payment_record in payment_records:
+                        total_transferred_amount += previous_record.transferred_amount if previous_record else 0
+                        previous_debt = purchase_amount - total_transferred_amount
+                        payment_record.previous_debt = previous_debt
+                        payment_record.purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
+                        payment_record.debt = previous_debt - payment_record.transferred_amount
+                        payment_record.save()
+
+
+
+        elif self.approval_status == 'rejected':
+            PaymentRecord.objects.filter(vehicle_maintenance=self).delete()
+
     def calculate_all_provider_payment_states(self):
         # get all the parts in this vehicle maintenance
         vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
@@ -1215,7 +1325,7 @@ class VehicleMaintenance(BaseModel):
             transferred_amount = 0
             payment_records = PaymentRecord.objects.filter(vehicle_maintenance=self, provider=provider)
             for payment_record in payment_records:
-                transferred_amount += payment_record.amount
+                transferred_amount += payment_record.transferred_amount
 
             # calculate the debt amount
             debt_amount = purchase_amount - transferred_amount
@@ -1225,7 +1335,7 @@ class VehicleMaintenance(BaseModel):
                 'transferred_amount': transferred_amount,
                 'debt_amount': debt_amount
             }
-            all_provider_payment_state[provider.id] = state
+            all_provider_payment_state[provider.id] = state 
         return all_provider_payment_state
 
     @classmethod
@@ -1239,13 +1349,11 @@ class VehicleMaintenance(BaseModel):
     def get_vehicle_part_list(self):
         vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self, repair_part__isnull=False)
         # Put into dict of groups of providers
-        print(vehicle_parts)
         vehicle_parts_dict = {}
         for vehicle_part in vehicle_parts:
             if vehicle_part.repair_part.part_provider not in vehicle_parts_dict:
                 vehicle_parts_dict[vehicle_part.repair_part.part_provider] = []
             vehicle_parts_dict[vehicle_part.repair_part.part_provider].append(vehicle_part)
-        print(vehicle_parts_dict)
         return vehicle_parts_dict
 
     @classmethod
@@ -1261,9 +1369,9 @@ class VehicleMaintenance(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
-    
+
     def __str__(self):
-        return f'{self.repair_code} - {self.vehicle}'
+        return self.repair_code
 
 class MaintenanceImage(BaseModel):
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
@@ -1316,7 +1424,7 @@ class PartProvider(BaseModel):
         transferred_amount = 0
         payment_records = PaymentRecord.objects.filter(provider=self)
         for payment_record in payment_records:
-            transferred_amount += payment_record.amount
+            transferred_amount += payment_record.transferred_amount
 
         # Calculate the debt amount
         debt_amount = purchase_amount - transferred_amount
@@ -1355,6 +1463,7 @@ class RepairPart(BaseModel):
 
 
 class VehicleMaintenanceRepairPart(BaseModel):
+
     RECEIVED_STATUS_CHOICES = (
         ('received', 'Đã nhận'),
         ('not_received', 'Chưa nhận'),
@@ -1383,18 +1492,40 @@ class VehicleMaintenanceRepairPart(BaseModel):
 
 
 class PaymentRecord(BaseModel):
+    class Meta:
+        ordering = ['vehicle_maintenance', 'provider', '-id']
+
+    PAID_STATUS_CHOICES = (
+        ('not_requested', 'Chưa đề nghị'),
+        ('requested', 'Đề nghị T.toán'),
+        ('partial_paid', 'T.toán một phần'),
+        ('paid', 'Đã T.toán đủ'),
+    )
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
-    payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)
-    amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
+    status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_requested', verbose_name="Trạng thái thanh toán")
+
+    purchase_amount= models.IntegerField(verbose_name="Tổng tiền trên phiếu sửa chữa", default=0, validators=[MinValueValidator(0)])
+    previous_debt = models.IntegerField(verbose_name="Nợ kì trước", default=0, validators=[MinValueValidator(0)])
+
+    requested_amount = models.IntegerField(verbose_name="Số tiền đề nghị", default=0, validators=[MinValueValidator(0)])
+    requested_date = models.DateField(verbose_name="Ngày đề nghị", default=timezone.now)
+
+    transferred_amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
+    payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)   
+
+    debt = models.IntegerField(verbose_name="Nợ còn lại", default=0, validators=[MinValueValidator(0)])
+
+    lock = models.BooleanField(verbose_name="Khóa phiếu", default=False)
+
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.vehicle_maintenance} - {self.payment_date} - {self.amount}'
+        return f'{self.vehicle_maintenance} - {self.payment_date}'
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_maintenance', 'provider', 'payment_date', 'amount', 'note', 'created_at']
+        fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 'payment_date', 'debt', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1402,5 +1533,61 @@ class PaymentRecord(BaseModel):
         return fields
     
     def save(self, *args, **kwargs):
+        # Delete to test
+        # print("Delete payment records")
+        # payment_records = PaymentRecord.objects.all().delete()
+        if self.requested_amount > 0:
+            self.status = 'requested'
+
+        if self.transferred_amount > 0 and self.transferred_amount < self.previous_debt:
+            self.status = 'partial_paid'
+            self.debt = self.previous_debt - self.transferred_amount
+
+        if self.transferred_amount > 0 and self.transferred_amount == self.previous_debt:
+            self.status = 'paid'
+            self.debt = self.previous_debt - self.transferred_amount
+
+        if self.requested_amount == 0:
+            self.status = 'not_requested'
+
+
         super().save(*args, **kwargs)
         self.provider.calculate_payment_states()
+        
+        # extract the vehicle maintenance and provider
+        vehicle_maintenance = self.vehicle_maintenance
+        provider = self.provider
+        # get all payment records
+        last_payment_record = PaymentRecord.objects.filter(vehicle_maintenance=vehicle_maintenance, provider=provider).order_by('id').last()
+        # if self = last payment record
+        if last_payment_record == self and self.lock == True and self.debt != 0:
+            # create new payment record
+            new_payment_record = PaymentRecord.objects.create(vehicle_maintenance=vehicle_maintenance, provider=provider)
+            new_payment_record.previous_debt = self.debt
+            new_payment_record.purchase_amount = self.purchase_amount
+            new_payment_record.debt = self.debt
+            new_payment_record.save()
+
+
+
+    def clean(self):
+        errors = ""
+        if self.requested_amount > self.previous_debt:
+            errors += (f'- Số tiền đề nghị phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n')
+
+        if self.requested_amount==0 and self.transferred_amount > 0:
+            errors += (f'-Chưa thanh toán khi chưa có đề nghị.\n')
+
+        if self.transferred_amount < self.requested_amount and self.transferred_amount > 0:
+            errors += (f'- Số tiền thanh toán phải lớn hơn hoặc bằng số tiền đề nghị {format(self.requested_amount, ",d")}.\n')
+        if self.transferred_amount > self.previous_debt:
+            errors += (f'- Số tiền thanh toán phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n')
+        if self.payment_date < self.requested_date:
+            errors += (f'- Ngày thanh toán phải lớn hơn hoặc bằng ngày đề nghị {self.requested_date.strftime("%d/%m/%Y")}.\n')
+        
+        if self.lock and self.transferred_amount == 0:
+            errors += (f'- Không thể khóa phiếu thanh toán khi chưa thanh toán.\n')
+
+        if errors:
+            raise ValidationError(errors)
+    

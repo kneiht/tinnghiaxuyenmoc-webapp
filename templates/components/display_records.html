@@ -134,7 +134,7 @@
                                 {{ record|format_display:field }}
                             </td>
                         {% elif field == 'category' %}
-                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 150px;">
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 180px;">
                             {{ record|format_display:field }}
                         </td>
                         {% else %}
@@ -241,7 +241,7 @@
                         </div>
 
                         <div class="overflow-x-scroll">
-                            <table id="display-table-records-{{ group.group_name }}" class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-b-2xl shadow-md">
+                            <table id="display-table-records-{{ group.group_name }}" class="table-auto w-full border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-b-2xl shadow-md overflow-y-visible">
 
                                 <thead>
                                     <tr class="text-sm leading-normal text-theme shadow-md bg-white dark:bg-slate-800
@@ -265,7 +265,7 @@
                                                 {% elif field == 'driver' %}
                                                     <input type="hidden" name="id" value="{{ record.pk }}">
                                                     <span class="display">{{ record|format_display:field }}</span>
-                                                    <select name="driver_{{ record.pk }}" class="form-input input input-driver hidden" id="id_driver" style="width: 150px">
+                                                    <select name="driver_{{ record.pk }}" class="form-input input input-driver hidden" id="id_driver" style="width: 180px;">
                                                         <option value="" selected">----------</option>
                                                         {% for driver in record.get_driver_choices %}
                                                             {% if driver.id == record.driver.id %}
@@ -278,7 +278,7 @@
 
                                                 {% elif field == 'location' %}
                                                     <span class="display">{{ record|format_display:field }}</span>
-                                                    <select name="location_{{ record.pk }}" class="form-input input hidden" id="id_location" style="width: 150px">
+                                                    <select name="location_{{ record.pk }}" class="form-input input hidden" id="id_location" style="width: 180px;">
                                                         <option value="" selected">----------</option>
                                                         {% for location in record.get_location_choices %}
                                                             {% if location.id == record.location.id %}
@@ -291,7 +291,7 @@
 
                                                 {% elif field == 'fuel_allowance' %}
                                                     <span class="display">{{ record|format_display:field }}</span>
-                                                    <input type="number" name="fuel_allowance_{{ record.pk }}" class="form-input input hidden" value="{{ record.fuel_allowance }}" step="any" style="width: 150px"/>
+                                                    <input type="number" name="fuel_allowance_{{ record.pk }}" class="form-input input hidden" value="{{ record.fuel_allowance }}" step="any" style="width: 180px;"/>
 
 
                                                 {% elif field == 'note' %}
@@ -317,7 +317,7 @@
                                                         {% endif %}
                                                         
                                                         <div class="flex flex-row">
-                                                            <select name="{{ field }}_sign_{{ record.pk }}" class="form-input input hidden" id="id_{{ field }}_sign_" style="width: 130px;">
+                                                            <select name="{{ field }}_sign_{{ record.pk }}" class="form-input input hidden" id="id_{{ field }}_sign_" style="width: 180px;">
                                                                 <option value="plus" {% if record|get_sign:field == '+' %} selected {% endif %}>+ Cộng</option>
                                                                 <option value="minus" {% if record|get_sign:field == '-' %} selected {% endif %}>- Trừ</option>
                                                             </select>
@@ -375,7 +375,7 @@
                                         
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                             <div class="flex flex-row">
-                                                <select disabled name="duration_seconds_sign_new" class="form-input input hidden" id="id_duration_seconds_sign_new" style="width: 130px;">
+                                                <select disabled name="duration_seconds_sign_new" class="form-input input hidden" id="id_duration_seconds_sign_new" style="width: 180px;">
                                                     <option value="plus" selected>+ Cộng</option>
                                                     <option value="minus">- Trừ</option>
                                                 </select>
@@ -389,7 +389,7 @@
                                         </td>
                                         
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                            <select disabled name="driver_new" class="form-input input input-driver hidden" id="id_driver" style="width: 150px">
+                                            <select disabled name="driver_new" class="form-input input input-driver hidden" id="id_driver" style="width: 180px;">
                                                 <option value="">----------</option>
                                                 {% for driver in group.drivers %}
                                                         <option value="{{ driver.id }}">{{ driver.full_name }}</option>
@@ -398,7 +398,7 @@
                                         </td>
                                         
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                            <select disabled name="location_new" class="form-input input hidden" id="id_location" style="width: 150px">
+                                            <select disabled name="location_new" class="form-input input hidden" id="id_location" style="width: 180px;">
                                                 <option value="" selected">----------</option>
                                                 {% for location in group.locations %}
                                                     <option value="{{ location.id }}">{{ location.name }}</option>
@@ -408,7 +408,7 @@
 
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                             <div class="flex flex-row">
-                                                <select disabled name="normal_working_time_sign_new" class="form-input input hidden" id="id_normal_working_time_sign_new" style="width: 130px;">
+                                                <select disabled name="normal_working_time_sign_new" class="form-input input hidden" id="id_normal_working_time_sign_new" style="width: 180px;">
                                                     <option value="plus" selected>+ Cộng</option>
                                                     <option value="minus">- Trừ</option>
                                                 </select>
@@ -419,7 +419,7 @@
 
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                             <div class="flex flex-row">
-                                                <select disabled name="overtime_sign_new" class="form-input input hidden" id="id_overtime_sign_" style="width: 130px;">
+                                                <select disabled name="overtime_sign_new" class="form-input input hidden" id="id_overtime_sign_" style="width: 180px;">
                                                     <option value="plus" selected>+ Cộng</option>
                                                     <option value="minus">- Trừ</option>
                                                 </select>
@@ -436,7 +436,7 @@
 
 
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
-                                            <input disabled type="number" name="fuel_allowance_new" class="form-input input hidden" value="0" step="any" style="width: 150px"/>
+                                            <input disabled type="number" name="fuel_allowance_new" class="form-input input hidden" value="0" step="any" style="width: 180px;"/>
                                         </td>
 
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
@@ -500,9 +500,17 @@
                     {% for field in fields %}
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             
-                        {% if 'status' in field %} 
+                        {% if 'status' in field  %} 
                             <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
-                        
+
+                        {% elif field == 'lock' %} 
+                            {% if record|get_value:field == True  %} 
+                                <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Đã khóa</span>
+                            {% else %}
+                                <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Chưa khóa</span>
+                            {% endif %}
+
+
                         {% elif field == 'image' and record.image %} 
                             <div class="relative group">
                                 <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">

@@ -1182,15 +1182,94 @@ class PartProviderForm(forms.ModelForm):
         }
 
 
+
+class LiquidUnitPriceForm(forms.ModelForm):
+    class Meta:
+        model = LiquidUnitPrice
+        fields = ['liquid_type', 'unit_price', 'valid_from', 'note']
+        labels = {
+            'liquid_type': 'Loại',
+            'unit_price': 'Đơn giá',
+            'valid_from': 'Ngày bắt đầu áp dụng',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'liquid_type': forms.Select(attrs={
+                'placeholder': 'Chọn loại nhớt',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=LiquidUnitPrice.TYPE_OF_LOCATION_CHOICES),
+            'unit_price': forms.NumberInput(attrs={
+                'placeholder': 'Nhập đơn giá',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'valid_from': forms.DateInput(attrs={
+                'placeholder': 'Ngày bắt đầu áp dụng',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+
+class FillingRecordForm(forms.ModelForm):
+    class Meta:
+        model = FillingRecord
+        fields = ['liquid_type', 'quantity', 'vehicle', 'fill_date', 'note']
+        labels = {
+            'liquid_type': 'Loại',
+            'vehicle': 'Xe',
+            'quantity': 'Số lượng',
+            'fill_date': 'Ngày đổ',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'liquid_type': forms.Select(attrs={
+                'placeholder': 'Chọn loại',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=FillingRecord.TYPE_OF_LOCATION_CHOICES),
+            'vehicle': forms.Select(attrs={
+                'placeholder': 'Chọn xe',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'placeholder': 'Nhập số lượng',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'fill_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày đổ',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+                'required': False,
+            }),
+        }
+
+
 class PaymentRecordForm(forms.ModelForm):
     class Meta:
         model = PaymentRecord
-        fields = ['vehicle_maintenance', 'provider', 'payment_date', 'amount', 'note']
+        fields = ['vehicle_maintenance', 'provider', 'requested_amount', 'requested_date', 'transferred_amount', 'payment_date', 'lock', 'note']
         labels = {
             'vehicle_maintenance': 'Phiếu sửa chữa',
             'provider': 'Nhà cung cấp',
+            'status': 'Trạng thái thanh toán',
+            'purchase_amount': 'Tổng tiền trên phiếu sửa chữa',
+            'requested_amount': 'Số tiền đề nghị',
+            'reqested_date': 'Ngày đề nghị',
+            'transferred_amount': 'Tiền thanh toán',
             'payment_date': 'Ngày thanh toán',
-            'amount': 'Tiền thanh toán',
+            'debt': 'Nợ còn lại',
+            'lock': 'Khoá phiếu thanh toán',
             'note': 'Ghi chú',
         }
         widgets = {
@@ -1198,26 +1277,59 @@ class PaymentRecordForm(forms.ModelForm):
                 'placeholder': 'Chọn phiếu sửa chữa',
                 'class': 'form-input',
                 'required': 'required',
+                'readonly': 'readonly',
             }),
             'provider': forms.Select(attrs={
                 'placeholder': 'Chọn nhà cung cấp',
                 'class': 'form-input',
                 'required': 'required',
+                'readonly': 'readonly',
             }),
-
-
+            'status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=PaymentRecord.PAID_STATUS_CHOICES),
+            'purchase_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tổng tiền trên phiếu sửa chữa',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'requested_amount': forms.NumberInput(attrs={
+                'placeholder': 'Số tiền đề nghị',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'requested_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày đề nghị',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'transferred_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tiền thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+            }),
             'payment_date': forms.DateInput(attrs={
                 'placeholder': 'Ngày thanh toán',
                 'class': 'form-input',
                 'required': 'required',
                 'type': 'date'
             }),
-            'amount': forms.NumberInput(attrs={
-                'placeholder': 'Tiền thanh toán',
+            'debt': forms.NumberInput(attrs={
+                'placeholder': 'Nợ còn lại',
                 'class': 'form-input',
                 'required': 'required',
             }),
+
+            'lock': forms.CheckboxInput(attrs={
+                'class': 'checkbox',
+            }),
+
+
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',
+                'required': False,
             }),
         }

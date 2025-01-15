@@ -321,6 +321,15 @@ def render_display_records(request, **kwargs):
             record.progress_by_amount = progress_by_amount(record)
             record.progress_by_plan = progress_by_plan(record)
 
+    elif model_class == PaymentRecord:
+        for record in records:
+            if record.requested_amount == 0:
+                record.requested_amount = "chưa đề nghị"
+                record.requested_date = ""
+
+            if record.transferred_amount == 0:
+                record.transferred_amount = "chưa thanh toán"
+                record.payment_date = ""
 
     template = 'components/display_records.html'
     context = {'model': model, 

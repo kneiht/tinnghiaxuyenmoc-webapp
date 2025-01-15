@@ -1,0 +1,190 @@
+{% load custom_tags %}
+<div up-hungry id="modal-sub">
+    <div id="modal-sub-body" class="modal z-40 fixed inset-0 h-screen w-full flex justify-center overflow-auto bg-slate-600 bg-opacity-60">
+        <!-- Modal Content -->
+        <div class="relative top-10 mx-4 card h-12/12 w-11/12 mb-28">
+                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Danh sách đơn hàng chưa thanh toán xong</h3>
+
+                <button id='cancel-modal' type="button" class="cancel-modal absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-sub-body').remove();">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+
+                <div class="flex justify-center mb-4 mx-4 gap-5">
+                    <div id="search-bar" class="h-10 flex w-[500px]">
+                        <!-- Input field for filter values -->
+                        <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..." class="form-input rounded-lg h-full border-theme dark:border-gray-600 border-opacity-30 text-theme" autocomplete="off">
+                    </div>
+
+                    <button id="all-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Tất cả đơn hàng</button>
+                    <button id="selected-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Thanh toán một phần</button>
+                    <button id="unselected-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Chưa thanh toán</button>
+                </div>
+
+            
+                <div class="h-full">
+                    {% csrf_token %}
+                    <div class="flex flex-col h-full justify-between gap-5 text-sm text-theme">
+                        <p id="no-payments" class="hidden text-center mt-14 text-xl">Không tìm thấy đơn hàng trong danh sách, vui lòng tìm kiếm với từ khóa khác.</p>
+                        <div id="payments-display" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
+                            
+                            <div class="flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
+
+                                <div id="payments">
+                                    {% for group in groups %}
+                                        <div class="font-bold border-b pt-3 pb-1">
+                                            {{ group }}
+                                        </div>
+                                        {% for key, payments in group.items %}
+                                            hello
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col justify-center gap-5">
+                            <div class="flex justify-center gap-5">
+                                <button type="submit" id="submit-slections" class="submit btn btn-primary rounded-full w-28">
+                                    Cập nhật
+                                </button>
+                                <button id='cancel-modal' type="button" class="cancel-modal btn btn-secondary rounded-full w-28" onclick="document.getElementById('modal-sub-body').remove();">
+                                    Hủy bỏ
+                                </button>
+                            </div>
+                            <div class="h-28"></div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script>
+        // Hide modal
+        document.getElementById('modal').classList.add('hidden');
+        document.querySelectorAll('.cancel-modal').forEach(el => {
+            el.addEventListener('click', function(){
+                document.getElementById('modal').classList.remove('hidden');
+            })
+        })
+        // Click card-part add class "selected" and input-part show
+        document.querySelectorAll('.card-part').forEach(el => {
+            el.addEventListener('click', function(){
+                this.classList.toggle('selected');
+                this.querySelector('.input-part').classList.toggle('hidden');
+                this.querySelector('.input-part').addEventListener('click', function(e){
+                    e.stopPropagation();
+                })
+            })
+        })
+        // Filter
+        document.getElementById('filter-input').addEventListener('keyup', function(){
+            const value = this.value.toLowerCase().trim();
+            document.querySelectorAll('.card-part').forEach(el => {
+                const text = el.textContent.toLowerCase().trim();
+                if (text.includes(value)) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            })
+            // If card-part = car-part hidden => show "no-repair-part" else hidden
+            if (document.querySelectorAll('.card-part:not(.hidden)').length == 0) {
+                document.getElementById('no-repair-part').classList.remove('hidden');
+            } else {
+                document.getElementById('no-repair-part').classList.add('hidden');
+            }
+        })
+        // Filter button all parts
+        document.getElementById('all-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-part').forEach(el => {
+                el.classList.remove('hidden');
+            })
+        })
+        // Filter button selected parts
+        document.getElementById('selected-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-part').forEach(el => {
+                if (el.classList.contains('selected')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            })
+        })
+        // Filter button unselected parts
+        document.getElementById('unselected-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-part').forEach(el => {
+                if (!el.classList.contains('selected')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            })
+        })
+
+        // Select cards from data from maintanance
+        document.querySelectorAll('.vehice_part').forEach(el => {
+            const partId = el.getAttribute('data-part-id');
+            const partQuantity = el.getAttribute('data-part-quantity');
+            const cardPart = document.querySelector(`.card-part-${partId}`);
+            if (cardPart && partQuantity > 0) {
+                cardPart.classList.add('selected');
+                cardPart.querySelector('.input-part').classList.remove('hidden');
+                cardPart.querySelectorAll('input[name="part_quantity"]').forEach(el => {
+                    el.disabled = false;
+                    el.value = partQuantity;
+                })
+            }
+        })
+        // Submit form
+        document.getElementById('submit-slections').addEventListener('click', function(){
+            const vehiceParts = [];
+            const providers = {};
+            const providerCalculations = {};
+            document.querySelectorAll('.card-part.selected').forEach(el => {
+                const partId = el.querySelector('input[name="part_id"]').value;
+                const partNumber = el.querySelector('input[name="part_number"]').value;
+                const partName = el.querySelector('input[name="part_name"]').value;
+                const partPrice = el.querySelector('input[name="part_price"]').value;
+                // Make partPrice human readable
+                const partQuantity = el.querySelector('input[name="part_quantity"]').value;
+                const partProvider = el.querySelector('input[name="part_provider"]').value;
+                if (!providers[partProvider]) {
+                    providers[partProvider] = [];
+                }
+                if (!providerCalculations[partProvider]) {
+                    providerCalculations[partProvider] = [0];
+                }
+                providerCalculations[partProvider] = parseInt(providerCalculations[partProvider]) + parseInt(partPrice * partQuantity);
+                console.log(providerCalculations);
+                providers[partProvider].push(`
+                    <div class="vehice_part border-b py-2 flex items-center w-full" data-part-id="${partId}" data-part-quantity="${partQuantity}">
+                        <input type="hidden" name="part_id" value="${partId}">
+                        <input type="hidden" name="part_quantity_${partId}" value="${partQuantity}">
+                        <span class="w-5/12">${partNumber} - ${partName} - ${formatNumber(partPrice)} VNÐ </span>
+                        <span class="w-1/12 text-center">${partQuantity}</span>
+                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-2/12 flex justify-center"></div>
+                    </div>
+                `);
+            });
+            const sortedProviders = Object.keys(providers).sort().reduce(
+                (obj, key) => { 
+                    obj[key] = providers[key]; 
+                    return obj;
+                }, 
+                {}
+            );
+            // Calculate total price
+            let totalPrice = 0;
+            Object.keys(sortedProviders).forEach(provider => {
+                vehiceParts.push(`<div class="font-bold border-b pt-3 pb-1">${provider} - <span class="text-red-600">${formatNumber(providerCalculations[provider])} VNÐ</span></div>`);
+                vehiceParts.push(...sortedProviders[provider]);
+            });
+            document.getElementById('vehicle_parts').innerHTML = vehiceParts.join('');
+            // Click cancel model to close this modal
+            document.querySelector('.cancel-modal').click();
+        })
+    </script>
+</div>
+
+
