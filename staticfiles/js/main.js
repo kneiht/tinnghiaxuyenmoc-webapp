@@ -500,12 +500,11 @@ function handleNewSelectElement(select) {
 
     // Handle option selection
     optionsContainer.addEventListener('click', event => {
-        if (event.target.dataset.value) {
+        if (event.target.dataset) {
             select.value = event.target.dataset.value;
             // Manually trigger the change event
             const eventSelect = new Event('change', { bubbles: true });
             select.dispatchEvent(eventSelect);
-
 
             card.querySelector('.selected-option').textContent = event.target.textContent;
             dropdown.classList.add('hidden');
