@@ -1198,7 +1198,7 @@ class LiquidUnitPriceForm(forms.ModelForm):
                 'placeholder': 'Chọn loại nhớt',
                 'class': 'form-input',
                 'required': 'required',
-            }, choices=LiquidUnitPrice.TYPE_OF_LOCATION_CHOICES),
+            }, choices=LiquidUnitPrice.TYPE_CHOICES),
             'unit_price': forms.NumberInput(attrs={
                 'placeholder': 'Nhập đơn giá',
                 'class': 'form-input',
@@ -1231,7 +1231,7 @@ class FillingRecordForm(forms.ModelForm):
                 'placeholder': 'Chọn loại',
                 'class': 'form-input',
                 'required': 'required',
-            }, choices=FillingRecord.TYPE_OF_LOCATION_CHOICES),
+            }, choices=FillingRecord.TYPE_CHOICES),
             'vehicle': forms.Select(attrs={
                 'placeholder': 'Chọn xe',
                 'class': 'form-input',
@@ -1258,7 +1258,9 @@ class FillingRecordForm(forms.ModelForm):
 class PaymentRecordForm(forms.ModelForm):
     class Meta:
         model = PaymentRecord
-        fields = ['vehicle_maintenance', 'provider', 'requested_amount', 'requested_date', 'transferred_amount', 'payment_date', 'lock', 'note']
+        fields = ['vehicle_maintenance', 'provider', 'requested_amount', 
+                    'requested_date', 'transferred_amount', 
+                    'payment_date', 'image1', 'image2', 'lock', 'note']
         labels = {
             'vehicle_maintenance': 'Phiếu sửa chữa',
             'provider': 'Nhà cung cấp',
@@ -1269,6 +1271,10 @@ class PaymentRecordForm(forms.ModelForm):
             'transferred_amount': 'Tiền thanh toán',
             'payment_date': 'Ngày thanh toán',
             'debt': 'Nợ còn lại',
+
+            'image1': 'Hình 1',
+            'image2': 'Hình 2',
+
             'lock': 'Khoá phiếu thanh toán',
             'note': 'Ghi chú',
         }
@@ -1326,7 +1332,11 @@ class PaymentRecordForm(forms.ModelForm):
             'lock': forms.CheckboxInput(attrs={
                 'class': 'checkbox',
             }),
-
+            'image1': forms.FileInput(attrs={
+                    'class': 'form-input-file',}),
+                    
+            'image2': forms.FileInput(attrs={
+                    'class': 'form-input-file',}),
 
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',

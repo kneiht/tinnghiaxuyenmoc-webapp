@@ -456,7 +456,7 @@
                 </div>
             {% endfor %}
         {% else %}
-            {% calculate_revenue_report records update=update %}
+            {% calculate_revenue_report records select_start_date=start_date select_end_date=end_date update=update %}
             
         {% endif %}
     </div>
@@ -513,11 +513,27 @@
 
                         {% elif field == 'image' and record.image %} 
                             <div class="relative group">
-                                <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                <a href="{{ record.image.url }}" target="_blank">
+                                    <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                </a>
                             </div>
+                        {% elif field == 'image1' and record.image1 %} 
+                        <div class="flex flex-row gap-2" style="width: 100px;">
+                            <div class="relative group">
+                                <a href="{{ record.image1.url }}" target="_blank">
+                                    <img src="{{ record.image1.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                </a>
+                            </div>
+                            <div class="relative group">
+                                <a href="{{ record.image2.url }}" target="_blank">
+                                    <img src="{{ record.image2.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                </a>
+                            </div>
+                        </div>
                         {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 
+
                     </td>
                     {% endfor %}
     

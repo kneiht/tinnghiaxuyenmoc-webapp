@@ -458,6 +458,7 @@ def filter_records(request, records, model_class, **kwargs):
     # Determine the fields to be used as filter options based on the selected page
     fields = [field.name for field in model_class._meta.get_fields() if 
                   isinstance(field, (models.CharField, models.TextField))]
+
     # Add fields from forein keys
     for field in model_class._meta.get_fields():
         if isinstance(field, models.ForeignKey):
@@ -465,6 +466,9 @@ def filter_records(request, records, model_class, **kwargs):
             for foreign_field in field.related_model._meta.get_fields():
                 if isinstance(foreign_field, (models.CharField, models.TextField)):
                     fields.append(f"{field.name}__{foreign_field.name}")
+
+
+
 
     # Construct Q objects for filtering
     combined_query = Q()

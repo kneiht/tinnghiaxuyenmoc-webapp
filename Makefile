@@ -22,8 +22,22 @@ confirm:
 run:
 	python manage.py runserver
 
+## makemigrations
+.PHONY: migrations
+migrations:
+	python manage.py makemigrations
+
+## migrate
+.PHONY: migrate
+migrate:
+	python manage.py migrate
 
 ## runserver
 .PHONY: tailwind
 tailwind:
 	cd jstoolchain && npm run tailwind-watch
+
+## migrate
+.PHONY: collect
+collect:
+	python manage.py collectstatic

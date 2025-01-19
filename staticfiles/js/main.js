@@ -564,3 +564,31 @@ up.compiler('.just-updated', function (update) {
         console.log('update');
     }
 });
+
+
+up.compiler('#id_image1', function(image) {
+    image.addEventListener('change', function(event) {
+        const uploadedFile = event.target.files[0];
+        if (uploadedFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                document.querySelector('.modal-image1 img').src = imageUrl;
+            };
+            reader.readAsDataURL(uploadedFile);
+        }
+    });
+});
+up.compiler('#id_image2', function(image) {
+    image.addEventListener('change', function(event) {
+        const uploadedFile = event.target.files[0];
+        if (uploadedFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                document.querySelector('.modal-image2 img').src = imageUrl;
+            };
+            reader.readAsDataURL(uploadedFile);
+        }
+    });
+});

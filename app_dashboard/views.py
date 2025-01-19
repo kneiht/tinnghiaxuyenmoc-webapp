@@ -143,8 +143,16 @@ def handle_form(request, model, pk=0):
         if forbit_html:
             return HttpResponse(forbit_html)
         
+        if model == 'PaymentRecord':
         # check if the use have the right to modify approval status
-        if model == 'VehicleMaintenance':
+            forbit_html = decide_permission(request, 'approve', {'model': model})
+            lock = request.POST.get('lock')
+            if lock and forbit_html:
+                message = 'Bạn không được cấp quyền khóa phiếu. \n\n Vui lí liên hệ admin cấp quyền.'
+                html_message = render_message(request, message=message, message_type='red')
+                return HttpResponse(html_message)
+
+        elif model == 'VehicleMaintenance':
             current_approval_status = model_class.objects.filter(pk=pk).first().approval_status
             form_approval_status = request.POST.get('approval_status')
 
@@ -234,6 +242,8 @@ def handle_form(request, model, pk=0):
                         html_message = render_message(request, message='Cập nhật thành công')
                         html_record = render_display_records(request, model=model, records=[record], update='True', project_id=project_id)
                         return HttpResponse(html_message + html_record)
+
+
     if form.is_valid():
         instance_form = form.save(commit=False)
         instance_form.save()

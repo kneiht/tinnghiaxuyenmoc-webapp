@@ -599,7 +599,7 @@ class VehicleRevenueInputs(BaseModel):
     # todo: thêm fields chạy ngày, chạy đêm, tabo ngày, mỗi cái có đơn giá => tính phí vận chuyể
 
     @classmethod
-    def get_valid_record(self, date):
+    def get_valid_record(self, vehicle_type, date):
         date = get_valid_date(date)
         return VehicleRevenueInputs.objects.filter(valid_from__lte=date).order_by('-valid_from').first()
 
@@ -1004,14 +1004,22 @@ class VehicleOperationRecord(BaseModel):
 
 
 class LiquidUnitPrice(BaseModel):
-    TYPE_OF_LOCATION_CHOICES = [
+    TYPE_CHOICES = [
         ('diesel', 'Dầu diesel (lít)'),
-        ('lubricant_10', 'Nhớt 10 (lít)'),
-        ('lubricant_engine', 'Nhớt máy (lít)'),
         ('gasoline', 'Xăng (lít)'),
-        ('coolant', 'Nước làm mát (lít)'),
+
+        ('lubricant_10', 'Nhớt thủy lực (lít)'),
+
+        ('lubricant_engine', 'Nhớt máy xe cơ giới (lít)'),
+        ('lubricant_engine_dumbtruck', 'Nhớt máy xe ben (lít)'),
+
+        ('lubricant_140_thick', 'Nhớt 140 đặc (lít)'),
+        ('lubricant_140', 'Nhớt 140 lỏng (lít)'),
+
+        ('grease', 'Mỡ bò xe cơ giới (lít)'),
+        ('grease_dumbtruck', 'Mỡ bò xe ben (lít)'),
     ]
-    liquid_type = models.CharField(max_length=100, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại")
+    liquid_type = models.CharField(max_length=100, choices=TYPE_CHOICES, verbose_name="Loại")
     unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
     valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng", default=timezone.now)
     note = models.TextField(verbose_name="Ghi chú", default="")
@@ -1031,6 +1039,7 @@ class LiquidUnitPrice(BaseModel):
 
     @classmethod
     def get_unit_price(self, liquid_type, date):
+        print(">>>>>>>>>>>>>>>>>>", liquid_type, date)
         liquid_unit_price = LiquidUnitPrice.objects.filter(liquid_type=liquid_type, valid_from__lte=date).order_by('-valid_from').first()
         return liquid_unit_price
 
@@ -1045,14 +1054,22 @@ class LiquidUnitPrice(BaseModel):
 
 
 class FillingRecord(BaseModel):
-    TYPE_OF_LOCATION_CHOICES = [
+    TYPE_CHOICES = [
         ('diesel', 'Dầu diesel (lít)'),
-        ('lubricant_10', 'Nhớt 10 (lít)'),
-        ('lubricant_engine', 'Nhớt máy (lít)'),
         ('gasoline', 'Xăng (lít)'),
-        ('coolant', 'Nước làm mát (lít)'),
+
+        ('lubricant_10', 'Nhớt thủy lực (lít)'),
+
+        ('lubricant_engine', 'Nhớt máy xe cơ giới (lít)'),
+        ('lubricant_engine_dumbtruck', 'Nhớt máy xe ben (lít)'),
+
+        ('lubricant_140_thick', 'Nhớt 140 đặc (lít)'),
+        ('lubricant_140', 'Nhớt 140 lỏng (lít)'),
+
+        ('grease', 'Mỡ bò xe cơ giới (lít)'),
+        ('grease_dumbtruck', 'Mỡ bò xe ben (lít)'),
     ]
-    liquid_type = models.CharField(max_length=100, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại")
+    liquid_type = models.CharField(max_length=100, choices=TYPE_CHOICES, verbose_name="Loại")
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     quantity = models.FloatField(verbose_name="Số lượng")
     total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
@@ -1076,7 +1093,6 @@ class FillingRecord(BaseModel):
     def calculate_total_amount(self):
         # Get Unit Price
         unit_price = LiquidUnitPrice.get_unit_price(self.liquid_type, self.fill_date)
-        print(unit_price)
         if unit_price:
             self.total_amount = self.quantity * unit_price.unit_price
         else:
@@ -1491,6 +1507,19 @@ class VehicleMaintenanceRepairPart(BaseModel):
         provider = self.repair_part.part_provider
         provider.calculate_payment_states()
 
+    @classmethod
+    def get_maintenance_amount(cls, vehicle, from_date, to_date):
+        total_amount = 0
+        vehicle_maintenances = VehicleMaintenance.objects.filter(
+            vehicle=vehicle, from_date__gte=from_date, from_date__lte=to_date)
+        for vehicle_maintenance in vehicle_maintenances:
+            repair_parts = VehicleMaintenanceRepairPart.objects.filter(
+                vehicle_maintenance=vehicle_maintenance)
+            for repair_part in repair_parts:
+                if repair_part.received_status == 'received':
+                    total_amount += repair_part.repair_part.part_price * repair_part.quantity
+
+        return total_amount
 
 class PaymentRecord(BaseModel):
     class Meta:
@@ -1519,6 +1548,9 @@ class PaymentRecord(BaseModel):
 
     lock = models.BooleanField(verbose_name="Khóa phiếu", default=False)
 
+    image1 = models.ImageField(verbose_name="Hình ảnh", upload_to='images/finance/', blank=True, null=True)
+    image2 = models.ImageField(verbose_name="Hình ảnh", upload_to='images/finance/', blank=True, null=True)
+
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
@@ -1526,7 +1558,9 @@ class PaymentRecord(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 'payment_date', 'debt', 'note']
+        fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 
+            'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
+            'payment_date', 'debt', 'note', 'image1']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
