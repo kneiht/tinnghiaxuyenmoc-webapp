@@ -517,18 +517,22 @@
                                     <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
                                 </a>
                             </div>
-                        {% elif field == 'image1' and record.image1 %} 
+                        {% elif field == 'image1' %} 
                         <div class="flex flex-row gap-2" style="width: 100px;">
-                            <div class="relative group">
-                                <a href="{{ record.image1.url }}" target="_blank">
-                                    <img src="{{ record.image1.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
-                                </a>
-                            </div>
-                            <div class="relative group">
-                                <a href="{{ record.image2.url }}" target="_blank">
-                                    <img src="{{ record.image2.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
-                                </a>
-                            </div>
+                            {% if record.image1 %}
+                                <div class="relative group">
+                                    <a href="{{ record.image1.url }}" target="_blank">
+                                        <img src="{{ record.image1.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if record.image2 %}
+                                <div class="relative group">
+                                    <a href="{{ record.image2.url }}" target="_blank">
+                                        <img src="{{ record.image2.url }}" alt="image" class="h-10 rounded-xl cursor-pointer">
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                         {% else %}
                             {{ record|format_display:field }}
