@@ -1531,6 +1531,15 @@ class PaymentRecord(BaseModel):
         ('partial_paid', 'T.toán một phần'),
         ('paid', 'Đã T.toán đủ'),
     )
+
+    MONEY_SOURCE_CHOICES = (
+        ('individual', 'Cá nhân'),
+        ('huy_bao_company', 'Công ty Huy Bảo'),
+        ('tin_nghia_company', 'Công ty Tín Nghĩa'),
+        ('viet_tin_company', 'Công ty Việt Tín'),
+        ('dhc_company', 'Công ty DHC'),
+        ('bh_company', 'Công ty BH'),
+    )
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
     status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_requested', verbose_name="Trạng thái thanh toán")
@@ -1541,6 +1550,7 @@ class PaymentRecord(BaseModel):
     requested_amount = models.IntegerField(verbose_name="Số tiền đề nghị", default=0, validators=[MinValueValidator(0)])
     requested_date = models.DateField(verbose_name="Ngày đề nghị", default=timezone.now)
 
+    money_source = models.CharField(max_length=100, choices=MONEY_SOURCE_CHOICES, default='individual', verbose_name="Nguồn tiền")
     transferred_amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
     payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)   
 
@@ -1560,7 +1570,7 @@ class PaymentRecord(BaseModel):
     def get_display_fields(self):
         fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 
             'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
-            'payment_date', 'debt', 'note', 'image1']
+            'payment_date', 'money_source', 'debt', 'note', 'image1']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

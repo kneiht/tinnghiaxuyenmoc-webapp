@@ -373,9 +373,10 @@ up.compiler('.form-input', function (inputfield) {
 
 function handleNewSelectElement(select) {
     // If there are only about 5 options, don't create the wrapper
-    if (select.options.length <= 6) {
+    if (select.options.length <= 6 && !select.hasAttribute('readonly')) {
         return;
     }
+
     // Check if there an element ".select-wrapper" below the select element => return
     if (select.parentNode.querySelector('.select-wrapper')) {
         // delete the element ".select-wrapper" below the select element

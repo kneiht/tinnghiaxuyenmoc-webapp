@@ -163,10 +163,18 @@
                             {{ form.description }}    
                     </div>
                     {% endif %}
+
                     {% if form.note.name == 'note' %}  
                     <div class="col-span-full">
                             <label for="description" class="text-theme">Ghi chú</label>
                             {{ form.note }}    
+                    </div>
+                    {% endif %}
+
+                    {% if record.provider %}  
+                    <div class="col-span-full flex items-center w-full flex-col justify-center bg-slate-100 dark:bg-slate-700 rounded-md p-2">
+                        <span class="text-theme font-semibold">Thông tin thanh toán: </span>
+                        <span class="text-lg text-blue-500">{{ record.provider.bank_name }} - {{ record.provider.account_holder_name }} - {{ record.provider.account_number }}</span>
                     </div>
                     {% endif %}
                 </div>

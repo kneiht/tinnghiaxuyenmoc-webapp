@@ -1260,7 +1260,7 @@ class PaymentRecordForm(forms.ModelForm):
         model = PaymentRecord
         fields = ['vehicle_maintenance', 'provider', 'requested_amount', 
                     'requested_date', 'transferred_amount', 
-                    'payment_date', 'image1', 'image2', 'lock', 'note']
+                    'payment_date', 'image1', 'image2', 'money_source','lock', 'note']
         labels = {
             'vehicle_maintenance': 'Phiếu sửa chữa',
             'provider': 'Nhà cung cấp',
@@ -1276,6 +1276,7 @@ class PaymentRecordForm(forms.ModelForm):
             'image2': 'Hình 2',
 
             'lock': 'Khoá phiếu thanh toán',
+            'money_souce': 'Nguồn tiền',
             'note': 'Ghi chú',
         }
         widgets = {
@@ -1332,6 +1333,13 @@ class PaymentRecordForm(forms.ModelForm):
             'lock': forms.CheckboxInput(attrs={
                 'class': 'checkbox',
             }),
+
+            'money_source': forms.Select(attrs={
+                'placeholder': 'Chọn nguồn tiền',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=PaymentRecord.MONEY_SOURCE_CHOICES),
+
             'image1': forms.FileInput(attrs={
                     'class': 'form-input-file',}),
                     
