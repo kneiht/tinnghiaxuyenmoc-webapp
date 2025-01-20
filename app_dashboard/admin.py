@@ -178,20 +178,6 @@ from .models import (
 
 # Register your models here.
 
-@admin.register(FuelFillingRecord)
-class FuelFillingRecordAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note')
-    search_fields = ('vehicle__name', 'fill_date')
-    list_filter = ('fill_date',)
-    ordering = ('-fill_date',)
-
-@admin.register(LubeFillingRecord)
-class LubeFillingRecordAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note')
-    search_fields = ('vehicle__name', 'fill_date')
-    list_filter = ('fill_date',)
-    ordering = ('-fill_date',)
-
 @admin.register(VehicleDepreciation)
 class VehicleDepreciationAdmin(admin.ModelAdmin):
     list_display = ('vehicle', 'depreciation_amount', 'from_date', 'to_date', 'note')
@@ -225,3 +211,15 @@ class VehicleMaintenanceRepairPartAdmin(admin.ModelAdmin):
     list_display = ('vehicle_maintenance', 'repair_part', 'quantity')
     search_fields = ('vehicle_maintenance__vehicle__name', 'repair_part__part_name')
     ordering = ('-vehicle_maintenance__from_date',)
+
+
+
+
+@admin.register(PaymentRecord)
+class PaymentRecordAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount',
+                    'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount',
+                    'payment_date', 'money_source', 'debt', 'note', 'image1')
+    search_fields = ('vehicle_maintenance__vehicle__name', 'provider__name', 'status')
+    list_filter = ('status', 'money_source', 'payment_date')
+    ordering = ('-payment_date',)
