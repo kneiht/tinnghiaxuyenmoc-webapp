@@ -32,12 +32,12 @@ migrations:
 migrate:
 	python manage.py migrate
 
-## runserver
+## tailwind
 .PHONY: tailwind
 tailwind:
 	cd jstoolchain && npm run tailwind-watch
 
-## migrate
+## collect
 .PHONY: collect
 collect:
 	python manage.py collectstatic

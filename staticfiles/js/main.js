@@ -342,31 +342,76 @@ up.compiler('.form-input', function (inputfield) {
         return parts.join(',');
     }
 
+    function formatVerboseCurrency(number) {
+        if (isNaN(number) || number < 0) {
+            return "Invalid input";
+        }
+
+        const billion = 1000000000;
+        const million = 1000000;
+        const thousand = 1000;
+
+        let result = "";
+
+        // Handle billions
+        if (number >= billion) {
+            const billions = Math.floor(number / billion);
+            result += `${billions} tỷ `;
+            number %= billion;
+        }
+
+        // Handle millions
+        if (number >= million) {
+            const millions = Math.floor(number / million);
+            result += `${millions} triệu `;
+            number %= million;
+        }
+
+        // Handle thousands
+        if (number >= thousand) {
+            const thousands = Math.floor(number / thousand);
+            result += `${thousands} ngàn `;
+            number %= thousand;
+        }
+
+        // Handle the remaining units
+        if (number > 0) {
+            result += `${number} `;
+        }
+
+        // Append "đồng" at the end
+        result += "đồng";
+
+        // Remove any extra spaces and return the result
+        return result.replace(/\s+/g, ' ').trim();
+    }
+
+
 
     // Create a popup element
     const popup = document.createElement('div');
-    popup.classList.add('text-blue-500'); // You can style this with Tailwind or custom CSS
+    popup.classList.add('text-blue-500');
+    popup.classList.add('ms-3');
+
+    function formatPopup(popup, inputfield) {
+        const listVerbose = ['requested_amount', 'transferred_amount'];
+        // If name attribute = requested_amount, use formatVerBoseCurrency
+        if (listVerbose.includes(inputfield.name)) {
+            popup.innerText = formatVerboseCurrency(inputfield.value);
+        }
+        else {
+            popup.innerText = formatNumber(inputfield.value);
+        }
+    }
 
 
-    // Event listener for focus
-    inputfield.addEventListener('focus', function () {
-
-        // Initialize the field value if present
-        popup.innerText = formatNumber(inputfield.value);
-
-        // Insert the popup after the input field
-        inputfield.parentNode.insertBefore(popup, inputfield.nextSibling);
-
-        // Optionally, remove the popup on blur or some other event
-        inputfield.addEventListener('blur', function () {
-            popup.remove();
-        });
-    });
+    // Insert the popup after the input field
+    formatPopup(popup, inputfield)
+    inputfield.parentNode.insertBefore(popup, inputfield.nextSibling);
 
     // Add keyup event listener to format the value and update tooltip
     inputfield.addEventListener('keyup', function () {
-        popup.innerText = formatNumber(inputfield.value);
-
+        formatPopup(popup, inputfield)
     });
 
 });
@@ -377,11 +422,16 @@ function handleNewSelectElement(select) {
         return;
     }
 
+    // id =sort-select
+    if (select.id === 'sort-select') {
+        return;
+    }
+
     // Check if there an element ".select-wrapper" below the select element => return
     if (select.parentNode.querySelector('.select-wrapper')) {
         // delete the element ".select-wrapper" below the select element
         select.parentNode.querySelector('.select-wrapper').remove();
-    }   
+    }
     // Create the wrapper div for card and dropdown
     const wrapper = document.createElement('div');
     const width = select.style.width;
@@ -394,7 +444,7 @@ function handleNewSelectElement(select) {
     // Create the card element
     const card = document.createElement('div');
     Array.from(select.classList).forEach(c => {
-         card.classList.add(c);
+        card.classList.add(c);
     });
     card.classList.add('form-input', 'cursor-pointer');
     card.innerHTML = `
@@ -524,7 +574,7 @@ function handleNewSelectElement(select) {
     select.addEventListener('change', () => {
         console.log('change');
         card.querySelector('.selected-option').textContent = select.options[select.selectedIndex]?.text || 'Select an option';
-    }); 
+    });
 }
 
 
@@ -567,12 +617,12 @@ up.compiler('.just-updated', function (update) {
 });
 
 
-up.compiler('#id_image1', function(image) {
-    image.addEventListener('change', function(event) {
+up.compiler('#id_image1', function (image) {
+    image.addEventListener('change', function (event) {
         const uploadedFile = event.target.files[0];
         if (uploadedFile) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const imageUrl = e.target.result;
                 document.querySelector('.modal-image1 img').src = imageUrl;
             };
@@ -580,12 +630,12 @@ up.compiler('#id_image1', function(image) {
         }
     });
 });
-up.compiler('#id_image2', function(image) {
-    image.addEventListener('change', function(event) {
+up.compiler('#id_image2', function (image) {
+    image.addEventListener('change', function (event) {
         const uploadedFile = event.target.files[0];
         if (uploadedFile) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const imageUrl = e.target.result;
                 document.querySelector('.modal-image2 img').src = imageUrl;
             };

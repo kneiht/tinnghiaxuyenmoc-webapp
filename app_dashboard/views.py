@@ -191,7 +191,6 @@ def handle_form(request, model, pk=0):
                             vehicle_part = VehicleMaintenanceRepairPart.objects.filter(id=vehicle_part_id).first()
                             # Get fields
                             vehicle_part.received_status = request.POST.get(f'received_status_{vehicle_part_id}')
-                            vehicle_part.paid_status = request.POST.get(f'paid_status_{vehicle_part_id}')
                             vehicle_part.done_status = request.POST.get(f'done_status_{vehicle_part_id}')
                             vehicle_part.save()
                         record = instance

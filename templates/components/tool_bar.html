@@ -78,10 +78,31 @@
                             });
                         </script>
 
-                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' or model == 'FillingRecord'%}
+                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' or model == 'FillingRecord' %}
                         <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
                             <option value="-fill_date" selected>Ngày đổ (gần nhất trước)</option>
                             <option value="fill_date">Ngày đổ (xa nhất trước)</option>
+                        </select>
+
+                        <script>
+                            document.getElementById('sort-select').addEventListener('change', function() {
+                                // Press search-button
+                                document.getElementById('search-button').click();
+                            });
+                        </script>
+
+                        {% elif model == 'PaymentRecord' %}
+                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                            <option value="" selected>Mặc định - (Mã sửa chữa)</option>
+                            <option value="status">Trạng thái thanh toán  - (A → Z)</option>
+                            <option value="-status">Trạng thái thanh toán  - (Z → A)</option>
+                            <option value="provider">Nhà cung cấp  - (A → Z)</option>
+                            <option value="-provider">Nhà cung cấp  - (Z → A)</option>
+                            <option value="-requested_date">Ngày đề nghị  - (gần nhất trước)</option>
+                            <option value="requested_date">Nhà cung cấp  - (xa nhất trước)</option>
+                            <option value="-payment_date">Ngày thanh toán  - (gần nhất trước)</option>
+                            <option value="payment_date">Nhà thanh toán  - (xa nhất trước)</option>
+
                         </select>
 
                         <script>

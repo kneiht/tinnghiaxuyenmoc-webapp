@@ -108,7 +108,7 @@ class BaseModel(models.Model):
         output_io_stream = io.BytesIO()
 
         # Save the image to the output stream with desired quality
-        image_temp.save(output_io_stream, format='WEBP', quality=40)
+        image_temp.save(output_io_stream, format='WEBP', quality=80)
         output_io_stream.seek(0)
 
         # Create a Django InMemoryUploadedFile from the compressed image
@@ -149,7 +149,7 @@ class BaseModel(models.Model):
             value = getattr(self, field.name)
             if isinstance(value, ImageFieldFile):
                 if value:  # If there's an image to compress
-                    compressed_image = self.compress_image(value, 500)
+                    compressed_image = self.compress_image(value, 1000)
                     setattr(self, field.name, compressed_image)
 
                     if not Thumbnail.objects.filter(reference_url=value.url).exists():
@@ -234,7 +234,7 @@ class UserPermission(BaseModel):
         ('FuelFillingRecord', 'LS đổ nhiên liệu'),
         ('LubeFillingRecord', 'LS đổ nhớt'),
         ('PartProvider', 'Nhà cung cấp phụ tùng'),
-        ('RepairPart', 'Danh mục sửa chữa'),
+        ('RepairPart', 'Danh mục phụ tùng'),
         ('PaymentRecord', 'Lịch sử thanh toán'),
         ('VehicleMaintenance', 'Phiếu sửa chữa'),
         ('VehicleDepreciation', 'Khấu hao'),
@@ -1215,8 +1215,8 @@ class VehicleBankInterest(BaseModel):
 
 class VehicleMaintenance(BaseModel):
     MAINTENANCE_CATEGORY_CHOICES = (
-        ('periodic_check', 'Kiểm tra định kì'),
-        ('repair', 'Sửa chữa hư hỏng'),
+        ('periodic_check', 'Bảo dưỡng/ Sửa chữa nhỏ/ Kiểm tra định kì'),
+        ('repair', 'Sửa chữa lớn/ sửa chữa hư hỏng'),
     )
     
     APPROVAL_STATUS_CHOICES = (
@@ -1235,6 +1235,7 @@ class VehicleMaintenance(BaseModel):
     PAID_STATUS_CHOICES = (
         ('paid', 'Đã T.toán'),
         ('not_paid', 'Chưa T.toán'),
+        ('partial_paid', 'T.toán một phần'),
     )
 
     DONE_STATUS_CHOICES = (
@@ -1279,11 +1280,30 @@ class VehicleMaintenance(BaseModel):
             self.received_status = 'received'
         else:
             self.received_status = 'not_received'
+            
         # Check if all parts are paid, if yes => paid_status = 'paid'
-        if vehicle_parts.filter(paid_status='not_paid').count() == 0:
-            self.paid_status = 'paid'
-        else:
+        all_provider_payment_states = self.calculate_all_provider_payment_states()
+        total_purchase_amount = 0
+        total_transferred_amount = 0
+        total_debt_amount = 0
+        for provider_payment_state in all_provider_payment_states.values():
+            total_purchase_amount += provider_payment_state['purchase_amount']
+            total_transferred_amount += provider_payment_state['transferred_amount']
+            total_debt_amount += provider_payment_state['debt_amount']
+
+
+        if total_purchase_amount == 0:
             self.paid_status = 'not_paid'
+        else:
+            if total_debt_amount == 0:
+                self.paid_status = 'paid'
+            elif total_debt_amount > 0 and total_transferred_amount > 0:
+                self.paid_status = 'partial_paid'
+            else:
+                self.paid_status = 'not_paid'
+
+
+            
         # Check if all parts are done, if yes => done_status = 'done'
         if vehicle_parts.filter(done_status='not_done').count() == 0:
             self.done_status = 'done'
@@ -1486,10 +1506,6 @@ class VehicleMaintenanceRepairPart(BaseModel):
         ('not_received', 'Chưa nhận'),
     )
 
-    PAID_STATUS_CHOICES = (
-        ('paid', 'Đã T.toán'),
-        ('not_paid', 'Chưa T.toán'),
-    )
 
     DONE_STATUS_CHOICES = (
         ('done', 'Xong'),
@@ -1500,7 +1516,6 @@ class VehicleMaintenanceRepairPart(BaseModel):
     repair_part = models.ForeignKey(RepairPart, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Bộ phận")
     quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
-    paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Trạng thái thanh toán")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Trạng thái xong sửa chữa")
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -1621,7 +1636,7 @@ class PaymentRecord(BaseModel):
             errors += (f'- Số tiền đề nghị phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n')
 
         if self.requested_amount==0 and self.transferred_amount > 0:
-            errors += (f'-Chưa thanh toán khi chưa có đề nghị.\n')
+            errors += (f'- Chưa thanh toán khi chưa có đề nghị.\n')
 
         if self.transferred_amount < self.requested_amount and self.transferred_amount > 0:
             errors += (f'- Số tiền thanh toán phải lớn hơn hoặc bằng số tiền đề nghị {format(self.requested_amount, ",d")}.\n')

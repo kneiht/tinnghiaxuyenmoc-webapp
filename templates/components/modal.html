@@ -299,8 +299,8 @@
                                 <span class="w-5/12"> Bộ phận </span>
                                 <span class="w-1/12 text-center"> Số lượng </span>
                                 <span class="w-2/12 text-center"> Nhận hàng </span>
-                                <span class="w-2/12 text-center"> Thanh toán </span>
                                 <span class="w-2/12 text-center"> Sửa chữa </span>
+                                <span class="w-2/12 text-center"> Ngày thêm </span>
                             </div> 
                             <div id="vehicle_parts">
                             {% for provider, vehice_parts in record.get_vehicle_part_list.items %}
@@ -335,20 +335,8 @@
                                             </select>
                                         {% endif %}
                                     </div>
-                                    <div class="w-2/12 flex justify-center">
-                                        <span class="{{ vehice_part|get_value:'paid_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap approve-hidable">{{ vehice_part|format_display:'paid_status' }}</span>
-                                        {% if record.approval_status == "approved" %}
-                                        <select name="paid_status_{{ vehice_part.pk }}" class="form-input hidable approve-hidable hidden" id="id_paid_status" style="width: 150px">
-                                            {% if vehice_part.paid_status == "paid" %}
-                                                <option selected value="paid">Đã thanh toán</option>
-                                                <option value="not_paid">Chưa thanh toán</option>
-                                            {% else %}
-                                                <option value="paid">Đã thanh toán</option>
-                                                <option selected value="not_paid">Chưa thanh toán</option>
-                                            {% endif %}
-                                        </select>
-                                    {% endif %}
-                                    </div>
+
+
                                     <div class="w-2/12 flex justify-center">
                                         <span class="{{ vehice_part|get_value:'done_status' }} text-white text-xs p-1 rounded-md shadow-2xl px-2 text-nowrap approve-hidable">{{ vehice_part|format_display:'done_status' }}</span>
                                         {% if record.approval_status == "approved" %}
@@ -363,7 +351,11 @@
                                         </select>
                                     {% endif %}
                                     </div>
-                                    
+
+                                    <div class="w-2/12 flex justify-center">
+                                        {{ record.last_saved|date:"d/m/Y" }}
+                                    </div>
+
                                 </div>
                                 {% endfor %}   
                             {% endfor %}    
