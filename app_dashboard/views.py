@@ -1142,6 +1142,12 @@ def form_repair_parts(request):
     context = {'repair_parts': repair_parts}
     return render(request, 'components/modal_repair_parts.html', context)
 
+def form_cost_estimation_table(request):
+    # Get the list of repair parts
+    supplies = Supply.objects.all()
+    context = {'supplies': supplies}
+    return render(request, 'components/modal_cost_estimation_table.html', context)
+
 
 
 def form_maintenance_images(request, maintenance_id):
@@ -1257,7 +1263,7 @@ def page_transport_department(request, sub_page=None):
         'LiquidUnitPrice': 'Bảng đơn giá nhiên liệu/nhớt',
         'FillingRecord': 'LS đổ nhiên liệu/nhớt',
         'PartProvider': 'Nhà cung cấp phụ tùng',
-        'RepairPart': 'Danh mục sửa chữa',
+        'RepairPart': 'Danh mục phụ tùng',
         'PaymentRecord': 'LS thanh toán',
         'VehicleMaintenance': 'Phiếu sửa chữa',
         'VehicleDepreciation': 'Khấu hao',
@@ -1292,16 +1298,24 @@ def page_transport_department(request, sub_page=None):
     return render(request, 'pages/page_transport_department.html', context)
 
 
-def test(request):
-    records = VehicleOperationRecord.objects.all()
-    for record in records:
-        record.delete()
-    return render(request, 'pages/test.html')
-
-
 @login_required
-def page_projects(request):
-    return render(request, 'pages/page_projects.html')
+def page_projects(request, sub_page=None):
+    if sub_page == None:
+        return redirect('page_projects', sub_page='Project')
+
+    display_name_dict = {
+        'Project': 'Dự án',
+        'SupplyProvider': 'Nhà cung cấp vật tư',
+        'Supply': 'Dữ liệu vật tư',
+    }
+    context = {
+        'sub_page': sub_page,
+        'model': sub_page,
+        'display_name_dict': display_name_dict,
+        'current_url': request.path,
+    }
+    return render(request, 'pages/page_projects.html', context)
+
 
 
 @login_required
@@ -1312,3 +1326,13 @@ def page_each_project(request, pk):
     # Should check if the project is belong to the user
     context = {'project_id': project_id, 'check_date': check_date, 'project':project}
     return render(request, 'pages/page_each_project.html', context)
+
+
+
+
+def test(request):
+    records = VehicleOperationRecord.objects.all()
+    for record in records:
+        record.delete()
+    return render(request, 'pages/test.html')
+

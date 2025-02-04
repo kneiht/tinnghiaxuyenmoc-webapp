@@ -36,7 +36,7 @@ def render_title_bar(request, **kwargs):
 
     if page=='page_each_project': 
         project = Project.objects.filter(pk=project_id).first()
-        context['title'] = translate(f'Quản lý dự án: {project.name}')
+        context['title'] = translate(f'{project.name}')
 
     # Render
     template = 'components/title_bar.html'
@@ -86,7 +86,7 @@ def render_tool_bar(request, **kwargs):
         'lazy_load': params.get('lazy_load', False),
         'display_trashcan':display_trashcan
     }
-    if model not in ['Project', 'Job', 'VehicleOperationRecord']:
+    if model not in ['Job', 'VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
     # Render 
     template = 'components/tool_bar.html'

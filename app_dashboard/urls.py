@@ -16,11 +16,11 @@ urlpatterns = [
     path('home/<str:sub_page>/', views.page_home, name='page_home'),
     
     path('projects', views.page_projects, name='page_projects'),
-    path('projects/<int:pk>/', views.page_each_project, name='page_each_project'),
+    path('projects/<str:sub_page>/', views.page_projects, name='page_projects'),
+    path('projects/each/<int:pk>/', views.page_each_project, name='page_each_project'),
 
     path('general-data/', views.page_general_data, name='page_general_data'),
     path('general-data/<str:sub_page>/', views.page_general_data, name='page_general_data'),
-
 
     path('transport-department/', views.page_transport_department, name='page_transport_department'),
     path('transport-department/<str:sub_page>/', views.page_transport_department, name='page_transport_department'),
@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/form_repair_parts', views.form_repair_parts, name='form_repair_parts'),
     path('api/form_maintenance_images/<int:maintenance_id>/', views.form_maintenance_images, name='form_maintenance_images'),
     path('api/form_maintenance_payment_request', views.form_maintenance_payment_request, name='form_maintenance_payment_request'),
+    path('api/form_cost_estimation_table', views.form_cost_estimation_table, name='form_cost_estimation_table'),
 
 
     path('test', views.test, name='test'),

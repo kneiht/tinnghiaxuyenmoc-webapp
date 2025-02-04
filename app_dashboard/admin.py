@@ -223,3 +223,12 @@ class PaymentRecordAdmin(admin.ModelAdmin):
     search_fields = ('vehicle_maintenance__vehicle__name', 'provider__name', 'status')
     list_filter = ('status', 'money_source', 'payment_date')
     ordering = ('-payment_date',)
+
+
+@admin.register(PartProvider)
+class PartProviderAdmin(admin.ModelAdmin):
+    list_display = ('name', 'bank_name', 'account_number', 'account_holder_name', 'total_purchase_amount',
+                    'total_transferred_amount', 'total_outstanding_debt', 'phone_number', 'address', 'note')
+    search_fields = ('name', 'bank_name', 'account_number', 'account_holder_name')
+    list_filter = ('total_purchase_amount', 'total_transferred_amount', 'total_outstanding_debt')
+    ordering = ('-created_at',)

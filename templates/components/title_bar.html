@@ -1,7 +1,7 @@
 {% load custom_tags %}
 
 
-<div id="title-bar" class="flex flex-wrap justify-between mb-6 gap-5">
+<div id="title-bar" class="flex flex-nowrap justify-between mb-6 gap-5">
     <div class="w-3/6 flex gap-4 justify-between items-center mt-2">
         <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
     </div>
@@ -21,7 +21,7 @@
 
             <div id="jobs-plan-toggle">
                 <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ check_date }}" class="btn btn-primary text-nowrap">
-                    <i class="fas fa-bullseye me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                    <i class="fas fa-bullseye" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="me-3"> Xem KH tuần </span>
                 </a>
 
@@ -37,6 +37,11 @@
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span class="me-3"> Excel </span>
             </button>
+            <a href="{% url 'form_cost_estimation_table' %}?project_id="
+                id="cost-estimation-table-button" class="btn btn-primary text-nowrap"
+                up-preload="insert" up-target="#modal:maybe">
+                <span class="me-3"> Bảng dự toán </span>
+            </a>
         {% endif %}
         
         {% if create_new_button_name %}

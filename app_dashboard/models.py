@@ -218,6 +218,10 @@ class UserPermission(BaseModel):
         ('UserPermission', 'Cấp quyền quản lý dữ liệu'),
         ('ProjectUser', 'Cấp quyền quản lý dự án'),
 
+        ('Project', 'Dự án'),
+        ('SupplyProvider', 'Nhà cung cấp vật tư'),
+        ('Supply', 'Dữ liệu vật tư'),
+
         ('VehicleType', 'DL loại xe'),
         ('VehicleRevenueInputs', 'DL tính DT theo loại xe'),
         ('VehicleDetail', 'DL xe chi tiết'),
@@ -324,6 +328,85 @@ class Project(BaseModel):
             'in_progress': self.job_set.filter(status='in_progress').count(),
             'pending': self.job_set.filter(status='pending').count(),
         }
+
+class SupplyProvider(BaseModel):
+    # Driver Information Fields
+    name = models.CharField(max_length=255, verbose_name="Tên nhà cung cấp", unique=True)
+    # Bank Information
+    bank_name = models.CharField(max_length=255, verbose_name="Ngân hàng", default="", blank=True)
+    account_number = models.CharField(max_length=255, verbose_name="Số tài khoản", default="", blank=True)
+    account_holder_name = models.CharField(max_length=255, verbose_name="Tên chủ tài khoản", default="", blank=True)
+
+    # Fianance
+    total_purchase_amount = models.IntegerField(verbose_name="Tổng tiền mua", default=0, validators=[MinValueValidator(0)])
+    total_transferred_amount = models.IntegerField(verbose_name="Tổng thanh toán", default=0, validators=[MinValueValidator(0)])
+    total_outstanding_debt = models.IntegerField(verbose_name="Tổng công nợ", default=0, validators=[MinValueValidator(0)])
+    
+    # Contact Information
+    phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
+    address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
+    def __str__(self):
+        return f'{self.name}'
+    @classmethod
+    def get_display_fields(self):
+        fields = ['name', 'phone_number', 'address', 'bank_name', 'account_number', 'account_holder_name', 
+            'total_purchase_amount', 'total_transferred_amount', 'total_outstanding_debt' ,'note']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+    # def calculate_payment_states(self):
+    #     # Get all VehicleMaintenanceRepairPart
+    #     repair_parts = VehicleMaintenanceRepairPart.objects.filter(repair_part__part_provider=self)
+    #     # Calculate the purchase amount
+    #     purchase_amount = 0
+    #     for repair_part in repair_parts:
+    #         purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
+
+    #     # Calculate the transferred amount
+    #     transferred_amount = 0
+    #     payment_records = PaymentRecord.objects.filter(provider=self)
+    #     for payment_record in payment_records:
+    #         transferred_amount += payment_record.transferred_amount
+
+    #     # Calculate the debt amount
+    #     debt_amount = purchase_amount - transferred_amount
+
+    #     self.total_purchase_amount = purchase_amount
+    #     self.total_transferred_amount = transferred_amount
+    #     self.total_outstanding_debt = debt_amount
+    #     self.save()
+
+
+class Supply(BaseModel):
+    class Meta:
+        ordering = ['supply_provider', 'supply_number']
+    supply_provider = models.ForeignKey(SupplyProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
+    supply_number = models.CharField(max_length=255, verbose_name="Mã vật tư", unique=True)
+    supply_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
+    supply_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
+    unit = models.CharField(max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True)
+    image = models.ImageField(verbose_name="Hình ảnh", default="", null=True, blank=True)
+    note = models.TextField(verbose_name="Mô tả", default="", null=True, blank=True)
+    valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f'{self.part_number} - {self.part_name}'
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['supply_provider', 'supply_number', 'supply_name', 'supply_price', 'unit', 'image', 'note', 'valid_from']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 
 class ProjectUser(BaseModel):
@@ -840,7 +923,7 @@ class NormalWorkingTime(BaseModel):
     afternoon_end = models.TimeField(verbose_name="Kết thúc ca chiều", default=time(17, 0))
     # Valid from
     valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng")
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     @classmethod
     def get_display_fields(self):
@@ -884,7 +967,7 @@ class Holiday(BaseModel):
     class Meta:
         ordering = ['-date']
     date = models.DateField(verbose_name="Ngày lễ",  unique=True)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     @classmethod
     def get_display_fields(self):
@@ -932,7 +1015,7 @@ class VehicleOperationRecord(BaseModel):
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(upload_to='images/vehicle_operations/', verbose_name="Hình ảnh", default='', null=True, blank=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES, verbose_name="Nguồn dữ liệu", default='gps')
-    note = models.TextField(verbose_name="Ghi chú", default='')
+    note = models.TextField(verbose_name="Ghi chú", default='', null=True, blank=True)
     
     # add over time
     allow_overtime = models.BooleanField(verbose_name="Cho phép tính lương tăng ca", default=False)
@@ -1022,7 +1105,7 @@ class LiquidUnitPrice(BaseModel):
     liquid_type = models.CharField(max_length=100, choices=TYPE_CHOICES, verbose_name="Loại")
     unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
     valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -1074,7 +1157,7 @@ class FillingRecord(BaseModel):
     quantity = models.FloatField(verbose_name="Số lượng")
     total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
     fill_date = models.DateField(verbose_name="Ngày đổ", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self):
@@ -1106,7 +1189,7 @@ class FuelFillingRecord(BaseModel):
     total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
     
     fill_date = models.DateField(verbose_name="Ngày đổ nhiên liệu", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self):
@@ -1132,7 +1215,7 @@ class LubeFillingRecord(BaseModel):
     total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
     
     fill_date = models.DateField(verbose_name="Ngày đổ nhớt", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self):
@@ -1156,7 +1239,7 @@ class VehicleDepreciation(BaseModel):
     depreciation_amount = models.IntegerField(verbose_name="Khấu hao theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
     to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     @classmethod
@@ -1186,7 +1269,7 @@ class VehicleBankInterest(BaseModel):
     interest_amount = models.IntegerField(verbose_name="Lãi suất theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
     to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     @classmethod
@@ -1258,7 +1341,7 @@ class VehicleMaintenance(BaseModel):
     paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Thanh toán")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Sửa chữa")
 
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
 
     def save(self):
@@ -1433,7 +1516,7 @@ class PartProvider(BaseModel):
     # Contact Information
     phone_number = models.CharField(max_length=15, verbose_name="Số điện thoại", default="")
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
-    note = models.TextField(verbose_name="Ghi chú", default="")
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
 
@@ -1650,4 +1733,3 @@ class PaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
-    
