@@ -643,3 +643,27 @@ up.compiler('#id_image2', function (image) {
         }
     });
 });
+
+
+
+// When a cell in a table is click this function is call, 
+// this function will filter row which has the cell value is the cell value of the cell which is clicked
+function filterTable(cell, filterText) {
+    console.log(cell);
+    const table = cell.closest('table');
+    const filterValue = cell.textContent.trim();
+
+    const row = cell.closest('tr');
+    const cells = Array.from(row.children); // Convert to array to use indexOf
+    const columnIndex = cells.indexOf(cell.closest('td')); // Get the column index
+
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const display = cells[columnIndex].textContent.includes(filterValue);
+        row.style.display = display ? '' : 'none';
+    });
+    document.getElementById('current-filter-text').innerText = 'Đang lọc: ' + filterText;
+    document.getElementById('current-filter').classList.remove('hidden');
+}
+
