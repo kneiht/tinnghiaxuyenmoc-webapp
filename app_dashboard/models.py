@@ -1329,6 +1329,8 @@ class VehicleMaintenance(BaseModel):
     class Meta:
         ordering = ['-created_at']
 
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
     repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu sửa chữa", default="", null=True, blank=True)
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
@@ -1344,7 +1346,9 @@ class VehicleMaintenance(BaseModel):
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
 
-    def save(self):
+    def save(self, *args, **kwargs):
+        # if self.user changed => skip (just save the frist user)
+
         super().save()
         self.repair_code = "SC" + str(self.pk).zfill(4)
         # Get all related vehicle parts
@@ -1394,7 +1398,10 @@ class VehicleMaintenance(BaseModel):
             self.done_status = 'not_done'
         super().save()
 
-
+        # prevent recursion
+        from_payment_record = kwargs.get('from_payment_record', None)
+        if from_payment_record:
+            return
 
         # Create or update payment records
         if self.approval_status == 'approved' or True:
@@ -1483,7 +1490,7 @@ class VehicleMaintenance(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date', 'created_at']
+        fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date', 'created_at', 'user']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1638,6 +1645,7 @@ class PaymentRecord(BaseModel):
         ('dhc_company', 'Công ty DHC'),
         ('bh_company', 'Công ty BH'),
     )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
     status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_requested', verbose_name="Trạng thái thanh toán")
@@ -1668,7 +1676,7 @@ class PaymentRecord(BaseModel):
     def get_display_fields(self):
         fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 
             'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
-            'payment_date', 'money_source', 'debt', 'note', 'image1']
+            'payment_date', 'money_source', 'debt', 'note', 'image1', 'user']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1711,6 +1719,8 @@ class PaymentRecord(BaseModel):
             new_payment_record.debt = self.debt
             new_payment_record.save()
 
+        # save vehicle maintenance to update payment status
+        vehicle_maintenance.save(from_payment_record=True)
 
 
     def clean(self):
@@ -1721,8 +1731,8 @@ class PaymentRecord(BaseModel):
         if self.requested_amount==0 and self.transferred_amount > 0:
             errors += (f'- Chưa thanh toán khi chưa có đề nghị.\n')
 
-        if self.transferred_amount < self.requested_amount and self.transferred_amount > 0:
-            errors += (f'- Số tiền thanh toán phải lớn hơn hoặc bằng số tiền đề nghị {format(self.requested_amount, ",d")}.\n')
+        # if self.transferred_amount < self.requested_amount and self.transferred_amount > 0:
+        #     errors += (f'- Số tiền thanh toán phải lớn hơn hoặc bằng số tiền đề nghị {format(self.requested_amount, ",d")}.\n')
         if self.transferred_amount > self.previous_debt:
             errors += (f'- Số tiền thanh toán phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n')
         if self.payment_date < self.requested_date:

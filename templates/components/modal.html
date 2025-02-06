@@ -11,21 +11,29 @@
 
     
             {% if modal == "modal_VehicleMaintenance" %}
-                <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
-                        onclick="toggleModalEdit(this)">
-                    <i class="fas fa-eye me-3" style="font-size: 16px;"></i>
-                    Chỉ xem
-                </button>
-                <button id="btn-view" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm hidden"
-                        onclick="toggleModalEdit(this)">
-                    <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
-                    Chỉnh sửa
-                </button>   
                 {% if record %}
-                <a href="{% url 'form_maintenance_images' record.pk %}" class="absolute top-5 left-36 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
-                    up-preload="insert" up-target="#modal-sub:maybe">
-                    Xem hình ảnh
-                </a>
+                    <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                            onclick="toggleModalEdit(this)">
+                        <i class="fas fa-eye me-3" style="font-size: 16px;"></i>
+                        Chỉ xem
+                    </button>
+                    <button id="btn-view" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm hidden"
+                            onclick="toggleModalEdit(this)">
+                        <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
+                        Chỉnh sửa
+                    </button>   
+                    <a href="{% url 'form_maintenance_images' record.pk %}" class="absolute top-5 left-36 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                        up-preload="insert" up-target="#modal-sub:maybe">
+                        Xem hình ảnh
+                    </a>
+                {% else %}
+                    <script>
+                        const hideables = modal.querySelectorAll('.hidable');
+                        const autoFields = modal.querySelectorAll('.auto-field');
+                        const approveHideables = modal.querySelectorAll('.approve-hidable');
+                        hideables.forEach(el => el.classList.toggle('hidden'));
+                        autoFields.forEach(el => el.disabled = !el.disabled);
+                    </script>
                 {% endif %}
                 {% if not record or record.approval_status == "scratch" or record.approval_status == "need_update" %}
                     <script>
@@ -122,10 +130,10 @@
                 </div>  
                 {% endif %}
 
-                {% if form.fields|length >= 12 or modal == 'modal_VehicleMaintenance' %}
+                {% if form.fields|length >= 13 or modal == 'modal_VehicleMaintenance' %}
                 <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[1100px] gap-4 px-6">
                 
-                {% elif form.fields|length >= 5 and form.fields|length < 12 %}
+                {% elif form.fields|length >= 6 and form.fields|length < 13 %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 sm:w-[700px] gap-4 px-6">
 
                 {% else %}
@@ -134,12 +142,19 @@
 
                     {% if project_id and model != 'ProjectUser'  %}  
                         <input type="hidden" name="project" value="{{ project_id }}">
+                    {% endif %}
 
+                    {% if form.user.name == 'user' %} 
+                        {% if record.user %}
+                            <input type="hidden" name="user" value="{{ record.user.id }}">
+                        {% else %}
+                            <input type="hidden" name="user" value="{{ user.id }}">
+                        {% endif %}
                     {% endif %}
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
+                        {% if field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -157,6 +172,8 @@
                     {% endfor %}
 
 
+
+
                     {% if form.description.name == 'description' %}  
                     <div class="col-span-full">
                             <label for="description" class="text-theme">Mô tả</label>
@@ -172,10 +189,23 @@
                     {% endif %}
 
                     {% if record.provider %}  
-                    <div class="col-span-full flex items-center w-full flex-col justify-center bg-slate-100 dark:bg-slate-700 rounded-md p-2">
-                        <span class="text-theme font-semibold">Thông tin thanh toán: </span>
-                        <span class="text-lg text-blue-500">{{ record.provider.bank_name }} - {{ record.provider.account_holder_name }} - {{ record.provider.account_number }}</span>
+                    <div class="col-span-full flex items-center w-full flex-col justify-center bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-blue-300 dark:border-blue-500">
+                        <span class="text-lg font-bold text-green-600  uppercase tracking-wide">
+                            🔹 Thông tin thanh toán 🔹
+                        </span>
+                        <div>
+                            <span class="text-xl text-gray-900 dark:text-gray-100 font-semibold mt-2">
+                                {{ record.provider.bank_name }} - 
+                            </span>
+                            <span class="text-xl text-blue-500 dark:text-blue-400 font-semibold">
+                                {{ record.provider.account_holder_name }} - 
+                            </span>
+                            <span class="text-xl text-red-500 dark:text-red-400 font-semibold">
+                                {{ record.provider.account_number }}
+                            </span>
+                        </div>
                     </div>
+                    
                     {% endif %}
                 </div>
 
@@ -369,8 +399,10 @@
                 <div class="flex pt-4 px-6 sm:w-[600px] gap-5 items-center justify-center">
                     <div class="modal-image1 modal-image-container w-auto flex items-center justify-center">
                         {% if record.image1 %}
-                        <img src="{{ record.image1.url }}" alt="student avatar"
-                            class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
+                        <a href="{{ record.image1.url }}" target="_blank">
+                            <img src="{{ record.image1.url }}" alt="student avatar"
+                                class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
+                        </a>
                         {% else %}
                         <img src="/static/images/default/default_transaction.webp" alt="no image"
                             class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
@@ -378,8 +410,10 @@
                     </div>
                     <div class="modal-image2 modal-image-container w-auto flex items-center justify-center">
                         {% if record.image2 %}
-                        <img src="{{ record.image2.url }}" alt="student portrait"
-                            class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
+                        <a href="{{ record.image2.url }}" target="_blank">
+                            <img src="{{ record.image2.url }}" alt="student portrait"
+                                class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
+                        </a>
                         {% else %}
                         <img src="/static/images/default/default_transaction.webp" alt="no image"
                             class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">

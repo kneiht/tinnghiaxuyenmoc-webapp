@@ -501,13 +501,18 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             
                         {% if 'status' in field  %} 
-                            <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
-
+                            <span onclick="filterTable(this, '{{ record|format_display:field }}')"
+                                class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">
+                                {{ record|format_display:field }}
+                            </span>
+                
                         {% elif field == 'lock' %} 
                             {% if record|get_value:field == True  %} 
-                                <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Đã khóa</span>
+                            <span onclick="filterTable(this, 'Phiếu đã khóa')"
+                                    class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Đã khóa</span>
                             {% else %}
-                                <span class="{{ record|get_value:field }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Chưa khóa</span>
+                            <span onclick="filterTable(this, 'Phiếu chưa khóa')"
+                                    class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Chưa khóa</span>
                             {% endif %}
 
 
@@ -557,4 +562,5 @@
 </div>
 
 {% endif %}
+
 

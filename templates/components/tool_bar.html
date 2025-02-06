@@ -146,10 +146,24 @@
                                     });
                                 </script>
                         {% endif %}
+
+                        
+                        <input id="click-filter" name="all" type="hidden" class="form-input w-fit ml-5">
+                        
+                        
+                    </div>
+                    <div id="current-filter" class="form-input text-sm flex flex-nowrap items-center gap-2 hidden">
+                        <span class="text-theme" id="current-filter-text"></span>
+                        <button type="button" class=" text-red-500" id="clear-filter" 
+                            onclick="
+                                document.getElementById('current-filter-text').innerHTML='';
+                                document.getElementById('current-filter').classList.add('hidden');
+                                document.getElementById('search-button').click();">
+                            <i class="fas fa-times mt-1" style="font-size: 23px;"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-            <input name="archived" id="archived" value="false" class="hidden">
         </form>
         <!-- Right controls for view toggle and information display -->
         {% if page == 'page_each_project' %}
@@ -164,7 +178,7 @@
                 <!-- Separate 2 sections of controls -->
             </div>
             <input name="archived" id="archived" value="false" class="hidden">
-        </form>
+        </form> 
         {% endif %}
     </div>
     

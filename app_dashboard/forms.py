@@ -898,7 +898,7 @@ class VehicleBankInterestForm(forms.ModelForm):
 class VehicleMaintenanceForm(forms.ModelForm):
     class Meta:
         model = VehicleMaintenance
-        fields = ['repair_code', 'vehicle', 'maintenance_category', 'from_date', 'to_date', 'approval_status', 'note']
+        fields = ['user', 'repair_code', 'vehicle', 'maintenance_category', 'from_date', 'to_date', 'approval_status', 'note']
         labels = {
             'repair_code': 'Mã phiếu sửa chữa',
             'vehicle': 'Xe',
@@ -1258,7 +1258,7 @@ class FillingRecordForm(forms.ModelForm):
 class PaymentRecordForm(forms.ModelForm):
     class Meta:
         model = PaymentRecord
-        fields = ['vehicle_maintenance', 'provider', 'requested_amount', 
+        fields = ['user', 'vehicle_maintenance', 'provider', 'requested_amount', 
                     'requested_date', 'transferred_amount', 
                     'payment_date', 'image1', 'image2', 'money_source','lock', 'note']
         labels = {
@@ -1315,7 +1315,7 @@ class PaymentRecordForm(forms.ModelForm):
             }),
             'transferred_amount': forms.NumberInput(attrs={
                 'placeholder': 'Tiền thanh toán',
-                'class': 'form-input',
+                'class': 'form-input text-2xl',
                 'required': 'required',
             }),
             'payment_date': forms.DateInput(attrs={
@@ -1336,7 +1336,7 @@ class PaymentRecordForm(forms.ModelForm):
 
             'money_source': forms.Select(attrs={
                 'placeholder': 'Chọn nguồn tiền',
-                'class': 'form-input',
+                'class': 'form-input text-lg',
                 'required': 'required',
             }, choices=PaymentRecord.MONEY_SOURCE_CHOICES),
 
@@ -1347,7 +1347,7 @@ class PaymentRecordForm(forms.ModelForm):
                     'class': 'form-input-file',}),
 
             'note': forms.Textarea(attrs={
-                'class': 'form-input h-20',
+                'class': 'form-input h-20 text-lg',
                 'required': False,
             }),
         }
