@@ -74,8 +74,6 @@
     }
 
 
-
-
     .btn-outline {
         @apply 
             bg-transparent border border-theme dark:border-gray-600 border-opacity-50 text-theme
@@ -104,6 +102,15 @@
             disabled:opacity-100 disabled:pointer-events-none;
     }
 
+    .extra-info {
+        @apply 
+            w-full h-10 block px-3 pr-4
+            rounded-lg border border-slate-300 dark:border-slate-600
+            placeholder-gray-400 
+            focus:border-theme-600 focus:ring-1 focus:ring-theme-700 focus:outline-none
+            bg-green-100 text-green-700 font-medium text-lg
+            disabled:opacity-100 disabled:pointer-events-none;
+    }
     .form-input-file {
         @apply 
             block h-10 w-full cursor-pointer
@@ -119,10 +126,9 @@
         }
 
 
-
     .checkbox {
         @apply 
-            w-5 h-5 cursor-pointer
+            w-10 h-10 cursor-pointer
             rounded-lg border border-gray-400 text-theme-700 
             focus:border-theme-600 focus:ring-2 focus:ring-theme-700 focus:outline-none;
     }

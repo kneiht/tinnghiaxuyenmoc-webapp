@@ -1258,7 +1258,7 @@ class FillingRecordForm(forms.ModelForm):
 class PaymentRecordForm(forms.ModelForm):
     class Meta:
         model = PaymentRecord
-        fields = ['user', 'vehicle_maintenance', 'provider', 'requested_amount', 
+        fields = ['vehicle_maintenance', 'provider', 'requested_amount', 
                     'requested_date', 'transferred_amount', 
                     'payment_date', 'image1', 'image2', 'money_source','lock', 'note']
         labels = {
@@ -1304,7 +1304,7 @@ class PaymentRecordForm(forms.ModelForm):
             }),
             'requested_amount': forms.NumberInput(attrs={
                 'placeholder': 'Số tiền đề nghị',
-                'class': 'form-input',
+                'class': 'form-input text-2xl',
                 'required': 'required',
             }),
             'requested_date': forms.DateInput(attrs={
@@ -1324,14 +1324,9 @@ class PaymentRecordForm(forms.ModelForm):
                 'required': 'required',
                 'type': 'date'
             }),
-            'debt': forms.NumberInput(attrs={
-                'placeholder': 'Nợ còn lại',
-                'class': 'form-input',
-                'required': 'required',
-            }),
 
             'lock': forms.CheckboxInput(attrs={
-                'class': 'checkbox',
+                'class': 'form-input checkbox',
             }),
 
             'money_source': forms.Select(attrs={
@@ -1347,8 +1342,9 @@ class PaymentRecordForm(forms.ModelForm):
                     'class': 'form-input-file',}),
 
             'note': forms.Textarea(attrs={
-                'class': 'form-input h-20 text-lg',
+                'class': 'form-input text-lg',
                 'required': False,
+                'style': 'height: 80px;'
             }),
         }
 

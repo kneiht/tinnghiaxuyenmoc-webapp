@@ -28,13 +28,19 @@
                     </a>
                 {% else %}
                     <script>
-                        const hideables = modal.querySelectorAll('.hidable');
-                        const autoFields = modal.querySelectorAll('.auto-field');
-                        const approveHideables = modal.querySelectorAll('.approve-hidable');
-                        hideables.forEach(el => el.classList.toggle('hidden'));
-                        autoFields.forEach(el => el.disabled = !el.disabled);
+                        function toggleModalEdit() {
+                            const hideables = modal.querySelectorAll('.hidable');
+                            const autoFields = modal.querySelectorAll('.auto-field');
+                            const approveHideables = modal.querySelectorAll('.approve-hidable');
+                            hideables.forEach(el => el.classList.toggle('hidden'));
+                            autoFields.forEach(el => el.disabled = !el.disabled);
+                        }
+                        toggleModalEdit();
                     </script>
                 {% endif %}
+
+
+                
                 {% if not record or record.approval_status == "scratch" or record.approval_status == "need_update" %}
                     <script>
                     function toggleModalEdit(button) {
@@ -171,9 +177,6 @@
                         {% endif %}
                     {% endfor %}
 
-
-
-
                     {% if form.description.name == 'description' %}  
                     <div class="col-span-full">
                             <label for="description" class="text-theme">Mô tả</label>
@@ -183,7 +186,7 @@
 
                     {% if form.note.name == 'note' %}  
                     <div class="col-span-full">
-                            <label for="description" class="text-theme">Ghi chú</label>
+                            <label for="note" class="text-theme">Ghi chú</label>
                             {{ form.note }}    
                     </div>
                     {% endif %}
@@ -461,4 +464,20 @@
             </form>
         </div>
     </div>
+    {% if modal == 'modal_PaymentRecord' %}
+    <script>
+        // find label with f="requested_amount" and for="transfer"
+        document.querySelectorAll('label[for]').forEach(el => {
+            if (el.getAttribute('for') == 'requested_amount' 
+                    || el.getAttribute('for') == 'transferred_amount'
+                    || el.getAttribute('for') == 'money_source'
+                    || el.getAttribute('for') == 'note') 
+                    {
+                el.classList.remove('text-theme');
+                el.classList.add('text-green-600');
+                el.classList.add('font-bold');
+            }
+        })
+    </script>
+    {% endif %}
 </div>

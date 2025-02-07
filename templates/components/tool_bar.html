@@ -148,11 +148,8 @@
                         {% endif %}
 
                         
-                        <input id="click-filter" name="all" type="hidden" class="form-input w-fit ml-5">
-                        
-                        
                     </div>
-                    <div id="current-filter" class="form-input text-sm flex flex-nowrap items-center gap-2 hidden">
+                    <div id="current-filter" class="form-input text-sm flex flex-nowrap items-center gap-2 hidden text-nowrap">
                         <span class="text-theme" id="current-filter-text"></span>
                         <button type="button" class=" text-red-500" id="clear-filter" 
                             onclick="
@@ -162,6 +159,12 @@
                             <i class="fas fa-times mt-1" style="font-size: 23px;"></i>
                         </button>
                     </div>
+
+                    {% if model == 'PaymentRecord' %}
+                    <div id="extra-info" class="extra-info flex flex-nowrap items-center gap-2 text-nowrap"></div>
+                    <script>totalRequestedAmountDisplay();</script>
+                    {% endif %}
+
                 </div>
             </div>
         </form>

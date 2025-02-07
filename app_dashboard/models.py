@@ -1137,6 +1137,8 @@ class LiquidUnitPrice(BaseModel):
 
 
 class FillingRecord(BaseModel):
+    class Meta:
+        ordering = ['-fill_date']
     TYPE_CHOICES = [
         ('diesel', 'Dầu diesel (lít)'),
         ('gasoline', 'Xăng (lít)'),
@@ -1346,9 +1348,12 @@ class VehicleMaintenance(BaseModel):
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
 
+    part_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
+
     def save(self, *args, **kwargs):
         # if self.user changed => skip (just save the frist user)
-
+        # get al
+        print('self.user: ', self.user) 
         super().save()
         self.repair_code = "SC" + str(self.pk).zfill(4)
         # Get all related vehicle parts
@@ -1373,11 +1378,16 @@ class VehicleMaintenance(BaseModel):
         total_purchase_amount = 0
         total_transferred_amount = 0
         total_debt_amount = 0
-        for provider_payment_state in all_provider_payment_states.values():
+        self.part_providers = ""
+
+        for provider_id, provider_payment_state in all_provider_payment_states.items():
             total_purchase_amount += provider_payment_state['purchase_amount']
             total_transferred_amount += provider_payment_state['transferred_amount']
             total_debt_amount += provider_payment_state['debt_amount']
 
+            part_provider = PartProvider.objects.get(pk=provider_id)
+            self.part_providers += '- ' + part_provider.name  + '\n'
+        self.part_providers.strip()
 
         if total_purchase_amount == 0:
             self.paid_status = 'not_paid'
@@ -1490,7 +1500,7 @@ class VehicleMaintenance(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'maintenance_amount', 'from_date', 'to_date', 'created_at', 'user']
+        fields = ['repair_code', 'vehicle', 'maintenance_category', 'approval_status', 'received_status', 'paid_status', 'done_status', 'part_providers', 'maintenance_amount', 'from_date', 'to_date', 'created_at', 'user']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1701,6 +1711,7 @@ class PaymentRecord(BaseModel):
         if self.requested_amount == 0:
             self.status = 'not_requested'
 
+        self.user = self.vehicle_maintenance.user
 
         super().save(*args, **kwargs)
         self.provider.calculate_payment_states()

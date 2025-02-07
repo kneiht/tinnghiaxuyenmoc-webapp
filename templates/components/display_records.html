@@ -539,6 +539,10 @@
                                 </div>
                             {% endif %}
                         </div>
+                        {% elif field == 'part_providers' or field == 'maintenance_category' or field == 'user' %}
+                            <div class="flex flex-row gap-2 whitespace-pre-line text-nowrap">
+                                {{ record|format_display:field }}
+                            </div>
                         {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 

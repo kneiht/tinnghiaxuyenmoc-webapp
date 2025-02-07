@@ -93,7 +93,7 @@ def decide_permission(request, action, params):
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-    # print(request.POST)
+    print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -252,7 +252,7 @@ def handle_form(request, model, pk=0):
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
             vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=vehicle_maintenance)
             part_ids = request.POST.getlist('part_id')
-            print(request.POST)
+
             # check if the id is in the list, if not delete it
             for vehicle_part in vehicle_parts:
                 if str(vehicle_part.repair_part.id) not in part_ids:

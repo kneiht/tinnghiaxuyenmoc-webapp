@@ -180,6 +180,8 @@ def render_display_records(request, **kwargs):
             if 'XE CHẤM CÔNG' in unique_values:
                 unique_values.remove('XE CHẤM CÔNG')   
             unique_values = ['XE CHẤM CÔNG'] + unique_values
+            # Don't use vehicle with license plate "72"
+            unique_values = [value for value in unique_values if not value.startswith('72')]
 
         return unique_values
 
