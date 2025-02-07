@@ -150,7 +150,7 @@
                         <input type="hidden" name="project" value="{{ project_id }}">
                     {% endif %}
 
-                    {% if form.user.name == 'user' %} 
+                    {% if model != 'UserPermission' and form.user.name == 'user' %} 
                         {% if record.user %}
                             <input type="hidden" name="user" value="{{ record.user.id }}">
                         {% else %}
@@ -160,7 +160,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
+                        {% if model == 'UserPermission' and field.name == 'user'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
