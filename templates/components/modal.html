@@ -32,8 +32,8 @@
                             const hideables = modal.querySelectorAll('.hidable');
                             const autoFields = modal.querySelectorAll('.auto-field');
                             const approveHideables = modal.querySelectorAll('.approve-hidable');
-                            hideables.forEach(el => el.classList.toggle('hidden'));
-                            autoFields.forEach(el => el.disabled = !el.disabled);
+                            hideables.forEach(el => el.classList.remove('hidden'));
+                            autoFields.forEach(el => el.disabled = false);
                         }
                         toggleModalEdit();
                     </script>
