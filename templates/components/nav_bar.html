@@ -9,26 +9,25 @@
         <!-- This is the center part of the navagation bar with various icons and links. It only appears when user is in dashboard-->
             <div id="nav_menu" class="flex items-center m-auto gap-5">
 
-                <a up-preload="insert" up-cache="True" href="{% url 'page_home' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                <a up-preload="insert" up-cache="False" href="{% url 'page_home' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-home w-8" style="font-size: 18px;"></span>
                     Trang chủ
                 </a>
 
-                <a up-preload="insert" up-cache="True" href="{% url 'page_projects' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                <a up-preload="insert" up-cache="False" href="{% url 'page_projects' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-building w-8" style="font-size: 18px;"></span>
                     Dự án
                 </a>
 
-                <a up-preload="insert" up-cache="True" href="{% url 'page_general_data'  %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                <a up-preload="insert" up-cache="False" href="{% url 'page_general_data'  %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-database w-8" style="font-size: 18px;"></span>
                     Dữ liệu chung
                 </a>
 
-                <a up-preload="insert" up-cache="True" href="{% url 'page_transport_department' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
+                <a up-preload="insert" up-cache="False" href="{% url 'page_transport_department' %}" class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme">
                     <span class="fa fa-truck w-8" style="font-size: 18px;"></span>
                     Phòng vận tải
                 </a>
-
 
                 <div id="nav_menu_more" class="menu hidden relative">
                     <button class="menu-button space-y-1 p-3  items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer">

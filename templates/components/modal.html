@@ -26,14 +26,14 @@
                         up-preload="insert" up-target="#modal-sub:maybe">
                         Xem hình ảnh
                     </a>
+                    
                 {% else %}
                     <script>
                         function toggleModalEdit() {
-                            const hideables = modal.querySelectorAll('.hidable');
-                            const autoFields = modal.querySelectorAll('.auto-field');
-                            const approveHideables = modal.querySelectorAll('.approve-hidable');
-                            hideables.forEach(el => el.classList.remove('hidden'));
-                            autoFields.forEach(el => el.disabled = false);
+                            console.log("Hellosakhdfsdkfasjkl");
+                            const modal = document.getElementById('modal');
+                            modal.querySelectorAll('.hidable').forEach(el => el.classList.remove('hidden'));
+                            modal.querySelectorAll('.auto-field').forEach(el => el.disabled = false);
                         }
                         toggleModalEdit();
                     </script>
@@ -41,7 +41,7 @@
 
 
                 
-                {% if not record or record.approval_status == "scratch" or record.approval_status == "need_update" %}
+                {% if record.approval_status == "scratch" or record.approval_status == "need_update" %}
                     <script>
                     function toggleModalEdit(button) {
                         const modal = button.closest('.modal');
