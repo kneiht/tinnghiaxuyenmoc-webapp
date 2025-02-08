@@ -752,7 +752,7 @@ class VehicleDetail(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return f'{self.vehicle_name} - {self.license_plate}'
+        return f'{self.license_plate}'
     
     @classmethod
     def get_display_fields(self):
