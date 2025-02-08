@@ -1333,12 +1333,12 @@ class VehicleMaintenance(BaseModel):
 
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
-    repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu sửa chữa", default="", null=True, blank=True)
+    repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu", default="", null=True, blank=True)
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     maintenance_amount = models.IntegerField(verbose_name="Chi phí", default=0, validators=[MinValueValidator(0)])
     maintenance_category = models.CharField(max_length=255, choices=MAINTENANCE_CATEGORY_CHOICES, verbose_name="Phân loại", default="", null=True, blank=True)
-    from_date = models.DateField(verbose_name="Ngày nhận sửa chữa", default=timezone.now)
-    to_date = models.DateField(verbose_name="Ngày xong sửa chữa", default=timezone.now)
+    from_date = models.DateField(verbose_name="Ngày nhận", default=timezone.now)
+    to_date = models.DateField(verbose_name="Ngày xong", default=timezone.now)
 
     approval_status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='scratch', verbose_name="Duyệt")
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Nhận hàng")
