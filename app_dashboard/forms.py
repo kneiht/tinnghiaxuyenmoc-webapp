@@ -1396,25 +1396,23 @@ class SupplyProviderForm(forms.ModelForm):
         }
 
 
-class SupplyForm(forms.ModelForm):
+class BaseSupplyForm(forms.ModelForm):
     class Meta:
-        model = Supply
-        fields = ['supply_provider', 'supply_number', 'supply_name', 'supply_price', 'unit', 'image', 'note', 'valid_from']
+        model = BaseSupply
+        fields = ['material_type', 'supply_number', 'supply_name', 'unit', 'image', 'note']
         labels = {
-            'supply_provider': 'Nhà cung cấp',
+            'material_type': 'Nhóm vật tư',
             'supply_number': 'Mã vật tư',
             'supply_name': 'Tên đầy đủ',
-            'supply_price': 'Đơn giá',
             'unit': 'Đơn vị',
             'image': 'Hình ảnh',
-            'note': 'Mô tả',
-            'valid_from': 'Ngày áp dụng',
+            'note': 'Ghi chú',
         }
         widgets = {
-            'supply_provider': forms.Select(attrs={
+            'material_type': forms.Select(attrs={
                 'class': 'form-input',
                 'required': 'required',
-            }),
+            }, choices=BaseSupply.MATERIAL_CHOICES),
             'supply_number': forms.TextInput(attrs={
                 'placeholder': 'Mã vật tư',
                 'class': 'form-input',
@@ -1425,18 +1423,45 @@ class SupplyForm(forms.ModelForm):
                 'class': 'form-input',
                 'required': 'required',
             }),
+            'unit': forms.TextInput(attrs={
+                'placeholder': 'Đơn vị',
+                'class': 'form-input',
+                'required': False,
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-input-file',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+
+
+
+class DetailSupplyForm(forms.ModelForm):
+    class Meta:
+        model = DetailSupply
+        fields = ['supply_provider', 'base_supply', 'supply_price', 'note', 'valid_from']
+        labels = {
+            'supply_provider': 'Nhà cung cấp',
+            'base_supply': 'Vật tư',
+            'unit': 'Đơn vị',
+            'note': 'Mô tả',
+            'valid_from': 'Ngày áp dụng',
+        }
+        widgets = {
+            'supply_provider': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'base_supply': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
             'supply_price': forms.NumberInput(attrs={
                 'placeholder': 'Đơn giá',
                 'class': 'form-input',
                 'required': 'required',
-            }),
-            'unit': forms.TextInput(attrs={
-                'placeholder': 'Đơn vị',
-                'class': 'form-input',
-                'required': 'required',
-            }),
-            'image': forms.FileInput(attrs={
-                'class': 'form-input-file',
             }),
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',
@@ -1447,3 +1472,5 @@ class SupplyForm(forms.ModelForm):
                 'required': 'required',
             }),
         }
+
+

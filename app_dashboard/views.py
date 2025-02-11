@@ -26,7 +26,10 @@ from .utils import *
 from core.settings import DOMAIN
 from django.utils import timezone
 from django.urls import reverse_lazy
+import tempfile
 
+import shutil
+from openpyxl import load_workbook
 
 @login_required
 def decide_permission(request, action, params):
@@ -695,15 +698,59 @@ def handle_vehicle_operation_form(request):
 
 @login_required
 def download_excel_template(request, template_name):
-    # Get the Excel file from media/excel/Mẫu công việc trong dự án.xlsx
-    excel_file = os.path.join(settings.MEDIA_ROOT, 'excel', f'cong-viec-trong-du-an.xlsx')
+    if template_name=='jobs':
+        # Get the Excel file from media/excel/Mẫu công việc trong dự án.xlsx
+        excel_file = os.path.join(settings.MEDIA_ROOT, 'excel', f'cong-viec-trong-du-an.xlsx')
+        # Return the file
+        with open(excel_file, 'rb') as f:
+            excel_data = f.read()
+        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="cong-viec-trong-du-an.xlsx"'
 
-    # Return the file
-    with open(excel_file, 'rb') as f:
-        excel_data = f.read()
+    elif template_name=='cost_estimation_table':
+        original_excel_path = os.path.join(settings.MEDIA_ROOT, 'excel', f'mau-bang-du-toan.xlsx')
 
-    response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="cong-viec-trong-du-an.xlsx"'
+        # Create a temporary copy of the file to avoid race conditions
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_file:
+            temp_excel_path = temp_file.name
+            shutil.copy(original_excel_path, temp_excel_path)  # Copy original file
+
+        # Load the copied file (not the original) to preserve formatting
+        wb = load_workbook(temp_excel_path)
+
+        # Modify or create the "data" sheet
+        if "data" in wb.sheetnames:
+            sheet = wb["data"]
+            sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
+        else:
+            sheet = wb.create_sheet("data")
+
+        # Get all data from BasicSupply
+        records = BaseSupply.objects.all()
+        # convert to data
+        data = []
+        for record in records:
+            data.append([record.supply_number + ' - ' + record.supply_name, record.unit, '#' + record.supply_number, record.material_type])
+
+
+        # Append new data to the "data" sheet
+        for row in data:
+            sheet.append(row)
+
+        # Save modifications to the temporary file
+        wb.save(temp_excel_path)
+
+        # Open the modified file and return it as a response
+        with open(temp_excel_path, "rb") as f:
+            response = HttpResponse(
+                f.read(),
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            response["Content-Disposition"] = 'attachment; filename="mau-bang-du-toan.xlsx"'
+
+        # Cleanup: Delete the temporary file after sending the response
+        os.remove(temp_excel_path)
+
     return response
 
 
@@ -1142,13 +1189,95 @@ def form_repair_parts(request):
     context = {'repair_parts': repair_parts}
     return render(request, 'components/modal_repair_parts.html', context)
 
-def form_cost_estimation_table(request):
-    # Get the list of repair parts
-    supplies = Supply.objects.all()
-    context = {'supplies': supplies}
-    return render(request, 'components/modal_cost_estimation_table.html', context)
+def form_cost_estimation_table(request, project_id):
+    def render_modal(project_id, message=None, message_type='green'):
+        # Get fields to be displayed by using record meta
+        # If there is get_display_fields method, use that method
+        fields = []
+        headers = []
+        if hasattr(CostEstimation, 'get_display_fields'):
+            
+            for field in CostEstimation.get_display_fields():
+                fields.append(field)
+                headers.append(CostEstimation._meta.get_field(field).verbose_name)
 
+        # Get the list of repair parts
+        records = CostEstimation.objects.filter(project=project_id)
+        context = {'records': records,
+                'fields': fields,
+                'headers': headers,
+                'project_id': project_id,
+                'message': message,
+                'message_type': message_type}
+        return render(request, 'components/modal_cost_estimation_table.html', context)
 
+    if request.method == 'GET':
+        return render_modal(project_id)
+
+    if request.method == 'POST':
+        excel_file = request.FILES.get('file')
+        project = Project.objects.filter(pk=project_id).first()
+
+        if not excel_file:
+            html_message = render_message(request, message='Vui lý nhập file Excel', message_type='red')
+            return HttpResponse(html_message)
+        if not project:
+            html_message = render_message(request, message='Dự án này không tồn tại', message_type='red')
+            return HttpResponse(html_message)
+
+        # Read the data from the Excel file then save as job record
+        df = pd.read_excel(excel_file, header=1)
+
+        cost_estimation_list = []
+        supply_number_list = []
+        # Loop over each row in the Excel file
+        for index, row in df.iterrows():
+            if row['STT']=="":
+                continue
+            cost_estimation = CostEstimation()
+            cost_estimation.project = project
+
+            # Make sure "STT", "Khối lượng", "Mã vật tư", "Ghi chú" are in the row
+            if not all(field in row for field in ['STT', 'Khối lượng', 'Mã vật tư', 'Ghi chú']):
+                return render_modal(project_id, message='File excel không đúng mẫu, vui lòng kiểm tra lại', message_type='red')
+
+            # check quantity
+            try:
+                int(row['Khối lượng'])
+                cost_estimation.quantity = row['Khối lượng']
+                print(cost_estimation.quantity)
+            except:
+                return render_modal(project_id, message='Vui lòng kiểm tra lại cột khối lượng, tất cả phải là số', message_type='red')
+
+            # check note
+            cost_estimation.note = row['Ghi chú'] if row['Ghi chú'] else ""
+
+            # because there is a "#" at the beginning of the string to make sure the string is not number
+            # so we need to remove it, also check if supply number is duplicate
+            supply_number = row['Mã vật tư'][1:]
+            if supply_number in supply_number_list:
+                return render_modal(project_id, message='Mã vật tư "' + str(supply_number) + '" bị trùng lập', message_type='red')    
+            supply_number_list.append(supply_number)
+
+            # check base_supply
+            base_supply = BaseSupply.objects.filter(supply_number=supply_number).first()
+            if base_supply:
+                cost_estimation.base_supply = base_supply
+            else:
+                return render_modal(project_id, message='Không tìm thấy mã vật tư: ' + str(supply_number), message_type='red')
+            
+            # if every field is valid, append to the list
+            cost_estimation_list.append(cost_estimation)
+
+        # delete old records
+        CostEstimation.objects.filter(project=project).delete()
+
+        # Save the records
+        for cost_estimation in cost_estimation_list:
+            cost_estimation.save() 
+
+        return render_modal(project_id, message='Cập nhật thành công', message_type='green')
+        
 
 def form_maintenance_images(request, maintenance_id):
     # If Get
@@ -1180,7 +1309,7 @@ def form_maintenance_images(request, maintenance_id):
             return JsonResponse({'success': True, 'images': images})
         except:
             return JsonResponse({'success': False}) 
-        
+            
 def form_maintenance_payment_request(request):
     # If Get
     if request.method == 'GET':
@@ -1306,7 +1435,8 @@ def page_projects(request, sub_page=None):
     display_name_dict = {
         'Project': 'Dự án',
         'SupplyProvider': 'Nhà cung cấp vật tư',
-        'Supply': 'Dữ liệu vật tư',
+        'BaseSupply': 'Vật tư',
+        'DetailSupply': 'Vật tư chi tiết',
     }
     context = {
         'sub_page': sub_page,

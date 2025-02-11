@@ -46,13 +46,17 @@ urlpatterns = [
     path('api/form_repair_parts', views.form_repair_parts, name='form_repair_parts'),
     path('api/form_maintenance_images/<int:maintenance_id>/', views.form_maintenance_images, name='form_maintenance_images'),
     path('api/form_maintenance_payment_request', views.form_maintenance_payment_request, name='form_maintenance_payment_request'),
-    path('api/form_cost_estimation_table', views.form_cost_estimation_table, name='form_cost_estimation_table'),
+    
+    
+    path('api/form_cost_estimation_table/<int:project_id>/', views.form_cost_estimation_table, name='form_cost_estimation_table'),
 
 
     path('test', views.test, name='test'),
 
 
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),
+
+    
     path('api/upload-project/<int:project_id>/', views.upload_project, name='upload_project'),
     
 

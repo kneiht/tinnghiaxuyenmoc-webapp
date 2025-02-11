@@ -707,3 +707,76 @@ up.compiler('#display-table-records', function (table) {
         totalRequestedAmountDisplay();
     }
 })
+
+
+
+function calculatePLTotals() {
+    const table = document.getElementById('display-table-records');
+    if (!table) return false;
+    const headerRow = table.querySelector('thead tr');
+    const revenueColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Doanh thu");
+    const revenueIndex = revenueColumn ? Array.from(headerRow.children).indexOf(revenueColumn) : -1;
+    const interestColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Lợi nhuận");
+    const interestIndex = 13;
+
+    if (revenueIndex == -1 && interestIndex == -1) {
+        return false;
+    }
+
+
+    // Get all rows in <tbody>
+    const rows = table.querySelectorAll('tbody tr');
+    // Calculate sum of the values in that column
+    let totalRevenue = 0;
+    let totalInterest = 0;
+
+
+    const calculateTotal = (index) => {
+        return (total, row) => {
+            const cell = row.children[index];
+            if (cell) {
+                const value = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, '')); // Remove non-numeric characters
+                if (!isNaN(value)) {
+                    return total + value;
+                }
+            }
+            return total;
+        }
+    };
+
+    const calcRevenue = calculateTotal(revenueIndex);
+    const calcInterest = calculateTotal(interestIndex);
+
+    rows.forEach(row => {
+        totalRevenue = calcRevenue(totalRevenue, row);
+        totalInterest = calcInterest(totalInterest, row);
+    });
+    
+    // humanize sum
+    totalRevenue = formatNumber(totalRevenue);
+    totalInterest = formatNumber(totalInterest);
+    // Display the sum in this innerText
+    const totalRevenueElement = document.getElementById('total-revenue')
+    const totalCostElement = document.getElementById('total-cost')
+    const totalInterestElement = document.getElementById('total-interest')
+    totalRevenueElement.innerHTML = `Tổng doanh thu: ${totalRevenue} VNĐ`;
+    totalInterestElement.innerHTML = `Tổng lợi nhuận: ${totalInterest} VNĐ`;
+};
+
+
+up.compiler('#display-table-records', function (table) {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('ConstructionReportPL')) {
+        console.log('ConstructionReportPL');
+        // Checek if the table contennt changes => call calculatePLTotals
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    calculatePLTotals();
+                }
+            }
+        });
+        observer.observe(table, { childList: true, subtree: true });
+    }
+
+})
