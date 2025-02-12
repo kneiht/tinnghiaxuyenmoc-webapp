@@ -643,12 +643,16 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
 
                 # Đơn giá gần nhất
                 revenue_base = vehicle_revenue_inputs_record.revenue_day_price
-                revenue += (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*total_working_hours
+                date_revenue = (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*working_time_hours
+                revenue += date_revenue
+                # print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
+                # print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
+                # print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
 
             # calculate fuel cost
             filling_records = FillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
-            print(">>>>>>>>>>>>>>>>>", "From date:", min_start_date, "to date:", max_end_date, "vehicle:", vehicle_instance)
-            print(">>>>>>>>>>>>>>>>>> filling_records:", filling_records)
+            # print(">>>>>>>>>>>>>>>>>", "From date:", min_start_date, "to date:", max_end_date, "vehicle:", vehicle_instance)
+            # print(">>>>>>>>>>>>>>>>>> filling_records:", filling_records)
             if filling_records:
                 filling_cost_amount = filling_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
 
@@ -707,7 +711,6 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
                 total_interest = format_money(total_revenue - total_cost)
             else:
                 total_interest = total_revenue
-
 
             rows.append({
                 "STT": len(rows) + 1,
