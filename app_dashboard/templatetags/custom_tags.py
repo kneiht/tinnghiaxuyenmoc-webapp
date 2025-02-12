@@ -588,6 +588,14 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
             unique_gps_vehicles.append(record.vehicle)
     # Sort
     unique_gps_vehicles.sort()
+    # if there is "XE CHẤM CÔNG" in unique_values, remove it, and add it to the bottom
+    if 'XE CHẤM CÔNG' in unique_gps_vehicles:
+        unique_gps_vehicles.remove('XE CHẤM CÔNG')   
+        unique_gps_vehicles = unique_gps_vehicles + ['XE CHẤM CÔNG']
+    # Don't use vehicle with license plate "72"
+    unique_gps_vehicles = [value for value in unique_gps_vehicles if not value.startswith('72')]
+
+
     rows = []
 
     # Use vehicle_operation_records to get 2 capped dates
@@ -630,24 +638,24 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
                 total_working_hours += working_time_hours
                 
 
-                vehicle_revenue_inputs_record = VehicleRevenueInputs.get_valid_record(vehicle_instance.vehicle_type, start_date)
-                if not vehicle_revenue_inputs_record:
+                date_vehicle_revenue_inputs_record = VehicleRevenueInputs.get_valid_record(vehicle_instance.vehicle_type, start_date)
+                if not date_vehicle_revenue_inputs_record:
                     revenue = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
                     revenue_base = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
                     break
 
-                if vehicle_revenue_inputs_record.number_of_hours== 0:
+                if date_vehicle_revenue_inputs_record.number_of_hours== 0:
                     revenue = "Dữ liệu số giờ tính doanh thu 1 ngày không được bằng 0"
                     revenue_base = "Dữ liệu số giờ tính doanh thu 1 ngày không được bằng 0"
                     break
 
                 # Đơn giá gần nhất
-                revenue_base = vehicle_revenue_inputs_record.revenue_day_price
-                date_revenue = (vehicle_revenue_inputs_record.revenue_day_price/vehicle_revenue_inputs_record.number_of_hours)*working_time_hours
+                revenue_base = date_vehicle_revenue_inputs_record.revenue_day_price
+                date_revenue = (date_vehicle_revenue_inputs_record.revenue_day_price/date_vehicle_revenue_inputs_record.number_of_hours)*working_time_hours
                 revenue += date_revenue
-                # print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
-                # print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
-                # print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
+                print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
+                print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
+                print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
 
             # calculate fuel cost
             filling_records = FillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)

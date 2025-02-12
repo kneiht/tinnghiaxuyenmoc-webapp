@@ -778,7 +778,7 @@ class VehicleRevenueInputs(BaseModel):
     @classmethod
     def get_valid_record(self, vehicle_type, date):
         date = get_valid_date(date)
-        return VehicleRevenueInputs.objects.filter(valid_from__lte=date).order_by('-valid_from').first()
+        return VehicleRevenueInputs.objects.filter(vehicle_type=vehicle_type, valid_from__lte=date).order_by('-valid_from').first()
 
 
 class DriverSalaryInputs(BaseModel):
