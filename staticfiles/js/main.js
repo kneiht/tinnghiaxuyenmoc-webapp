@@ -751,19 +751,19 @@ function calculatePLTotals() {
         totalRevenue = calcRevenue(totalRevenue, row);
         totalInterest = calcInterest(totalInterest, row);
     });
-    if (totalInterest < 0) {
-        totalInterestElement.classList.add('text-red-700');
-        totalInterestElement.classList.add('bg-red-100');
-    }
-    // humanize sum
-    totalRevenue = formatNumber(totalRevenue);
-    totalInterest = formatNumber(totalInterest);
+
+
     // Display the sum in this innerText
     const totalRevenueElement = document.getElementById('total-revenue')
     const totalCostElement = document.getElementById('total-cost')
     const totalInterestElement = document.getElementById('total-interest')
-    totalRevenueElement.innerHTML = `Tổng doanh thu: ${totalRevenue} VNĐ`;
-    totalInterestElement.innerHTML = `Tổng lợi nhuận: ${totalInterest} VNĐ`;
+
+    if (totalInterest < 0) {
+        totalInterestElement.classList.add('text-red-700');
+        totalInterestElement.classList.add('bg-red-100');
+    }
+    totalRevenueElement.innerHTML = `Tổng doanh thu: ${formatNumber(totalRevenue)} VNĐ`;
+    totalInterestElement.innerHTML = `Tổng lợi nhuận: ${formatNumber(totalInterest)} VNĐ`;
 
 };
 
