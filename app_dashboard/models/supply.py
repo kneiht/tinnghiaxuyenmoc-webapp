@@ -69,18 +69,26 @@ class BaseSupply(BaseModel):
                 fields.remove(field)
         return fields
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        DetailSupply.objects.filter(base_supply=self).update(
+            material_type=self.material_type,
+            supply_number=self.supply_number,
+            supply_name=self.supply_name,
+            unit=self.unit,
+            image=self.image
+        )
+        CostEstimation.objects.filter(base_supply=self).update(
+            material_type=self.material_type,
+            supply_number=self.supply_number,
+            supply_name=self.supply_name,
+            unit=self.unit
+        )
+    
+
  
 
 class DetailSupply(BaseModel):
-    MATERIAL_CHOICES = (
-        ('Vật tư thông thường', 'Vật tư thông thường'),
-        ('Vật tư sắt thép', 'Vật tư sắt thép'),
-        ('Vật tư cát, đá, xi măng', 'Vật tư cát, đá, xi măng'),
-        ('Vật tư bê tông', 'Vật tư bê tông'),
-        ('Vật tư nhựa', 'Vật tư nhựa'),
-        ('Vật tư biển báo, cọc tiêu, cơ khí', 'Vật tư biển báo, cọc tiêu, cơ khí'),
-    )
-
     class Meta:
         ordering = ['supply_provider', 'material_type', 'supply_number']
     supply_provider = models.ForeignKey(SupplyProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
@@ -112,6 +120,15 @@ class DetailSupply(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+    
+    def save(self, *args, **kwargs):
+        if self.base_supply:
+            self.material_type = self.base_supply.material_type
+            self.supply_number = self.base_supply.supply_number
+            self.supply_name = self.base_supply.supply_name
+            self.unit = self.base_supply.unit
+            self.image = self.base_supply.image
+        super().save()
 
 
 class CostEstimation(BaseModel):
@@ -142,3 +159,10 @@ class CostEstimation(BaseModel):
                 fields.remove(field)
         return fields
     
+    def save(self, *args, **kwargs):
+        if self.base_supply:
+            self.material_type = self.base_supply.material_type
+            self.supply_number = self.base_supply.supply_number
+            self.supply_name = self.base_supply.supply_name
+            self.unit = self.base_supply.unit
+        super().save()

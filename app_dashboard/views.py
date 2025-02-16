@@ -1437,6 +1437,9 @@ def page_projects(request, sub_page=None):
         'SupplyProvider': 'Nhà cung cấp vật tư',
         'BaseSupply': 'Vật tư',
         'DetailSupply': 'Vật tư chi tiết',
+        'Subcontractor': 'Tổ đội/ nhà thầu phụ',
+        'BaseSubJob': 'Công việc của tổ đội/ nhà thầu phụ',
+        'DetailSubJob': 'Công việc chi tiết của tổ đội/ nhà thầu phụ',
     }
     context = {
         'sub_page': sub_page,

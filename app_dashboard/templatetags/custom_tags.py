@@ -574,18 +574,24 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
         seconds = time_seconds % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
     
-    # only keep records which has driver
-    vehicle_operation_records = vehicle_operation_records.filter(driver__isnull=False)
+    # # only keep records which has driver
+    # Quyết định hiển thị toàn bộ xe không lọc tài xế nữa
+    # vehicle_operation_records = vehicle_operation_records.filter(driver__isnull=False)
     if not vehicle_operation_records:
         return {"success": "false",
-                "message": "Không tìm thấy dữ liệu nào có gắn tên tài xế",
+                "message": "Không tìm thấy dữ liệu trong khoảng thời gian đã chọn",
                 }
 
-    # Get list of unique driver + vehicle together
+    
+
+    
+    # Get list of unique vehicle together
     unique_gps_vehicles = []
     for record in vehicle_operation_records:
         if record.vehicle not in unique_gps_vehicles:
             unique_gps_vehicles.append(record.vehicle)
+
+
     # Sort
     unique_gps_vehicles.sort()
     # if there is "XE CHẤM CÔNG" in unique_values, remove it, and add it to the bottom
@@ -605,6 +611,7 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
     if update:
         for gps_name in unique_gps_vehicles:
             vehicle_records = vehicle_operation_records.filter(vehicle=gps_name)
+            vehicle_records_with_driver = vehicle_records.filter(driver__isnull=False)
             # get unique start_date
             unique_start_dates = vehicle_records.values_list('start_time', flat=True).distinct()
             unique_start_dates = list(unique_start_dates)
@@ -631,13 +638,15 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
             
             # Because the revenue is different for each day, so we need to calculate revenue for each day
             for start_date in unique_start_dates:
-                vehicle_records_for_date = vehicle_records.filter(start_time__date=start_date)
+                # check vehicle records for calculating time must have driver
+                vehicle_records_with_driver_for_date = vehicle_records_with_driver.filter(start_time__date=start_date)
                 # calculate total time which has driver
-                working_time_seconds = vehicle_records_for_date.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+                working_time_seconds = vehicle_records_with_driver_for_date.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+                if working_time_seconds == None:
+                    working_time_seconds = 0
                 working_time_hours = working_time_seconds/3600
                 total_working_hours += working_time_hours
                 
-
                 date_vehicle_revenue_inputs_record = VehicleRevenueInputs.get_valid_record(vehicle_instance.vehicle_type, start_date)
                 if not date_vehicle_revenue_inputs_record:
                     revenue = "Không có dữ liệu tính doanh thu ngày  " + start_date.strftime("%d/%m/%Y")
@@ -653,9 +662,9 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
                 revenue_base = date_vehicle_revenue_inputs_record.revenue_day_price
                 date_revenue = (date_vehicle_revenue_inputs_record.revenue_day_price/date_vehicle_revenue_inputs_record.number_of_hours)*working_time_hours
                 revenue += date_revenue
-                print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
-                print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
-                print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
+                # print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
+                # print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
+                # print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
 
             # calculate fuel cost
             filling_records = FillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
@@ -684,15 +693,19 @@ def calculate_revenue_report(vehicle_operation_records, select_start_date, selec
             total_cost = filling_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
             monthly_salary_display = ""
             hourly_salary_display = ""
-            # salary
-            salary_data = calculate_driver_salary(vehicle_records, None)
+            
             # List driver
             drivers = []
-            for record in vehicle_records:
+            for record in vehicle_records_with_driver:
                 if record.driver not in drivers:
                     drivers.append(record.driver)
+            if len(drivers) == 0:
+                monthly_salary_display = "Không có tài xế"
+                hourly_salary_display = "Không có tài xế"
 
             for driver in drivers:
+                vehicle_records_per_driver = vehicle_records_with_driver.filter(driver=driver)
+                salary_data = calculate_driver_salary(vehicle_records_per_driver, None)
                 if salary_data['success'] == 'false':
                     monthly_salary = salary_data['message']
                     hourly_salary = salary_data['message']

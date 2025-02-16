@@ -92,7 +92,13 @@ class UserPermission(BaseModel):
 
         ('Project', 'Dự án'),
         ('SupplyProvider', 'Nhà cung cấp vật tư'),
-        ('Supply', 'Dữ liệu vật tư'),
+        ('BaseSupply', 'Dữ liệu vật tư'),
+        ('DetailSupply', 'Dữ liệu vật tư chi tiết'),
+
+        ('Subcontractor', 'Tổ đội/ nhà thầu phụ'),
+        ('BaseSubJob', 'Công việc của tổ đội/ nhà thầu phụ'),
+        ('DetailSubJob', 'Công việc chi tiết của tổ đội/ nhà thầu phụ'),
+
 
         ('VehicleType', 'DL loại xe'),
         ('VehicleRevenueInputs', 'DL tính DT theo loại xe'),
@@ -118,6 +124,7 @@ class UserPermission(BaseModel):
         ('VehicleOperationRecord', 'DL HĐ xe công trình / ngày'),
         ('ConstructionDriverSalary', 'Bảng lương'),
         ('ConstructionReportPL', 'Bảng BC P&L xe cơ giới'),
+
     )
 
     class Meta:
