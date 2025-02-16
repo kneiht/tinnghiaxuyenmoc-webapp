@@ -194,6 +194,10 @@ def render_display_records(request, **kwargs):
     start_date = get_valid_date(params.get('start_date', ''))
     end_date = get_valid_date(params.get('end_date', start_date))
     search_phrase = request.GET.get('all', '')
+    filter_vehicle = params.get('filter_vehicle', None)
+    if filter_vehicle == "None":
+        filter_vehicle = None
+
 
     check_month = params.get('check_month', '')
     if check_month != '':
@@ -226,9 +230,6 @@ def render_display_records(request, **kwargs):
             records = model_class.objects.filter(project=project)
         
         if tab == 'vehicle_revenue' and update=='true':
-            filter_vehicle = params.get('filter_vehicle', None)
-            if filter_vehicle == "None":
-                filter_vehicle = None
             records = records.filter(vehicle=filter_vehicle)
 
         records = filter_records(request, records, model_class, start_date=start_date, end_date=end_date, check_date=check_date, check_month=check_month)
@@ -338,7 +339,8 @@ def render_display_records(request, **kwargs):
                'check_month': check_month,    
                'tab': tab,
                'next': next,
-               'search_phrase': search_phrase
+               'search_phrase': search_phrase,
+               'vehicle': filter_vehicle
     }
 
     html = render_to_string(template, context, request)

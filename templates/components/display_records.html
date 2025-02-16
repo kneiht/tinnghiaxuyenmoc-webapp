@@ -456,7 +456,7 @@
                 </div>
             {% endfor %}
         {% else %}
-            {% calculate_revenue_report records select_start_date=start_date select_end_date=end_date update=update %}
+            {% calculate_revenue_report records vehicle=vehicle select_start_date=start_date select_end_date=end_date update=update %}
             
         {% endif %}
     </div>
