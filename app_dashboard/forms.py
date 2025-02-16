@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 
 
 from django.db.models import Exists, OuterRef
-from .models import *
+from .models.models import *
 from django.core.exceptions import ValidationError
 
 
@@ -382,7 +382,7 @@ class StaffDataForm(forms.ModelForm):
 
 
 from django import forms
-from .models import DriverSalaryInputs
+from .models.models import DriverSalaryInputs
 
 class DriverSalaryInputsForm(forms.ModelForm):
     class Meta:

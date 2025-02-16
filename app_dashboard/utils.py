@@ -6,7 +6,7 @@ from django.db.models import Q, Sum
 from django.utils import timezone
 
 from .forms import *
-from .models import *
+from .models.models import *
 
 # AUTHENTICATION =============================================================
 def is_admin(user):

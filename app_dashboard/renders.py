@@ -11,7 +11,7 @@ from django.views import View
 
 from django.contrib.auth.models import User
 from .forms import *
-from .models import *
+from .models.models import *
 from .utils import *
 
 

@@ -1,7 +1,7 @@
 from django import template
 from django.urls import reverse
 
-from app_dashboard.models import Thumbnail
+from app_dashboard.models.models import Thumbnail
 
 register = template.Library()
 from datetime import date, time, datetime

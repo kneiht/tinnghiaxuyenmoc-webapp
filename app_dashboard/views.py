@@ -18,7 +18,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
 from .forms import *
-from .models import *
+from .models.models import *
 
 from .renders import *
 from .utils import *

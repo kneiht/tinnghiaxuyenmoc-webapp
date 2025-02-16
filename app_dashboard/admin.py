@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import *
+from .models.models import *
 
 
 @admin.register(UserExtra)
@@ -164,17 +164,6 @@ class VehicleOperationRecordAdmin(admin.ModelAdmin):
     ordering = ['-start_time']
 
 
-
-from django.contrib import admin
-from .models import (
-    FuelFillingRecord,
-    LubeFillingRecord,
-    VehicleDepreciation,
-    VehicleBankInterest,
-    VehicleMaintenance,
-    RepairPart,
-    VehicleMaintenanceRepairPart,
-)
 
 # Register your models here.
 
