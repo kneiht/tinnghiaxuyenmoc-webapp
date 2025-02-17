@@ -146,15 +146,21 @@ class JobPlanForm(forms.ModelForm):
 class VehicleTypeForm(forms.ModelForm):
     class Meta:
         model = VehicleType
-        fields = ['vehicle_type', 'note']
+        fields = ['vehicle_type', 'allowed_to_display_in_revenue_table', 'note']
         labels = {
             'vehicle_type': 'Loại xe',
+            'allowed_to_display_in_revenue_table': 'Cho phép hiển thị trong bảng P&L',
             'note': 'Ghi chú',
         }
         widgets = {
             'vehicle_type': forms.TextInput(attrs={
                     'placeholder': 'Loại xe (điền chi tiết như "Xe ben 15 tấn")',
                     'class': 'form-input'}),
+            'allowed_to_display_in_revenue_table': forms.Select(attrs={
+                    'class': 'form-input',
+                    'required': 'required',
+
+            }),
             'note': forms.Textarea(attrs={
                     'class': 'form-input',
                     'rows': 2}),

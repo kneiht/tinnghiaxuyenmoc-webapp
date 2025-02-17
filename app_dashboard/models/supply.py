@@ -137,7 +137,12 @@ class CostEstimation(BaseModel):
         unique_together = ('project', 'base_supply')  # Enforces uniqueness
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
+
+    # Danh mục công việc
+    category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Nhóm công việc")
+
     base_supply = models.ForeignKey(BaseSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
+
 
     # From BaseSupply
     material_type = models.CharField(max_length=50, verbose_name="Nhóm vật tư")
@@ -152,7 +157,7 @@ class CostEstimation(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['material_type', 'supply_number', 'supply_name', 'unit', 'quantity', 'note']
+        fields = ['category', 'material_type', 'supply_number', 'supply_name', 'unit', 'quantity', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

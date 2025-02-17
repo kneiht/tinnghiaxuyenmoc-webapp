@@ -620,6 +620,16 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             working_time_seconds = vehicle_records_with_driver_for_date.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
             if working_time_seconds == None:
                 working_time_seconds = 0
+            # Calculate for the case when adding data munally
+            # if working_time_seconds == 0:
+            #     normal_working_time_seconds = vehicle_records_with_driver_for_date.aggregate(models.Sum('normal_working_time'))['normal_working_time__sum']
+            #     overtime_seconds = vehicle_records_with_driver_for_date.aggregate(models.Sum('overtime'))['overtime__sum']
+            #     if normal_working_time_seconds == None:
+            #         normal_working_time_seconds = 0
+            #     if overtime_seconds == None:
+            #         overtime_seconds = 0
+            #     working_time_seconds = normal_working_time_seconds + overtime_seconds
+
             working_time_hours = working_time_seconds/3600
             total_working_hours += working_time_hours
             
@@ -675,6 +685,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         for record in vehicle_records_with_driver:
             if record.driver not in drivers:
                 drivers.append(record.driver)
+        print(">>>>>>>>>>>>>>>>>> drivers:", drivers)
         if len(drivers) == 0:
             monthly_salary_display = "Không có tài xế"
             hourly_salary_display = "Không có tài xế"
@@ -739,7 +750,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
 
         # Get list of unique vehicle together
         unique_gps_vehicles = []
-        vehicles = VehicleDetail.objects.all()
+        vehicles = VehicleDetail.objects.filter(vehicle_type__allowed_to_display_in_revenue_table='Cho phép')
         for vehicle in vehicles:
             if vehicle.gps_name not in unique_gps_vehicles:
                 unique_gps_vehicles.append(vehicle.gps_name)

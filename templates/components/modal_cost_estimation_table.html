@@ -37,7 +37,7 @@
 
 
                                 <!-- download_backup.html -->
-                                <a href="{% url 'download_excel_template' 'cost_estimation_table' %}"
+                                <a href="{% url 'download_excel_template' 'cost_estimation_table' %}?project_id={{ project_id }}"
                                     class="whitespace-nowrap">
                                     {% csrf_token %}
                                     <button class="btn btn-primary nowrap" type="submit">
@@ -81,7 +81,6 @@
                                             <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
                                             {% endfor %}
 
-                                            <th></th>
                                         </tr>
                                         {% endif %}
 

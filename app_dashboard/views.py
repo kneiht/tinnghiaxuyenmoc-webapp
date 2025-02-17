@@ -719,22 +719,46 @@ def download_excel_template(request, template_name):
         wb = load_workbook(temp_excel_path)
 
         # Modify or create the "data" sheet
-        if "data" in wb.sheetnames:
-            sheet = wb["data"]
+        if "Vật tư" in wb.sheetnames:
+            sheet = wb["Vật tư"]
             sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
         else:
-            sheet = wb.create_sheet("data")
+            sheet = wb.create_sheet("Vật tư")
 
         # Get all data from BasicSupply
         records = BaseSupply.objects.all()
         # convert to data
-        data = []
+        supplies = []
         for record in records:
-            data.append([record.supply_number + ' - ' + record.supply_name, record.unit, '#' + record.supply_number, record.material_type])
-
+            supplies.append([record.supply_number + ' - ' + record.supply_name, record.unit, '#' + record.supply_number, record.material_type])
 
         # Append new data to the "data" sheet
-        for row in data:
+        for row in supplies:
+            sheet.append(row)
+
+        # GET JOB CATEGORIES
+        # Modify or create the "Nhóm công việc" sheet
+        if "Nhóm công việc" in wb.sheetnames:
+            sheet = wb["Nhóm công việc"]
+            sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
+        else:
+            sheet = wb.create_sheet("Nhóm công việc")
+
+        # lấy project id từ query 
+        project_id = request.GET.get('project_id')
+        if not project_id:
+            html_message = render_message(request, message='Thiếu mã dự án', message_type='red')
+            return HttpResponse(html_message)
+
+        # Get category_list from Job
+        jobs = Job.objects.filter(project=project_id)
+        category_list = []
+        for job in jobs:
+            if job.category not in category_list:
+                category_list.append([job.category])
+
+        # Append new data to the "data" sheet
+        for row in category_list:
             sheet.append(row)
 
         # Save modifications to the temporary file
@@ -1230,6 +1254,7 @@ def form_cost_estimation_table(request, project_id):
 
         cost_estimation_list = []
         supply_number_list = []
+        category_list = []
         # Loop over each row in the Excel file
         for index, row in df.iterrows():
             if row['STT']=="":
@@ -1265,7 +1290,16 @@ def form_cost_estimation_table(request, project_id):
                 cost_estimation.base_supply = base_supply
             else:
                 return render_modal(project_id, message='Không tìm thấy mã vật tư: ' + str(supply_number), message_type='red')
-            
+
+            # Xử lý nhóm công việc
+            category = row['Nhóm công việc']
+            # check category
+            job = Job.objects.filter(category=category).first()
+            if job:
+                cost_estimation.category = category
+            else:
+                return render_modal(project_id, message='Không tìm thấy nhóm công việc: ' + str(category) + '\nVui lòng kiểm tra lại danh sách công việc trong dự án.', message_type='red')
+
             # if every field is valid, append to the list
             cost_estimation_list.append(cost_estimation)
 

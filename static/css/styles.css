@@ -1620,6 +1620,10 @@ select {
   position: relative;
 }
 
+.sticky {
+  position: sticky;
+}
+
 .inset-0 {
   inset: 0px;
 }
@@ -1666,6 +1670,10 @@ select {
 
 .top-5 {
   top: 1.25rem;
+}
+
+.top-0 {
+  top: 0px;
 }
 
 .z-10 {
@@ -1930,6 +1938,14 @@ select {
 
 .max-h-64 {
   max-height: 16rem;
+}
+
+.max-h-\[600px\] {
+  max-height: 600px;
+}
+
+.max-h-\[3000px\] {
+  max-height: 3000px;
 }
 
 .min-h-full {

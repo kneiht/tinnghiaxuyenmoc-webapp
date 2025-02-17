@@ -175,9 +175,14 @@ class TaskUser(BaseModel):
 
 
 class VehicleType(BaseModel):
+    ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES = (
+        ('Cho phép', 'Cho phép'),
+        ('Không cho phép', 'Không cho phép'),
+    )
     class Meta:
         ordering = ['vehicle_type']
     vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", unique=True)
+    allowed_to_display_in_revenue_table = models.CharField( max_length=20, choices=ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES , default="Cho phép", verbose_name="Cho phép hiển thị trong bảng P&L")
     note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
@@ -185,7 +190,7 @@ class VehicleType(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ['vehicle_type', 'note']
+        fields = ['vehicle_type', 'allowed_to_display_in_revenue_table', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

@@ -491,9 +491,10 @@
 
                     <th></th>
             </tr>
+        </thead>
         {% endif %}
 
-        </thead>
+        
         {% for record in records %}
             <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
                 <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
