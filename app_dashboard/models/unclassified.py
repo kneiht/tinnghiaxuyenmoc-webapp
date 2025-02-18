@@ -635,8 +635,28 @@ class VehicleOperationRecord(BaseModel):
         print(">>> [DELETE] VehicleOperationRecord: ", self.pk, self.vehicle, self.start_time)
         # Save to a file
         with open('deleted_vehicle_operations.txt', 'a') as f:
-            f.write(f"VehicleOperationRecord: {self.pk}, {self.vehicle}, {self.start_time}\n")
+            text = f"VehicleOperationRecord: {self.pk} - {self.vehicle} - {self.start_time}\n"
+            text += f"    - Vehicle: {self.vehicle}\n"
+            text += f"    - Driver: {self.driver}\n"
+            text += f"    - Location: {self.location}\n"
+            text += f"    - Duration: {self.duration_seconds}\n"
+            text += f"    - Source: {self.source}\n"
+            text += f"    - Note: {self.note}\n"
+            text += f"    - Image: {self.image}\n"
+            text += f"    - Allow Overtime: {self.allow_overtime}\n"
+            text += f"    - Fuel Allowance: {self.fuel_allowance}\n"
+            text += f"    - Overtime: {self.overtime}\n"
+            text += f"    - Normal Working Time: {self.normal_working_time}\n"
+            text += f"    - Start Time: {self.start_time}\n"
+            text += f"    - End Time: {self.end_time}\n"
+            
+            text = text.strip() + "\n\n"
+            f.write(text)
+            # save all information
 
+        if self.source == 'manual':
+            # allow delete
+            super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.vehicle
