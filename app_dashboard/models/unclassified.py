@@ -631,6 +631,12 @@ class VehicleOperationRecord(BaseModel):
     # add over time
     allow_overtime = models.BooleanField(verbose_name="Cho phép tính lương tăng ca", default=False)
 
+    def delete(self, *args, **kwargs):
+        print(">>> [DELETE] VehicleOperationRecord: ", self.pk, self.vehicle, self.start_time)
+        # Save to a file
+        with open('deleted_vehicle_operations.txt', 'a') as f:
+            f.write(f"VehicleOperationRecord: {self.pk}, {self.vehicle}, {self.start_time}\n")
+
 
     def __str__(self):
         return self.vehicle

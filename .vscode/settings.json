@@ -1,4 +1,11 @@
 {
     "liveServer.settings.multiRootWorkspaceName": "django-tinnghiaxuyenmoc",
-    "workbench.tree.indent": 25
+    "workbench.tree.indent": 25,
+    "files.exclude": {
+        ".vscode": true,
+        ".venv": true,
+        "app_accounts": true,
+        "app_dashboard/__pycache__": true,
+        "app_dashboard/migrations": true
+    }
 }

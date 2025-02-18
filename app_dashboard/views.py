@@ -1105,7 +1105,7 @@ def get_trip_data_from_binhanh(request):
                     vehicle_operation_record.end_time = end_time
                     vehicle_operation_record.duration_seconds = duration_seconds
                     vehicle_operation_record.save()
-                    log_result_data += f'- Update record with id {vehicle_operation_record.id}: ' + str(vehicle) + ' - ' + str(start_time) + ' - ' + str(end_time) + ' - ' + str(duration_seconds) + '\n'
+                    # log_result_data += f'- Update record with id {vehicle_operation_record.id}: ' + str(vehicle) + ' - ' + str(start_time) + ' - ' + str(end_time) + ' - ' + str(duration_seconds) + '\n'
                 else:
                     # Create and save the VehicleOperationRecord instance
                     VehicleOperationRecord.objects.create(
@@ -1136,7 +1136,7 @@ def get_trip_data_from_binhanh(request):
 
     # Define the headers (optional, if needed)
     headers = {"Content-Type": "application/json"}
-    print('\n>>>> Get data for vehicle: ', gps_name, ' on date: ', check_date)
+    # print('\n>>>> Get data for vehicle: ', gps_name, ' on date: ', check_date)
     try:
         # Make the POST request
         response = requests.post(url, json=payload, headers=headers)

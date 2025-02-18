@@ -156,12 +156,12 @@ class HolidayAdmin(admin.ModelAdmin):
     ordering = ['-date']
 
 # Admin for VehicleOperationRecord
-@admin.register(VehicleOperationRecord)
-class VehicleOperationRecordAdmin(admin.ModelAdmin):
-    list_display = VehicleOperationRecord.get_display_fields()
-    search_fields = ['vehicle', 'driver__full_name', 'location__name']
-    list_filter = ['source', 'driver', 'location']
-    ordering = ['-start_time']
+# @admin.register(VehicleOperationRecord)
+# class VehicleOperationRecordAdmin(admin.ModelAdmin):
+#     list_display = VehicleOperationRecord.get_display_fields()
+#     search_fields = ['vehicle', 'driver__full_name', 'location__name']
+#     list_filter = ['source', 'driver', 'location']
+#     ordering = ['-start_time']
 
 
 
