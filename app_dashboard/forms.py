@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 
 
 
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -1480,3 +1481,183 @@ class DetailSupplyForm(forms.ModelForm):
         }
 
 
+
+class SubcontractorForm(forms.ModelForm):
+    class Meta:
+        model = Subcontractor
+        fields = ['name', 'bank_name', 'account_number', 'account_holder_name', 'phone_number', 'address', 'note']
+        labels = {
+            'name': 'Tổ đội/ nhà thầu phụ',
+            'bank_name': 'Ngân hàng',
+            'account_number': 'Số tài khoản',
+            'account_holder_name': 'Tên chủ tài khoản',
+            'phone_number': 'Số điện thoại',
+            'address': 'Địa chỉ',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Tổ đội/ nhà thầu phụ',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'placeholder': 'Ngân hàng',
+                'class': 'form-input',
+            }),
+            'account_number': forms.TextInput(attrs={
+                'placeholder': 'Số tài khoản',
+                'class': 'form-input',
+            }),
+            'account_holder_name': forms.TextInput(attrs={
+                'placeholder': 'Tên chủ tài khoản',
+                'class': 'form-input',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'placeholder': 'Số điện thoại',
+                'class': 'form-input',
+            }),
+            'address': forms.TextInput(attrs={
+                'placeholder': 'Địa chỉ',
+                'class': 'form-input',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+
+class BaseSubJobForm(forms.ModelForm):
+    class Meta:
+        model = BaseSubJob
+        fields = ['job_type', 'job_number', 'job_name', 'unit', 'image', 'note']
+        labels = {
+            'job_type': 'Nhóm công việc',
+            'job_number': 'Mã công việc',
+            'job_name': 'Tên đầy đủ',
+            'unit': 'Đơn vị',
+            'image': 'Hình ảnh',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'job_type': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'job_number': forms.TextInput(attrs={
+                'placeholder': 'Mã công việc',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'job_name': forms.TextInput(attrs={
+                'placeholder': 'Tên đầy đủ',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'unit': forms.TextInput(attrs={
+                'placeholder': 'Đơn vị',
+                'class': 'form-input',
+                'required': False,
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-input-file',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+class DetailSubJobForm(forms.ModelForm):
+    class Meta:
+        model = DetailSubJob
+        fields = ['subcontractor', 'base_sub_job', 'sub_job_price', 'note', 'valid_from']
+        labels = {
+            'subcontractor': 'Tổ đội/ nhà thầu phụ',
+            'base_sub_job': 'Công việc',
+            'unit': 'Đơn vị',
+            'note': 'Ghi chú',
+            'valid_from': 'Ngày áp dụng',
+        }
+        widgets = {
+            'subcontractor': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'base_sub_job': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'sub_job_price': forms.NumberInput(attrs={
+                'placeholder': 'Đơn giá',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+            'valid_from': forms.DateInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'required': 'required',
+            }),
+        }
+
+class SupplyOrderForm(forms.ModelForm):
+    class Meta:
+        model = SupplyOrder
+        fields = ['user', 'order_code', 'project', 'order_amount', 'approval_status', 'received_status', 'paid_status', 'note', 'created_at', 'supply_providers']
+        labels = {
+            'order_code': 'Mã phiếu',
+            'project': 'Dự án',
+            'order_amount': 'Tổng tiền',
+            'approval_status': 'Duyệt',
+            'received_status': 'Nhận hàng',
+            'paid_status': 'Thanh toán',
+            'note': 'Ghi chú',
+            'created_at': 'Ngày tạo phiếu',
+            'supply_providers': 'Các nhà cung cấp',
+        }
+        widgets = {
+            'order_code': forms.TextInput(attrs={
+                'placeholder': 'Tự động sau khi lưu',
+                'class': 'form-input',
+                'readonly': 'readonly',
+            }),
+            'project': forms.Select(attrs={
+                'placeholder': 'Chọn dự án',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'order_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tổng tiền',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'approval_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái phê duyệt',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SupplyOrder.APPROVAL_STATUS_CHOICES),
+            'received_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái nhận hàng',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SupplyOrder.RECEIVED_STATUS_CHOICES),
+            'paid_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SupplyOrder.PAID_STATUS_CHOICES),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+                'rows': 2
+            }),
+            'created_at': forms.DateTimeInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'required': 'required',
+                'readonly': 'readonly',
+            }),
+            'supply_providers': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+                'rows': 2
+            })
+        }

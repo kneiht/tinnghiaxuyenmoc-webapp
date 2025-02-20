@@ -29,7 +29,6 @@ def render_title_bar(request, **kwargs):
         'page': page,
         'model': model,
         'title': translate('Tiêu đề cho trang: ' + page),
-        'create_new_button_name': translate(f'Thêm {model}'),
         'project_id': project_id,
         'check_date': check_date if check_date else datetime.now().date().strftime('%Y-%m-%d')
     }
@@ -38,11 +37,12 @@ def render_title_bar(request, **kwargs):
         project = Project.objects.filter(pk=project_id).first()
         context['title'] = translate(f'{project.name}')
 
+    if model != 'Job':
+        context['create_new_button_name'] = translate(f'Thêm {model}')
+
     # Render
     template = 'components/title_bar.html'
     return render_to_string(template, context, request)
-
-
 
 
 
@@ -50,7 +50,6 @@ def render_tool_bar(request, **kwargs):
     params = kwargs
     page = params.get('page', '')
     sub_page = params.get('sub_page', '')
-    print(sub_page)
     model = params.get('model', '')
     project_id = get_valid_id(params.get('project_id', 0))
     check_date = get_valid_date(params.get('check_date', ''))
@@ -86,7 +85,7 @@ def render_tool_bar(request, **kwargs):
         'lazy_load': params.get('lazy_load', False),
         'display_trashcan':display_trashcan
     }
-    if model not in ['Job', 'VehicleOperationRecord']:
+    if model not in ['VehicleOperationRecord']:
         context['create_new_button_name'] = translate(f'Thêm {model}')
     # Render 
     template = 'components/tool_bar.html'

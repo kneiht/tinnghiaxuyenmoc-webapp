@@ -1,49 +1,30 @@
-up.compiler('#show-all-jobs', function () {
+up.compiler('#project-display-mode', function () {
     const showWeekplan = document.getElementById('show-weekplan');
-    const showAllJobs = document.getElementById('show-all-jobs');
+    const showAllJobs = document.getElementById('show-table-jobs');
     const showGanttJobs = document.getElementById('show-gantt-jobs');
-    const showTableJobs = document.getElementById('show-table-jobs');
-    const tableChartToggle  = document.getElementById('table-chart-toggle');
-    const jobsPlanToggle  = document.getElementById('jobs-plan-toggle');
 
-    showWeekplan.addEventListener('click', function (e) {
-        showWeekplan.classList.add('hidden');
-        showAllJobs.classList.remove('hidden');
-        tableChartToggle.classList.add('hidden');
-        ganttChartContainer = document.getElementById('gantt-chart-container');
+    const showCostEstimation = document.getElementById('cost-estimation');
+    const showSupplyOrder = document.getElementById('supply-order');
+
+    function hideGantt() {
+        const ganttChartContainer = document.getElementById('gantt-chart-container');
         ganttChartContainer.classList.add('hidden');
-        document.getElementById('display-records').innerHTML = 'loading';
-        document.getElementById('create-new').classList.add('disabled');
-        document.getElementById('excel-button').classList.add('disabled');
-    });
+    }
 
-    showAllJobs.addEventListener('click', function (e) {
-        showWeekplan.classList.remove('hidden');
-        showAllJobs.classList.add('hidden');
-        tableChartToggle.classList.remove('hidden');
-        document.getElementById('display-records').innerHTML = 'loading';
-        document.getElementById('create-new').classList.remove('disabled');
-        document.getElementById('excel-button').classList.remove('disabled');
+    const arrayButtons = [showWeekplan, showAllJobs, showCostEstimation, showSupplyOrder];
+    arrayButtons.forEach(el => {
+        el.addEventListener('click', function (e) {
+            hideGantt();
+            document.getElementById('display-records').innerHTML = 'loading';
+        });
     });
-
 
     showGanttJobs.addEventListener('click', function (e) {
         ganttChartContainer = document.getElementById('gantt-chart-container');
         displayRecords = document.getElementById('display-records');
-        showGanttJobs.classList.add('hidden');
-        showTableJobs.classList.remove('hidden');
         ganttChartContainer.classList.remove('hidden');
         displayRecords.classList.add('hidden');
         fetchAndDrawGanttChart();
-    });
-
-    showTableJobs.addEventListener('click', function (e) {
-        ganttChartContainer = document.getElementById('gantt-chart-container');
-        displayRecords = document.getElementById('display-records');
-        showGanttJobs.classList.remove('hidden');
-        showTableJobs.classList.add('hidden');
-        ganttChartContainer.classList.add('hidden');
-        displayRecords.classList.remove('hidden');
     });
 
 });
@@ -95,7 +76,7 @@ function drawGanttChart(tasks) {
     const margin = { top: 40, right: 40, bottom: 40, left: 150 };
     const width = document.getElementById('ganttChart').offsetWidth - margin.left - margin.right;
     const height = tasks.length * 50 + margin.top + margin.bottom;
-    
+
     const svg = d3.select("#ganttChart")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -188,7 +169,7 @@ function drawGanttChart(tasks) {
 
     // Find all <text> elements that match the specified attributes
     textElements = ganttChart.querySelectorAll('text[fill="currentColor"][x="-9"][dy="0.32em"]');
-    
+
     // Log the found elements to the console
     textElements.forEach((element, index) => {
         // Calcuate the width of the element
@@ -201,7 +182,7 @@ function drawGanttChart(tasks) {
         function measureTextWidth(text, element) {
             element.textContent = text
             textWidth = element.getBBox().width;
-            return  textWidth
+            return textWidth
         }
 
         // Split the text into multiple lines, each with a max width of 100px
@@ -230,13 +211,13 @@ function drawGanttChart(tasks) {
         element.textContent = ''
         const maxLines = 3
         var offset = 0
-        if  (lines.length > 3) {
+        if (lines.length > 3) {
             offset = (maxLines - 1) * 6;
         } else {
-            offset = (lines.length-1) * 6;
+            offset = (lines.length - 1) * 6;
         }
-        
-        let count =  0
+
+        let count = 0
         lines.slice(0, maxLines).forEach((line, index) => {
             count += 1;
             if (count === maxLines && lines.length > maxLines) {
@@ -255,7 +236,7 @@ function drawGanttChart(tasks) {
         // element.remove();
     });
 
-    
+
 }
 
 
@@ -290,11 +271,11 @@ up.compiler('#check_date', function (element) {
         let checkDate = document.getElementById('check_date').value;
         let showAllJobs = document.getElementById('show-all-jobs');
         let showAllJobsUrl = showAllJobs.href;
-        showAllJobs.href = updateUrlParams(showAllJobsUrl, {'check_date': checkDate});
+        showAllJobs.href = updateUrlParams(showAllJobsUrl, { 'check_date': checkDate });
 
         let showWeekplan = document.getElementById('show-weekplan');
         let showWeekplanUrl = showWeekplan.href;
-        showWeekplan.href = updateUrlParams(showWeekplanUrl, {'check_date': checkDate});
+        showWeekplan.href = updateUrlParams(showWeekplanUrl, { 'check_date': checkDate });
 
         // Case 1: The table of all jobs is shown
         if (showAllJobs && showAllJobs.classList.contains('hidden')) {

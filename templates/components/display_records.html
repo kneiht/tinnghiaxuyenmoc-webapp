@@ -4,7 +4,7 @@
 
 <!-- Cards -->
 {% if model == 'Project' %}
-    <div id="display-records" class="display-cards opacity-0 w-full flex justify-center
+    <div id="display-records" class="overflow-scroll display-cards opacity-0 w-full flex justify-center
     gap-6 grid mt-5">
         {% for record in records %}
             <div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
@@ -198,10 +198,10 @@
 
 
 {% elif model == 'VehicleOperationRecord' %}
-    <div id="display-records" class="w-full overflow-scroll">
+    <div id="display-records" class="h-screen w-full overflow-scroll mt-4">
         {% if groups %}
             {% for group in groups %}
-                <div id="group-{{ group.group_id }}" class="transport-table group-{{ group.group_id }} mt-5">
+                <div id="group-{{ group.group_id }}" class="transport-table group-{{ group.group_id }}">
 
                     <form id="form-group-{{ group.group_id }}" action="{% url 'handle_vehicle_operation_form' %}" method="POST" up-target=".group-{{ group.group_id }}:maybe" class="rounded-b-2xl">
                         {% csrf_token %}
@@ -479,10 +479,10 @@
 
 {% else %}
 
-<div id="display-records" class="w-full overflow-scroll">
-    <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+<div id="display-records" class="w-full overflow-scroll mt-4">
+    <table id="display-table-records" class="relative table-auto w-full border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
-        <thead>
+        <thead class="sticky top-0">
             <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 {% for header in headers %}

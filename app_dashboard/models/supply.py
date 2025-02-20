@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from .base import models, BaseModel
 from .project import Project
+from django.contrib.auth.models import User
 
 class SupplyProvider(BaseModel):
     # Driver Information Fields
@@ -171,3 +172,65 @@ class CostEstimation(BaseModel):
             self.supply_name = self.base_supply.supply_name
             self.unit = self.base_supply.unit
         super().save()
+
+
+
+
+
+class SupplyOrder(BaseModel):
+
+    APPROVAL_STATUS_CHOICES = (
+        ('scratch', 'Bảng nháp'),
+        ('wait_for_approval', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('need_update', 'Cần sửa lại'),
+        ('rejected', 'Từ chối'),
+    )
+
+    RECEIVED_STATUS_CHOICES = (
+        ('received', 'Đã nhận'),
+        ('not_received', 'Chưa nhận'),
+    )
+
+    PAID_STATUS_CHOICES = (
+        ('paid', 'Đã T.toán'),
+        ('not_paid', 'Chưa T.toán'),
+        ('partial_paid', 'T.toán một phần'),
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo")
+    order_code = models.CharField(max_length=255, verbose_name="Mã phiếu", default="", null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
+
+    order_amount = models.IntegerField(verbose_name="Tổng tiền", default=0, validators=[MinValueValidator(0)])
+
+    approval_status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='scratch', verbose_name="Duyệt")
+    received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Nhận hàng")
+    paid_status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_paid', verbose_name="Thanh toán")
+
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
+
+    supply_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.repair_code = "#" + str(self.pk).zfill(4)
+        super().save()
+
+    @classmethod
+    def get_display_fields(self):
+        fields = [
+            'order_code', 'project', 'approval_status', 
+            'received_status', 'paid_status', 'supply_providers', 'order_amount', 'note', 'created_at', 'user']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+
+    def __str__(self):
+        return self.order_code

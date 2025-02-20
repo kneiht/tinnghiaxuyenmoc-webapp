@@ -35,7 +35,7 @@ migrate:
 ## tailwind
 .PHONY: tailwind
 tailwind:
-	cd jstoolchain && npm run tailwind-watch
+	cd jstoolchain && npm run tailwind-build
 
 ## collect
 .PHONY: collect

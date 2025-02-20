@@ -216,6 +216,13 @@
     
     <div class="flex flex-row items-end gap-5">
 
+        {% if page == 'page_each_project' %}
+        <button id="excel-button" class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
+            <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+            <span class="me-3"> Excel </span>
+        </button>
+        {% endif %}
+
         {% if create_new_button_name and model != "PaymentRecord" %}
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target=":none" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
@@ -242,3 +249,39 @@
     </div>
 
 </div>
+
+{% if page == 'page_each_project' %}
+<div id="extra-tool-bar" class="flex justify-center hidden">
+    <div class="hidden" id="project-id" data-id="{{ project_id }}"></div>
+    <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
+
+        <form up-target="#display-records:maybe" action="{% url 'upload_project' project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
+            class="flex flex-row whitespace-nowrap gap-2">
+            {% csrf_token %}
+            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
+                accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
+            <input type="hidden" name="project" value="{{ project_id }}">
+            <button class="btn btn-primary" type="submit" id="upload-button">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Nhập File Excel </span>
+            </button>
+        </form>
+
+
+        <!-- download_backup.html -->
+        <a href="{% url 'download_excel_template' 'jobs' %}"  class="whitespace-nowrap">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Tải mẫu excel </span>
+            </button>
+        </a>
+
+        <button class="btn btn-secondary ml-5" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.add('hidden');">
+            <span class=""> Đóng </span>
+        </button>
+
+    </div>
+
+</div>
+{% endif %}

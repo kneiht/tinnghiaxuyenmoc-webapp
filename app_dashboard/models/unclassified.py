@@ -1212,7 +1212,7 @@ class PartProvider(BaseModel):
 
 class RepairPart(BaseModel):
     class Meta:
-        ordering = ['vehicle_type', 'part_price']
+        ordering = ['-created_at', 'part_provider', 'part_name']
     part_provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại xe")
     part_number = models.CharField(max_length=255, verbose_name="Mã phụ tùng", unique=True)

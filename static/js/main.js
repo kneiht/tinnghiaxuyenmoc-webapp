@@ -696,7 +696,7 @@ function totalRequestedAmountDisplay() {
         const extraInfoElement = document.getElementById('extra-info')
         if (extraInfoElement) {
             extraInfoElement.innerHTML = `Tổng tiền đề nghị: ${sum} VNĐ`;
-        } 
+        }
     };
 };
 
@@ -784,3 +784,26 @@ up.compiler('#display-table-records', function (table) {
     }
 
 })
+
+
+function adjustDisplayRecordsHeight() {
+    const displayRecords = document.getElementById("display-records");
+    const currentDisplayRecordsHeight = displayRecords.offsetHeight;
+    if (currentDisplayRecordsHeight == 0) return false;
+
+    const bodyHeight = document.body.offsetHeight;
+    const viewportHeight = window.innerHeight;
+
+    const bottomMargin = 40;
+
+
+    let newDisplayRecordsHeight = currentDisplayRecordsHeight - (bodyHeight - viewportHeight);
+    console.log(newDisplayRecordsHeight)
+    displayRecords.style.height = `${newDisplayRecordsHeight - bottomMargin}px`;
+}
+
+
+up.compiler('#display-records', function (display) {
+    adjustDisplayRecordsHeight();
+});
+window.addEventListener("resize", adjustDisplayRecordsHeight);

@@ -2,10 +2,20 @@
     "liveServer.settings.multiRootWorkspaceName": "django-tinnghiaxuyenmoc",
     "workbench.tree.indent": 25,
     "files.exclude": {
-        ".vscode": true,
+        ".vscode": false,
         ".venv": true,
         "app_accounts": true,
         "app_dashboard/__pycache__": true,
         "app_dashboard/migrations": true
-    }
+    },
+    "files.autoSave": "onFocusChange",
+    "emeraldwalk.runonsave": {
+    "commands": [
+        {
+            "match": ".*",
+            "cmd": "make tailwind"
+        },
+    ]
+}
+
 }

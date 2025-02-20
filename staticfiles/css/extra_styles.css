@@ -8,8 +8,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .selected {
@@ -34,11 +38,10 @@
   /* Prevent text from wrapping to the next line */
 }
 
-.truncate-start>* {
+.truncate-start > * {
   direction: ltr;
   /* Correct the direction of the content inside */
 }
-
 
 .card-image-container {
   width: 100%;
@@ -68,7 +71,6 @@
   /* Ensures image covers the entire container */
 }
 
-
 .meme-container {
   width: 100%;
   display: inline-block;
@@ -82,7 +84,6 @@
   object-fit: cover;
   /* Ensures image covers the entire container */
 }
-
 
 .protal-profile-image-container {
   width: 100%;
@@ -98,10 +99,9 @@
   /* Ensures image covers the entire container */
 }
 
-
-
 .glow {
-  text-shadow: 0 0 5px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fff, 0 0 50px #fff, 0 0 60px #fff, 0 0 70px #fff, 0 0 80px #fff;
+  text-shadow: 0 0 5px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fff,
+    0 0 50px #fff, 0 0 60px #fff, 0 0 70px #fff, 0 0 80px #fff;
 }
 
 /* SHAKING EFFECT FOR STUDENT CARDS */
@@ -157,7 +157,6 @@
   /* The number of times the animation should repeat; you might want to increase or decrease this value. */
 }
 
-
 .just-updated {
   animation: just-updated 5s forwards;
 }
@@ -201,7 +200,6 @@
   }
 }
 
-
 /* STATUS STYLES */
 .done {
   background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
@@ -223,10 +221,6 @@
   background-image: linear-gradient(310deg, #000000 0%, #808080 100%);
 }
 
-
-
-
-
 /* STATUS STYLES */
 .active {
   background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
@@ -244,8 +238,6 @@
   background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
 }
 
-
-
 .approved {
   background-image: linear-gradient(310deg, #17ad37 0%, #98ec2d 100%);
 }
@@ -258,32 +250,26 @@
   background-image: linear-gradient(310deg, #dc1414 0%, #c55353 100%);
 }
 
-
-
-
 th {
-    position: relative;
-    padding-right: 20px;
+  position: relative;
+  padding-right: 20px;
 }
 /* th:hover {
     background-color: #f2f1f1;
 } */
 th.sorted-asc::after {
-    content: ' ▲';
-    position: absolute;
-    right: 5px;
+  content: " ▲";
+  position: absolute;
+  right: 5px;
 }
 th.sorted-desc::after {
-    content: ' ▼';
-    position: absolute;
-    right: 5px;
+  content: " ▼";
+  position: absolute;
+  right: 5px;
 }
-
-
 
 .plus {
   color: green;
-  
 }
 
 .minus {
@@ -296,14 +282,13 @@ th.sorted-desc::after {
 
 .True {
   color: green;
-  
 }
 
 .False {
   color: red;
 }
 
-.scratch{
+.scratch {
   background-image: linear-gradient(310deg, #4d4d4d 0%, #4d4d4d 100%);
   opacity: 50%;
 }
@@ -363,8 +348,6 @@ th.sorted-desc::after {
 .partial_paid {
   background-image: linear-gradient(310deg, #1773ad 0%, #2da6ec 100%);
 }
-
-
 
 .trimmed-text {
   white-space: pre-line;
