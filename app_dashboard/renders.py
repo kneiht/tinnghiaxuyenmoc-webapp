@@ -445,7 +445,6 @@ def render_weekplan_table(request, project_id, check_date=None):
         jobplan_in_week.progress_by_amount = progress_by_amount(jobplan_in_week, check_date=check_date)
         
 
-    # print('>>>>>>>>>>>>>> jobplans_in_week', jobplans_in_week)
 
 
     template = 'components/weekplan_table.html'

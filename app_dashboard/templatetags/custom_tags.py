@@ -600,7 +600,8 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         revenue = 0
         
         total_working_hours = 0
-        filling_cost_amount = 0
+        fuel_filling_cost_amount = 0
+        other_filling_cost_amount = 0
         depreciation_amount = 0
         bank_interest_amount = 0
         maintenance_amount = 0
@@ -657,8 +658,12 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         # print(">>>>>>>>>>>>>>>>>", "From date:", min_start_date, "to date:", max_end_date, "vehicle:", vehicle_instance)
         # print(">>>>>>>>>>>>>>>>>> filling_records:", filling_records)
         if filling_records:
-            filling_cost_amount = filling_records.aggregate(models.Sum('total_amount'))['total_amount__sum']
-
+            fuel_filling_cost_amount = filling_records.filter(liquid_type__in=['diesel', 'gasoline']).aggregate(models.Sum('total_amount'))['total_amount__sum']
+            other_filling_cost_amount = filling_records.exclude(liquid_type__in=['diesel', 'gasoline']).aggregate(models.Sum('total_amount'))['total_amount__sum']
+            if fuel_filling_cost_amount == None:
+                fuel_filling_cost_amount = 0
+            if other_filling_cost_amount == None:
+                other_filling_cost_amount = 0
 
         # caculate VehicleDepreciation
         for n in range(int ((max_end_date - min_start_date).days)+1):
@@ -676,7 +681,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         maintenance_amount = VehicleMaintenanceRepairPart.get_maintenance_amount(vehicle_instance, min_start_date, max_end_date)
         
 
-        total_cost = filling_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
+        total_cost = fuel_filling_cost_amount + other_filling_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
         monthly_salary_display = ""
         hourly_salary_display = ""
         
@@ -685,7 +690,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         for record in vehicle_records_with_driver:
             if record.driver not in drivers:
                 drivers.append(record.driver)
-        print(">>>>>>>>>>>>>>>>>> drivers:", drivers)
+                
         if len(drivers) == 0:
             monthly_salary_display = "Không có tài xế"
             hourly_salary_display = "Không có tài xế"
@@ -727,7 +732,8 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             "Lịch sử đơn giá": revenue_base_display,
             "Số giờ làm": round(total_working_hours, 2),
             "Doanh thu": revenue,
-            "Nhiên liệu / Nhớt": format_money(filling_cost_amount),  
+            "Nhiên liệu": format_money(fuel_filling_cost_amount),  
+            "Nhớt": format_money(other_filling_cost_amount),  
             "Sửa xe + mua vật tư": format_money(maintenance_amount),
             "Khấu hao xe": format_money(depreciation_amount),
             "Lãi ngân hàng": format_money(bank_interest_amount),
@@ -791,7 +797,7 @@ def calculate_total_payment_state(maintenance_record):
             'total_debt_amount': 0
         }
     states = maintenance_record.calculate_all_provider_payment_states()
-    print(states)
+    # print(states)
     total_purchase_amount = 0
     total_transferred_amount = 0
     total_debt_amount = 0
@@ -799,9 +805,9 @@ def calculate_total_payment_state(maintenance_record):
         total_purchase_amount += state['purchase_amount']
         total_transferred_amount += state['transferred_amount']
         total_debt_amount += state['debt_amount']
-        print(total_purchase_amount)
-        print(total_transferred_amount)
-        print(total_debt_amount)
+        # print(total_purchase_amount)
+        # print(total_transferred_amount)
+        # print(total_debt_amount)
     return {
         'total_purchase_amount': total_purchase_amount,
         'total_transferred_amount': total_transferred_amount,

@@ -119,13 +119,26 @@ if DOMAIN != "localhost":
     }
 
 else:
-    # use sqlite if local host
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': env['database_name'],
+            'USER': env['database_user'],
+            'PASSWORD': env['database_password'],
+            'HOST': env['database_host'],
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',             # Hỗ trợ tiếng Việt và emoji
+            },
         }
     }
+    # use sqlite if local host
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     }
+    # }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

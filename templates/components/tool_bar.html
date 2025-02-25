@@ -198,7 +198,7 @@
             </div>
         </form>
         <!-- Right controls for view toggle and information display -->
-        {% if page == 'page_each_project' %}
+        {% if page == 'page_each_project' and model == "Job" %}
         <form action="{% url 'load_elements' %}" up-target="#display-records">
             <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id elements='display_records' %}" />
             <div class="flex flex-wrap items-end justify-between gap-4">
@@ -216,7 +216,7 @@
     
     <div class="flex flex-row items-end gap-5">
 
-        {% if page == 'page_each_project' %}
+        {% if page == 'page_each_project' and model == "Job" %}
         <button id="excel-button" class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
             <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
             <span class="me-3"> Excel </span>

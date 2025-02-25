@@ -96,7 +96,7 @@ def decide_permission(request, action, params):
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-    print(request.POST)
+    # print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -328,7 +328,7 @@ def load_elements(request):
     for key, value in request.GET.items():
         if key != 'q':
             params[key] = value
-    print('\n>>>>>>>>>> elements params:', params)
+    # print('\n>>>>>>>>>> elements params:', params)
     html = '<div id="load-elements" class"hidden"></div>'
 
     # CHECK PERMISSIONS
@@ -1151,11 +1151,11 @@ def get_trip_data_from_binhanh(request):
         else:
             result = 'Request failed with status code: ' + str(response.status_code)
             result += '\nResponse: ' + str(response.text)
-            print(result)
+            # print(result)
             return  HttpResponse(result)
 
     except requests.exceptions.RequestException as e:
-        print("An error occurred:", e)
+        # print("An error occurred:", e)
         result = 'An error occurred: ' + str(e)
         return HttpResponse(result)
 
@@ -1208,9 +1208,9 @@ def save_vehicle_operation_record(request):
 
 
 def form_repair_parts(request):
-    # Get the list of repair parts
-    repair_parts = RepairPart.objects.all()
-    context = {'repair_parts': repair_parts}
+    providers = PartProvider.objects.all()
+    repair_parts = RepairPart.objects.all() 
+    context = {'repair_parts': repair_parts, 'providers': providers}
     return render(request, 'components/modal_repair_parts.html', context)
 
 def form_cost_estimation_table(request, project_id):
@@ -1270,7 +1270,6 @@ def form_cost_estimation_table(request, project_id):
             try:
                 int(row['Khối lượng'])
                 cost_estimation.quantity = row['Khối lượng']
-                print(cost_estimation.quantity)
             except:
                 return render_modal(project_id, message='Vui lòng kiểm tra lại cột khối lượng, tất cả phải là số', message_type='red')
 
@@ -1319,8 +1318,7 @@ def form_maintenance_images(request, maintenance_id):
         vehicle_maintenance = VehicleMaintenance.objects.get(pk=maintenance_id)
         # Get the list of images for the maintenance record
         maintenance_images = MaintenanceImage.objects.filter(vehicle_maintenance=vehicle_maintenance)
-        print(">>> maintenance_images: ", maintenance_images)
-        
+
         context = {
             'maintenance_id': maintenance_id,
             'maintenance_images': maintenance_images
@@ -1359,7 +1357,6 @@ def form_maintenance_payment_request(request):
                 groups[key] = [payment]
 
         context = {'groups': groups}
-        print('>>>>>>>>>>> context:', context)
         return render(request, 'components/maintenance_payment_request.html', context)
     # If Post
     elif request.method == 'POST':

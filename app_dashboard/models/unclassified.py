@@ -759,7 +759,6 @@ class LiquidUnitPrice(BaseModel):
 
     @classmethod
     def get_unit_price(self, liquid_type, date):
-        print(">>>>>>>>>>>>>>>>>>", liquid_type, date)
         liquid_unit_price = LiquidUnitPrice.objects.filter(liquid_type=liquid_type, valid_from__lte=date).order_by('-valid_from').first()
         return liquid_unit_price
 
@@ -820,58 +819,6 @@ class FillingRecord(BaseModel):
         else:
             self.total_amount = 0
 
-
-class FuelFillingRecord(BaseModel):
-    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
-    litter = models.FloatField(verbose_name="Số lít")
-    unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
-    total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
-    
-    fill_date = models.DateField(verbose_name="Ngày đổ nhiên liệu", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def save(self):
-        self.total_amount = self.litter * self.unit_price
-        super().save()
-
-    @classmethod
-    def get_display_fields(self):
-        fields = ['vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-    
-    def __str__(self):
-        return f'{self.vehicle} - {self.fill_date}'
-
-class LubeFillingRecord(BaseModel):
-    vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
-    litter = models.FloatField(verbose_name="Số lít")
-    unit_price = models.IntegerField(verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)])
-    total_amount = models.IntegerField(verbose_name="Thành tiền", default=0, validators=[MinValueValidator(0)])
-    
-    fill_date = models.DateField(verbose_name="Ngày đổ nhớt", default=timezone.now)
-    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def save(self):
-        self.total_amount = self.litter * self.unit_price
-        super().save()
-
-    @classmethod
-    def get_display_fields(self):
-        fields = ['vehicle', 'litter', 'unit_price', 'total_amount', 'fill_date', 'note']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-    
-    def __str__(self):
-        return f'{self.vehicle} - {self.fill_date}'
 
 class VehicleDepreciation(BaseModel):
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
@@ -989,8 +936,7 @@ class VehicleMaintenance(BaseModel):
 
     def save(self, *args, **kwargs):
         # if self.user changed => skip (just save the frist user)
-        # get al
-        print('self.user: ', self.user) 
+
         super().save()
         self.repair_code = "SC" + str(self.pk).zfill(4)
         # Get all related vehicle parts

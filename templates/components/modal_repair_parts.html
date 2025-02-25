@@ -10,7 +10,33 @@
                 </button>
 
                 <div class="flex justify-center mb-4 mx-4 gap-5">
-                    <div id="search-bar" class="h-10 flex w-[500px]">
+                        <select id="selected-provider-id" name="selected-provider-id" class="w-[200px] form-input border-theme dark:border-gray-600 border-opacity-50"
+                        onchange="
+                            document.querySelectorAll('.card-part').forEach(el => {
+                                if (this.value == '') {
+                                    el.classList.remove('hidden');
+                                    showNoItems();
+                                    return;
+                                }
+                                if (el.classList.contains('provider-' + this.value)) {
+                                    el.classList.remove('hidden');
+                                } else {
+                                    el.classList.add('hidden');
+                                }
+                                showNoItems();
+                            });
+                        ">
+                            <option value="" selected>
+                                Tất cả nhà cung cấp
+                            </option>
+                            {% for provider in providers %}
+                            <option value="{{ provider.pk }}">
+                                {{ provider.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                    <div id="search-bar" class="h-10 flex w-[300px]">
                         <!-- Input field for filter values -->
                         <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..." class="form-input rounded-lg h-full border-theme dark:border-gray-600 border-opacity-30 text-theme" autocomplete="off">
                     </div>
@@ -27,7 +53,7 @@
                         <p id="no-repair-part" class="hidden text-center mt-14 text-xl">Không tìm thấy phụ tùng trong danh sách, vui lòng tìm kiếm với từ khóa khác.</p>
                         <div id="repair-part-cards" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
                             {% for part in repair_parts %}
-                            <div class="relative card-part card-part-{{ part.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" >
+                            <div class="relative card-part provider-{{ part.part_provider.id }} card-part-{{ part.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" >
 
                                 <div class="input-part absolute top-28 w-full hidden flex flex-row justify-center">
                                     <div class="bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl px-2 py-1 text-sm w-5/6 flex flex-row justify-center items-center">
@@ -93,6 +119,16 @@
         </div>
     </div>
     <script>
+        function showNoItems() {
+            // If card-part = car-part hidden => show "no-repair-part" else hidden
+            if (document.querySelectorAll('.card-part:not(.hidden)').length == 0) {
+                document.getElementById('no-repair-part').classList.remove('hidden');
+            } else {
+                document.getElementById('no-repair-part').classList.add('hidden');
+            }
+        }
+
+
         // Hide modal
         document.getElementById('modal').classList.add('hidden');
         document.querySelectorAll('.cancel-modal').forEach(el => {
@@ -100,6 +136,8 @@
                 document.getElementById('modal').classList.remove('hidden');
             })
         })
+
+        
         // Click card-part add class "selected" and input-part show
         document.querySelectorAll('.card-part').forEach(el => {
             el.addEventListener('click', function(){
@@ -110,48 +148,60 @@
                 })
             })
         })
-        // Filter
-        document.getElementById('filter-input').addEventListener('keyup', function(){
-            const value = this.value.toLowerCase().trim();
+
+        function fillter(providerId) {
+            const value = document.getElementById('filter-input').value.toLowerCase().trim();
             document.querySelectorAll('.card-part').forEach(el => {
                 const text = el.textContent.toLowerCase().trim();
-                if (text.includes(value)) {
+                if (text.includes(value) && (el.classList.contains('provider-' + providerId) || providerId == '')) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
                 }
             })
-            // If card-part = car-part hidden => show "no-repair-part" else hidden
-            if (document.querySelectorAll('.card-part:not(.hidden)').length == 0) {
-                document.getElementById('no-repair-part').classList.remove('hidden');
-            } else {
-                document.getElementById('no-repair-part').classList.add('hidden');
-            }
+        }
+
+        // Filter
+        document.getElementById('filter-input').addEventListener('keyup', function(){
+            const providerId = document.getElementById('selected-provider-id').value;
+            fillter(providerId);
+            showNoItems();
         })
         // Filter button all parts
         document.getElementById('all-parts').addEventListener('click', function(){
             document.querySelectorAll('.card-part').forEach(el => {
-                el.classList.remove('hidden');
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (el.classList.contains('provider-' + providerId) || providerId == '') {
+                    el.classList.remove('hidden');
+                    document.getElementById('filter-input').value = '';
+                    showNoItems();
+                }
             })
         })
         // Filter button selected parts
         document.getElementById('selected-parts').addEventListener('click', function(){
             document.querySelectorAll('.card-part').forEach(el => {
-                if (el.classList.contains('selected')) {
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
                 }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
             })
         })
         // Filter button unselected parts
         document.getElementById('unselected-parts').addEventListener('click', function(){
             document.querySelectorAll('.card-part').forEach(el => {
-                if (!el.classList.contains('selected')) {
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (!el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
                 }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
             })
         })
 

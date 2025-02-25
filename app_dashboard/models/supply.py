@@ -234,3 +234,4 @@ class SupplyOrder(BaseModel):
 
     def __str__(self):
         return self.order_code
+
