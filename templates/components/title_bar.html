@@ -11,34 +11,34 @@
         {% if page == 'page_each_project' %}
             <div id="project-display-mode" class="flex gap-3">
                 <a id="show-gantt-jobs" class="btn btn-primary text-nowrap cursor-pointer">
-                    <i class="fas fa-bar-chart" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3"> Xem Gantt </span>
+                    <i class="fas fa-bar-chart px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Xem Gantt </span>
                 </a>
                 
                 <a id="show-table-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap">
-                    <i class="fas fa-table" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3"> Xem Table </span>
+                    <i class="fas fa-table px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Xem Table </span>
                 </a>
 
                 <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ check_date }}" class="btn btn-primary text-nowrap">
-                    <i class="fas fa-bullseye" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3"> Xem KH tuần </span>
+                    <i class="fas fa-bullseye px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Xem KH tuần </span>
                 </a>
             </div>
 
             <div id="related-tables" class="flex gap-3">
-                <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='SupplyOrder' elements='tool_bar|display_records' %}"
+                <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' project_id=project_id model='SupplyOrder' elements='tool_bar|display_records' %}"
                     id="supply-order" class="btn btn-primary text-nowrap"
                     up-target="#modal:maybe, #display-records, #tool-bar">
-                    <i class="fas fa-shopping-cart" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3"> Đặt vật tư </span>
+                    <i class="fas fa-shopping-cart  px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Đặt vật tư </span>
                 </a>
 
                 <a href="{% url 'form_cost_estimation_table' project_id=project_id %}"
                     id="cost-estimation" class="btn btn-primary text-nowrap"
                     up-preload="insert" up-target="#modal:maybe, #display-records, #tool-bar">
-                    <i class="fas fa-clipboard-list" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3"> Bảng dự toán </span>
+                    <i class="fas fa-clipboard-list   px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Bảng dự toán </span>
                 </a>
             </div>
 

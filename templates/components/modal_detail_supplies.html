@@ -1,0 +1,275 @@
+{% load custom_tags %}
+<div up-hungry id="modal-sub">
+    <div id="modal-sub-body" class="modal z-40 fixed inset-0 h-screen w-full flex justify-center overflow-auto bg-slate-600 bg-opacity-60">
+        <!-- Modal Content -->
+        <div class="relative top-10 mx-4 card h-12/12 w-11/12 mb-28">
+                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Danh sách vật tư</h3>
+
+                <button id='cancel-modal' type="button" class="cancel-modal absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-sub-body').remove();">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+
+                <div class="flex justify-center mb-4 mx-4 gap-5">
+                        <select id="selected-provider-id" name="selected-provider-id" class="w-[200px] form-input border-theme dark:border-gray-600 border-opacity-50"
+                        onchange="
+                            document.querySelectorAll('.card-supply').forEach(el => {
+                                if (this.value == '') {
+                                    el.classList.remove('hidden');
+                                    showNoItems();
+                                    return;
+                                }
+                                if (el.classList.contains('provider-' + this.value)) {
+                                    el.classList.remove('hidden');
+                                } else {
+                                    el.classList.add('hidden');
+                                }
+                                showNoItems();
+                            });
+                        ">
+                            <option value="" selected>
+                                Tất cả nhà cung cấp
+                            </option>
+                            {% for provider in providers %}
+                            <option value="{{ provider.pk }}">
+                                {{ provider.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                    <div id="search-bar" class="h-10 flex w-[300px]">
+                        <!-- Input field for filter values -->
+                        <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..." class="form-input rounded-lg h-full border-theme dark:border-gray-600 border-opacity-30 text-theme" autocomplete="off">
+                    </div>
+
+                    <button id="all-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Tất cả vật tư</button>
+                    <button id="selected-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Vật tư đã chọn</button>
+                    <button id="unselected-parts" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Vật tư chưa chọn</button>
+                </div>
+
+            
+                <div class="h-full">
+                    {% csrf_token %}
+                    <div class="flex flex-col h-full justify-between gap-5 text-sm text-theme">
+                        <p id="no-supplies" class="hidden text-center mt-14 text-xl">Không tìm thấy vật tư trong danh sách, vui lòng tìm kiếm với từ khóa khác.</p>
+                        <div id="repair-part-cards" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
+                            {% for supply in supplies %}
+                            <div class="relative card-supply provider-{{ supply.supply_provider.id }} card-supply-{{ supply.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" >
+
+                                <div class="input-part absolute top-28 w-full hidden flex flex-row justify-center">
+                                    <div class="bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl px-2 py-1 text-sm w-5/6 flex flex-row justify-center items-center">
+                                        <label class="mr-2">SL ({{  supply.unit }})</label>
+                                        <input type="hidden" name="supply_id" value="{{ supply.id }}">
+                                        <input type="hidden" name="supply_number" value="{{ supply.supply_number }}">
+                                        <input type="hidden" name="supply_name" value="{{ supply.supply_name }}">
+                                        <input type="hidden" name="supply_price" value="{{ supply.supply_price }}">
+                                        <input type="hidden" name="supply_provider" value="{{ supply.supply_provider }}">
+                                        <input type="number" name="supply_quantity" value="1" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                    </div>
+                                </div>
+
+                                <div style="height: 10rem;">
+                                    {% if supply.image %}
+                                    <img src="{{ supply.image.url }}" alt="{{ supply.supply_name }}"
+                                        class="rounded-t-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                                    {% else %}
+                                    <img src="/static/images/default/default_part.webp" alt="Default Supply Image"
+                                        class="rounded-t-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                                    {% endif %}
+                                </div>
+
+                                <div class="flex justify-between items-center px-2 relative">
+                                    <div class="w-10/12">
+                                        <h3 class=" font-semibold text-theme text-center pl-1">
+                                            {{ supply.supply_number }} - {{ supply.supply_name }}
+                                        </h3>
+                                    </div>
+                                </div>
+                    
+                                <div class="flex flex-col text-sm px-2 pb-3 ">            
+                                    <div class="mt-1">
+                                        NCC: {{ supply.supply_provider }}
+                                    </div>
+                    
+                                    <div class="mt-1.5">
+                                        Giá: {{ supply.supply_price|format_money }} VND
+                                    </div>
+                                    <div class="mt-1.5">
+                                        Ngày áp dụng: {{ supply.valid_from|date:"d/m/Y" }}
+                                    </div>
+                                    <!-- Keep <p> for paragraphs of text -->
+                                    <div class="mt-1.5 note whitespace-pre-line">Mô tả: {{ supply.note }} </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex flex-col justify-center gap-5">
+                            <div class="flex justify-center gap-5">
+                                <button type="submit" id="submit-slections" class="submit btn btn-primary rounded-full w-28">
+                                    Cập nhật
+                                </button>
+                                <button id='cancel-modal' type="button" class="cancel-modal btn btn-secondary rounded-full w-28" onclick="document.getElementById('modal-sub-body').remove();">
+                                    Hủy bỏ
+                                </button>
+                            </div>
+                            <div class="h-28"></div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script>
+        function showNoItems() {
+            // If card-supply = car-part hidden => show "no-supplies" else hidden
+            if (document.querySelectorAll('.card-supply:not(.hidden)').length == 0) {
+                document.getElementById('no-supplies').classList.remove('hidden');
+            } else {
+                document.getElementById('no-supplies').classList.add('hidden');
+            }
+        }
+
+
+        // Hide modal
+        document.getElementById('modal').classList.add('hidden');
+        document.querySelectorAll('.cancel-modal').forEach(el => {
+            el.addEventListener('click', function(){
+                document.getElementById('modal').classList.remove('hidden');
+            })
+        })
+
+        
+        // Click card-supply add class "selected" and input-part show
+        document.querySelectorAll('.card-supply').forEach(el => {
+            el.addEventListener('click', function(){
+                this.classList.toggle('selected');
+                this.querySelector('.input-part').classList.toggle('hidden');
+                this.querySelector('.input-part').addEventListener('click', function(e){
+                    e.stopPropagation();
+                })
+            })
+        })
+
+        function fillter(providerId) {
+            const value = document.getElementById('filter-input').value.toLowerCase().trim();
+            document.querySelectorAll('.card-supply').forEach(el => {
+                const text = el.textContent.toLowerCase().trim();
+                if (text.includes(value) && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            })
+        }
+
+        // Filter
+        document.getElementById('filter-input').addEventListener('keyup', function(){
+            const providerId = document.getElementById('selected-provider-id').value;
+            fillter(providerId);
+            showNoItems();
+        })
+        // Filter button all parts
+        document.getElementById('all-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-supply').forEach(el => {
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (el.classList.contains('provider-' + providerId) || providerId == '') {
+                    el.classList.remove('hidden');
+                    document.getElementById('filter-input').value = '';
+                    showNoItems();
+                }
+            })
+        })
+        // Filter button selected parts
+        document.getElementById('selected-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-supply').forEach(el => {
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
+            })
+        })
+        // Filter button unselected parts
+        document.getElementById('unselected-parts').addEventListener('click', function(){
+            document.querySelectorAll('.card-supply').forEach(el => {
+                const providerId = document.getElementById('selected-provider-id').value;
+                if (!el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
+            })
+        })
+
+        // Select cards from data from maintanance
+        document.querySelectorAll('.vehice_part').forEach(el => {
+            const partId = el.getAttribute('data-part-id');
+            const partQuantity = el.getAttribute('data-part-quantity');
+            const cardPart = document.querySelector(`.card-supply-${partId}`);
+            if (cardPart && partQuantity > 0) {
+                cardsupply.classList.add('selected');
+                cardsupply.querySelector('.input-part').classList.remove('hidden');
+                cardsupply.querySelectorAll('input[name="supply_quantity"]').forEach(el => {
+                    el.disabled = false;
+                    el.value = partQuantity;
+                })
+            }
+        })
+        // Submit form
+        document.getElementById('submit-slections').addEventListener('click', function(){
+            const vehiceParts = [];
+            const providers = {};
+            const providerCalculations = {};
+            document.querySelectorAll('.card-supply.selected').forEach(el => {
+                const partId = el.querySelector('input[name="supply_id"]').value;
+                const partNumber = el.querySelector('input[name="supply_number"]').value;
+                const partName = el.querySelector('input[name="supply_name"]').value;
+                const partPrice = el.querySelector('input[name="supply_price"]').value;
+                // Make partPrice human readable
+                const partQuantity = el.querySelector('input[name="supply_quantity"]').value;
+                const partProvider = el.querySelector('input[name="supply_provider"]').value;
+                if (!providers[partProvider]) {
+                    providers[partProvider] = [];
+                }
+                if (!providerCalculations[partProvider]) {
+                    providerCalculations[partProvider] = [0];
+                }
+                providerCalculations[partProvider] = parseInt(providerCalculations[partProvider]) + parseInt(partPrice * partQuantity);
+                console.log(providerCalculations);
+                providers[partProvider].push(`
+                    <div class="vehice_part border-b py-2 flex items-center w-full" data-part-id="${partId}" data-part-quantity="${partQuantity}">
+                        <input type="hidden" name="supply_id" value="${partId}">
+                        <input type="hidden" name="supply_quantity_${partId}" value="${partQuantity}">
+                        <span class="w-5/12">${partNumber} - ${partName} - ${formatNumber(partPrice)} VNÐ </span>
+                        <span class="w-1/12 text-center">${partQuantity}</span>
+                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-2/12 flex justify-center"></div>
+                    </div>
+                `);
+            });
+            const sortedProviders = Object.keys(providers).sort().reduce(
+                (obj, key) => { 
+                    obj[key] = providers[key]; 
+                    return obj;
+                }, 
+                {}
+            );
+            // Calculate total price
+            let totalPrice = 0;
+            Object.keys(sortedProviders).forEach(provider => {
+                vehiceParts.push(`<div class="font-bold border-b pt-3 pb-1">${provider} - <span class="text-red-600">${formatNumber(providerCalculations[provider])} VNÐ</span></div>`);
+                vehiceParts.push(...sortedProviders[provider]);
+            });
+            document.getElementById('vehicle_parts').innerHTML = vehiceParts.join('');
+            // Click cancel model to close this modal
+            document.querySelector('.cancel-modal').click();
+        })
+    </script>
+</div>
+
+

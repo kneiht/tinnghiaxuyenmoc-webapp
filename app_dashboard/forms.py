@@ -1523,7 +1523,7 @@ class DetailSubJobForm(forms.ModelForm):
 class SupplyOrderForm(forms.ModelForm):
     class Meta:
         model = SupplyOrder
-        fields = ['user', 'order_code', 'project', 'order_amount', 'approval_status', 'received_status', 'paid_status', 'note', 'created_at', 'supply_providers']
+        fields = ['user', 'order_code', 'project', 'approval_status', 'note']
         labels = {
             'order_code': 'Mã phiếu',
             'project': 'Dự án',

@@ -96,7 +96,7 @@ def decide_permission(request, action, params):
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-    # print(request.POST)
+    print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -137,7 +137,7 @@ def handle_form(request, model, pk=0):
         if forbit_html:
             return HttpResponse(forbit_html)
 
-        if model == 'VehicleMaintenance':
+        if model == 'VehicleMaintenance' or model == 'SupplyOrder':
             # set approval status to make sure there no injection hacking
             form.instance.approval_status = 'scratch'
     else: # update
@@ -277,6 +277,35 @@ def handle_form(request, model, pk=0):
                             repair_part=part,
                             quantity=request.POST.get(f'part_quantity_{part_id}'),
                         )
+        elif model == 'SupplyOrder':
+            order = instance_form
+            # get the list of vehicle_parts VehicleMaintenanceRepairPart
+            order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+            supply_ids = request.POST.getlist('supply_id')
+
+            # check if the id is in the list, if not delete it
+            for order_supply in order_supplies:
+                if str(order_supply.detail_supply.id) not in supply_ids:
+                    order_supply.delete()
+
+            for supply_id in supply_ids:
+                # get the instance VehicleMaintenanceRepairPart which has the repair_part.part_id == part_id
+                supply = DetailSupply.objects.filter(id=supply_id).first()
+                if supply:
+                    order_supply = SupplyOrderSupply.objects.filter(supply_order=order, detail_supply=supply).first()
+                # Update
+                if order_supply: # Update quantity
+                    order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}')
+                    order_supply.save()
+                else: # create new
+                    if supply:
+                        SupplyOrderSupply.objects.create(
+                            supply_order=order,
+                            detail_supply=supply,
+                            quantity=request.POST.get(f'supply_quantity_{supply_id}'),
+                        )
+
+
 
         instance_form.save()
 
@@ -1213,6 +1242,14 @@ def form_repair_parts(request):
     context = {'repair_parts': repair_parts, 'providers': providers}
     return render(request, 'components/modal_repair_parts.html', context)
 
+def form_detailed_supplies(request):
+    providers = SupplyProvider.objects.all()
+    supplies = DetailSupply.objects.all() 
+    context = {'supplies': supplies, 'providers': providers}
+    return render(request, 'components/modal_detail_supplies.html', context)
+
+
+
 def form_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type='green'):
         # Get fields to be displayed by using record meta
@@ -1361,6 +1398,7 @@ def form_maintenance_payment_request(request):
     # If Post
     elif request.method == 'POST':
         return JsonResponse({'success': True})
+
 
 # PAGES ==============================================================
 @login_required

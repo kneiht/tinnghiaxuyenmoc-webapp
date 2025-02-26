@@ -132,6 +132,7 @@ class DetailSupply(BaseModel):
         super().save()
 
 
+
 class CostEstimation(BaseModel):
     class Meta:
         ordering = ['project', 'material_type', 'supply_number']
@@ -172,7 +173,6 @@ class CostEstimation(BaseModel):
             self.supply_name = self.base_supply.supply_name
             self.unit = self.base_supply.unit
         super().save()
-
 
 
 
@@ -218,7 +218,7 @@ class SupplyOrder(BaseModel):
     supply_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.repair_code = "#" + str(self.pk).zfill(4)
+        self.order_code = "#" + str(self.pk).zfill(4)
         super().save()
 
     @classmethod
@@ -234,4 +234,55 @@ class SupplyOrder(BaseModel):
 
     def __str__(self):
         return self.order_code
+
+    def calculate_all_provider_payment_states(self):
+        # # get all the parts in this vehicle maintenance
+        # vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
+        # # get all the providers in this vehicle maintenance
+        # provider_ids = vehicle_parts.values_list('repair_part__part_provider', flat=True).distinct()
+        # provider_ids = set(provider_ids)
+        # all_provider_payment_state = {}
+        # for provider_id in provider_ids:
+        #     provider = PartProvider.objects.get(pk=provider_id)
+        #     # calculate the purchase amount
+        #     purchase_amount = 0
+        #     provider_vehicle_parts = vehicle_parts.filter(repair_part__part_provider=provider)
+        #     for provider_vehicle_part in provider_vehicle_parts:
+        #         purchase_amount += provider_vehicle_part.repair_part.part_price * provider_vehicle_part.quantity
+
+        #     # calculate the transferred amount
+        #     transferred_amount = 0
+        #     payment_records = PaymentRecord.objects.filter(vehicle_maintenance=self, provider=provider)
+        #     for payment_record in payment_records:
+        #         transferred_amount += payment_record.transferred_amount
+
+        #     # calculate the debt amount
+        #     debt_amount = purchase_amount - transferred_amount
+
+        #     state = {
+        #         'purchase_amount': purchase_amount,
+        #         'transferred_amount': transferred_amount,
+        #         'debt_amount': debt_amount
+        #     }
+        #     all_provider_payment_state[provider.id] = state 
+        all_provider_payment_state = {}
+        return all_provider_payment_state
+
+
+
+class SupplyOrderSupply(BaseModel):
+    RECEIVED_STATUS_CHOICES = (
+        ('received', 'Đã nhận'),
+        ('not_received', 'Chưa nhận'),
+    )
+    id = models.IntegerField(primary_key=True)
+    supply_order = models.ForeignKey(SupplyOrder, on_delete=models.CASCADE, verbose_name="Phiếu mua hàng", null=True, blank=True)
+    detail_supply = models.ForeignKey(DetailSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
+    quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
+    received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # provider = self.detail_supply.supply_provider
+        # provider.calculate_payment_states()
 

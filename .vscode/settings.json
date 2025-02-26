@@ -4,9 +4,7 @@
     "files.exclude": {
         ".vscode": true,
         ".venv": true,
-        "app_accounts": true,
-        "app_dashboard/__pycache__": true,
-        "app_dashboard/migrations": true
+        "app_accounts": true
     },
     "files.autoSave": "onFocusChange",
     "emeraldwalk.runonsave": {

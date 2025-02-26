@@ -717,7 +717,7 @@ function calculatePLTotals() {
     const revenueColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Doanh thu");
     const revenueIndex = revenueColumn ? Array.from(headerRow.children).indexOf(revenueColumn) : -1;
     const interestColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Lợi nhuận");
-    const interestIndex = 13;
+    const interestIndex = 14;
 
     if (revenueIndex == -1 && interestIndex == -1) {
         return false;

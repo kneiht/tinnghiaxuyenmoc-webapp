@@ -41,3 +41,8 @@ tailwind:
 .PHONY: collect
 collect:
 	python manage.py collectstatic
+
+## activate env
+.PHONY: env
+env:
+	source ../myenv/bin/activate
