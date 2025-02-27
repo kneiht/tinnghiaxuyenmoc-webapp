@@ -176,6 +176,6 @@ LOGIN_URL = '/account/login/' # replace 'login' with the name of your login view
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000

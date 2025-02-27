@@ -1,0 +1,28 @@
+{% load custom_tags %}
+
+<div class="flex items-center justify-center">
+    <div class="flex pt-4 px-6 sm:w-[600px] gap-5 items-center justify-center">
+        <div class="modal-image1 modal-image-container w-auto flex items-center justify-center">
+            {% if record.image1 %}
+            <a href="{{ record.image1.url }}" target="_blank">
+                <img src="{{ record.image1.url }}" alt="student avatar"
+                    class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
+            </a>
+            {% else %}
+            <img src="/static/images/default/default_transaction.webp" alt="no image"
+                class="mx-auto rounded-xl border border-slate-300 dark:border-slate-600">
+            {% endif %}
+        </div>
+        <div class="modal-image2 modal-image-container w-auto flex items-center justify-center">
+            {% if record.image2 %}
+            <a href="{{ record.image2.url }}" target="_blank">
+                <img src="{{ record.image2.url }}" alt="student portrait"
+                    class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
+            </a>
+            {% else %}
+            <img src="/static/images/default/default_transaction.webp" alt="no image"
+                class="mx-auto  rounded-xl border border-slate-300 dark:border-slate-600">
+            {% endif %}
+        </div>
+    </div>
+</div>

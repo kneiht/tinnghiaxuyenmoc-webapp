@@ -277,6 +277,7 @@ def handle_form(request, model, pk=0):
                             repair_part=part,
                             quantity=request.POST.get(f'part_quantity_{part_id}'),
                         )
+                        
         elif model == 'SupplyOrder':
             order = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
@@ -289,16 +290,20 @@ def handle_form(request, model, pk=0):
                     order_supply.delete()
 
             for supply_id in supply_ids:
+                print(">>>>>>>>>> Supply id ", supply_id)
                 # get the instance VehicleMaintenanceRepairPart which has the repair_part.part_id == part_id
                 supply = DetailSupply.objects.filter(id=supply_id).first()
                 if supply:
                     order_supply = SupplyOrderSupply.objects.filter(supply_order=order, detail_supply=supply).first()
                 # Update
                 if order_supply: # Update quantity
+                    print(">>>>>>>>>> Update ", order_supply)
                     order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}')
                     order_supply.save()
+
                 else: # create new
                     if supply:
+                        print(">>>>>>>>>> Create ", supply)
                         SupplyOrderSupply.objects.create(
                             supply_order=order,
                             detail_supply=supply,
@@ -1248,6 +1253,10 @@ def form_detailed_supplies(request):
     context = {'supplies': supplies, 'providers': providers}
     return render(request, 'components/modal_detail_supplies.html', context)
 
+def form_base_supplies(request):
+    supplies = BaseSupply.objects.all() 
+    context = {'supplies': supplies}
+    return render(request, 'components/modal_base_supplies.html', context)
 
 
 def form_cost_estimation_table(request, project_id):

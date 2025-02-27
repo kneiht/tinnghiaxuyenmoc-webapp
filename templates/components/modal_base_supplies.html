@@ -3,38 +3,13 @@
     <div id="modal-sub-body" class="modal z-40 fixed inset-0 h-screen w-full flex justify-center overflow-auto bg-slate-600 bg-opacity-60">
         <!-- Modal Content -->
         <div class="relative top-10 mx-4 card h-12/12 w-11/12 mb-28">
-                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Danh sách vật tư</h3>
+                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Danh sách vật tư - Giám sát đặt</h3>
 
                 <button id='cancel-modal' type="button" class="cancel-modal absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-sub-body').remove();">
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </button>
 
                 <div class="flex justify-center mb-4 mx-4 gap-5">
-                        <select id="selected-provider-id" name="selected-provider-id" class="w-[200px] form-input border-theme dark:border-gray-600 border-opacity-50"
-                        onchange="
-                            document.querySelectorAll('.card-supply').forEach(el => {
-                                if (this.value == '') {
-                                    el.classList.remove('hidden');
-                                    showNoItems();
-                                    return;
-                                }
-                                if (el.classList.contains('provider-' + this.value)) {
-                                    el.classList.remove('hidden');
-                                } else {
-                                    el.classList.add('hidden');
-                                }
-                                showNoItems();
-                            });
-                        ">
-                            <option value="" selected>
-                                Tất cả nhà cung cấp
-                            </option>
-                            {% for provider in providers %}
-                            <option value="{{ provider.pk }}">
-                                {{ provider.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
 
                     <div id="search-bar" class="h-10 flex w-[300px]">
                         <!-- Input field for filter values -->
@@ -61,8 +36,6 @@
                                         <input type="hidden" name="supply_id" value="{{ supply.id }}">
                                         <input type="hidden" name="supply_number" value="{{ supply.supply_number }}">
                                         <input type="hidden" name="supply_name" value="{{ supply.supply_name }}">
-                                        <input type="hidden" name="supply_price" value="{{ supply.supply_price }}">
-                                        <input type="hidden" name="supply_provider" value="{{ supply.supply_provider }}">
                                         <input type="number" name="supply_quantity" value="1" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
                                     </div>
                                 </div>
@@ -85,17 +58,7 @@
                                     </div>
                                 </div>
                     
-                                <div class="flex flex-col text-sm px-2 pb-3 ">            
-                                    <div class="mt-1">
-                                        NCC: {{ supply.supply_provider }}
-                                    </div>
-                    
-                                    <div class="mt-1.5">
-                                        Giá: {{ supply.supply_price|format_money }} VND
-                                    </div>
-                                    <div class="mt-1.5">
-                                        Ngày áp dụng: {{ supply.valid_from|date:"d/m/Y" }}
-                                    </div>
+                                <div class="flex flex-col text-sm px-2 pb-3 ">
                                     <!-- Keep <p> for paragraphs of text -->
                                     <div class="mt-1.5 note whitespace-pre-line">Mô tả: {{ supply.note }} </div>
                                 </div>
@@ -149,40 +112,31 @@
             })
         })
 
-        function fillter(providerId) {
+        // Filter
+        document.getElementById('filter-input').addEventListener('keyup', function(){
             const value = document.getElementById('filter-input').value.toLowerCase().trim();
             document.querySelectorAll('.card-supply').forEach(el => {
                 const text = el.textContent.toLowerCase().trim();
-                if (text.includes(value) && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                if (text.includes(value)) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
                 }
             })
-        }
-
-        // Filter
-        document.getElementById('filter-input').addEventListener('keyup', function(){
-            const providerId = document.getElementById('selected-provider-id').value;
-            fillter(providerId);
             showNoItems();
         })
         // Filter button all parts
         document.getElementById('all-supplies').addEventListener('click', function(){
             document.querySelectorAll('.card-supply').forEach(el => {
-                const providerId = document.getElementById('selected-provider-id').value;
-                if (el.classList.contains('provider-' + providerId) || providerId == '') {
                     el.classList.remove('hidden');
                     document.getElementById('filter-input').value = '';
                     showNoItems();
-                }
             })
         })
         // Filter button selected parts
         document.getElementById('selected-supplies').addEventListener('click', function(){
             document.querySelectorAll('.card-supply').forEach(el => {
-                const providerId = document.getElementById('selected-provider-id').value;
-                if (el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                if (el.classList.contains('selected')) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
@@ -194,8 +148,7 @@
         // Filter button unselected parts
         document.getElementById('unselected-supplies').addEventListener('click', function(){
             document.querySelectorAll('.card-supply').forEach(el => {
-                const providerId = document.getElementById('selected-provider-id').value;
-                if (!el.classList.contains('selected') && (el.classList.contains('provider-' + providerId) || providerId == '')) {
+                if (!el.classList.contains('selected')) {
                     el.classList.remove('hidden');
                 } else {
                     el.classList.add('hidden');
@@ -220,53 +173,31 @@
                 })
             }
         })
+
         // Submit form
         document.getElementById('submit-slections').addEventListener('click', function(){
-            const vehiceParts = [];
-            const providers = {};
-            const providerCalculations = {};
+            let orderSupplies = [];
             document.querySelectorAll('.card-supply.selected').forEach(el => {
-                const partId = el.querySelector('input[name="supply_id"]').value;
-                const partNumber = el.querySelector('input[name="supply_number"]').value;
-                const partName = el.querySelector('input[name="supply_name"]').value;
-                const partPrice = el.querySelector('input[name="supply_price"]').value;
+                const supplyId = el.querySelector('input[name="supply_id"]').value;
+                const supplyNumber = el.querySelector('input[name="supply_number"]').value;
+                const supplyName = el.querySelector('input[name="supply_name"]').value;
                 // Make partPrice human readable
-                const partQuantity = el.querySelector('input[name="supply_quantity"]').value;
-                const partProvider = el.querySelector('input[name="supply_provider"]').value;
-                if (!providers[partProvider]) {
-                    providers[partProvider] = [];
-                }
-                if (!providerCalculations[partProvider]) {
-                    providerCalculations[partProvider] = [0];
-                }
-                providerCalculations[partProvider] = parseInt(providerCalculations[partProvider]) + parseInt(partPrice * partQuantity);
-                console.log(providerCalculations);
-                providers[partProvider].push(`
-                    <div class="vehice_part border-b py-2 flex items-center w-full" data-part-id="${partId}" data-part-quantity="${partQuantity}">
-                        <input type="hidden" name="supply_id" value="${partId}">
-                        <input type="hidden" name="supply_quantity_${partId}" value="${partQuantity}">
-                        <span class="w-5/12">${partNumber} - ${partName} - ${formatNumber(partPrice)} VNÐ </span>
-                        <span class="w-1/12 text-center">${partQuantity}</span>
+                const supplyQuantity = el.querySelector('input[name="supply_quantity"]').value;
+
+                orderSupplies.push(`
+                    <div class="order-supply border-b py-2 flex items-center w-full" data-part-id="${supplyId}" data-part-quantity="${supplyQuantity}">
+                        <input type="hidden" name="supply_id" value="${supplyId}">
+                        <input type="hidden" name="supply_quantity_${supplyId}" value="${supplyQuantity}">
+                        <span class="w-6/12">${supplyNumber} - ${supplyName} </span>
+                        <span class="w-1/12 text-center">${supplyQuantity}</span>
                         <div class="w-2/12 flex justify-center"></div>
-                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-1/12 flex justify-center"></div>
                         <div class="w-2/12 flex justify-center"></div>
                     </div>
                 `);
             });
-            const sortedProviders = Object.keys(providers).sort().reduce(
-                (obj, key) => { 
-                    obj[key] = providers[key]; 
-                    return obj;
-                }, 
-                {}
-            );
-            // Calculate total price
-            let totalPrice = 0;
-            Object.keys(sortedProviders).forEach(provider => {
-                vehiceParts.push(`<div class="font-bold border-b pt-3 pb-1">${provider} - <span class="text-red-600">${formatNumber(providerCalculations[provider])} VNÐ</span></div>`);
-                vehiceParts.push(...sortedProviders[provider]);
-            });
-            document.getElementById('vehicle_parts').innerHTML = vehiceParts.join('');
+
+            document.getElementById('order-supplies').innerHTML = orderSupplies.join('');
             // Click cancel model to close this modal
             document.querySelector('.cancel-modal').click();
         })

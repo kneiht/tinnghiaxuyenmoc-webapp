@@ -45,6 +45,7 @@ urlpatterns = [
     
     path('api/form_repair_parts', views.form_repair_parts, name='form_repair_parts'),
     path('api/form_detailed_supplies', views.form_detailed_supplies, name='form_detailed_supplies'),
+    path('api/form_base_supplies', views.form_base_supplies, name='form_base_supplies'),
 
 
     path('api/form_maintenance_images/<int:maintenance_id>/', views.form_maintenance_images, name='form_maintenance_images'),

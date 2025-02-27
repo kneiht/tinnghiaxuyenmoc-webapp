@@ -268,6 +268,19 @@ class SupplyOrder(BaseModel):
         all_provider_payment_state = {}
         return all_provider_payment_state
 
+    def get_supply_order_base_supply_list(self):
+        order_supplies = SupplyOrderSupply.objects.filter(supply_order=self, base_supply__isnull=False)
+        return order_supplies
+
+    def get_supply_order_detail_supply_list(self):
+        order_supplies = SupplyOrderSupply.objects.filter(supply_order=self, detail_supply__isnull=False)
+        # Put into dict of groups of providers
+        supply_order_supply_dict = {}
+        for order_supply in order_supplies:
+            if order_supply.detail_supply.supply_provider not in supply_order_supply_dict:
+                supply_order_supply_dict[order_supply.detail_supply.supply_provider] = []
+            supply_order_supply_dict[order_supply.detail_supply.supply_provider].append(order_supply)
+        return supply_order_supply_dict
 
 
 class SupplyOrderSupply(BaseModel):
@@ -275,10 +288,13 @@ class SupplyOrderSupply(BaseModel):
         ('received', 'Đã nhận'),
         ('not_received', 'Chưa nhận'),
     )
-    id = models.IntegerField(primary_key=True)
+    # id = models.IntegerField(primary_key=True)
     supply_order = models.ForeignKey(SupplyOrder, on_delete=models.CASCADE, verbose_name="Phiếu mua hàng", null=True, blank=True)
-    detail_supply = models.ForeignKey(DetailSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
+    base_supply = models.ForeignKey(BaseSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
+    detail_supply = models.ForeignKey(DetailSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư chi tiết")
     quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
+    paid_quantity = models.IntegerField(verbose_name="Số lượng đã T.toán", default=0, validators=[MinValueValidator(0)])
+    received_quatity = models.IntegerField(verbose_name="Số lượng đã nhận", default=0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
 
     def save(self, *args, **kwargs):
