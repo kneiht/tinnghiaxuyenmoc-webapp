@@ -224,7 +224,7 @@ class SupplyOrder(BaseModel):
     @classmethod
     def get_display_fields(self):
         fields = [
-            'order_code', 'project', 'approval_status', 
+            'order_code','approval_status', 
             'received_status', 'paid_status', 'supply_providers', 'order_amount', 'note', 'created_at', 'user']
         # Check if the field is in the model
         for field in fields:
@@ -270,6 +270,7 @@ class SupplyOrder(BaseModel):
 
     def get_supply_order_base_supply_list(self):
         order_supplies = SupplyOrderSupply.objects.filter(supply_order=self, base_supply__isnull=False)
+        print(order_supplies)
         return order_supplies
 
     def get_supply_order_detail_supply_list(self):
@@ -292,9 +293,9 @@ class SupplyOrderSupply(BaseModel):
     supply_order = models.ForeignKey(SupplyOrder, on_delete=models.CASCADE, verbose_name="Phiếu mua hàng", null=True, blank=True)
     base_supply = models.ForeignKey(BaseSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
     detail_supply = models.ForeignKey(DetailSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư chi tiết")
-    quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
-    paid_quantity = models.IntegerField(verbose_name="Số lượng đã T.toán", default=0, validators=[MinValueValidator(0)])
-    received_quatity = models.IntegerField(verbose_name="Số lượng đã nhận", default=0, validators=[MinValueValidator(0)])
+    quantity = models.FloatField(verbose_name="Số lượng", default=0.0, validators=[MinValueValidator(0)])
+    paid_quantity = models.FloatField(verbose_name="Số lượng đã T.toán", default=0.0, validators=[MinValueValidator(0)])
+    received_quantity = models.FloatField(verbose_name="Số lượng đã nhận", default=0.0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
 
     def save(self, *args, **kwargs):
@@ -302,3 +303,34 @@ class SupplyOrderSupply(BaseModel):
         # provider = self.detail_supply.supply_provider
         # provider.calculate_payment_states()
 
+    def estimate_quantity(self):
+        cost_estimation = CostEstimation.objects.filter(project=self.supply_order.project, base_supply=self.base_supply).first()
+        if cost_estimation:
+            return cost_estimation.quantity
+            prin()
+        else:
+            return 0.0
+        
+    def orderable_quantity(self):
+        # Get cost estimation for this project and supply
+        cost_estimation = CostEstimation.objects.filter(
+            project=self.supply_order.project, 
+            base_supply=self.base_supply
+        ).first()
+        
+        if not cost_estimation:
+            return 0.0
+            
+        # Get all supply orders for this project and supply
+        existing_orders = SupplyOrderSupply.objects.filter(
+            supply_order__project=self.supply_order.project,
+            base_supply=self.base_supply
+        ).exclude(pk=self.pk)  # Exclude current order
+        
+        # Calculate total ordered quantity
+        total_ordered = sum(order.quantity for order in existing_orders)
+        
+        # Maximum orderable quantity is the difference between estimated and ordered
+        max_orderable = max(0.0, cost_estimation.quantity - total_ordered)
+        
+        return max_orderable

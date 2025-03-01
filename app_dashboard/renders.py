@@ -379,7 +379,7 @@ def render_form(request, **kwargs):
         'record': record
     }
 
-    if model == 'VehicleMaintenance':
+    if model in ['VehicleMaintenance', 'SupplyOrder']:
         permissions = request.user.check_permission('VehicleMaintenance')
         context['permissions'] = permissions
 

@@ -1,6 +1,6 @@
 
 function updateUrlParams(currentUrl, paramsToUpdate) {
-    console.log("Current URL:", currentUrl);
+    // console.log("Current URL:", currentUrl);
     // Convert the current URL to a URL object if the url is not already a URL object
     if (!(currentUrl instanceof URL)) {
         currentUrl = new URL(currentUrl);
@@ -15,7 +15,7 @@ function updateUrlParams(currentUrl, paramsToUpdate) {
     // Create the new URL with the updated parameters
     const newUrl = `${currentUrl.origin}${currentUrl.pathname}?${searchParams.toString()}`;
     // Log the new URL to the console
-    console.log("New URL:", newUrl);
+    // console.log("New URL:", newUrl);
     // Return the new URL
     return newUrl;
 }
@@ -93,7 +93,7 @@ up.compiler('#nav_bar', function (element) {
 up.compiler('#theme-toggle', function (element) {
     const themeToggles = document.querySelectorAll('#theme-toggle');
     const storedTheme = localStorage.getItem('theme');
-    console.log(storedTheme);
+    // console.log(storedTheme);
     function updateTheme(isDark) {
         const sunIcon = document.getElementById('sun-icon');
         const moonIcon = document.getElementById('moon-icon');
@@ -572,7 +572,7 @@ function handleNewSelectElement(select) {
 
     // Add if the select value change the wrapper change too
     select.addEventListener('change', () => {
-        console.log('change');
+        // console.log('change');
         card.querySelector('.selected-option').textContent = select.options[select.selectedIndex]?.text || 'Select an option';
     });
 }
@@ -612,7 +612,7 @@ up.compiler('.just-updated', function (update) {
     if (window.location.href.includes('PaymentRecord')) {
         // Click the search button "search-button"
         document.getElementById('search-button').click();
-        console.log('update');
+        // console.log('update');
     }
 });
 
@@ -771,7 +771,7 @@ function calculatePLTotals() {
 up.compiler('#display-table-records', function (table) {
     const currentUrl = window.location.href;
     if (currentUrl.includes('ConstructionReportPL')) {
-        console.log('ConstructionReportPL');
+        // console.log('ConstructionReportPL');
         // Checek if the table contennt changes => call calculatePLTotals
         const observer = new MutationObserver((mutationsList) => {
             for (const mutation of mutationsList) {
@@ -798,7 +798,7 @@ function adjustDisplayRecordsHeight() {
 
 
     let newDisplayRecordsHeight = currentDisplayRecordsHeight - (bodyHeight - viewportHeight);
-    console.log(newDisplayRecordsHeight)
+    // console.log(newDisplayRecordsHeight)
     displayRecords.style.height = `${newDisplayRecordsHeight - bottomMargin}px`;
 }
 
@@ -807,3 +807,21 @@ up.compiler('#display-records', function (display) {
     adjustDisplayRecordsHeight();
 });
 window.addEventListener("resize", adjustDisplayRecordsHeight);
+
+
+
+// Add submit button handler to prevent double submissions
+up.compiler('button[type="submit"]', function(button) {
+    button.addEventListener('click', function(e) {
+        if (this.classList.contains('disabled')) {
+            e.preventDefault();
+            return;
+        }
+        this.classList.add('disabled');
+        this.style.opacity = '0.5';
+        this.innerHTML = 'Đang xử lý...';
+    });
+});
+
+// Rest of existing code...
+// ... (rest of the original file content)

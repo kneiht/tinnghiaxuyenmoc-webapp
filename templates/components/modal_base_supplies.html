@@ -159,7 +159,7 @@
         })
 
         // Select cards from data from maintanance
-        document.querySelectorAll('.order_supply').forEach(el => {
+        document.querySelectorAll('.order-supply').forEach(el => {
             console.log(el);
             const supplyId = el.getAttribute('data-supply-id');
             const supplyQuantity = el.getAttribute('data-supply-quantity');
@@ -185,7 +185,7 @@
                 const supplyQuantity = el.querySelector('input[name="supply_quantity"]').value;
 
                 orderSupplies.push(`
-                    <div class="order-supply border-b py-2 flex items-center w-full" data-part-id="${supplyId}" data-part-quantity="${supplyQuantity}">
+                    <div class="order-supply border-b py-2 flex items-center w-full" data-supply-id="${supplyId}" data-supply-quantity="${supplyQuantity}">
                         <input type="hidden" name="supply_id" value="${supplyId}">
                         <input type="hidden" name="supply_quantity_${supplyId}" value="${supplyQuantity}">
                         <span class="w-6/12">${supplyNumber} - ${supplyName} </span>

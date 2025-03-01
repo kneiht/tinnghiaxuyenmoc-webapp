@@ -96,22 +96,25 @@
     </div>
     <div class="form-input flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
         <div class="border-b pb-0.5 flex w-full font-semibold">
-            <span class="w-6/12"> Vật tư </span>
+            <span class="w-5/12"> Vật tư </span>
+            <span class="w-1/12 text-center"> SL dự toán </span>
+            <span class="w-1/12 text-center"> SL thiếu </span>
             <span class="w-1/12 text-center"> SL đặt </span>
-            <span class="w-2/12 text-center"> SL đã thanh toán </span>
+            <span class="w-1/12 text-center"> SL T.toán </span>
             <span class="w-1/12 text-center"> SL đã nhận </span>
             <span class="w-2/12 text-center"> Ngày thêm </span>
         </div> 
         <div id="order-supplies">
-        {% for order_supplies in record.get_supply_order_base_supply_list %}
-            {% for order_supply in order_supplies %}
+        {% for order_supply in record.get_supply_order_base_supply_list %}
             <div  class="order-supply border-b py-2 flex items-center w-full" data-supply-id="{{ order_supply.base_supply.pk }}" data-supply-quantity="{{ order_supply.quantity }}">
                 {% if record %}
                 <input type="hidden" name="supply_id" value="{{ order_supply.base_supply.pk }}">
                 <input type="hidden" name="supply_order_supply_id" value="{{ order_supply.pk }}">
                 <input type="hidden" name="supply_quantity_{{ order_supply.base_supply.pk }}" value="{{ order_supply.quantity }}">
                 {% endif %}
-                <span class="w-7/12"> {{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</span>
+                <span class="w-5/12"> {{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</span>
+                <span class="w-1/12 text-center"> {{ order_supply.estimate_quantity }} </span>
+                <span class="w-1/12 text-center"> {{ order_supply.orderable_quantity }} </span>
                 <span class="w-1/12 text-center"> {{ order_supply.quantity }} </span>
                 <span class="w-1/12 text-center"> {{ order_supply.paid_quantity }} </span>
                 <span class="w-1/12 text-center"> {{ order_supply.received_quantity }} </span>
@@ -121,7 +124,6 @@
                 </div>
 
             </div>
-            {% endfor %}   
         {% endfor %}    
         </div>
     

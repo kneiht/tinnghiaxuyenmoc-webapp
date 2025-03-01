@@ -125,6 +125,14 @@ class UserPermission(BaseModel):
         ('ConstructionDriverSalary', 'Bảng lương'),
         ('ConstructionReportPL', 'Bảng BC P&L xe cơ giới'),
 
+        ('SupplyProvider', 'Nhà cung cấp vật tư'),
+        ('BaseSupply', 'Dữ liệu vật tư'),
+        ('DetailSupply', 'Dữ liệu vật tư chi tiết'),
+        ('Subcontractor', 'Tổ đội/ nhà thầu phụ'),
+        ('BaseSubJob', 'Công việc của tổ đội/ nhà thầu phụ'),
+        ('DetailSubJob', 'Công việc chi tiết của tổ đội/ nhà thầu phụ'),
+        ('CostEstimation', 'Dự Toán'),
+        ('SupplyOrder', 'Đơn đặt vật tư'),
     )
 
     class Meta:

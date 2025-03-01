@@ -286,15 +286,15 @@ def handle_form(request, model, pk=0):
 
             # check if the id is in the list, if not delete it
             for order_supply in order_supplies:
-                if str(order_supply.detail_supply.id) not in supply_ids:
+                if str(order_supply.base_supply.id) not in supply_ids:
                     order_supply.delete()
 
             for supply_id in supply_ids:
                 print(">>>>>>>>>> Supply id ", supply_id)
                 # get the instance VehicleMaintenanceRepairPart which has the repair_part.part_id == part_id
-                supply = DetailSupply.objects.filter(id=supply_id).first()
+                supply = BaseSupply.objects.filter(id=supply_id).first()
                 if supply:
-                    order_supply = SupplyOrderSupply.objects.filter(supply_order=order, detail_supply=supply).first()
+                    order_supply = SupplyOrderSupply.objects.filter(supply_order=order, base_supply=supply).first()
                 # Update
                 if order_supply: # Update quantity
                     print(">>>>>>>>>> Update ", order_supply)
@@ -306,7 +306,7 @@ def handle_form(request, model, pk=0):
                         print(">>>>>>>>>> Create ", supply)
                         SupplyOrderSupply.objects.create(
                             supply_order=order,
-                            detail_supply=supply,
+                            base_supply=supply,
                             quantity=request.POST.get(f'supply_quantity_{supply_id}'),
                         )
 

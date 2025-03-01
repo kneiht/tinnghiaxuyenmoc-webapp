@@ -2,9 +2,10 @@
     "liveServer.settings.multiRootWorkspaceName": "django-tinnghiaxuyenmoc",
     "workbench.tree.indent": 25,
     "files.exclude": {
-        ".vscode": true,
         ".venv": true,
-        "app_accounts": true
+        "app_accounts": true,
+        ".vscode": true,
+        "jstoolchain": true
     },
     "files.autoSave": "onFocusChange",
     "emeraldwalk.runonsave": {
