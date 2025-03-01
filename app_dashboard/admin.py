@@ -3,6 +3,14 @@ from django.contrib import admin
 from .models.models import *
 
 
+@admin.register(LiquidUnitPrice)
+class LiquidUnitPriceAdmin(admin.ModelAdmin):
+    list_display = ('liquid_type', 'unit_price', 'valid_from', 'note')
+    search_fields = ('liquid_type', 'note')
+    list_filter = ('liquid_type', 'valid_from')
+    ordering = ('-valid_from',)
+
+
 @admin.register(UserExtra)
 class UserExtraAdmin(admin.ModelAdmin):
     list_display = ('user', 'role', 'created_at')
