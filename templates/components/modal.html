@@ -1,12 +1,12 @@
 {% load custom_tags %}
-<div up-hungry id="modal">
+<div id="modal">
     <div id="modal-body" class="modal z-40 fixed inset-0 bg-slate-600 bg-opacity-60 h-full w-full flex justify-center overflow-auto">
         <!-- Modal Content -->
         <div class="relative top-16 mx-4 card h-fit w-full sm:w-fit mb-28  pb-8">
             <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ title }}</h3>
 
             <button id='cancel-modal' type="button" class="absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-body').remove();">
-                <i class="fa fa-times" aria-hidden="true"></i>
+                <i class=" fa fa-times" aria-hidden="true"></i>
             </button>
 
     
@@ -21,8 +21,8 @@
                             onclick="toggleModalEdit(this)">
                         <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
                         Chỉnh sửa
-                    </button>   
-                    
+                    </button>
+
                 {% else %}
                     <script>
                         function toggleModalEdit() {
@@ -146,7 +146,7 @@
                         <input type="hidden" name="project" value="{{ project_id }}">
                     {% endif %}
 
-                    {% if model != 'UserPermission' and form.user.name == 'user' %} 
+                    {% if model != 'UserPermission' and model != 'ProjectUser' and form.user.name == 'user' %} 
                         {% if record.user %}
                             <input type="hidden" name="user" value="{{ record.user.id }}">
                         {% else %}
@@ -156,7 +156,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if model == 'UserPermission' and field.name == 'user'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' %}
+                        {% if model == 'UserPermission' and field.name == 'user'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' or model == "ProjectUser" and field.name == 'project' or model == 'ProjectUser' and field.name == 'user' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -212,14 +212,12 @@
                     {% include 'components/modals/maintenance.html' %}
                     
                 {% elif modal == "modal_SupplyOrder" %}
-                    {% include 'components/modals/extend_supply_order_base.html' %}
+                    {% include 'components/modals/extend_supply_order_base.html' with role=project|get_project_role:user %}
 
                 {% elif modal == 'modal_PaymentRecord' %}
                     {% include 'components/modals/payment_record.html' %}
 
                 {%  endif %}
-
-
 
 
                 <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable approve-hidable

@@ -357,6 +357,7 @@ def render_form(request, **kwargs):
     model_class = globals()[model]
     form_class = globals()[model + 'Form']
     project_id = get_valid_id(kwargs.get('project_id', 0))
+    project = Project.objects.filter(pk=project_id).first()
 
     # Set selections
     modal = 'modal_' + model
@@ -374,6 +375,7 @@ def render_form(request, **kwargs):
         'model': model,
         'model_class': model_class,
         'project_id': project_id,
+        'project': project,
         'modal': modal,
         'form': form,
         'record': record

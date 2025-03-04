@@ -299,6 +299,16 @@ def handle_form(request, model, pk=0):
                 if order_supply: # Update quantity
                     print(">>>>>>>>>> Update ", order_supply)
                     order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}')
+                    # add detail supply
+                    supply_provider = request.POST.get(f'provider_{supply_id}')
+                    if supply_provider:
+                        detail_supply = supply.get_list_of_detail_supplies_of_a_provider(supply_provider).first()
+                        if detail_supply:
+                            order_supply.detail_supply = detail_supply
+                        else:
+                            order_supply.detail_supply = None
+                    else:
+                        order_supply.detail_supply = None
                     order_supply.save()
 
                 else: # create new
@@ -1254,8 +1264,15 @@ def form_detailed_supplies(request):
     return render(request, 'components/modal_detail_supplies.html', context)
 
 def form_base_supplies(request):
-    supplies = BaseSupply.objects.all() 
-    context = {'supplies': supplies}
+    project_id = request.GET.get('project')
+    # Get cost estimations for the project
+    estimations = CostEstimation.objects.filter(project_id=project_id)
+    base_supplies = BaseSupply.objects.filter(id__in=estimations.values_list('base_supply_id', flat=True))
+
+    # supplies = BaseSupply.objects.all() 
+    context = {'estimations': estimations,
+                'project_id': project_id,
+    }
     return render(request, 'components/modal_base_supplies.html', context)
 
 

@@ -27,22 +27,37 @@
                     <div class="flex flex-col h-full justify-between gap-5 text-sm text-theme">
                         <p id="no-supplies" class="hidden text-center mt-14 text-xl">Không tìm thấy vật tư trong danh sách, vui lòng tìm kiếm với từ khóa khác.</p>
                         <div id="repair-part-cards" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
-                            {% for supply in supplies %}
-                            <div class="relative card-supply provider-{{ supply.supply_provider.id }} card-supply-{{ supply.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" >
+                            {% for estimation in estimations %}
+                            <div class="relative card-supply card-supply-{{ estimation.base_supply.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" > 
+                                <div class="absolute top-20 w-full flex flex-row justify-center gap-1.5">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng dự toán">
+                                        <i class="fas fa-clipboard-list mr-1.5"></i>
+                                        <span class="font-bold">{{ estimation.estimate_quantity }}</span>
+                                        <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
+                                        <i class="fas fa-shopping-cart mr-1.5"></i>
+                                        <span class="orderable font-bold">{{ estimation.orderable_quantity }}</span>
+                                        <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
+                                    </span>
+                                </div>
 
                                 <div class="input-supply absolute top-28 w-full hidden flex flex-row justify-center">
                                     <div class="bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl px-2 py-1 text-sm w-5/6 flex flex-row justify-center items-center">
-                                        <label class="mr-2">SL ({{  supply.unit }})</label>
-                                        <input type="hidden" name="supply_id" value="{{ supply.id }}">
-                                        <input type="hidden" name="supply_number" value="{{ supply.supply_number }}">
-                                        <input type="hidden" name="supply_name" value="{{ supply.supply_name }}">
-                                        <input type="number" name="supply_quantity" value="1" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                        <label class="mr-2">SL ({{  estimation.base_supply.unit }})</label>
+                                        <input type="hidden" name="supply_id" value="{{ estimation.base_supply.id }}">
+                                        <input type="hidden" name="supply_number" value="{{ estimation.base_supply.supply_number }}">
+                                        <input type="hidden" name="supply_name" value="{{ estimation.base_supply.supply_name }}">
+                                        <input type="number" name="supply_quantity" value="0" min="0" max="{{ estimation.orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                        <input type="hidden" name="estimate_quantity" value="{{ estimation.estimate_quantity }}">
+                                        <input type="hidden" name="orderable_quantity" value="{{ estimation.orderable_quantity }}">
+
                                     </div>
                                 </div>
 
                                 <div style="height: 10rem;">
-                                    {% if supply.image %}
-                                    <img src="{{ supply.image.url }}" alt="{{ supply.supply_name }}"
+                                    {% if estimation.base_supply.image %}
+                                    <img src="{{ estimation.base_supply.image.url }}" alt="{{ estimation.base_supply.supply_name }}"
                                         class="rounded-t-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
                                     {% else %}
                                     <img src="/static/images/default/default_part.webp" alt="Default Supply Image"
@@ -53,14 +68,14 @@
                                 <div class="flex justify-between items-center px-2 relative">
                                     <div class="w-10/12">
                                         <h3 class=" font-semibold text-theme text-center pl-1">
-                                            {{ supply.supply_number }} - {{ supply.supply_name }}
+                                            {{ estimation.base_supply.supply_number }} - {{ estimation.base_supply.supply_name }}
                                         </h3>
                                     </div>
                                 </div>
                     
                                 <div class="flex flex-col text-sm px-2 pb-3 ">
                                     <!-- Keep <p> for paragraphs of text -->
-                                    <div class="mt-1.5 note whitespace-pre-line">Mô tả: {{ supply.note }} </div>
+                                    <div class="mt-1.5 note whitespace-pre-line">Mô tả: {{ estimation.base_supply.note }} </div>
                                 </div>
                             </div>
                             {% endfor %}
@@ -183,14 +198,18 @@
                 const supplyName = el.querySelector('input[name="supply_name"]').value;
                 // Make partPrice human readable
                 const supplyQuantity = el.querySelector('input[name="supply_quantity"]').value;
-
+                const estimateQuantity = el.querySelector('input[name="estimate_quantity"]').value;
+                const orderableQuantity = el.querySelector('input[name="orderable_quantity"]').value;
                 orderSupplies.push(`
                     <div class="order-supply border-b py-2 flex items-center w-full" data-supply-id="${supplyId}" data-supply-quantity="${supplyQuantity}">
                         <input type="hidden" name="supply_id" value="${supplyId}">
                         <input type="hidden" name="supply_quantity_${supplyId}" value="${supplyQuantity}">
-                        <span class="w-6/12">${supplyNumber} - ${supplyName} </span>
+                        <span class="w-5/12">${supplyNumber} - ${supplyName} </span>
+                        
+                        <div class="w-1/12 flex justify-center">${estimateQuantity}</div>
+                        <div class="w-1/12 flex justify-center">${orderableQuantity}</div>
                         <span class="w-1/12 text-center">${supplyQuantity}</span>
-                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-1/12 flex justify-center"></div>  
                         <div class="w-1/12 flex justify-center"></div>
                         <div class="w-2/12 flex justify-center"></div>
                     </div>

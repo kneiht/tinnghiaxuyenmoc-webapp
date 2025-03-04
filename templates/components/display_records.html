@@ -31,7 +31,7 @@
                         <div class="w-10 h-10 flex justify-end items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload="reveal" up-cache="auto"
-                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target=":none">
+                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
                                 <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
@@ -183,7 +183,7 @@
                         <div class="w-10 h-10 flex justify-center items-center">
                             <a id="record-edit" class="flex flex-row justify-center items-center"
                             up-preload="reveal" up-cache="auto"
-                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target=":none">
+                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
                                 <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  
@@ -399,7 +399,7 @@
                                         
                                         <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                             <select disabled name="location_new" class="form-input input hidden" id="id_location" style="width: 180px;">
-                                                <option value="" selected">----------</option>
+                                                <option value="" selected>----------</option>
                                                 {% for location in group.locations %}
                                                     <option value="{{ location.id }}">{{ location.name }}</option>
                                                 {% endfor %}
@@ -553,8 +553,11 @@
     
                     <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                         <div class="w-10 h-10 flex justify-center items-center">
-                            <a id="record-edit" class="flex flex-row justify-center items-center"
-                            up-preload="reveal" up-cache="auto" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}"  up-target=":none">
+                            <a id="record-edit" class="flex flex-row justify-center items-center" 
+                            up-preload="reveal" 
+                            up-cache="auto" 
+                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" 
+                            up-target="#modal">
                                 <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
                             </a>
                         </div>  

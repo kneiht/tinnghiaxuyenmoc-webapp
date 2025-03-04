@@ -157,6 +157,7 @@ class UserExtra(BaseModel):
         ('technician', 'Kỹ Thuật'),
         ('supervisor', 'Giám Sát'),
         ('normal_staff', 'Nhân Viên'),
+        ('accountant', 'Kế toán'),
     )
     role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)

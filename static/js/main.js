@@ -822,6 +822,3 @@ up.compiler('button[type="submit"]', function(button) {
         this.innerHTML = 'Đang xử lý...';
     });
 });
-
-// Rest of existing code...
-// ... (rest of the original file content)

@@ -27,7 +27,7 @@
                                 class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme"
                                 autocomplete="off"/>
                             <!-- Button to submit search -->
-                            <button id="search-button" type="submit"
+                            <button id="search-button"
                                 class="btn btn-outline rounded-l-none h-full shadow-none">
                                 <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
                             </button>
@@ -224,7 +224,7 @@
         {% endif %}
 
         {% if create_new_button_name and model != "PaymentRecord" %}
-        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target=":none" class="btn btn-primary text-nowrap">
+        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="me-3"> {{ create_new_button_name }} </span>
         </a>
@@ -261,7 +261,7 @@
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
                 accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
             <input type="hidden" name="project" value="{{ project_id }}">
-            <button class="btn btn-primary" type="submit" id="upload-button">
+            <button class="btn btn-primary" id="upload-button">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span class="me-3"> Nhập File Excel </span>
             </button>
@@ -271,7 +271,7 @@
         <!-- download_backup.html -->
         <a href="{% url 'download_excel_template' 'jobs' %}"  class="whitespace-nowrap">
             {% csrf_token %}
-            <button class="btn btn-primary" type="submit">
+            <button class="btn btn-primary">
                 <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span class="me-3"> Tải mẫu excel </span>
             </button>

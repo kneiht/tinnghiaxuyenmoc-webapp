@@ -4,17 +4,18 @@
     "files.exclude": {
         ".venv": true,
         "app_accounts": true,
-        ".vscode": true,
-        "jstoolchain": true
+        ".vscode": false,
+        "jstoolchain": false
     },
     "files.autoSave": "onFocusChange",
     "emeraldwalk.runonsave": {
-    "commands": [
-        {
-            "match": ".*",
-            "cmd": "make tailwind"
-        },
-    ]
+        "commands": [
+            {
+                "match": ".*",
+                "cmd": "make tailwind"
+            },
+        ]
+    },
+    "tailwindCSS.experimental.configFile": "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/jstoolchain/tailwind.config.js"
 }
 
-}

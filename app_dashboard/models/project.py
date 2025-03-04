@@ -49,6 +49,7 @@ class ProjectUser(BaseModel):
         ('view_only', 'Chỉ xem'),
         ('technician', 'Kỹ Thuật'),
         ('supervisor', 'Giám Sát'),
+        ('accountant', 'Kế Toán'),
         ('all', 'Cấp tất cả quyền trong dự án'),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Tài khoản")

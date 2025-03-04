@@ -86,8 +86,24 @@ class BaseSupply(BaseModel):
             unit=self.unit
         )
     
+    def get_providers(self):
+        """Get list of providers that have this base supply"""
+        detail_supplies = DetailSupply.objects.filter(base_supply=self)
+        providers = [detail.supply_provider for detail in detail_supplies if detail.supply_provider]
+        return list(set(providers))  # Remove duplicates
+    
+    def get_list_of_detail_supplies_of_a_provider(self, provider):
+        """Get list of detail supplies that have this base supply"""
+        return DetailSupply.objects.filter(base_supply=self, supply_provider=provider).order_by('-valid_from')
 
- 
+    def get_dict_of_detail_supplies(self):
+        providers = self.get_providers()
+        detail_supply_dict = {}
+        for provider in providers:
+            detail_supplies = self.get_list_of_detail_supplies_of_a_provider(provider)
+            detail_supply_dict[provider] = detail_supplies
+        return detail_supply_dict
+
 
 class DetailSupply(BaseModel):
     class Meta:
@@ -174,7 +190,24 @@ class CostEstimation(BaseModel):
             self.unit = self.base_supply.unit
         super().save()
 
-
+    # estimate_quantity
+    def estimate_quantity(self):
+        return self.quantity
+    
+    def orderable_quantity(self):
+        # Get all supply orders for this project and supply
+        existing_orders = SupplyOrderSupply.objects.filter(
+            supply_order__project=self.project,
+            base_supply=self.base_supply
+        )
+        
+        # Calculate total ordered quantity
+        total_ordered = sum(order.quantity for order in existing_orders)
+        
+        # Maximum orderable quantity is the difference between estimated and ordered
+        max_orderable = max(0.0, self.quantity - total_ordered)
+        
+        return max_orderable
 
 
 class SupplyOrder(BaseModel):
@@ -225,7 +258,7 @@ class SupplyOrder(BaseModel):
     def get_display_fields(self):
         fields = [
             'order_code','approval_status', 
-            'received_status', 'paid_status', 'supply_providers', 'order_amount', 'note', 'created_at', 'user']
+            'received_status', 'paid_status', 'note', 'created_at', 'user']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

@@ -17,6 +17,8 @@ def get_static_version():
     return settings.STATIC_VERSION
 
 
+
+
 import base64, json
 @register.simple_tag
 def encode_params(**kwargs):
@@ -34,6 +36,13 @@ def encode_params(**kwargs):
     query_string = encoded_string.decode('utf-8')
     return query_string
 
+
+@register.filter(name='multiply')
+def multiply(value, arg):
+    try:
+        return value * arg
+    except:
+        return 0
 
 
 @register.filter(name='get_unique_values')

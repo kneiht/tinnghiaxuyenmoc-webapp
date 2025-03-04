@@ -47,7 +47,7 @@
         {% endif %}
         
         {% if create_new_button_name %}
-        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target=":none" class="max-sm:hidden btn btn-primary text-nowrap">
+        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="max-sm:hidden me-3"> {{ create_new_button_name }} </span>
         </a>

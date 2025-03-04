@@ -83,49 +83,139 @@
 
 
 <div class="w-full pt-4 px-6">
+    <p class="text-center text-theme"> Lưu ý: các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật </p>
     <div class="flex flex-row justify-between gap-5 items-center py-1">
         <div class="flex flex-row gap-5 items-end py-2">
-            <label for="students" class="text-theme">Bảng vật tư đã chọn</label>
+            
+            <label for="students" class="text-theme">Bảng vật tư</label>
 
-            <a href="{% url 'form_base_supplies' %}?project={{ project_id }}" class="btn btn-success h-7 hidable hidden"
-                up-preload="insert" up-target="#modal-sub:maybe">
-                <span class="me-3"> Chọn vật tư </span>
-            </a>
+
+            {% if role != 'accountant' %}
+                <a href="{% url 'form_base_supplies' %}?project={{ project_id }}" class="btn btn-success h-7 hidable hidden"
+                    up-preload="insert" up-target="#modal-sub:maybe">
+                    <span> Chọn vật tư </span>
+                </a>
+            {% endif %}
 
         </div>
     </div>
-    <div class="form-input flex flex-col h-fit h-max-[300px] gap-4 pt-4 pb-6 overflow-y-scroll">
-        <div class="border-b pb-0.5 flex w-full font-semibold">
-            <span class="w-5/12"> Vật tư </span>
-            <span class="w-1/12 text-center"> SL dự toán </span>
-            <span class="w-1/12 text-center"> SL thiếu </span>
-            <span class="w-1/12 text-center"> SL đặt </span>
-            <span class="w-1/12 text-center"> SL T.toán </span>
-            <span class="w-1/12 text-center"> SL đã nhận </span>
-            <span class="w-2/12 text-center"> Ngày thêm </span>
+
+    
+    <div class="form-input flex flex-col h-fit h-max-[500px] gap-4 pt-4 pb-6 overflow-auto sm:w-[1100px]">
+        <div class="border-b pb-0.5 flex font-semibold w-fit">
+            <span class="w-72"> Vật tư </span>
+            
+            {% if role == 'accountant' %}
+                <span class="w-40 text-center"> Nhà cung cấp </span>
+                <span class="w-28 text-center"> Đơn giá </span>
+                <span class="w-28 text-center"> Thành tiền </span>
+            {% endif %}
+            <span class="w-28 text-center"> SL dự toán </span>
+            <span class="w-28 text-center"> SL thiếu </span>
+            <span class="w-28 text-center"> SL đặt </span>
+            <span class="w-28 text-center"> SL T.toán </span>
+            <span class="w-28 text-center"> SL đã nhận </span>
+            <span class="w-28 text-center"> Ngày thêm </span>
         </div> 
-        <div id="order-supplies">
-        {% for order_supply in record.get_supply_order_base_supply_list %}
-            <div  class="order-supply border-b py-2 flex items-center w-full" data-supply-id="{{ order_supply.base_supply.pk }}" data-supply-quantity="{{ order_supply.quantity }}">
-                {% if record %}
-                <input type="hidden" name="supply_id" value="{{ order_supply.base_supply.pk }}">
-                <input type="hidden" name="supply_order_supply_id" value="{{ order_supply.pk }}">
-                <input type="hidden" name="supply_quantity_{{ order_supply.base_supply.pk }}" value="{{ order_supply.quantity }}">
-                {% endif %}
-                <span class="w-5/12"> {{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</span>
-                <span class="w-1/12 text-center"> {{ order_supply.estimate_quantity }} </span>
-                <span class="w-1/12 text-center"> {{ order_supply.orderable_quantity }} </span>
-                <span class="w-1/12 text-center"> {{ order_supply.quantity }} </span>
-                <span class="w-1/12 text-center"> {{ order_supply.paid_quantity }} </span>
-                <span class="w-1/12 text-center"> {{ order_supply.received_quantity }} </span>
+        <div id="order-supplies" class="overflow-y-auto w-fit">
+            {% for order_supply in record.get_supply_order_base_supply_list %}
+                <div  class="order-supply border-b py-2 flex items-center w-full"
+                        data-supply-id="{{ order_supply.base_supply.pk }}"
+                        data-supply-quantity="{{ order_supply.quantity }}">
+                    {% if record %}
+                    <input type="hidden" name="supply_id" value="{{ order_supply.base_supply.pk }}">
+                    <input type="hidden" name="supply_order_supply_id" value="{{ order_supply.pk }}">
+                    <input type="hidden" name="supply_quantity_{{ order_supply.base_supply.pk }}" value="{{ order_supply.quantity }}">
+                    {% endif %}
+                    <span class="w-72"> {{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</span>
+                        
+                    {% if role == 'accountant' %}
+                    <div class="w-40 text-center">
+                        <button class="hidable approve-hidable hidden" onclick="showProviderModal('{{ order_supply.base_supply.pk }}')">
+                            {% if order_supply.detail_supply.supply_provider %}
+                                {{ order_supply.detail_supply.supply_provider }}
+                            {% else %}
+                                Chưa chọn
+                            {% endif %}
+                        </button>
+                        <span class="hidable approve-hiddable">
+                            {{ order_supply.detail_supply.supply_provider }}
+                        </span>
+                        <input class="hidden" id="provider_{{ order_supply.base_supply.pk }}" name="provider_{{ order_supply.base_supply.pk }}" value="{{ order_supply.detail_supply.supply_provider.pk }}">
+                    </div>
+                    <div class="w-28 text-center">
+                        {{ order_supply.detail_supply.supply_price|format_money }}
+                    </div>
+                    <div class="w-28 text-center">
+                        {{ order_supply.detail_supply.supply_price|multiply:order_supply.quantity|format_money }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Provider Modal -->
+                    <div id="provider-modal-{{ order_supply.base_supply.pk }}" class="hidden fixed inset-0 bg-gray-600 bg-opacity-30 flex justify-center items-center z-50">
+                        <div class="card p-4 rounded shadow-lg w-1/3">
+                            <h3 class="text-lg font-bold mb-4">Chọn Nhà Cung Cấp</h3>
+                            <ul>
+                                {% for provider, detail_supply_list in order_supply.base_supply.get_dict_of_detail_supplies.items %}
+                                    <li class="py-2 border-b flex justify-between items-center">
+                                        <span>{{ provider.name }}</span>
+                                        <button class="text-blue-500" onclick="selectProvider('{{ provider.pk }}', '{{ provider.name }}', '{{ order_supply.base_supply.pk }}')">
+                                            Chọn
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <button class="mt-4 btn btn-secondary" onclick="closeProviderModal('{{ order_supply.base_supply.pk }}')">Đóng</button>
+                        </div>
+                    </div>
+                    
 
-                <div class="w-2/12 flex justify-center">
-                    {{ record.last_saved|date:"d/m/Y" }}
+                    <span class="w-28 text-center"> {{ order_supply.estimate_quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_supply.orderable_quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_supply.quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_supply.paid_quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_supply.received_quantity }} </span>
+                    <div class="w-28 flex justify-center">
+                        {{ record.last_saved|date:"d/m/Y" }}
+                    </div>
+
                 </div>
-
-            </div>
-        {% endfor %}    
+            {% endfor %}    
         </div>
     
     </div>
+    <script>
+        function updateProviderSpan(selectElement) {
+            // Get span by sibling of the element
+            const spanElement = selectElement.nextElementSibling;
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            spanElement.textContent = selectedOption.text;
+        }
+    </script>
+    <script>
+        function showProviderModal(baseSupplyPk) {
+            // Prevent submit
+            event.preventDefault();
+            document.getElementById('provider-modal-' + baseSupplyPk).classList.remove('hidden');
+        }
+    
+        function closeProviderModal(baseSupplyPk) {
+            event.preventDefault();
+            document.getElementById('provider-modal-' + baseSupplyPk).classList.add('hidden');
+        }
+    
+        function selectProvider(providerPk, providerName, baseSupplyPk) {
+            event.preventDefault();
+            // Update the button text with the selected provider name
+            const button = document.querySelector(`button[onclick="showProviderModal('${baseSupplyPk}')"]`);
+            button.textContent = providerName;
+    
+            // Optionally, update a hidden input or perform an AJAX request to save the selection
+            // Example: document.getElementById('selected-provider-' + baseSupplyPk).value = providerPk;
+            // Update the hidden input value when selecting provider
+            document.getElementById('provider_' + baseSupplyPk).value = providerPk;
+            closeProviderModal(baseSupplyPk);
+        }
+    </script>
+
 </div>
