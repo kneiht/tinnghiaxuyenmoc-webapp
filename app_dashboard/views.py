@@ -299,6 +299,11 @@ def handle_form(request, model, pk=0):
                 if order_supply: # Update quantity
                     print(">>>>>>>>>> Update ", order_supply)
                     order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}')
+                    
+                    # Update paid and received quantities
+                    order_supply.paid_quantity = request.POST.get(f'paid_quantity_{supply_id}')
+                    order_supply.received_quantity = request.POST.get(f'received_quantity_{supply_id}')
+                    
                     # add detail supply
                     supply_provider = request.POST.get(f'provider_{supply_id}')
                     if supply_provider:
@@ -1366,7 +1371,7 @@ def form_cost_estimation_table(request, project_id):
             cost_estimation_list.append(cost_estimation)
 
         # delete old records
-        CostEstimation.objects.filter(project=project).delete()
+        CostEstimation.objects.filter(project=project)
 
         # Save the records
         for cost_estimation in cost_estimation_list:
@@ -1532,9 +1537,11 @@ def page_projects(request, sub_page=None):
         'SupplyProvider': 'Nhà cung cấp vật tư',
         'BaseSupply': 'Vật tư',
         'DetailSupply': 'Vật tư chi tiết',
+        'SupplyPaymentRecord': 'LS thanh toán vật tư',
         'Subcontractor': 'Tổ đội/ nhà thầu phụ',
         'BaseSubJob': 'Công việc của tổ đội/ nhà thầu phụ',
         'DetailSubJob': 'Công việc chi tiết của tổ đội/ nhà thầu phụ',
+        
     }
     context = {
         'sub_page': sub_page,

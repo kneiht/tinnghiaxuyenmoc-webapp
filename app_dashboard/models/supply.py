@@ -4,6 +4,7 @@ from django.utils import timezone
 from .base import models, BaseModel
 from .project import Project
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class SupplyProvider(BaseModel):
     # Driver Information Fields
@@ -36,6 +37,30 @@ class SupplyProvider(BaseModel):
                 fields.remove(field)
         return fields
 
+    def calculate_payment_states(self):
+        # Get all SupplyOrderSupply records for this provider
+        order_supplies = SupplyOrderSupply.objects.filter(detail_supply__supply_provider=self)
+        
+        # Calculate total purchase amount
+        purchase_amount = 0
+        for order_supply in order_supplies:
+            if order_supply.detail_supply:
+                purchase_amount += order_supply.detail_supply.supply_price * order_supply.quantity
+
+        # Calculate total transferred amount from payment records
+        transferred_amount = 0
+        payment_records = SupplyPaymentRecord.objects.filter(provider=self)
+        for payment_record in payment_records:
+            transferred_amount += payment_record.transferred_amount
+
+        # Calculate outstanding debt
+        debt_amount = purchase_amount - transferred_amount
+
+        # Update provider's financial fields
+        self.total_purchase_amount = purchase_amount
+        self.total_transferred_amount = transferred_amount
+        self.total_outstanding_debt = debt_amount
+        self.save()
 
 
 class BaseSupply(BaseModel):
@@ -161,7 +186,6 @@ class CostEstimation(BaseModel):
 
     base_supply = models.ForeignKey(BaseSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
 
-
     # From BaseSupply
     material_type = models.CharField(max_length=50, verbose_name="Nhóm vật tư")
     supply_number = models.CharField(max_length=255, verbose_name="Mã vật tư", null=True, blank=True)
@@ -169,13 +193,19 @@ class CostEstimation(BaseModel):
     unit = models.CharField(max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True)
     # end From BaseSupply
 
-    quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng")
+    quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng dự toán")
+    orderable_quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng còn thiếu")
+    ordered_quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng đã đặt")
+    paid_quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng đã thanh toán")
+    received_quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng đã nhận")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     @classmethod
     def get_display_fields(self):
-        fields = ['category', 'material_type', 'supply_number', 'supply_name', 'unit', 'quantity', 'note']
+        fields = ['category', 'material_type', 'supply_number', 'supply_name', 'unit', 
+            'quantity', 'ordered_quantity', 'orderable_quantity', 'paid_quantity', 
+            'received_quantity','note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -183,31 +213,65 @@ class CostEstimation(BaseModel):
         return fields
     
     def save(self, *args, **kwargs):
+        if self.note == "nan":
+            self.note = ""
+
         if self.base_supply:
             self.material_type = self.base_supply.material_type
             self.supply_number = self.base_supply.supply_number
             self.supply_name = self.base_supply.supply_name
             self.unit = self.base_supply.unit
+        
+        self.orderable_quantity = self.get_orderable_quantity()
+        self.ordered_quantity = self.get_ordered_quantity()
+        self.paid_quantity = self.get_paid_quantity()
+        self.received_quantity = self.get_received_quantity()
         super().save()
 
     # estimate_quantity
-    def estimate_quantity(self):
+    def get_estimate_quantity(self):
         return self.quantity
     
-    def orderable_quantity(self):
+    def get_orderable_quantity(self):
         # Get all supply orders for this project and supply
         existing_orders = SupplyOrderSupply.objects.filter(
             supply_order__project=self.project,
             base_supply=self.base_supply
         )
-        
         # Calculate total ordered quantity
         total_ordered = sum(order.quantity for order in existing_orders)
-        
         # Maximum orderable quantity is the difference between estimated and ordered
         max_orderable = max(0.0, self.quantity - total_ordered)
-        
         return max_orderable
+
+    def get_ordered_quantity(self):
+        # Get all supply orders for this project and supply
+        existing_orders = SupplyOrderSupply.objects.filter(
+            supply_order__project=self.project,
+            base_supply=self.base_supply
+        )
+        # Calculate total ordered quantity
+        total_ordered = sum(order.quantity for order in existing_orders)
+        return total_ordered
+
+    def get_paid_quantity(self):
+        # Get all supply orders for this project and supply
+        existing_orders = SupplyOrderSupply.objects.filter(
+            supply_order__project=self.project,
+            base_supply=self.base_supply
+        )
+        total_paid = sum(order.paid_quantity for order in existing_orders)
+        return total_paid
+
+    def get_received_quantity(self):
+        # Get all supply orders for this project and supply
+        existing_orders = SupplyOrderSupply.objects.filter(
+            supply_order__project=self.project,
+            base_supply=self.base_supply
+        )
+        total_received = sum(order.received_quantity for order in existing_orders)
+        return total_received
+
 
 
 class SupplyOrder(BaseModel):
@@ -216,7 +280,6 @@ class SupplyOrder(BaseModel):
         ('scratch', 'Bảng nháp'),
         ('wait_for_approval', 'Chờ duyệt'),
         ('approved', 'Đã duyệt'),
-        ('need_update', 'Cần sửa lại'),
         ('rejected', 'Từ chối'),
     )
 
@@ -247,12 +310,106 @@ class SupplyOrder(BaseModel):
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
-
     supply_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
 
+
     def save(self, *args, **kwargs):
+        # Skip if user changed (keep first user)
+        if self.pk:
+            old_instance = SupplyOrder.objects.get(pk=self.pk)
+            if old_instance.user:
+                self.user = old_instance.user
         self.order_code = "#" + str(self.pk).zfill(4)
         super().save()
+        
+        # Get all related supply orders
+        order_supplies = SupplyOrderSupply.objects.filter(supply_order=self)
+        
+        # Calculate total order amount
+        total_amount = 0
+        for order_supply in order_supplies:
+            if order_supply.detail_supply:
+                supply_amount = order_supply.detail_supply.supply_price * order_supply.quantity
+                total_amount += supply_amount
+        
+        self.order_amount = total_amount
+        
+        # Check received status
+        if order_supplies.filter(received_status='not_received').count() == 0:
+            self.received_status = 'received'
+        else:
+            self.received_status = 'not_received'
+            
+        # Check payment status and update providers list
+        all_provider_payment_states = self.calculate_all_provider_payment_states()
+        total_purchase_amount = 0
+        total_transferred_amount = 0
+        total_debt_amount = 0
+        self.supply_providers = ""
+        
+        for provider_id, provider_payment_state in all_provider_payment_states.items():
+            total_purchase_amount += provider_payment_state['purchase_amount']
+            total_transferred_amount += provider_payment_state['transferred_amount']
+            total_debt_amount += provider_payment_state['debt_amount']
+            
+            provider = SupplyProvider.objects.get(pk=provider_id)
+            self.supply_providers += '- ' + provider.name + '\n'
+        self.supply_providers = self.supply_providers.strip()
+        
+        # Update paid status
+        if total_purchase_amount == 0:
+            self.paid_status = 'not_paid'
+        else:
+            if total_debt_amount == 0:
+                self.paid_status = 'paid'
+            elif total_debt_amount > 0 and total_transferred_amount > 0:
+                self.paid_status = 'partial_paid'
+            else:
+                self.paid_status = 'not_paid'
+                
+        super().save()
+        
+        # Prevent recursion from payment records
+        from_payment_record = kwargs.get('from_payment_record', None)
+        if from_payment_record:
+            return
+            
+        # Create or update payment records
+        if self.approval_status == 'approved' or True:
+            all_provider_payment_state = self.calculate_all_provider_payment_states()
+            
+            for provider_id in all_provider_payment_state:
+                payment_records = SupplyPaymentRecord.objects.filter(
+                    supply_order=self, 
+                    provider_id=provider_id
+                ).order_by('id')
+                
+                if len(payment_records) == 0:
+                    payment_record = SupplyPaymentRecord.objects.create(
+                        supply_order=self,
+                        provider_id=provider_id,
+                        previous_debt=all_provider_payment_state[provider_id]['debt_amount'],
+                        purchase_amount=all_provider_payment_state[provider_id]['purchase_amount']
+                    )
+                else:
+                    total_transferred_amount = 0
+                    previous_record = None
+                    purchase_amount = all_provider_payment_state[provider_id]['purchase_amount']
+                    
+                    for payment_record in payment_records:
+                        total_transferred_amount += previous_record.transferred_amount if previous_record else 0
+                        previous_record = payment_record
+                        previous_debt = purchase_amount - total_transferred_amount
+                        payment_record.previous_debt = previous_debt
+                        payment_record.purchase_amount = purchase_amount
+                        payment_record.debt = previous_debt - payment_record.transferred_amount
+                        payment_record.save()
+                        
+        elif self.approval_status == 'rejected':
+            SupplyPaymentRecord.objects.filter(supply_order=self).delete()
+
+
+
 
     @classmethod
     def get_display_fields(self):
@@ -269,36 +426,43 @@ class SupplyOrder(BaseModel):
         return self.order_code
 
     def calculate_all_provider_payment_states(self):
-        # # get all the parts in this vehicle maintenance
-        # vehicle_parts = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance=self)
-        # # get all the providers in this vehicle maintenance
-        # provider_ids = vehicle_parts.values_list('repair_part__part_provider', flat=True).distinct()
-        # provider_ids = set(provider_ids)
-        # all_provider_payment_state = {}
-        # for provider_id in provider_ids:
-        #     provider = PartProvider.objects.get(pk=provider_id)
-        #     # calculate the purchase amount
-        #     purchase_amount = 0
-        #     provider_vehicle_parts = vehicle_parts.filter(repair_part__part_provider=provider)
-        #     for provider_vehicle_part in provider_vehicle_parts:
-        #         purchase_amount += provider_vehicle_part.repair_part.part_price * provider_vehicle_part.quantity
-
-        #     # calculate the transferred amount
-        #     transferred_amount = 0
-        #     payment_records = PaymentRecord.objects.filter(vehicle_maintenance=self, provider=provider)
-        #     for payment_record in payment_records:
-        #         transferred_amount += payment_record.transferred_amount
-
-        #     # calculate the debt amount
-        #     debt_amount = purchase_amount - transferred_amount
-
-        #     state = {
-        #         'purchase_amount': purchase_amount,
-        #         'transferred_amount': transferred_amount,
-        #         'debt_amount': debt_amount
-        #     }
-        #     all_provider_payment_state[provider.id] = state 
+        # Get all supplies in this supply order
+        order_supplies = SupplyOrderSupply.objects.filter(supply_order=self)
+        
+        # Get all providers in this supply order
+        provider_ids = order_supplies.values_list('detail_supply__supply_provider', flat=True).distinct()
+        provider_ids = set(provider_ids)
+        
         all_provider_payment_state = {}
+        for provider_id in provider_ids:
+            if not provider_id:  # Skip if provider is None
+                continue
+                
+            provider = SupplyProvider.objects.get(pk=provider_id)
+            
+            # Calculate purchase amount
+            purchase_amount = 0
+            provider_supplies = order_supplies.filter(detail_supply__supply_provider=provider)
+            for supply in provider_supplies:
+                if supply.detail_supply:
+                    purchase_amount += supply.detail_supply.supply_price * supply.quantity
+
+            # Calculate transferred amount
+            transferred_amount = 0
+            payment_records = SupplyPaymentRecord.objects.filter(supply_order=self, provider=provider)
+            for payment_record in payment_records:
+                transferred_amount += payment_record.transferred_amount
+
+            # Calculate debt amount
+            debt_amount = purchase_amount - transferred_amount
+
+            state = {
+                'purchase_amount': purchase_amount,
+                'transferred_amount': transferred_amount,
+                'debt_amount': debt_amount
+            }
+            all_provider_payment_state[provider.id] = state
+            
         return all_provider_payment_state
 
     def get_supply_order_base_supply_list(self):
@@ -332,9 +496,28 @@ class SupplyOrderSupply(BaseModel):
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
 
     def save(self, *args, **kwargs):
+        # Get old provider before saving
+        old_provider = None
+        if self.pk:
+            old_instance = SupplyOrderSupply.objects.get(pk=self.pk)
+            if old_instance.detail_supply:
+                old_provider = old_instance.detail_supply.supply_provider
         super().save(*args, **kwargs)
-        # provider = self.detail_supply.supply_provider
-        # provider.calculate_payment_states()
+
+        # Get new provider after saving
+        new_provider = None
+        if self.detail_supply:
+            new_provider = self.detail_supply.supply_provider
+
+        # Update payment states for both old and new providers
+        if old_provider and old_provider != new_provider:
+            old_provider.calculate_payment_states()
+        if new_provider:
+            new_provider.calculate_payment_states()
+
+        # update cost estimation
+        cost_estimation = CostEstimation.objects.filter(project=self.supply_order.project, base_supply=self.base_supply).first()
+        cost_estimation.save()
 
     def estimate_quantity(self):
         cost_estimation = CostEstimation.objects.filter(project=self.supply_order.project, base_supply=self.base_supply).first()
@@ -367,3 +550,122 @@ class SupplyOrderSupply(BaseModel):
         max_orderable = max(0.0, cost_estimation.quantity - total_ordered)
         
         return max_orderable
+
+class SupplyPaymentRecord(BaseModel):
+    class Meta:
+        ordering = ['supply_order', 'provider', '-id']
+
+    PAID_STATUS_CHOICES = (
+        ('not_requested', 'Chưa đề nghị'),
+        ('requested', 'Đề nghị T.toán'),
+        ('partial_paid', 'T.toán một phần'),
+        ('paid', 'Đã T.toán đủ'),
+    )
+
+    MONEY_SOURCE_CHOICES = (
+        ('individual', 'Cá nhân'),
+        ('huy_bao_company', 'Công ty Huy Bảo'),
+        ('tin_nghia_company', 'Công ty Tín Nghĩa'),
+        ('viet_tin_company', 'Công ty Việt Tín'),
+        ('dhc_company', 'Công ty DHC'),
+        ('bh_company', 'Công ty BH'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
+    supply_order = models.ForeignKey(SupplyOrder, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu mua hàng")
+    provider = models.ForeignKey(SupplyProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
+    status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_requested', verbose_name="Trạng thái thanh toán")
+
+    purchase_amount = models.IntegerField(verbose_name="Tổng tiền trên phiếu", default=0, validators=[MinValueValidator(0)])
+    previous_debt = models.IntegerField(verbose_name="Nợ kì trước", default=0, validators=[MinValueValidator(0)])
+
+    requested_amount = models.IntegerField(verbose_name="Số tiền đề nghị", default=0, validators=[MinValueValidator(0)])
+    requested_date = models.DateField(verbose_name="Ngày đề nghị", default=timezone.now)
+
+    money_source = models.CharField(max_length=100, choices=MONEY_SOURCE_CHOICES, default='individual', verbose_name="Nguồn tiền")
+    transferred_amount = models.IntegerField(verbose_name="Tiền thanh toán", default=0, validators=[MinValueValidator(0)])
+    payment_date = models.DateField(verbose_name="Ngày thanh toán", default=timezone.now)
+
+    debt = models.IntegerField(verbose_name="Nợ còn lại", default=0, validators=[MinValueValidator(0)])
+    lock = models.BooleanField(verbose_name="Khóa phiếu", default=False)
+
+    image1 = models.ImageField(verbose_name="Hình ảnh", upload_to='images/supply_payments/', blank=True, null=True)
+    image2 = models.ImageField(verbose_name="Hình ảnh", upload_to='images/supply_payments/', blank=True, null=True)
+
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.supply_order} - {self.payment_date}'
+
+    @classmethod
+    def get_display_fields(self):
+        fields = ['supply_order', 'provider', 'status', 'lock', 'purchase_amount', 
+            'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
+            'payment_date', 'money_source', 'debt', 'note', 'image1', 'user']
+        return [field for field in fields if hasattr(self, field)]
+
+    def save(self, *args, **kwargs):
+        # Update status based on amounts
+        if self.requested_amount > 0:
+            self.status = 'requested'
+
+        if self.transferred_amount > 0 and self.transferred_amount < self.previous_debt:
+            self.status = 'partial_paid'
+            self.debt = self.previous_debt - self.transferred_amount
+
+        if self.transferred_amount > 0 and self.transferred_amount == self.previous_debt:
+            self.status = 'paid'
+            self.debt = self.previous_debt - self.transferred_amount
+
+        if self.requested_amount == 0:
+            self.status = 'not_requested'
+
+        # Set user from supply order
+        self.user = self.supply_order.user
+
+        super().save(*args, **kwargs)
+        self.provider.calculate_payment_states()
+        
+        # Extract supply order and provider
+        supply_order = self.supply_order
+        provider = self.provider
+        
+        # Get last payment record for this supply order and provider
+        last_payment_record = SupplyPaymentRecord.objects.filter(
+            supply_order=supply_order, 
+            provider=provider
+        ).order_by('id').last()
+        
+        # Create new payment record if this is the last one, it's locked, and has remaining debt
+        if last_payment_record == self and self.lock and self.debt != 0:
+            new_payment_record = SupplyPaymentRecord.objects.create(
+                supply_order=supply_order,
+                provider=provider,
+                previous_debt=self.debt,
+                purchase_amount=self.purchase_amount,
+                debt=self.debt
+            )
+
+        # Update supply order payment status
+        supply_order.save(from_payment_record=True)
+
+    def clean(self):
+        errors = ""
+        if self.requested_amount > self.previous_debt:
+            errors += f'- Số tiền đề nghị phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n'
+
+        if self.requested_amount == 0 and self.transferred_amount > 0:
+            errors += '- Chưa thanh toán khi chưa có đề nghị.\n'
+
+        if self.transferred_amount > self.previous_debt:
+            errors += f'- Số tiền thanh toán phải nhỏ hơn hoặc bằng nợ kì trước {format(self.previous_debt, ",d")}.\n'
+
+        if self.payment_date < self.requested_date:
+            errors += f'- Ngày thanh toán phải lớn hơn hoặc bằng ngày đề nghị {self.requested_date.strftime("%d/%m/%Y")}.\n'
+
+        if self.lock and self.transferred_amount == 0:
+            errors += '- Không thể khóa phiếu thanh toán khi chưa thanh toán.\n'
+
+        if errors:
+            raise ValidationError(errors)

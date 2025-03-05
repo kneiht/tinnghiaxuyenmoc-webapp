@@ -27,10 +27,6 @@
                                             {% elif record.approval_status == "approved" %}
                                                 <option selected value="approved">Đã duyệt</option>
 
-                                            {% elif record.approval_status == "need_update" %}
-                                                <option value="wait_for_approval">Chờ duyệt</option>
-                                                <option selected value="need_update">Cần sửa lại</option>
-
                                             {% elif record.approval_status == "rejected" %}
                                                 <option value="rejected">Từ chối</option>
                                             {% endif %}
@@ -44,19 +40,12 @@
                                             {% elif record.approval_status == "wait_for_approval" %}
                                                 <option selected value="wait_for_approval">Chờ duyệt</option>
                                                 <option value="approved">Đã duyệt</option>
-                                                <option value="need_update">Cần sửa lại</option>
                                                 <option value="rejected">Từ chối</option>
 
                                             {% elif record.approval_status == "approved" %}
                                                 <option selected value="approved">Đã duyệt</option>
-                                                <option value="need_update">Cần sửa lại</option>
-
-                                            {% elif record.approval_status == "need_update" %}
-                                                <option value="wait_for_approval">Chờ duyệt</option>
-                                                <option selected value="need_update">Cần sửa lại</option>
 
                                             {% elif record.approval_status == "rejected" %}
-                                                <option value="need_update">Cần sửa lại</option>
                                                 <option selected value="rejected">Từ chối</option>
                                             {% endif %}
                                         

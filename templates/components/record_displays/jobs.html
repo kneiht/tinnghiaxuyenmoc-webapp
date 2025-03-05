@@ -1,0 +1,92 @@
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+<div id="display-records" class="w-full overflow-scroll">
+    <table id="display-table-records" class="table-auto w-full overflow-hidden mt-4 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        {% if not update %}
+        <thead>
+            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                {% for header in headers %}
+                    <th class="px-6 py-3 text-left font-semibold ">{{ header }}</th>
+                {% endfor %}
+                    <th class="px-6 py-3 text-left font-semibold">Tiến độ</th>
+                <th></th>
+            </tr>
+        {% endif %}
+
+        </thead>
+        {% for record in records %}
+            <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
+                <tr class=" bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                    {% for field in fields %}
+                        {% if field == 'status' %} 
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                                <span class="{{ record.status }} text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">{{ record|format_display:field }}</span>
+                            </td>
+                        {% elif field == 'name' %}
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 300px;">
+                                {{ record|format_display:field }}
+                            </td>
+                        {% elif field == 'category' %}
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" style="min-width: 180px;">
+                            {{ record|format_display:field }}
+                        </td>
+                        {% else %}
+                            <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                                {{ record|format_display:field }}
+                            </td>
+                        {% endif %} 
+                    {% endfor %}
+    
+
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        <div class="flex flex-col gap-2">
+
+                        {% if record.progress_by_time.status != "not_started" %}
+                            <div class="flex flex-row items-center text-theme w-52">
+                                <i class="fas fa-clock text-blue-500 w-6" aria-hidden="true"></i>   
+
+                                <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                        <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                                            {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
+                                                {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }}
+                                            {% else %}
+                                                {{ record.get_status_display }}
+                                            {% endif %}
+                                        </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="flex flex-row items-center text-theme w-52">
+                                <i class="fas fa-check-double text-green-500 w-6" aria-hidden="true"></i>   
+                                <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                    <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
+                                        {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                                Công việc chưa đến ngày bắt đầu
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        <div class="w-10 h-10 flex justify-center items-center">
+                            <a id="record-edit" class="flex flex-row justify-center items-center"
+                            up-preload="reveal" up-cache="auto"
+                            href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
+                                <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
+                            </a>
+                        </div>  
+                    </td>
+                </tr>
+                
+            </tbody>
+        {% endfor %}
+    </table>
+</div>

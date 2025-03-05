@@ -1,0 +1,105 @@
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+
+<div id="display-records" class="overflow-scroll display-cards opacity-0 w-full flex justify-center
+gap-6 grid mt-5">
+    {% for record in records %}
+        <div id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="relative card card-record {{ record.style }}">
+            <a up-preload href="{% url 'page_each_project' record.pk %}">
+                <div class="card-image-container">
+                    {% if record.image %}
+                    <img src="{{ record.image.url }}" alt="{{ record.name }}"
+                        class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
+                    {% else %}
+                    <img src="/media/images/default/default_project.webp" alt="Default School Image"
+                        class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
+                    {% endif %}
+                </div>
+            </a>
+
+            <div class="flex justify-between items-center px-2 relative">
+                <div class="w-10/12">
+                    <h3 class="text-md font-semibold text-theme text-center pl-1">
+                        {{ record }}
+                    </h3>
+                </div>
+
+                <div class="w-2/12 text-sm opacity-100 flex justify-end items-center">
+                    <div class="w-10 h-10 flex justify-end items-center">
+                        <a id="record-edit" class="flex flex-row justify-center items-center"
+                        up-preload="reveal" up-cache="auto"
+                        href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
+                            <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
+                        </a>
+                    </div>  
+                </div>
+            </div>
+
+            <div class="flex flex-col text-cyan-600 dark:text-cyan-500 text-sm px-4 pb-3 ">
+                <!-- Use div for flex container, span for inline text elements -->
+                <span class="{{ record.status }} text-white p-1 rounded-md absolute shadow-2xl top-5 right-5 px-2">{{ record.get_status_display }}</span>
+
+                <div class="flex">
+                    <div class="flex-1 mr-2 h-10 truncate flex items-center">
+                        <i class="fas fa-regular fa-calendar w-6" aria-hidden="true"></i>
+                        <span>Từ {{ record.start_date|date:"d/m/Y" }}</span>
+                    </div>
+                    <div class="flex-1 mr-2 h-10 truncate flex items-center">
+                        <span> đến {{ record.end_date|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+
+
+
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row items-center ">
+                        <i class="fas fa-clock text-blue-500 w-6" aria-hidden="true"></i>   
+                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                             
+                            <div class="bg-{{ record.progress_by_time.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_time.percent }}%">
+                                    {% if record.progress_by_time.status != 'gray' and record.progress_by_time.status != 'green' %}
+                                        {{ record.progress_by_time.progress }} / {{ record.progress_by_time.duration }}
+                                    {% else %}
+                                        {{ record.get_status_display }}
+                                    {% endif %}
+                                </div>
+
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row items-center ">
+                        <i class="fas fa-bullseye w-6" aria-hidden="true"></i>   
+                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                            <div class="bg-cyan-500 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_plan.percent }}%">
+                                {{ record.progress_by_plan.planned_amount_to_now_project|intcomma }} / {{ record.progress_by_plan.total_amount|intcomma }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row items-center ">
+                        <i class="fas fa-check-double text-green-500 w-6" aria-hidden="true"></i>   
+                        <div class="w-full bg-gray-300 rounded-full dark:bg-gray-700 text-nowrap">
+                                <div class="bg-{{ record.progress_by_amount.status }}-600 text-xs font-medium text-white  text-center p-0.5 leading-none rounded-full" style="width: {{ record.progress_by_amount.percent }}%">
+                                    {{ record.progress_by_amount.total_amount_reported|intcomma }} / {{ record.progress_by_amount.total_amount|intcomma }}
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="mt-3">
+                    Nguồn vốn: {{ record.func_source }}
+                </div>
+
+                <!-- Keep <p> for paragraphs of text -->
+                <div class="mt-2 note whitespace-pre-line">Mô tả: {{ record.description }} </div>
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+

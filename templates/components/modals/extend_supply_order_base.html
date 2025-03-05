@@ -26,10 +26,6 @@
                         {% elif record.approval_status == "approved" %}
                             <option selected value="approved">Đã duyệt</option>
 
-                        {% elif record.approval_status == "need_update" %}
-                            <option value="wait_for_approval">Chờ duyệt</option>
-                            <option selected value="need_update">Cần sửa lại</option>
-
                         {% elif record.approval_status == "rejected" %}
                             <option value="rejected">Từ chối</option>
                         {% endif %}
@@ -43,19 +39,12 @@
                         {% elif record.approval_status == "wait_for_approval" %}
                             <option selected value="wait_for_approval">Chờ duyệt</option>
                             <option value="approved">Đã duyệt</option>
-                            <option value="need_update">Cần sửa lại</option>
                             <option value="rejected">Từ chối</option>
 
                         {% elif record.approval_status == "approved" %}
                             <option selected value="approved">Đã duyệt</option>
-                            <option value="need_update">Cần sửa lại</option>
-
-                        {% elif record.approval_status == "need_update" %}
-                            <option value="wait_for_approval">Chờ duyệt</option>
-                            <option selected value="need_update">Cần sửa lại</option>
 
                         {% elif record.approval_status == "rejected" %}
-                            <option value="need_update">Cần sửa lại</option>
                             <option selected value="rejected">Từ chối</option>
                         {% endif %}
                     
@@ -131,14 +120,14 @@
                         
                     {% if role == 'accountant' %}
                     <div class="w-40 text-center">
-                        <button class="hidable approve-hidable hidden" onclick="showProviderModal('{{ order_supply.base_supply.pk }}')">
+                        <button class="btn btn-outline hidable approve-hidable hidden" onclick="showProviderModal('{{ order_supply.base_supply.pk }}')">
                             {% if order_supply.detail_supply.supply_provider %}
                                 {{ order_supply.detail_supply.supply_provider }}
                             {% else %}
                                 Chưa chọn
                             {% endif %}
                         </button>
-                        <span class="hidable approve-hiddable">
+                        <span class="hidable approve-hidable">
                             {{ order_supply.detail_supply.supply_provider }}
                         </span>
                         <input class="hidden" id="provider_{{ order_supply.base_supply.pk }}" name="provider_{{ order_supply.base_supply.pk }}" value="{{ order_supply.detail_supply.supply_provider.pk }}">
@@ -153,19 +142,31 @@
                     
                     <!-- Provider Modal -->
                     <div id="provider-modal-{{ order_supply.base_supply.pk }}" class="hidden fixed inset-0 bg-gray-600 bg-opacity-30 flex justify-center items-center z-50">
-                        <div class="card p-4 rounded shadow-lg w-1/3">
-                            <h3 class="text-lg font-bold mb-4">Chọn Nhà Cung Cấp</h3>
+                        <div class="card p-4 w-1/3 max-h-[80vh] overflow-y-auto">
+                            <h3 class="text-lg font-bold mb-4 text-center">Chọn Nhà Cung Cấp</h3>
                             <ul>
                                 {% for provider, detail_supply_list in order_supply.base_supply.get_dict_of_detail_supplies.items %}
-                                    <li class="py-2 border-b flex justify-between items-center">
-                                        <span>{{ provider.name }}</span>
-                                        <button class="text-blue-500" onclick="selectProvider('{{ provider.pk }}', '{{ provider.name }}', '{{ order_supply.base_supply.pk }}')">
-                                            Chọn
-                                        </button>
+                                    <li class="py-2 border-b">
+                                        <div class="flex justify-between items-center">
+                                            <span>{{ provider.name }}</span>
+                                            <button class="text-blue-500" onclick="selectProvider('{{ provider.pk }}', '{{ provider.name }}', '{{ order_supply.base_supply.pk }}')">
+                                                Chọn
+                                            </button>
+                                        </div>
+                                        <ul class="pl-4 mt-2">
+                                            {% for detail_supply in detail_supply_list %}
+                                                <li class="py-1 text-gray-600 dark:text-gray-400">
+                                                    <span class="">Giá: {{ detail_supply.supply_price|format_money }}</span>
+                                                    <span class="ml-4">Ngày: {{ detail_supply.created_at|date:"d/m/Y" }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
                                     </li>
                                 {% endfor %}
                             </ul>
-                            <button class="mt-4 btn btn-secondary" onclick="closeProviderModal('{{ order_supply.base_supply.pk }}')">Đóng</button>
+                            <div class="flex flex-row justify-center mt-5">
+                            <button class="mt-4 btn btn-secondary px-3" onclick="closeProviderModal('{{ order_supply.base_supply.pk }}')">Đóng</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -173,8 +174,22 @@
                     <span class="w-28 text-center"> {{ order_supply.estimate_quantity }} </span>
                     <span class="w-28 text-center"> {{ order_supply.orderable_quantity }} </span>
                     <span class="w-28 text-center"> {{ order_supply.quantity }} </span>
-                    <span class="w-28 text-center"> {{ order_supply.paid_quantity }} </span>
-                    <span class="w-28 text-center"> {{ order_supply.received_quantity }} </span>
+                    <div class="w-28 text-center">
+                        <span class="hidable approve-hidable">{{ order_supply.paid_quantity }}</span>
+                        <input type="number" name="paid_quantity_{{ order_supply.base_supply.pk }}" 
+                               class="form-input hidable approve-hidable hidden no-readable" 
+                               value="{{ order_supply.paid_quantity }}"
+                               min="0"
+                               max="{{ order_supply.quantity }}">
+                    </div>
+                    <div class="w-28 text-center">
+                        <span class="hidable approve-hidable">{{ order_supply.received_quantity }}</span>
+                        <input type="number" name="received_quantity_{{ order_supply.base_supply.pk }}" 
+                               class="form-input hidable approve-hidable hidden no-readable" 
+                               value="{{ order_supply.received_quantity }}"
+                               min="0"
+                               max="{{ order_supply.quantity }}">
+                    </div>
                     <div class="w-28 flex justify-center">
                         {{ record.last_saved|date:"d/m/Y" }}
                     </div>
@@ -216,6 +231,8 @@
             document.getElementById('provider_' + baseSupplyPk).value = providerPk;
             closeProviderModal(baseSupplyPk);
         }
+
+
     </script>
 
 </div>

@@ -1581,3 +1581,91 @@ class SupplyOrderForm(forms.ModelForm):
                 'rows': 2
             })
         }
+
+class SupplyPaymentRecordForm(forms.ModelForm):
+    class Meta:
+        model = SupplyPaymentRecord
+        fields = ['supply_order', 'provider', 'requested_amount', 
+                 'requested_date', 'transferred_amount', 
+                 'payment_date', 'image1', 'image2', 'money_source', 'lock', 'note']
+        labels = {
+            'supply_order': 'Phiếu mua hàng',
+            'provider': 'Nhà cung cấp',
+            'status': 'Trạng thái thanh toán',
+            'purchase_amount': 'Tổng tiền trên phiếu',
+            'requested_amount': 'Số tiền đề nghị',
+            'requested_date': 'Ngày đề nghị',
+            'transferred_amount': 'Tiền thanh toán',
+            'payment_date': 'Ngày thanh toán',
+            'debt': 'Nợ còn lại',
+            'image1': 'Hình 1',
+            'image2': 'Hình 2',
+            'lock': 'Khoá phiếu thanh toán',
+            'money_source': 'Nguồn tiền',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'supply_order': forms.Select(attrs={
+                'placeholder': 'Chọn phiếu mua hàng',
+                'class': 'form-input',
+                'required': 'required',
+                'readonly': 'readonly',
+            }),
+            'provider': forms.Select(attrs={
+                'placeholder': 'Chọn nhà cung cấp',
+                'class': 'form-input',
+                'required': 'required',
+                'readonly': 'readonly',
+            }),
+            'status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SupplyPaymentRecord.PAID_STATUS_CHOICES),
+            'purchase_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tổng tiền trên phiếu',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'requested_amount': forms.NumberInput(attrs={
+                'placeholder': 'Số tiền đề nghị',
+                'class': 'form-input text-2xl',
+                'required': 'required',
+            }),
+            'requested_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày đề nghị',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'transferred_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tiền thanh toán',
+                'class': 'form-input text-2xl',
+                'required': 'required',
+            }),
+            'payment_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'lock': forms.CheckboxInput(attrs={
+                'class': 'form-input checkbox',
+            }),
+            'money_source': forms.Select(attrs={
+                'placeholder': 'Chọn nguồn tiền',
+                'class': 'form-input text-lg',
+                'required': 'required',
+            }, choices=SupplyPaymentRecord.MONEY_SOURCE_CHOICES),
+            'image1': forms.FileInput(attrs={
+                'class': 'form-input-file',
+            }),
+            'image2': forms.FileInput(attrs={
+                'class': 'form-input-file',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input text-lg',
+                'required': False,
+                'style': 'height: 80px;'
+            }),
+        }
