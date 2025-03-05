@@ -523,7 +523,6 @@ class SupplyOrderSupply(BaseModel):
         cost_estimation = CostEstimation.objects.filter(project=self.supply_order.project, base_supply=self.base_supply).first()
         if cost_estimation:
             return cost_estimation.quantity
-            prin()
         else:
             return 0.0
         
@@ -533,23 +532,8 @@ class SupplyOrderSupply(BaseModel):
             project=self.supply_order.project, 
             base_supply=self.base_supply
         ).first()
-        
-        if not cost_estimation:
-            return 0.0
-            
-        # Get all supply orders for this project and supply
-        existing_orders = SupplyOrderSupply.objects.filter(
-            supply_order__project=self.supply_order.project,
-            base_supply=self.base_supply
-        ).exclude(pk=self.pk)  # Exclude current order
-        
-        # Calculate total ordered quantity
-        total_ordered = sum(order.quantity for order in existing_orders)
-        
-        # Maximum orderable quantity is the difference between estimated and ordered
-        max_orderable = max(0.0, cost_estimation.quantity - total_ordered)
-        
-        return max_orderable
+        orderable_quantity = cost_estimation.get_orderable_quantity() + self.quantity
+        return orderable_quantity
 
 class SupplyPaymentRecord(BaseModel):
     class Meta:

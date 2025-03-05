@@ -298,11 +298,16 @@ def handle_form(request, model, pk=0):
                 # Update
                 if order_supply: # Update quantity
                     print(">>>>>>>>>> Update ", order_supply)
-                    order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}')
+                    order_supply.quantity = request.POST.get(f'supply_quantity_{supply_id}', 0)
                     
                     # Update paid and received quantities
-                    order_supply.paid_quantity = request.POST.get(f'paid_quantity_{supply_id}')
-                    order_supply.received_quantity = request.POST.get(f'received_quantity_{supply_id}')
+                    paid_quantity = request.POST.get(f'paid_quantity_{supply_id}')
+                    if paid_quantity:
+                        order_supply.paid_quantity = paid_quantity
+                    received_quantity = request.POST.get(f'received_quantity_{supply_id}')
+                    if received_quantity:
+                        order_supply.received_quantity = received_quantity
+
                     
                     # add detail supply
                     supply_provider = request.POST.get(f'provider_{supply_id}')

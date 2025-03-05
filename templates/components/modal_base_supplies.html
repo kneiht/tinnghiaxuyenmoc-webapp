@@ -32,12 +32,12 @@
                                 <div class="absolute top-20 w-full flex flex-row justify-center gap-1.5">
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng dự toán">
                                         <i class="fas fa-clipboard-list mr-1.5"></i>
-                                        <span class="font-bold">{{ estimation.estimate_quantity }}</span>
+                                        <span class="font-bold">{{ estimation.get_estimate_quantity }}</span>
                                         <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
                                     </span>
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
                                         <i class="fas fa-shopping-cart mr-1.5"></i>
-                                        <span class="orderable font-bold">{{ estimation.orderable_quantity }}</span>
+                                        <span class="orderable font-bold">{{ estimation.get_orderable_quantity }}</span>
                                         <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
                                     </span>
                                 </div>
@@ -48,9 +48,9 @@
                                         <input type="hidden" name="supply_id" value="{{ estimation.base_supply.id }}">
                                         <input type="hidden" name="supply_number" value="{{ estimation.base_supply.supply_number }}">
                                         <input type="hidden" name="supply_name" value="{{ estimation.base_supply.supply_name }}">
-                                        <input type="number" name="supply_quantity" value="0" min="0" max="{{ estimation.orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
-                                        <input type="hidden" name="estimate_quantity" value="{{ estimation.estimate_quantity }}">
-                                        <input type="hidden" name="orderable_quantity" value="{{ estimation.orderable_quantity }}">
+                                        <input type="number" name="supply_quantity" value="0" min="0" max="{{ estimation.get_orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                        <input type="hidden" name="estimate_quantity" value="{{ estimation.get_estimate_quantity }}">
+                                        <input type="hidden" name="orderable_quantity" value="{{ estimation.get_orderable_quantity }}">
 
                                     </div>
                                 </div>
@@ -175,7 +175,6 @@
 
         // Select cards from data from maintanance
         document.querySelectorAll('.order-supply').forEach(el => {
-            console.log(el);
             const supplyId = el.getAttribute('data-supply-id');
             const supplyQuantity = el.getAttribute('data-supply-quantity');
             const cardsupply = document.querySelector(`.card-supply-${supplyId}`);
@@ -185,7 +184,15 @@
                 cardsupply.querySelectorAll('input[name="supply_quantity"]').forEach(el => {
                     el.disabled = false;
                     el.value = supplyQuantity;
+                    el.max = parseFloat(el.max) + parseFloat(supplyQuantity);
                 })
+                cardsupply.querySelectorAll('input[name="orderable_quantity"]').forEach(el => {
+                    el.disabled = false;
+                    el.value = (parseFloat(el.value) + parseFloat(supplyQuantity)).toString();
+                    
+                })
+                cardsupply.querySelector('.orderable').textContent = (parseFloat(cardsupply.querySelector('.orderable').textContent) + parseFloat(supplyQuantity)).toString();
+            
             }
         })
 
@@ -204,14 +211,14 @@
                     <div class="order-supply border-b py-2 flex items-center w-full" data-supply-id="${supplyId}" data-supply-quantity="${supplyQuantity}">
                         <input type="hidden" name="supply_id" value="${supplyId}">
                         <input type="hidden" name="supply_quantity_${supplyId}" value="${supplyQuantity}">
-                        <span class="w-5/12">${supplyNumber} - ${supplyName} </span>
+                        <span class="w-72">${supplyNumber} - ${supplyName} </span>
                         
-                        <div class="w-1/12 flex justify-center">${estimateQuantity}</div>
-                        <div class="w-1/12 flex justify-center">${orderableQuantity}</div>
-                        <span class="w-1/12 text-center">${supplyQuantity}</span>
-                        <div class="w-1/12 flex justify-center"></div>  
-                        <div class="w-1/12 flex justify-center"></div>
-                        <div class="w-2/12 flex justify-center"></div>
+                        <div class="w-28 flex justify-center">${estimateQuantity}</div>
+                        <div class="w-28 flex justify-center">${orderableQuantity}</div>
+                        <span class="w-28 text-center">${supplyQuantity}</span>
+                        <div class="w-28 flex justify-center"></div>  
+                        <div class="w-28 flex justify-center"></div>
+                        <div class="w-28 flex justify-center"></div>
                     </div>
                 `);
             });
