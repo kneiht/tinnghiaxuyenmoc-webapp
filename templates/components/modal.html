@@ -22,6 +22,13 @@
                         <i class="fas fa-pencil me-3" style="font-size: 16px;"></i>
                         Chỉnh sửa
                     </button>
+                    {% if modal == "modal_VehicleMaintenance" %}
+                    <a href="{% url 'form_maintenance_images' record.pk %}" class="absolute top-5 left-36 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                         up-preload="insert" up-target="#modal-sub:maybe">
+                         Xem hình ảnh
+                     </a>
+                    {% endif %}
+
 
                 {% else %}
                     <script>
