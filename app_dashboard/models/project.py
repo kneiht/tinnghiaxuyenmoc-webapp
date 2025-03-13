@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from .base import models, BaseModel
 
 class Project(BaseModel):
+    allow_display = True
+    vietnamese_name = "Dự án"    
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
         ('done', 'Hoàn thành'),
@@ -42,6 +44,7 @@ class Project(BaseModel):
 
 
 class ProjectUser(BaseModel):
+    vietnamese_name = "Vị trí người dùng trong dự án"
     class Meta:
         unique_together = ('user', 'project')
 

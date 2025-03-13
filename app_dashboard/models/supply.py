@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 class SupplyProvider(BaseModel):
+    allow_display = True
+    vietnamese_name = "Nhà cung cấp vật tư"
     # Driver Information Fields
     name = models.CharField(max_length=255, verbose_name="Tên nhà cung cấp", unique=True)
     # Bank Information
@@ -64,6 +66,8 @@ class SupplyProvider(BaseModel):
 
 
 class BaseSupply(BaseModel):
+    allow_display = False
+    vietnamese_name = "Vật tư"
     MATERIAL_CHOICES = (
         ('Vật tư thông thường', 'Vật tư thông thường'),
         ('Vật tư sắt thép', 'Vật tư sắt thép'),
@@ -131,6 +135,8 @@ class BaseSupply(BaseModel):
 
 
 class DetailSupply(BaseModel):
+    allow_display = True
+    vietnamese_name = "Vật tư chi tiết"
     class Meta:
         ordering = ['supply_provider', 'material_type', 'supply_number']
     supply_provider = models.ForeignKey(SupplyProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
@@ -175,6 +181,9 @@ class DetailSupply(BaseModel):
 
 
 class CostEstimation(BaseModel):
+    allow_display = True
+    vietnamese_name = "Dự toán vật tư"
+    
     class Meta:
         ordering = ['project', 'material_type', 'supply_number']
         unique_together = ('project', 'base_supply')  # Enforces uniqueness
@@ -275,6 +284,8 @@ class CostEstimation(BaseModel):
 
 
 class SupplyOrder(BaseModel):
+    allow_display = True
+    vietnamese_name = "Đặt vật tư"
 
     APPROVAL_STATUS_CHOICES = (
         ('scratch', 'Bảng nháp'),
@@ -536,6 +547,8 @@ class SupplyOrderSupply(BaseModel):
         return orderable_quantity
 
 class SupplyPaymentRecord(BaseModel):
+    allow_display = True
+    vietnamese_name = "Thanh toán vật tư"
     class Meta:
         ordering = ['supply_order', 'provider', '-id']
 

@@ -14,6 +14,7 @@ from django.db.models import Max
 from PIL import Image
 
 class BaseModel(models.Model):
+    allow_display = False
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
     archived = models.BooleanField(default=False)
 
@@ -114,6 +115,14 @@ class BaseModel(models.Model):
                         )
                         setattr(thumbnail, 'thumbnail', thumbnail_image)
                         thumbnail.save()
+
+    @classmethod
+    def get_vietnamese_name(cls):
+        if hasattr(cls, 'vietnamese_name'):
+            return cls.vietnamese_name
+        else:
+            return cls.__name__
+
 
 class Thumbnail(models.Model):
     reference_url = models.CharField(max_length=255, blank=True, null=True)

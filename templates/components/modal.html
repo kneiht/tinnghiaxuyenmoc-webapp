@@ -149,11 +149,11 @@
                 <div class="grid grid-cols-1 w-[500px]  gap-4 px-6">
                 {% endif %}
 
-                    {% if project_id and model != 'ProjectUser'  %}  
+                    {% if project_id and model != 'ProjectUser' and model != 'Permission'  %}  
                         <input type="hidden" name="project" value="{{ project_id }}">
                     {% endif %}
 
-                    {% if model != 'UserPermission' and model != 'ProjectUser' and form.user.name == 'user' %} 
+                    {% if model != 'Permission' and model != 'ProjectUser' and form.user.name == 'user' %} 
                         {% if record.user %}
                             <input type="hidden" name="user" value="{{ record.user.id }}">
                         {% else %}
@@ -163,7 +163,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if model == 'UserPermission' and field.name == 'user'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' or model == "ProjectUser" and field.name == 'project' or model == 'ProjectUser' and field.name == 'user' %}
+                        {% if model == 'Permission' and field.name != 'note'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' or model == "ProjectUser" and field.name == 'project' or model == 'ProjectUser' and field.name == 'user' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>

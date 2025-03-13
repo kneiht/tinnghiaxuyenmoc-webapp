@@ -11,6 +11,10 @@ from .project import Project
 
 
 class Job(SecondaryIDMixin, BaseModel):
+    allow_display = True
+    vietnamese_name = "Công việc (dự án)"
+    class Meta:
+        verbose_name = "Công việc"
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
         ('done', 'Hoàn thành'),
@@ -106,6 +110,9 @@ class Job(SecondaryIDMixin, BaseModel):
 
 
 class JobPlan(BaseModel):
+    
+    allow_display = False # Đã luôn luôn cho phép trong view, False để không hiển thị trong permission
+    vietnamese_name = "Kế hoạch tuần (dự án)"
     STATUS_CHOICES = (
         ('wait_for_approval', 'Chờ phê duyệt'),
         ('approved', 'Đã phê duyệt'),
@@ -130,6 +137,8 @@ class JobPlan(BaseModel):
 
 
 class JobDateReport(BaseModel):
+    allow_display = False # Đã luôn luôn cho phép trong view, False để không hiển thị trong permission
+    vietnamese_name = "Báo cáo ngày (dự án)"
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)])

@@ -20,152 +20,7 @@ def get_valid_date(date):
     date = date.strftime('%Y-%m-%d')
     return date
 
-def get_str_return(self):
-    if self.first_name in ('', None):
-        name = "Chưa cập nhật tên"
-    else:
-        name = self.first_name
-    return self.username + " (" + name +")"
 
-
-@classmethod
-def get_display_fields(self):
-    fields = ['username', 'first_name', 'email', 'is_superuser']
-    # Check if the field is in the model
-    for field in fields:
-        if not hasattr(self, field):
-            fields.remove(field)
-    return fields
-
-
-def check_permission(self, sub_page):
-    class Permission:
-        read = False
-        create = False
-        update = False
-        delete = False
-        approve = False
-
-    return_permission = Permission()
-
-    if self.is_superuser:
-        return_permission.read = True
-        return_permission.create = True
-        return_permission.update = True
-        return_permission.delete = True
-        return_permission.approve = True
-
-    user_permissions = UserPermission.objects.filter(user=self, sub_page=sub_page)
-    # get all permission in user_permissions
-    if user_permissions:
-        for permission in user_permissions:
-            if permission.permission:
-                for item in  ['read', 'create', 'update', 'delete', 'approve']:
-                    if item in permission.permission:
-                        setattr(return_permission, item, True)
-
-    return return_permission
-
-
-
-User.add_to_class("__str__", get_str_return)
-User.add_to_class("get_display_fields", get_display_fields)
-User.add_to_class("check_permission", check_permission)
-
-
-class UserPermission(BaseModel):
-    MODEL_PERMISSION_CHOICES = (
-        ('read', 'Đọc'),
-        ('read_create', 'Đọc - Tạo'),
-        ('read_create_update', 'Đọc - Tạo - Cập nhật'),
-        ('read_create_update_delete', 'Đọc - Tạo - Cập nhật - Xóa'),
-        ('read_create_update_delete_approve', 'Đọc - Tạo - Cập nhật - Xóa - Duyệt'),
-    )
-
-    MODEL_CHOICES = (
-        # From the first dictionary
-        ('Announcement', 'Thông báo'),
-        ('Task', 'Công việc'),
-        ('User', 'Tài khoản nhân viên'),
-        ('UserPermission', 'Cấp quyền quản lý dữ liệu'),
-        ('ProjectUser', 'Cấp quyền quản lý dự án'),
-
-        ('Project', 'Dự án'),
-        ('SupplyProvider', 'Nhà cung cấp vật tư'),
-        ('BaseSupply', 'Dữ liệu vật tư'),
-        ('DetailSupply', 'Dữ liệu vật tư chi tiết'),
-
-        ('Subcontractor', 'Tổ đội/ nhà thầu phụ'),
-        ('BaseSubJob', 'Công việc của tổ đội/ nhà thầu phụ'),
-        ('DetailSubJob', 'Công việc chi tiết của tổ đội/ nhà thầu phụ'),
-
-
-        ('VehicleType', 'DL loại xe'),
-        ('VehicleRevenueInputs', 'DL tính DT theo loại xe'),
-        ('VehicleDetail', 'DL xe chi tiết'),
-        ('StaffData', 'DL nhân viên'),
-        ('DriverSalaryInputs', 'DL mức lương tài xế'),
-        ('DumbTruckPayRate', 'DL tính lương tài xế xe ben'),
-        ('DumbTruckRevenueData', 'DL tính DT xe ben'),
-        ('Location', 'DL địa điểm'),
-        ('NormalWorkingTime', 'Thời gian làm việc'),
-        ('Holiday', 'Ngày lễ'),
-
-        ('LiquidUnitPrice', 'Bảng đơn giá nhiên liệu/nhớt'),
-        ('FillingRecord', 'LS đổ nhiên liệu/nhớt'),
-        ('FuelFillingRecord', 'LS đổ nhiên liệu'),
-        ('LubeFillingRecord', 'LS đổ nhớt'),
-        ('PartProvider', 'Nhà cung cấp phụ tùng'),
-        ('RepairPart', 'Danh mục phụ tùng'),
-        ('PaymentRecord', 'Lịch sử thanh toán'),
-        ('VehicleMaintenance', 'Phiếu sửa chữa'),
-        ('VehicleDepreciation', 'Khấu hao'),
-        ('VehicleBankInterest', 'Lãi ngân hàng'),
-        ('VehicleOperationRecord', 'DL HĐ xe công trình / ngày'),
-        ('ConstructionDriverSalary', 'Bảng lương'),
-        ('ConstructionReportPL', 'Bảng BC P&L xe cơ giới'),
-
-        ('SupplyProvider', 'Nhà cung cấp vật tư'),
-        ('BaseSupply', 'Dữ liệu vật tư'),
-        ('DetailSupply', 'Dữ liệu vật tư chi tiết'),
-        ('Subcontractor', 'Tổ đội/ nhà thầu phụ'),
-        ('BaseSubJob', 'Công việc của tổ đội/ nhà thầu phụ'),
-        ('DetailSubJob', 'Công việc chi tiết của tổ đội/ nhà thầu phụ'),
-        ('CostEstimation', 'Dự Toán'),
-        ('SupplyOrder', 'Đơn đặt vật tư'),
-    )
-
-    class Meta:
-        ordering = ['user', 'sub_page', 'created_at']
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Tài khoản")
-    sub_page = models.CharField(max_length=255, choices=MODEL_CHOICES, verbose_name="Bảng dữ liệu", null=True, blank=True)
-    permission = models.CharField(max_length=255, choices=MODEL_PERMISSION_CHOICES, verbose_name="Cấp quyền", null=True, blank=True)
-    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    @classmethod
-    def get_display_fields(self):
-        fields = ['user', 'sub_page', 'permission', 'note']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-
-class UserExtra(BaseModel):
-    ROLE_CHOICES = (
-        ('admin', 'Quản Lý Cao Cấp'),
-        ('technician', 'Kỹ Thuật'),
-        ('supervisor', 'Giám Sát'),
-        ('normal_staff', 'Nhân Viên'),
-        ('accountant', 'Kế toán'),
-    )
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default="normal_staff")
-    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    avatar = models.ImageField(upload_to='images/avatars/', blank=True, null=True)
-    settings = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    def __str__(self):
-        return self.user.username
 
 
 
@@ -184,6 +39,8 @@ class TaskUser(BaseModel):
 
 
 class VehicleType(BaseModel):
+    allow_display = True
+    vietnamese_name = "Loại xe"
     ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES = (
         ('Cho phép', 'Cho phép'),
         ('Không cho phép', 'Không cho phép'),
@@ -208,6 +65,8 @@ class VehicleType(BaseModel):
 
 
 class StaffData(BaseModel):
+    allow_display = True
+    vietnamese_name = "Thông tin nhân viên"
     STATUS_CHOICES = (
         ('active', 'Đang làm việc'),
         ('on_leave', 'Nghỉ phép'),
@@ -259,6 +118,8 @@ class StaffData(BaseModel):
 
 
 class VehicleRevenueInputs(BaseModel):
+    allow_display = True
+    vietnamese_name = "DL tính doanh thu" 
     class Meta:
         ordering = ['vehicle_type']
     # Vehicle Information Fields
@@ -308,6 +169,8 @@ class VehicleRevenueInputs(BaseModel):
 
 
 class DriverSalaryInputs(BaseModel):
+    allow_display = True
+    vietnamese_name = "DL tính lương xe cơ giới"    
     class Meta:
         ordering = ['driver']
 
@@ -363,6 +226,8 @@ class DriverSalaryInputs(BaseModel):
 
 
 class VehicleDetail(BaseModel):
+    allow_display = True
+    vietnamese_name = "Xe chi tiết"    
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, verbose_name="Loại xe")
     license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="",  unique=True)
     vehicle_name = models.CharField(max_length=255, verbose_name="Tên nhận dạng xe", default="")
@@ -393,6 +258,8 @@ class VehicleDetail(BaseModel):
 
 
 class DumbTruckPayRate(BaseModel):
+    allow_display = True
+    vietnamese_name = "DL tính lương xe ben"    
     xe = models.ForeignKey(
         VehicleDetail,
         on_delete=models.SET_NULL, 
@@ -437,6 +304,8 @@ class DumbTruckPayRate(BaseModel):
 
 
 class DumbTruckRevenueData(BaseModel):
+    allow_display = True
+    vietnamese_name = "DL tính DT xe ben"    
     # Choices for 'Loại chạy'
     LOAI_CHAY_CHOICES = [
         ('chay_ngay', 'Chạy ngày'),
@@ -500,6 +369,8 @@ class DumbTruckRevenueData(BaseModel):
 
 
 class Location(BaseModel):
+    allow_display = True
+    vietnamese_name = "Địa điểm"    
     TYPE_OF_LOCATION_CHOICES = [
         ('du_an', 'Dự án/công trình'),
         ('kho_noi_bo', 'Kho nội bộ'),
@@ -527,13 +398,11 @@ class Location(BaseModel):
 
 
 
-# Model báo cáo chuyến (file báo cáo xe ben tháng 8)
-# trong báo cáo chuyến, có điểm đến, điểm đi (chọn từ database)
-# điểm đến điểm đi là một bảng danh sách các nơi
-
 
 
 class NormalWorkingTime(BaseModel):
+    allow_display = True
+    vietnamese_name = "Thời gian làm việc"    
     # gotta get valid normal working time based on the valid date so that old data can be updated (from a button click manually)
     class Meta:
         ordering = ['-valid_from']
@@ -584,6 +453,8 @@ class NormalWorkingTime(BaseModel):
 
 
 class Holiday(BaseModel):  
+    allow_display = True
+    vietnamese_name = "Ngày lễ"    
     class Meta:
         ordering = ['-date']
     date = models.DateField(verbose_name="Ngày lễ",  unique=True)
@@ -610,7 +481,8 @@ class Holiday(BaseModel):
 
 
 class VehicleOperationRecord(BaseModel):
-
+    allow_display = True
+    vietnamese_name = "DL HĐ xe công trình / ngày"
     SOURCE_CHOICES = [
         ('gps', 'GPS'),
         ('manual', 'Nhập tay'),
@@ -733,6 +605,8 @@ class VehicleOperationRecord(BaseModel):
 
 
 class LiquidUnitPrice(BaseModel):
+    allow_display = True
+    vietnamese_name = "Đơn giá nhiên liệu/nhớt"
     TYPE_CHOICES = [
         ('diesel', 'Dầu diesel (lít)'),
         ('gasoline', 'Xăng (lít)'),
@@ -782,6 +656,8 @@ class LiquidUnitPrice(BaseModel):
 
 
 class FillingRecord(BaseModel):
+    allow_display = True
+    vietnamese_name = "LS đổ nhiên liệu/nhớt"    
     class Meta:
         ordering = ['-fill_date']
     TYPE_CHOICES = [
@@ -830,6 +706,8 @@ class FillingRecord(BaseModel):
 
 
 class VehicleDepreciation(BaseModel):
+    allow_display = True
+    vietnamese_name = "Khấu hao xe"    
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     depreciation_amount = models.IntegerField(verbose_name="Khấu hao theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
@@ -860,6 +738,8 @@ class VehicleDepreciation(BaseModel):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
 class VehicleBankInterest(BaseModel):
+    allow_display = True
+    vietnamese_name = "Lãi ngân hàng"    
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     interest_amount = models.IntegerField(verbose_name="Lãi suất theo ngày", default=0, validators=[MinValueValidator(0)])
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)

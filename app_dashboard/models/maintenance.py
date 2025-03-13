@@ -1,34 +1,34 @@
-import pandas as pd
+
 from django.utils import timezone
-from django.core.validators import MinValueValidator  # Add this import
-from .base import models, BaseModel
+from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
-from .unclassified import VehicleDetail, VehicleType
+from app_dashboard.models.unclassified import VehicleDetail, VehicleType
+from app_dashboard.models.base import models, BaseModel
 
 class VehicleMaintenance(BaseModel):
+
+    allow_display = True
+    vietnamese_name = "Sửa Chữa"
+
     MAINTENANCE_CATEGORY_CHOICES = (
         ('periodic_check', 'Bảo dưỡng/ Sửa chữa nhỏ/ Kiểm tra định kì'),
         ('repair', 'Sửa chữa lớn/ sửa chữa hư hỏng'),
     )
-    
     APPROVAL_STATUS_CHOICES = (
         ('scratch', 'Bảng nháp'),
         ('wait_for_approval', 'Chờ duyệt'),
         ('approved', 'Đã duyệt'),
         ('rejected', 'Từ chối'),
     )
-
     RECEIVED_STATUS_CHOICES = (
         ('received', 'Đã nhận'),
         ('not_received', 'Chưa nhận'),
     )
-
     PAID_STATUS_CHOICES = (
         ('paid', 'Đã T.toán'),
         ('not_paid', 'Chưa T.toán'),
         ('partial_paid', 'T.toán một phần'),
     )
-
     DONE_STATUS_CHOICES = (
         ('done', 'Xong'),
         ('not_done', 'Chưa xong'),
@@ -222,6 +222,8 @@ class MaintenanceImage(BaseModel):
         return f'{self.vehicle_maintenance}'
 
 class PartProvider(BaseModel):
+    allow_display = True
+    vietnamese_name = "NCC phụ tùng (sửa chữa)"
     # Driver Information Fields
     name = models.CharField(max_length=255, verbose_name="Tên nhà cung cấp", unique=True)
     # Bank Information
@@ -278,6 +280,8 @@ class PartProvider(BaseModel):
 
 
 class RepairPart(BaseModel):
+    allow_display = True
+    vietnamese_name = "Phụ tùng (sửa chữa)"
     class Meta:
         ordering = ['-created_at', 'part_provider', 'part_name']
     part_provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
@@ -341,6 +345,8 @@ class VehicleMaintenanceRepairPart(BaseModel):
         return total_amount
 
 class PaymentRecord(BaseModel):
+    allow_display = True
+    vietnamese_name = "Thanh toán (sửa chữa)"
     class Meta:
         ordering = ['vehicle_maintenance', 'provider', '-id']
 

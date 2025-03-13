@@ -5,6 +5,9 @@ from .base import models, BaseModel
 from .project import Project
 
 class Subcontractor(BaseModel):
+    allow_display = True
+    vietnamese_name = "Tổ đội/ Nhà thầu phụ"
+
     # Driver Information Fields
     name = models.CharField(max_length=255, verbose_name="Tổ đội/ nhà thầu phụ", unique=True)
     # Bank Information
@@ -38,7 +41,8 @@ class Subcontractor(BaseModel):
 
 
 class BaseSubJob(BaseModel):
-
+    allow_display = True
+    vietnamese_name = "Công việc của tổ đội/ nhà thầu phụ"
     class Meta:
         ordering = ['job_number', 'job_name']
     job_type = models.CharField(max_length=50, default="Chưa phân loại", verbose_name="Nhóm công việc")
@@ -81,6 +85,8 @@ class BaseSubJob(BaseModel):
  
 
 class DetailSubJob(BaseModel):
+    allow_display = True
+    vietnamese_name = "Công việc chi tiết của tổ đội/ nhà thầu phụ"
     class Meta:
         ordering = ['subcontractor', 'job_type', 'job_number']
     subcontractor = models.ForeignKey(Subcontractor, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tổ đội/ nhà thầu phụ")
@@ -124,6 +130,8 @@ class DetailSubJob(BaseModel):
 
 
 class SubJobEstimation(BaseModel):
+    allow_display = True
+    vietnamese_name = "Dự toán công việc tổ đội/ nhà thầu phụ"
     class Meta:
         ordering = ['project', 'job_type', 'job_number']
         unique_together = ('project', 'base_sub_job')  # Enforces uniqueness

@@ -1029,41 +1029,6 @@ class UserForm(forms.ModelForm):
         }
 
 
-class UserPermissionForm(forms.ModelForm):
-    class Meta:
-        model = UserPermission
-        fields = ['user', 'sub_page', 'permission', 'note']
-        labels = {
-            'user': 'Tài khoản',
-            'sub_page': 'Bảng dữ liệu',
-            'permission': 'Cấp quyền',
-            'note': 'Ghi chú',
-        }
-        help_texts = {
-            'permission': 'Quyền "Duyệt" chỉ có hiệu lực ở các chức năng yêu cầu phê duyệt hành động như "Phiếu sửa chữa"',
-        }
-        widgets = {
-            'user': forms.Select(attrs={
-                'placeholder': 'Chọn tài khoản',
-                'class': 'form-input',
-                'required': 'required',
-            }),
-            'sub_page': forms.Select(attrs={
-                'placeholder': 'Chọn bảng dữ liệu',
-                'class': 'form-input',
-                'required': 'required',
-            }, choices=UserPermission.MODEL_CHOICES),
-            'permission': forms.Select(attrs={
-                'placeholder': 'Chọn cấp quyền',
-                'class': 'form-input',
-            }, choices=UserPermission.MODEL_PERMISSION_CHOICES),
-            'note': forms.Textarea(attrs={
-                'class': 'form-input h-20',
-            }),
-        }
-
-
-
 class PartProviderForm(forms.ModelForm):
     class Meta:
         model = PartProvider
@@ -1669,3 +1634,43 @@ class SupplyPaymentRecordForm(forms.ModelForm):
                 'style': 'height: 80px;'
             }),
         }
+
+
+
+class PermissionForm(forms.ModelForm):
+    class Meta:
+        model = Permission
+        # All fields except archived and last_saved
+        fields = [field.name for field in Permission._meta.fields if field.name not in ['archived', 'last_saved', 'created_at']]
+
+        # You can define labels and widgets for known fields
+        labels = {
+            'user': 'Tài khoản',
+            'note': 'Ghi chú',
+            'created_at': 'Ngày tạo',
+        }
+
+        widgets = {
+            'user': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+            'created_at': forms.DateTimeInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'readonly': 'readonly',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically set widgets for permission fields
+        for field_name in self.fields:
+            if field_name not in ['user', 'note', 'created_at', 'last_saved', 'archived']:
+                self.fields[field_name].widget = forms.Select(attrs={
+                    'class': 'form-input',
+                }, choices=self.fields[field_name].choices)
+            

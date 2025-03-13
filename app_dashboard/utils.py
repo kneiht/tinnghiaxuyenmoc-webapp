@@ -79,7 +79,6 @@ def decode_params(encoded_params):
     # Convert bytes back to string
     return decoded_bytes.decode('utf-8')
 
-UserPermission
 
 def translate(text):
     translated_text = {
@@ -91,7 +90,6 @@ def translate(text):
         'Thêm UserPermission': 'Cấp quyền mới',
         'Tạo UserPermission mới': 'Cấp quyền cho tài khoản',
         'Cập nhật UserPermission': 'Cấp quyền cho tài khoản',
-
 
         'title_bar_page_projects': 'Trang quản lý các dự án',
         'Tiêu đề cho trang: page_projects': 'Trang quản lý các dự án',

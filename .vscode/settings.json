@@ -5,7 +5,13 @@
         ".venv": true,
         "app_accounts": true,
         ".vscode": false,
-        "jstoolchain": false
+        "jstoolchain": true,
+        "media": true,
+        "staticfiles": true,
+        "manage.py": true,
+        "requirements.txt": true,
+        "notes.txt": true,
+        "db.sqlite3": true
     },
     "files.autoSave": "onFocusChange",
     "emeraldwalk.runonsave": {

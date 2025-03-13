@@ -29,7 +29,7 @@
             <div id="related-tables" class="flex gap-3">
                 <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' project_id=project_id model='SupplyOrder' elements='tool_bar|display_records' %}"
                     id="supply-order" class="btn btn-primary text-nowrap"
-                    up-target="#modal:maybe, #display-records, #tool-bar">
+                    up-target="#modal:maybe, #display-records:maybe, #tool-bar:maybe">
                     <i class="fas fa-shopping-cart  px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block"> Đặt vật tư </span>
                 </a>
