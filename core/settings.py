@@ -181,43 +181,43 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "file": {
-            "level": "ERROR",  # Only log errors and above
-            "class": "logging.FileHandler",
-            "filename": "django_errors.log",
-            "formatter": "verbose",
-        },
-        "console": {
-            "level": "ERROR",
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        },
-    },
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["file", "console"],
-            "level": "ERROR",  # Show only errors and above
-            "propagate": True,
-        },
-        "django.request": {
-            "handlers": ["file", "console"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "django.server": {
-            "handlers": ["file", "console"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-    },
-}
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "file": {
+#             "level": "ERROR",  # Only log errors and above
+#             "class": "logging.FileHandler",
+#             "filename": "django_errors.log",
+#             "formatter": "verbose",
+#         },
+#         "console": {
+#             "level": "ERROR",
+#             "class": "logging.StreamHandler",
+#             "formatter": "verbose",
+#         },
+#     },
+#     "formatters": {
+#         "verbose": {
+#             "format": "{levelname} {asctime} {module} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["file", "console"],
+#             "level": "ERROR",  # Show only errors and above
+#             "propagate": True,
+#         },
+#         "django.request": {
+#             "handlers": ["file", "console"],
+#             "level": "ERROR",
+#             "propagate": False,
+#         },
+#         "django.server": {
+#             "handlers": ["file", "console"],
+#             "level": "ERROR",
+#             "propagate": False,
+#         },
+#     },
+# }

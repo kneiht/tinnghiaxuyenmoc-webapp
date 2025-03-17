@@ -37,7 +37,6 @@ class VehicleMaintenance(BaseModel):
     class Meta:
         ordering = ['-created_at']
 
-
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
     repair_code = models.CharField(max_length=255, verbose_name="Mã phiếu", default="", null=True, blank=True)
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
@@ -55,6 +54,9 @@ class VehicleMaintenance(BaseModel):
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
 
     part_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
+
+    def __str__(self):
+        return f'Mã {self.repair_code} - Xe {self.vehicle}'
 
     def save(self, *args, **kwargs):
         # if self.user changed => skip (just save the frist user)
@@ -104,8 +106,6 @@ class VehicleMaintenance(BaseModel):
             else:
                 self.paid_status = 'not_paid'
 
-
-            
         # Check if all parts are done, if yes => done_status = 'done'
         if vehicle_parts.filter(done_status='not_done').count() == 0:
             self.done_status = 'done'
@@ -211,15 +211,15 @@ class VehicleMaintenance(BaseModel):
                 fields.remove(field)
         return fields
 
-    def __str__(self):
-        return self.repair_code
+
 
 class MaintenanceImage(BaseModel):
+    vietnamese_name = "Hình ảnh sửa chữa"
     vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     image = models.ImageField(upload_to='maintenance/', verbose_name="Hình ảnh", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.vehicle_maintenance}'
+        return f'Mã sữa chưa "{self.vehicle_maintenance}"'
 
 class PartProvider(BaseModel):
     allow_display = True
@@ -242,9 +242,9 @@ class PartProvider(BaseModel):
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
-
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} - {self.phone_number}'
+
     @classmethod
     def get_display_fields(self):
         fields = ['name', 'phone_number', 'address', 'bank_name', 'account_number', 'account_holder_name', 
@@ -255,7 +255,8 @@ class PartProvider(BaseModel):
                 fields.remove(field)
         return fields
 
-    def calculate_payment_states(self):
+    def save(self, *args, **kwargs):
+        # calculate_payment_states
         # Get all VehicleMaintenanceRepairPart
         repair_parts = VehicleMaintenanceRepairPart.objects.filter(repair_part__part_provider=self)
         # Calculate the purchase amount
@@ -275,7 +276,7 @@ class PartProvider(BaseModel):
         self.total_purchase_amount = purchase_amount
         self.total_transferred_amount = transferred_amount
         self.total_outstanding_debt = debt_amount
-        self.save()
+        super().save(*args, **kwargs)
 
 
 
@@ -295,7 +296,7 @@ class RepairPart(BaseModel):
     valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.part_number} - {self.part_name}'
+        return f'{self.part_number} - {self.part_name} - Áp dụng từ {self.valid_from}'
 
     @classmethod
     def get_display_fields(self):
@@ -308,12 +309,11 @@ class RepairPart(BaseModel):
 
 
 class VehicleMaintenanceRepairPart(BaseModel):
-
+    vietnamese_name = "Phụ tùng trong phiếu sửa chữa"
     RECEIVED_STATUS_CHOICES = (
         ('received', 'Đã nhận'),
         ('not_received', 'Chưa nhận'),
     )
-
 
     DONE_STATUS_CHOICES = (
         ('done', 'Xong'),
@@ -325,10 +325,19 @@ class VehicleMaintenanceRepairPart(BaseModel):
     quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
     done_status = models.CharField(max_length=50, choices=DONE_STATUS_CHOICES, default='not_done', verbose_name="Trạng thái xong sửa chữa")
+    
+    def __str__(self):
+        return f'Mã phiếu {self.vehicle_maintenance.repair_code} - {self.repair_part.part_name}'
+    
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         provider = self.repair_part.part_provider
-        provider.calculate_payment_states()
+        provider.save()
+
+    def delete(self, *args, **kwargs):
+        provider = self.repair_part.part_provider
+        super().delete(*args, **kwargs)
+        provider.save()
 
     @classmethod
     def get_maintenance_amount(cls, vehicle, from_date, to_date):
@@ -388,21 +397,25 @@ class PaymentRecord(BaseModel):
     image2 = models.ImageField(verbose_name="Hình ảnh", upload_to='images/finance/', blank=True, null=True)
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
     def __str__(self):
-        return f'{self.vehicle_maintenance} - {self.payment_date}'
+        return f'Mã phiếu sửa chữa {self.vehicle_maintenance} - ngày tạo {self.created_at}'
 
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle_maintenance', 'provider', 'status', 'lock', 'purchase_amount', 
             'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
-            'payment_date', 'money_source', 'debt', 'note', 'image1', 'user']
+            'payment_date', 'money_source', 'debt', 'note', 'image1', 'user', 'created_at']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
-    
+
+    def delete(self, *args, **kwargs):
+        # Không cho phép xóa, vì Payment được tạo tự động
+        pass
+
     def save(self, *args, **kwargs):
         # Delete to test
         # print("Delete payment records")
@@ -424,7 +437,7 @@ class PaymentRecord(BaseModel):
         self.user = self.vehicle_maintenance.user
 
         super().save(*args, **kwargs)
-        self.provider.calculate_payment_states()
+        self.provider.save()
         
         # extract the vehicle maintenance and provider
         vehicle_maintenance = self.vehicle_maintenance

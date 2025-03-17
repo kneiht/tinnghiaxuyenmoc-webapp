@@ -21,23 +21,6 @@ def get_valid_date(date):
     return date
 
 
-
-
-
-
-class Task(BaseModel):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    due_date = models.DateField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-
-class TaskUser(BaseModel):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
-
-
 class VehicleType(BaseModel):
     allow_display = True
     vietnamese_name = "Loại xe"
@@ -51,6 +34,7 @@ class VehicleType(BaseModel):
     allowed_to_display_in_revenue_table = models.CharField( max_length=20, choices=ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES , default="Cho phép", verbose_name="Cho phép hiển thị trong bảng P&L")
     note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
     created_at = models.DateTimeField(default=timezone.now)
+    
     def __str__(self):
         return self.vehicle_type
 
@@ -99,7 +83,7 @@ class StaffData(BaseModel):
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
-        return f'{self.full_name}'
+        return f'{self.full_name} - {self.phone_number}'
 
 
 
@@ -148,7 +132,7 @@ class VehicleRevenueInputs(BaseModel):
 
 
     def __str__(self):
-        return f'{self.vehicle_type}'
+        return f'{self.vehicle_type} - hiệu lực từ {self.valid_from}'
 
     @classmethod
     def get_display_fields(self):
@@ -207,7 +191,10 @@ class DriverSalaryInputs(BaseModel):
 
     note = models.CharField(max_length=255, verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
-    
+
+    def __str__(self):
+        return f'{self.driver} - hiệu lực từ {self.valid_from}'
+
     @classmethod
     def get_display_fields(self):
         fields = ['driver', 'valid_from','basic_month_salary', 'sunday_month_salary_percentage', 
@@ -222,9 +209,6 @@ class DriverSalaryInputs(BaseModel):
 
  
 
-
-
-
 class VehicleDetail(BaseModel):
     allow_display = True
     vietnamese_name = "Xe chi tiết"    
@@ -237,7 +221,7 @@ class VehicleDetail(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return f'{self.license_plate}'
+        return f'{self.vehicle_name} - Biển số {self.license_plate} - GPS {self.gps_name}'
     
     @classmethod
     def get_display_fields(self):
@@ -414,6 +398,10 @@ class NormalWorkingTime(BaseModel):
     valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f'{self.morning_start} đến {self.morning_end} - {self.afternoon_start} đến {self.afternoon_end} - hiệu lực từ {self.valid_from}'
+    
     @classmethod
     def get_display_fields(self):
         fields = ['morning_start', 'morning_end', 'afternoon_start', 'afternoon_end', 'valid_from', 'note']
@@ -460,6 +448,10 @@ class Holiday(BaseModel):
     date = models.DateField(verbose_name="Ngày lễ",  unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f'{self.date} - {self.note}'
+    
     @classmethod
     def get_display_fields(self):
         fields = ['date', 'note']
@@ -512,6 +504,9 @@ class VehicleOperationRecord(BaseModel):
     # add over time
     allow_overtime = models.BooleanField(verbose_name="Cho phép tính lương tăng ca", default=False)
 
+    def __str__(self):
+        return f'{self.vehicle} - {self.start_time} - {self.end_time}'
+
     def delete(self, *args, **kwargs):
         print(">>> [DELETE] VehicleOperationRecord: ", self.pk, self.vehicle, self.start_time)
         # Save to a file
@@ -539,8 +534,6 @@ class VehicleOperationRecord(BaseModel):
             # allow delete
             super().delete(*args, **kwargs)
 
-    def __str__(self):
-        return self.vehicle
     
     @classmethod
     def get_display_fields(self):
@@ -629,7 +622,7 @@ class LiquidUnitPrice(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.liquid_type}"
+        return f"{self.liquid_type} - {self.unit_price} - {self.valid_from}"
 
     @classmethod
     def get_display_fields(self):
@@ -682,6 +675,9 @@ class FillingRecord(BaseModel):
     fill_date = models.DateField(verbose_name="Ngày đổ", default=timezone.now)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.liquid_type} - {self.vehicle} - {self.quantity} - {self.total_amount} - {self.fill_date}"
 
     def save(self):
         self.calculate_total_amount()

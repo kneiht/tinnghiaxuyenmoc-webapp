@@ -4,9 +4,9 @@
     <div id="modal" up-hungry>
         <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
             <!-- Modal Content -->
-            <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
+            <div id="moda-message" class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
                 <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-green-500 dark:text-green-800">Thông báo thành công</h3>
-                <div class="w-[300px] gap-4 px-6 flex justify-center whitespace-pre-line">
+                <div class="w-[500px] gap-4 px-6 flex justify-center whitespace-pre-line">
                     <div class="text-theme whitespace-pre-line"> {{ message }} </div>
                 </div>
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
@@ -23,9 +23,9 @@
     <div id="modal" up-hungry>
         <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
             <!-- Modal Content -->
-            <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
+            <div  id="modal-message"  class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
                 <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-red-500 dark:text-red-800">Thông báo thất bại</h3>
-                <div style="max-height: 500px; overflow-y: auto;" class="w-[300px] gap-4 px-6">
+                <div style="max-height: 500px; overflow-y: auto;" class="w-[500px] gap-4 px-6">
                     <p class="text-theme whitespace-pre-line"> {{ message }}</p>
                 </div>
                 <div class="flex justify-center items-center gap-5 pt-8 pb-7">
@@ -44,7 +44,7 @@
     <div id="modal">
         <div id="modal-body" class="modal z-50 fixed inset-0 bg-slate-600 bg-opacity-60 overflow-y-auto h-full w-full flex justify-center">
             <!-- Modal Content -->
-            <div class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
+            <div  id="modal-message"  class="relative top-20 mx-4 card h-fit w-full sm:w-fit">
                 <h3 class="mt-7 mb-8 text-xl font-bold leading-6 text-center text-theme">Delete confirmation</h3>
                 <div class="w-[300px] gap-4 px-6 flex justify-center">
                     <p class="text-theme"> {{ message }} </p>

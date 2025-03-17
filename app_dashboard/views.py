@@ -111,12 +111,63 @@ def handle_form(request, model, pk=0):
         forbit_html = decide_permission(request, "delete", {"model": model})
         if forbit_html:
             return HttpResponse(forbit_html)
-        html_message = render_message(
-            request,
-            message="Xóa dữ liệu thất bại.\n\nChức năng này đang thử nghiệm.",
-            message_type="red",
-        )
-        return HttpResponse(html_message)
+        
+        try:
+            record = instance
+            # Get related records
+            related_records = []
+            for related_object in record._meta.related_objects:
+                related_manager = getattr(record, related_object.get_accessor_name())
+                related_records.extend(list(related_manager.all()))
+            
+            # If there are related records, show warning
+            if related_records:
+                # Create list of related records
+                related_records_info = []
+                for related_record in related_records:
+                    # Skip MaintenanceImage records
+                    if related_record._meta.model_name.lower() == "maintenanceimage":
+                        continue
+
+                    try:    
+                        display_name = related_record.vietnamese_name
+                    except:
+                        display_name = related_record._meta.verbose_name
+                    record_info = f"{display_name}: {str(related_record)}"
+                    related_records_info.append(record_info)
+                
+                # Create message with related records
+                message = "Không thể xóa dữ liệu vì có các bản ghi liên quan.\n Nếu muốn xóa dữ liệu này, phải xóa các dữ liệu liên quan trước để đảm bảo toàn vẹn dữ liệu:\n\n"
+                message += "🔹 " + "\n🔹 ".join(related_records_info)
+                
+                html_message = render_message(
+                    request,
+                    message=message,
+                    message_type="red",
+                )
+                return HttpResponse(html_message)
+
+
+            record = instance
+            record.style = "hidden"
+            html_message = render_message(
+                request,
+                message="Xóa dữ liệu thành công.",
+                message_type="green",
+            )
+            html_record = render_display_records(
+                request, model=model, records=[record], update="True", project_id=project_id
+            )
+            record.delete()
+            return HttpResponse(html_message + html_record)
+        except Exception as e:
+            html_message = render_message(
+                request,
+                message="Xóa dữ liệu thất bại.\n\n" + str(e),
+                message_type="red",
+            )
+        
+            return HttpResponse(html_message)
     elif request.POST.get("archived") == "false":
         # CHECK PERMISSIONS
         forbit_html = decide_permission(request, "update", {"model": model})
@@ -352,7 +403,6 @@ def handle_form(request, model, pk=0):
                     order_supply.delete()
 
             for supply_id in supply_ids:
-                print(">>>>>>>>>> Supply id ", supply_id)
                 # get the instance VehicleMaintenanceRepairPart which has the repair_part.part_id == part_id
                 supply = BaseSupply.objects.filter(id=supply_id).first()
                 if supply:
@@ -361,7 +411,6 @@ def handle_form(request, model, pk=0):
                     ).first()
                 # Update
                 if order_supply:  # Update quantity
-                    print(">>>>>>>>>> Update ", order_supply)
                     order_supply.quantity = request.POST.get(
                         f"supply_quantity_{supply_id}", 0
                     )
@@ -394,7 +443,6 @@ def handle_form(request, model, pk=0):
 
                 else:  # create new
                     if supply:
-                        print(">>>>>>>>>> Create ", supply)
                         SupplyOrderSupply.objects.create(
                             supply_order=order,
                             base_supply=supply,
@@ -460,7 +508,7 @@ def load_elements(request):
     for key, value in request.GET.items():
         if key != "q":
             params[key] = value
-    # print('\n>>>>>>>>>> elements params:', params)
+    print('\n>>>>>>>>>> elements params:', params)
     html = '<div id="load-elements" class"hidden"></div>'
 
     # CHECK PERMISSIONS
@@ -493,7 +541,10 @@ def load_elements(request):
         elif element == "gantt_chart":
             pass
         elif element == "weekplan_table":
-            html_weekplan_table = render_weekplan_table(request, **params)
+            project_id = get_valid_id(params.get('project_id', 0))
+            check_date = get_valid_date(params.get('check_date', ''))
+            html_weekplan_table = render_weekplan_table(request, project_id, check_date)
+            html += html_weekplan_table
 
     return HttpResponse(html)
 
@@ -556,6 +607,7 @@ def handle_weekplan_form(request):
                     html_message = render_message(
                         request, message=message, message_type="red"
                     )
+                    # print(html_message  )
                     return HttpResponse(html_message)
 
                 jobplan = JobPlan.objects.filter(
@@ -605,7 +657,7 @@ def handle_weekplan_form(request):
 def handle_date_report_form(request):
     if request.method != "POST":
         return HttpResponseForbidden()
-
+    
     form = request.POST
     check_date = form.get("check_date")
     try:
@@ -615,6 +667,8 @@ def handle_date_report_form(request):
     # Get monday and sunday dates of the week that contains check_date
     monday = check_date - timedelta(days=check_date.weekday())
     sunday = check_date + timedelta(days=6 - check_date.weekday())
+
+    
     try:
         check_date = form.get("check_date")
         project_id = form.get("project_id")
@@ -975,11 +1029,11 @@ def download_excel_template(request, template_name):
 
         # GET JOB CATEGORIES
         # Modify or create the "Nhóm công việc" sheet
-        if "Nhóm công việc" in wb.sheetnames:
-            sheet = wb["Nhóm công việc"]
-            sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
-        else:
-            sheet = wb.create_sheet("Nhóm công việc")
+        # if "Nhóm công việc" in wb.sheetnames:
+        #     sheet = wb["Nhóm công việc"]
+        #     sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
+        # else:
+        #     sheet = wb.create_sheet("Nhóm công việc")
 
         # lấy project id từ query
         project_id = request.GET.get("project_id")
@@ -1021,6 +1075,7 @@ def download_excel_template(request, template_name):
 
 @login_required
 def upload_project(request, project_id):
+    
     if request.method != "POST":
         return "API này chỉ dùng POST"
 
@@ -1037,9 +1092,23 @@ def upload_project(request, project_id):
             request, message="Dự án này không tồn tại", message_type="red"
         )
         return HttpResponse(html_message)
-
+    
     # Read the data from the Excel file then save as job record
     df = pd.read_excel(excel_file, header=1)
+
+    # Check if header is in the second row
+    required_headers = ["STT", "Danh mục", "Tên công việc", "Mô tả", "Trạng thái", 
+                       "Bắt đầu", "Kết thúc", "Đơn vị", "Khối lượng", "Đơn giá", 
+                       "Mã hiệu đơn giá"]
+    
+    missing_headers = [header for header in required_headers if header not in df.columns]
+    if missing_headers:
+        html_message = render_message(
+            request, 
+            message=f"File Excel không đúng mẫu. Thiếu các cột: {', '.join(missing_headers)}.\nLưu ý: Tên cột phải ở dòng số 2.", 
+            message_type="red"
+        )
+        return HttpResponse(html_message)
 
     # The table uses verbose names in the excel file, so we need to convert the verbose names to real names
     # Loop through the fields in job
@@ -1081,7 +1150,6 @@ def upload_project(request, project_id):
         except ValidationError as e:
             errors += f"Hàng {str(index + 1)}:\n {e.message}" + "\n"
         jobs.append(job)
-
     if errors:
         html_message = render_message(request, message=errors, message_type="red")
         return HttpResponse(html_message)
@@ -1513,6 +1581,7 @@ def form_base_supplies(request):
 
 def form_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type="green"):
+
         # Get fields to be displayed by using record meta
         # If there is get_display_fields method, use that method
         fields = []
@@ -1542,13 +1611,12 @@ def form_cost_estimation_table(request, project_id):
         else:
             return render_modal(project_id)
 
+
+    
     if request.method == "POST":
         forbit_html = decide_permission(request, "create", {"model": "CostEstimation"})
         if forbit_html:
             return HttpResponse(forbit_html)
-        else:
-            return render_modal(project_id)
-
 
         excel_file = request.FILES.get("file")
         project = Project.objects.filter(pk=project_id).first()
@@ -1600,6 +1668,9 @@ def form_cost_estimation_table(request, project_id):
 
             # check note
             cost_estimation.note = row["Ghi chú"] if row["Ghi chú"] else ""
+            # check if the note is nan => set it empty
+            if pd.isna(cost_estimation.note):
+                cost_estimation.note = ""
 
             # because there is a "#" at the beginning of the string to make sure the string is not number
             # so we need to remove it, also check if supply number is duplicate
@@ -1614,6 +1685,7 @@ def form_cost_estimation_table(request, project_id):
 
             # check base_supply
             base_supply = BaseSupply.objects.filter(supply_number=supply_number).first()
+            print(base_supply)
             if base_supply:
                 cost_estimation.base_supply = base_supply
             else:
@@ -1623,27 +1695,43 @@ def form_cost_estimation_table(request, project_id):
                     message_type="red",
                 )
 
-            # Xử lý nhóm công việc
-            category = row["Nhóm công việc"]
-            # check category
-            job = Job.objects.filter(category=category).first()
-            if job:
-                cost_estimation.category = category
-            else:
-                return render_modal(
-                    project_id,
-                    message="Không tìm thấy nhóm công việc: "
-                    + str(category)
-                    + "\nVui lòng kiểm tra lại danh sách công việc trong dự án.",
-                    message_type="red",
-                )
-
+            # # Xử lý nhóm công việc
+            # category = row["Nhóm công việc"]
+            # # check category
+            # job = Job.objects.filter(category=category).first()
+            # if job:
+            #     cost_estimation.category = category
+            # else:
+            #     return render_modal(
+            #         project_id,
+            #         message="Không tìm thấy nhóm công việc: "
+            #         + str(category)
+            #         + "\nVui lòng kiểm tra lại danh sách công việc trong dự án.",
+            #         message_type="red",
+            #     )
+            print("cost_estimation: ", cost_estimation)
             # if every field is valid, append to the list
             cost_estimation_list.append(cost_estimation)
-
-        # delete old records
-        CostEstimation.objects.filter(project=project)
-
+            
+        # delete old records, save new records
+        old_cost_estimnations = CostEstimation.objects.filter(project=project)
+        for old_cost_estimation in old_cost_estimnations:
+            if old_cost_estimation.get_ordered_quantity() != 0:
+                # check if the old cost estimation is not in the new list, by checking if the supply_base is in the list
+                if old_cost_estimation.base_supply not in [cost_estimation.base_supply for cost_estimation in cost_estimation_list]:
+                    # apeend old cost estimation to the list
+                    old_cost_estimation.note = "Không có trong bảng dự toán được tải lên nhưng được giữ lại vì đã phát sinh khối lượng được đặt."
+                    # make a copy to save to the list and delete from the databaes
+                    cost_estimation_list.append(CostEstimation(
+                        project=old_cost_estimation.project,
+                        base_supply=old_cost_estimation.base_supply,
+                        quantity=old_cost_estimation.quantity,
+                        note=old_cost_estimation.note,
+                        # Copy other fields as needed
+                    ))
+        # Delete old records after appending the necessary records
+        old_cost_estimnations.delete()
+                
         # Save the records
         for cost_estimation in cost_estimation_list:
             cost_estimation.save()
@@ -1838,3 +1926,27 @@ def test(request):
     for record in records:
         record.delete()
     return render(request, "pages/test.html")
+
+
+
+def clean(request):
+    result = ""
+    # Find MaintenanceImage records with null vehicle_maintenance
+    orphaned_images = MaintenanceImage.objects.filter(vehicle_maintenance__isnull=True)
+    # Delete the orphaned records
+    deleted_count = orphaned_images.count()
+    orphaned_images.delete()
+    result = f"Deleted {deleted_count} MaintenanceImage records with null foreign keys."
+
+
+    orphan_records = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance__isnull=True)
+    # Delete the orphaned records
+    deleted_count = orphan_records.count()
+    orphan_records.delete()
+    result += f"\nDeleted {deleted_count} VehicleMaintenanceRepairPart records with null foreign keys"
+
+    # calculate PartProvider
+    records = PartProvider.objects.all()
+    for record in records:
+        record.save()
+    return HttpResponse(result)

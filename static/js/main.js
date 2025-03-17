@@ -531,7 +531,13 @@ function handleNewSelectElement(select) {
 
     // Insert the wrapper into the DOM
     select.parentNode.insertBefore(wrapper, select.nextSibling);
-    select.style.display = 'none'; // Hide the original select
+    // select.style.display = 'none'; // Hide the original select
+    select.style.position = 'absolute';
+    select.style.width = '100px';
+    select.style.opacity = '0';
+    select.style.pointerEvents = 'none';
+    
+
 
     // Toggle dropdown on card click
     card.addEventListener('click', () => {
@@ -810,15 +816,39 @@ window.addEventListener("resize", adjustDisplayRecordsHeight);
 
 
 
-// Add submit button handler to prevent double submissions
 up.compiler('button[type="submit"]', function(button) {
     button.addEventListener('click', function(e) {
+        const form = button.closest('form'); // Find the form containing the button
+
+        if (!form.checkValidity()) {
+            form.reportValidity(); // Show validation errors
+            return; // Stop execution, don't disable the button
+        }
+
         if (this.classList.contains('disabled')) {
             e.preventDefault();
             return;
         }
+
+        // Store original text in attribute if not already stored
+        if (!this.getAttribute('original-text')) {
+            this.setAttribute('original-text', this.innerHTML);
+        }
+
         this.classList.add('disabled');
         this.style.opacity = '0.5';
         this.innerHTML = 'Đang xử lý...';
+    });
+}); 
+
+up.compiler('#modal-message', function(el) {
+    console.log("hello")
+    // revert all button submit "Đang xử lý ..." to normal function
+    const buttons = document.querySelectorAll('button[type="submit"]');
+    buttons.forEach(button => {
+        button.classList.remove('disabled');
+        button.style.opacity = '1';
+        // Use saved original text from attribute
+        button.innerHTML = button.getAttribute('original-text') || 'Xác nhận';
     });
 });

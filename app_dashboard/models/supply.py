@@ -28,7 +28,8 @@ class SupplyProvider(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} - {self.phone_number}'
+
     @classmethod
     def get_display_fields(self):
         fields = ['name', 'phone_number', 'address', 'bank_name', 'account_number', 'account_holder_name', 
@@ -39,7 +40,8 @@ class SupplyProvider(BaseModel):
                 fields.remove(field)
         return fields
 
-    def calculate_payment_states(self):
+    def save(self, *args, **kwargs):
+        # calculate_payment_states
         # Get all SupplyOrderSupply records for this provider
         order_supplies = SupplyOrderSupply.objects.filter(detail_supply__supply_provider=self)
         
@@ -62,11 +64,11 @@ class SupplyProvider(BaseModel):
         self.total_purchase_amount = purchase_amount
         self.total_transferred_amount = transferred_amount
         self.total_outstanding_debt = debt_amount
-        self.save()
+        super().save(*args, **kwargs)
 
 
 class BaseSupply(BaseModel):
-    allow_display = False
+    allow_display = True
     vietnamese_name = "Vật tư"
     MATERIAL_CHOICES = (
         ('Vật tư thông thường', 'Vật tư thông thường'),
@@ -88,7 +90,7 @@ class BaseSupply(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.supply_number} - {self.supply_name} - {self.unit}'
+        return f'{self.supply_number} - {self.supply_name}'
 
     @classmethod
     def get_display_fields(self):
@@ -191,7 +193,7 @@ class CostEstimation(BaseModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
 
     # Danh mục công việc
-    category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Nhóm công việc")
+    # category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Nhóm công việc")
 
     base_supply = models.ForeignKey(BaseSupply, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vật tư")
 
@@ -210,9 +212,12 @@ class CostEstimation(BaseModel):
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return f'Dự án {self.project} - Vật tư {self.supply_number} - {self.supply_name}'
+
     @classmethod
     def get_display_fields(self):
-        fields = ['category', 'material_type', 'supply_number', 'supply_name', 'unit', 
+        fields = ['material_type', 'supply_number', 'supply_name', 'unit', 
             'quantity', 'ordered_quantity', 'orderable_quantity', 'paid_quantity', 
             'received_quantity','note']
         # Check if the field is in the model
@@ -250,7 +255,7 @@ class CostEstimation(BaseModel):
         # Calculate total ordered quantity
         total_ordered = sum(order.quantity for order in existing_orders)
         # Maximum orderable quantity is the difference between estimated and ordered
-        max_orderable = max(0.0, self.quantity - total_ordered)
+        max_orderable = self.quantity - total_ordered
         return max_orderable
 
     def get_ordered_quantity(self):
@@ -323,6 +328,8 @@ class SupplyOrder(BaseModel):
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo phiếu")
     supply_providers = models.TextField(verbose_name="Các nhà cung cấp", default="", null=True, blank=True)
 
+    def __str__(self):
+        return f'{self.order_code}'
 
     def save(self, *args, **kwargs):
         # Skip if user changed (keep first user)
@@ -493,6 +500,7 @@ class SupplyOrder(BaseModel):
 
 
 class SupplyOrderSupply(BaseModel):
+    vietnamese_name = "Vật tư trong phiếu đặt"
     RECEIVED_STATUS_CHOICES = (
         ('received', 'Đã nhận'),
         ('not_received', 'Chưa nhận'),
@@ -505,6 +513,17 @@ class SupplyOrderSupply(BaseModel):
     paid_quantity = models.FloatField(verbose_name="Số lượng đã T.toán", default=0.0, validators=[MinValueValidator(0)])
     received_quantity = models.FloatField(verbose_name="Số lượng đã nhận", default=0.0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
+
+    def __str__(self):
+        return f'{self.supply_order.order_code} - {self.base_supply}'
+
+    def delete(self, *args, **kwargs):
+        provider = None
+        if self.detail_supply:
+            provider = self.detail_supply.supply_provider
+        super().delete(*args, **kwargs)
+        if provider:
+            provider.save()
 
     def save(self, *args, **kwargs):
         # Get old provider before saving
@@ -522,9 +541,9 @@ class SupplyOrderSupply(BaseModel):
 
         # Update payment states for both old and new providers
         if old_provider and old_provider != new_provider:
-            old_provider.calculate_payment_states()
+            old_provider.save()
         if new_provider:
-            new_provider.calculate_payment_states()
+            new_provider.save()
 
         # update cost estimation
         cost_estimation = CostEstimation.objects.filter(project=self.supply_order.project, base_supply=self.base_supply).first()
@@ -593,7 +612,7 @@ class SupplyPaymentRecord(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.supply_order} - {self.payment_date}'
+        return f'Mã đơn vật tư {self.supply_order} - Ngày tạo thanh toán {self.created_at}'
 
     @classmethod
     def get_display_fields(self):
@@ -601,6 +620,9 @@ class SupplyPaymentRecord(BaseModel):
             'previous_debt', 'requested_amount', 'requested_date', 'transferred_amount', 
             'payment_date', 'money_source', 'debt', 'note', 'image1', 'user']
         return [field for field in fields if hasattr(self, field)]
+
+    def delete(self, *args, **kwargs):
+        pass
 
     def save(self, *args, **kwargs):
         # Update status based on amounts
@@ -622,7 +644,7 @@ class SupplyPaymentRecord(BaseModel):
         self.user = self.supply_order.user
 
         super().save(*args, **kwargs)
-        self.provider.calculate_payment_states()
+        self.provider.save()
         
         # Extract supply order and provider
         supply_order = self.supply_order

@@ -12,9 +12,9 @@ from .project import Project
 
 class Job(SecondaryIDMixin, BaseModel):
     allow_display = True
-    vietnamese_name = "Công việc (dự án)"
+    vietnamese_name = "Công việc trong dự án"
     class Meta:
-        verbose_name = "Công việc"
+        verbose_name = "Công việc trong dự án"
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
         ('done', 'Hoàn thành'),
@@ -39,6 +39,9 @@ class Job(SecondaryIDMixin, BaseModel):
 
     class Meta:
         ordering = ['category', 'secondary_id']
+
+    def __str__(self):
+        return f'{self.name} - {self.project.name}'
 
     def clean(self):
         errors = ""
@@ -104,15 +107,14 @@ class Job(SecondaryIDMixin, BaseModel):
                 fields.remove(field)
         return fields
 
-    def __str__(self):
-        return self.name
+
 
 
 
 class JobPlan(BaseModel):
     
     allow_display = False # Đã luôn luôn cho phép trong view, False để không hiển thị trong permission
-    vietnamese_name = "Kế hoạch tuần (dự án)"
+    vietnamese_name = "Kế hoạch tuần"
     STATUS_CHOICES = (
         ('wait_for_approval', 'Chờ phê duyệt'),
         ('approved', 'Đã phê duyệt'),
@@ -133,12 +135,12 @@ class JobPlan(BaseModel):
         super().save(*args, **kwargs)  # Call the original save method
 
     def __str__(self):
-        return f'Plan of {self.job} from {self.start_date} to {self.end_date}'
+        return f'{self.job} từ {self.start_date} đến {self.end_date}'
 
 
 class JobDateReport(BaseModel):
     allow_display = False # Đã luôn luôn cho phép trong view, False để không hiển thị trong permission
-    vietnamese_name = "Báo cáo ngày (dự án)"
+    vietnamese_name = "Báo cáo ngày"
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
@@ -153,5 +155,5 @@ class JobDateReport(BaseModel):
         super().save(*args, **kwargs)  # Call the original save method
 
     def __str__(self):
-        return f'progress of {self.job} on {self.date}'
+        return f'{self.job} ngày {self.date}'
 

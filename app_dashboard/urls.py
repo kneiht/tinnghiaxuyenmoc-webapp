@@ -55,7 +55,7 @@ urlpatterns = [
     path('api/form_cost_estimation_table/<int:project_id>/', views.form_cost_estimation_table, name='form_cost_estimation_table'),
 
 
-    path('test', views.test, name='test'),
+    path('clean', views.clean, name='clean'),
 
 
     path('api/download-excel-template/<str:template_name>', views.download_excel_template, name='download_excel_template'),

@@ -15,12 +15,12 @@
                     <span class="ms-3 hidden md:block"> Xem Gantt </span>
                 </a>
                 
-                <a id="show-table-jobs" up-preload="insert" up-target="#display-records, #tool-bar" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap">
+                <a id="show-table-jobs" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-table px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block"> Xem Table </span>
                 </a>
 
-                <a id="show-weekplan" up-preload="insert" up-target="#display-records, #tool-bar" href="{% url 'load_weekplan_table' project_id=project_id %}?check_date={{ check_date }}" class="btn btn-primary text-nowrap">
+                <a id="show-weekplan" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|weekplan_table' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-bullseye px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block"> Xem KH tuần </span>
                 </a>

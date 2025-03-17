@@ -27,7 +27,8 @@ class Subcontractor(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} - {self.phone_number}'
+
     @classmethod
     def get_display_fields(self):
         fields = ['name', 'phone_number', 'address', 'bank_name', 'account_number', 'account_holder_name', 
@@ -108,7 +109,7 @@ class DetailSubJob(BaseModel):
 
 
     def __str__(self):
-        return f'{self.subcontractor} - {self.job_number} - {self.job_name}'
+        return f'{self.subcontractor.name} - {self.job_number} - {self.job_name}'
 
     @classmethod
     def get_display_fields(self):
@@ -149,6 +150,9 @@ class SubJobEstimation(BaseModel):
     quantity = models.FloatField(default=0.0, validators=[MinValueValidator(0)], verbose_name="Khối lượng")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Dự án {self.project.name} - Công việc {self.job_number} - {self.job_name}'
 
     @classmethod
     def get_display_fields(self):

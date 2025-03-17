@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-    <div id="modal"></div>
+    <div id="modal" up-hungry></div>
     <main>
         {% include 'components/nav_bar.html' %}
         <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}">
@@ -25,8 +25,6 @@
         <div up-hungry id="extra-tool-bar"></div>
         <div up-hungry id="message-page"></div>
         <div up-hungry id="display-records"></div>
-        
-
         
         <div id="gantt-chart-container" class="card w-full mt-5 rounded-2xl hidden">
           <h3 class="px-6 py-3 text-xl font-semibold text-center text-theme border border-slate-300 dark:border-slate-900 border-opacity-50">

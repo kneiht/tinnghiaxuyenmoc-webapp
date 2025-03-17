@@ -255,7 +255,7 @@
     <div class="hidden" id="project-id" data-id="{{ project_id }}"></div>
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
 
-        <form up-target="#display-records:maybe" action="{% url 'upload_project' project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
+        <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_project' project_id %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"

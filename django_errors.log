@@ -3556,3 +3556,2167 @@ Traceback (most recent call last):
     raise LookupError(
 LookupError: App 'app_dashboard' doesn't have a 'User' model.
 ERROR 2025-03-13 15:35:19,101 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfaG9tZSIsICJtb2RlbCI6ICJVc2VyIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 101730
+ERROR 2025-03-13 23:13:19,948 log Internal Server Error: /api/download-excel-template/cost_estimation_table
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 943, in download_excel_template
+    shutil.copy(original_excel_path, temp_excel_path)  # Copy original file
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 435, in copy
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 260, in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/media/excel/mau-bang-du-toan.xlsx'
+ERROR 2025-03-13 23:13:19,950 basehttp "GET /api/download-excel-template/cost_estimation_table?project_id=3 HTTP/1.1" 500 82335
+ERROR 2025-03-13 23:14:12,963 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1647, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:14:12,969 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236018
+ERROR 2025-03-13 23:14:53,230 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1647, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:14:53,233 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236018
+ERROR 2025-03-13 23:15:26,561 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1647, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:15:26,569 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236018
+ERROR 2025-03-13 23:16:45,809 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1648, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:16:45,820 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 235996
+ERROR 2025-03-13 23:18:57,316 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1567, in form_cost_estimation_table
+    print(df.to_sring())
+          ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 6204, in __getattr__
+    return object.__getattribute__(self, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DataFrame' object has no attribute 'to_sring'. Did you mean: 'to_string'?
+ERROR 2025-03-13 23:18:57,325 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 74556
+ERROR 2025-03-13 23:19:21,949 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1648, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:19:21,956 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 235996
+ERROR 2025-03-13 23:20:50,102 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1648, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:20:50,112 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236066
+ERROR 2025-03-13 23:22:15,780 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1648, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 238, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:22:15,788 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236066
+ERROR 2025-03-13 23:23:39,787 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1648, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 241, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:23:39,798 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236376
+ERROR 2025-03-13 23:24:54,656 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1649, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 241, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:24:54,668 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236376
+ERROR 2025-03-13 23:26:51,342 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1649, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 241, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-13 23:26:51,353 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 236521
+ERROR 2025-03-14 07:38:35,311 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1660, in form_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 241, in save
+    super().save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/base.py", line 104, in save
+    super().save(*args, **kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.IntegrityError: (1062, "Duplicate entry '3-3' for key 'app_dashboard_costestimation.app_dashboard_costestima_project_id_base_supply_i_8b4e0ed3_uniq'")
+ERROR 2025-03-14 07:38:35,319 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 237282
+ERROR 2025-03-14 07:41:45,424 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1652, in form_cost_estimation_table
+    cost_estimation_list.append(old_cost_estimation.copy())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'CostEstimation' object has no attribute 'copy'
+ERROR 2025-03-14 07:41:45,426 basehttp "POST /api/form_cost_estimation_table/3/ HTTP/1.1" 500 73112
+ERROR 2025-03-14 09:21:25,268 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1491, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' expected at least one variable assignment
+ERROR 2025-03-14 09:21:25,272 basehttp "GET /api/form_cost_estimation_table/3/ HTTP/1.1" 500 198001
+ERROR 2025-03-14 09:21:26,298 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1491, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' expected at least one variable assignment
+ERROR 2025-03-14 09:21:26,300 basehttp "GET /api/form_cost_estimation_table/3/ HTTP/1.1" 500 198001
+ERROR 2025-03-14 09:24:09,180 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1498, in do_with
+    nodelist = parser.parse(("endwith",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1495, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' received an invalid token: '<'
+ERROR 2025-03-14 09:24:09,263 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1498, in do_with
+    nodelist = parser.parse(("endwith",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1495, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' received an invalid token: '<'
+ERROR 2025-03-14 09:24:09,443 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1498, in do_with
+    nodelist = parser.parse(("endwith",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1495, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' received an invalid token: '<'
+ERROR 2025-03-14 09:24:09,575 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1498, in do_with
+    nodelist = parser.parse(("endwith",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1495, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' received an invalid token: '<'
+ERROR 2025-03-14 09:24:09,578 basehttp "GET /api/form_cost_estimation_table/3/ HTTP/1.1" 500 217269
+ERROR 2025-03-14 09:24:54,388 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1491, in do_with
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'with' expected at least one variable assignment
+ERROR 2025-03-14 09:24:54,391 basehttp "GET /api/form_cost_estimation_table/3/ HTTP/1.1" 500 198971
+ERROR 2025-03-14 09:25:23,718 log Internal Server Error: /api/form_cost_estimation_table/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 502, in parse
+    compile_func = self.tags[command]
+                   ~~~~~~~~~^^^^^^^^^
+KeyError: 'endfor'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1541, in form_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1534, in render_modal
+    return render(request, "components/modal_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 1498, in do_with
+    nodelist = parser.parse(("endwith",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 504, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 555, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 83: 'endfor', expected 'endwith'. Did you forget to register or load this tag?
+ERROR 2025-03-14 09:25:23,721 basehttp "GET /api/form_cost_estimation_table/3/ HTTP/1.1" 500 211041
+ERROR 2025-03-14 09:38:26,341 log Internal Server Error: /api/upload-project/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1021, in upload_project
+    print("hello")
+    ^^^^^^
+NameError: name 'printn' is not defined. Did you mean: 'print'?
+ERROR 2025-03-14 09:38:26,345 basehttp "POST /api/upload-project/3/ HTTP/1.1" 500 72931
+ERROR 2025-03-14 11:57:38,703 log Internal Server Error: /api/upload-project/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1050, in upload_project
+    df = df.drop_duplicates(subset=["name", "category"], keep="first")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6566, in drop_duplicates
+    result = self[-self.duplicated(subset, keep=keep)]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6698, in duplicated
+    raise KeyError(Index(diff))
+KeyError: Index(['category', 'name'], dtype='object')
+ERROR 2025-03-14 11:57:38,707 basehttp "POST /api/upload-project/3/ HTTP/1.1" 500 83911
+ERROR 2025-03-14 12:00:33,338 log Internal Server Error: /api/upload-project/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1050, in upload_project
+    df = df.drop_duplicates(subset=["name", "category"], keep="first")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6566, in drop_duplicates
+    result = self[-self.duplicated(subset, keep=keep)]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6698, in duplicated
+    raise KeyError(Index(diff))
+KeyError: Index(['name', 'category'], dtype='object')
+ERROR 2025-03-14 12:00:33,341 basehttp "POST /api/upload-project/3/ HTTP/1.1" 500 83919
+ERROR 2025-03-14 12:09:04,680 log Internal Server Error: /api/upload-project/3/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1050, in upload_project
+    df = df.drop_duplicates(subset=["name", "category"], keep="first")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6566, in drop_duplicates
+    result = self[-self.duplicated(subset, keep=keep)]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 6698, in duplicated
+    raise KeyError(Index(diff))
+KeyError: Index(['category'], dtype='object')
+ERROR 2025-03-14 12:09:04,683 basehttp "POST /api/upload-project/3/ HTTP/1.1" 500 84545
+ERROR 2025-03-15 09:49:13,023 log Internal Server Error: /api/handle-form/VehicleType/36
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 128, in handle_form
+    record_info = f"{related_record._meta.vietnamese_name}: {str(related_record)}"
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Options' object has no attribute 'vietnamese_name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 155, in handle_form
+    except Error:
+           ^^^^^
+NameError: name 'Error' is not defined. Did you mean: 'OSError'?
+ERROR 2025-03-15 09:49:13,030 basehttp "POST /api/handle-form/VehicleType/36 HTTP/1.1" 500 83188
+ERROR 2025-03-15 11:29:18,362 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 535, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 192, in render
+    values = self.sequence.resolve(context, ignore_failures=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 488, in get_supply_order_base_supply_list
+    print(order_supplies)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 377, in __repr__
+    return "<%s %r>" % (self.__class__.__name__, data)
+                                                 ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 588, in __repr__
+    return "<%s: %s>" % (self.__class__.__name__, self)
+                                                  ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 518, in __str__
+    return f'{self.supply_order.order_code} - {self.base_supply.name}'
+                                               ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BaseSupply' object has no attribute 'name'
+ERROR 2025-03-15 11:29:18,363 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 535, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 192, in render
+    values = self.sequence.resolve(context, ignore_failures=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 488, in get_supply_order_base_supply_list
+    print(order_supplies)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 377, in __repr__
+    return "<%s %r>" % (self.__class__.__name__, data)
+                                                 ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 588, in __repr__
+    return "<%s: %s>" % (self.__class__.__name__, self)
+                                                  ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 518, in __str__
+    return f'{self.supply_order.order_code} - {self.base_supply.name}'
+                                               ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BaseSupply' object has no attribute 'name'
+ERROR 2025-03-15 11:29:18,368 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdXBwbHlPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMTUiLCAicHJvamVjdF9pZCI6IDMsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogM30= HTTP/1.1" 500 195054
+ERROR 2025-03-15 11:29:18,371 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdXBwbHlPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMTUiLCAicHJvamVjdF9pZCI6IDMsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogNH0= HTTP/1.1" 500 195054
+ERROR 2025-03-15 11:29:39,060 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 535, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 192, in render
+    values = self.sequence.resolve(context, ignore_failures=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 488, in get_supply_order_base_supply_list
+    print(order_supplies)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 377, in __repr__
+    return "<%s %r>" % (self.__class__.__name__, data)
+                                                 ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 588, in __repr__
+    return "<%s: %s>" % (self.__class__.__name__, self)
+                                                  ^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/supply.py", line 518, in __str__
+    return f'{self.supply_order.order_code} - {self.base_supply.name}'
+                                               ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BaseSupply' object has no attribute 'name'
+ERROR 2025-03-15 11:29:39,062 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdXBwbHlPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMTUiLCAicHJvamVjdF9pZCI6IDMsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogNH0= HTTP/1.1" 500 195054
+ERROR 2025-03-15 12:55:10,583 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 544, in load_elements
+    html_weekplan_table = render_weekplan_table(request, **params)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: render_weekplan_table() got an unexpected keyword argument 'page'
+ERROR 2025-03-15 12:55:10,586 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfZWFjaF9wcm9qZWN0IiwgIm1vZGVsIjogIkpvYiIsICJwcm9qZWN0X2lkIjogMywgImNoZWNrX2RhdGUiOiAiMjAyNS0wMy0xNSIsICJlbGVtZW50cyI6ICJ0aXRsZV9iYXJ8dG9vbF9iYXJ8aW5mb3JfYmFyfHdlZWtwbGFuX3RhYmxlIn0= HTTP/1.1" 500 98885
+ERROR 2025-03-15 12:55:11,372 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 544, in load_elements
+    html_weekplan_table = render_weekplan_table(request, **params)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: render_weekplan_table() got an unexpected keyword argument 'page'
+ERROR 2025-03-15 12:55:11,373 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfZWFjaF9wcm9qZWN0IiwgIm1vZGVsIjogIkpvYiIsICJwcm9qZWN0X2lkIjogMywgImNoZWNrX2RhdGUiOiAiMjAyNS0wMy0xNSIsICJlbGVtZW50cyI6ICJ0aXRsZV9iYXJ8dG9vbF9iYXJ8aW5mb3JfYmFyfHdlZWtwbGFuX3RhYmxlIn0= HTTP/1.1" 500 98885

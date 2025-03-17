@@ -242,7 +242,17 @@ function drawGanttChart(tasks) {
 
 
 
-
+// Add this to trigger change event when value is set programmatically
+function setCheckDate(value) {
+    // Get the input element by its ID
+    let checkDate = document.getElementById('check_date');
+    // Set the value of the input
+    if (checkDate) {
+        checkDate.value = value;
+        const event = new Event('change', { bubbles: true });
+        checkDate.dispatchEvent(event);
+    }
+}
 
 
 
@@ -269,7 +279,7 @@ up.compiler('#check_date', function (element) {
         }
 
         let checkDate = document.getElementById('check_date').value;
-        let showAllJobs = document.getElementById('show-all-jobs');
+        let showAllJobs = document.getElementById('show-table-jobs');
         let showAllJobsUrl = showAllJobs.href;
         showAllJobs.href = updateUrlParams(showAllJobsUrl, { 'check_date': checkDate });
 
@@ -277,18 +287,16 @@ up.compiler('#check_date', function (element) {
         let showWeekplanUrl = showWeekplan.href;
         showWeekplan.href = updateUrlParams(showWeekplanUrl, { 'check_date': checkDate });
 
-        // Case 1: The table of all jobs is shown
-        if (showAllJobs && showAllJobs.classList.contains('hidden')) {
-            let url = showAllJobs.href;
-            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url })
-        }
-
-        // Case 2: The weekplan table is shown
-        if (showWeekplan && showWeekplan.classList.contains('hidden')) {
+        // hide ganttChart
+        document.getElementById('gantt-chart-container').classList.add('hidden');
+        let weekplanTable = document.getElementById('weekplan-table');
+        if (weekplanTable) { // Case 1: weekplan-table is present
             let url = showWeekplan.href;
             up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url });
+        } else { // Case 2: weekplan-table is not present
+            let url = showAllJobs.href;
+            up.render({ target: '#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe', url: url });
         }
-
     });
 });
 

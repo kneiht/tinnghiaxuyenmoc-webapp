@@ -53,6 +53,7 @@ def check_permission(self, model):
         return_permission.update = True
         return_permission.delete = True
         return_permission.approve = True
+        return return_permission
     
     # Check if the  model is allowed to be displayed
     try:
@@ -85,7 +86,6 @@ def check_permission(self, model):
     
     # Get permission of a model
     model_permission = getattr(user_permission, model)
-    print(model_permission)
 
     # Check if the user has permission
     for item in ["read", "create", "update", "delete", "approve"]:
