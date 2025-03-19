@@ -1287,6 +1287,26 @@ class SupplyProviderForm(forms.ModelForm):
             }),
         }
 
+class SupplyBrandForm(forms.ModelForm):
+    class Meta:
+        model = SupplyBrand
+        fields = ['name', 'note']
+        labels = {
+            'name': 'Tên thương hiệu',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Tên thương hiệu',
+                'class': 'form-input',
+                'required': 'required'
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+        }
+
+
 
 class BaseSupplyForm(forms.ModelForm):
     class Meta:
@@ -1333,16 +1353,21 @@ class BaseSupplyForm(forms.ModelForm):
 class DetailSupplyForm(forms.ModelForm):
     class Meta:
         model = DetailSupply
-        fields = ['supply_provider', 'base_supply', 'supply_price', 'note', 'valid_from']
+        fields = ['supply_provider', 'supply_brand', 'base_supply', 'supply_price', 'valid_from', 'image_prove', 'note']
         labels = {
             'supply_provider': 'Nhà cung cấp',
+            'supply_brand': 'Thương hiệu',
             'base_supply': 'Vật tư',
-            'unit': 'Đơn vị',
             'note': 'Mô tả',
             'valid_from': 'Ngày áp dụng',
+            'image_prove': 'Hình ảnh chứng minh',
         }
         widgets = {
             'supply_provider': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'supply_brand': forms.Select(attrs={
                 'class': 'form-input',
                 'required': 'required',
             }),
@@ -1354,6 +1379,9 @@ class DetailSupplyForm(forms.ModelForm):
                 'placeholder': 'Đơn giá',
                 'class': 'form-input',
                 'required': 'required',
+            }),
+            'image_prove': forms.FileInput(attrs={
+                'class': 'form-input-file',
             }),
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',
@@ -1453,12 +1481,13 @@ class BaseSubJobForm(forms.ModelForm):
 class DetailSubJobForm(forms.ModelForm):
     class Meta:
         model = DetailSubJob
-        fields = ['subcontractor', 'base_sub_job', 'sub_job_price', 'note', 'valid_from']
+        fields = ['subcontractor', 'base_sub_job', 'sub_job_price', 'valid_from', 'image_prove', 'note']
         labels = {
             'subcontractor': 'Tổ đội/ nhà thầu phụ',
             'base_sub_job': 'Công việc',
             'unit': 'Đơn vị',
             'note': 'Ghi chú',
+            'image_prove': 'Hình ảnh chứng minh',
             'valid_from': 'Ngày áp dụng',
         }
         widgets = {
@@ -1474,6 +1503,9 @@ class DetailSubJobForm(forms.ModelForm):
                 'placeholder': 'Đơn giá',
                 'class': 'form-input',
                 'required': 'required',
+            }),
+            'image_prove': forms.FileInput(attrs={
+                'class': 'form-input-file',
             }),
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',

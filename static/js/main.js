@@ -1,3 +1,35 @@
+up.compiler('#modal_form', function (modalForm) {
+    modalForm.addEventListener('submit', function(submitEvent) {
+        // Find all file input elements inside the modal
+        const fileInputs = modalForm.querySelectorAll('input[type="file"]');
+
+        fileInputs.forEach(fileInput => {
+            const file = fileInput.files[0];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (file && file.size > maxSize) {
+                fileErrorText = document.getElementById('fileError');
+                fileErrorText.textContent = "File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.";
+                fileErrorText.classList.remove("hidden")
+                
+                submitEvent.preventDefault(); // Prevent form submission
+                enableSubmitButton();
+            } else {
+                fileErrorText = document.getElementById('fileError');
+                fileErrorText.classList.add("hidden");
+            }
+        });
+    });
+});
+
+
+up.compiler('.change-page', function (changePage) {
+    changePage.addEventListener('click', function () {
+        // Get the display name and replace the title
+        const displayName = changePage.textContent.trim();
+        document.title = displayName;
+    });
+});
 
 function updateUrlParams(currentUrl, paramsToUpdate) {
     // console.log("Current URL:", currentUrl);
@@ -841,9 +873,14 @@ up.compiler('button[type="submit"]', function(button) {
     });
 }); 
 
+
+
 up.compiler('#modal-message', function(el) {
-    console.log("hello")
     // revert all button submit "Đang xử lý ..." to normal function
+    enableSubmitButton();
+});
+
+function enableSubmitButton() {
     const buttons = document.querySelectorAll('button[type="submit"]');
     buttons.forEach(button => {
         button.classList.remove('disabled');
@@ -851,4 +888,4 @@ up.compiler('#modal-message', function(el) {
         // Use saved original text from attribute
         button.innerHTML = button.getAttribute('original-text') || 'Xác nhận';
     });
-});
+}

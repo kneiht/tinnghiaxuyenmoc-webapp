@@ -119,7 +119,7 @@ class VehicleMaintenance(BaseModel):
             return
 
         # Create or update payment records
-        if self.approval_status == 'approved' or True:
+        if self.approval_status == 'approved':
             all_provider_payment_state = self.calculate_all_provider_payment_states()
             
             # Get all payment records which has vehicle_maintenance = self and provider_id = provider_id
@@ -171,6 +171,9 @@ class VehicleMaintenance(BaseModel):
             # calculate the debt amount
             debt_amount = purchase_amount - transferred_amount
 
+            # calculate the debt amount
+            debt_amount = purchase_amount - transferred_amount
+
             state = {
                 'purchase_amount': purchase_amount,
                 'transferred_amount': transferred_amount,
@@ -215,7 +218,7 @@ class VehicleMaintenance(BaseModel):
 
 class MaintenanceImage(BaseModel):
     vietnamese_name = "Hình ảnh sửa chữa"
-    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     image = models.ImageField(upload_to='maintenance/', verbose_name="Hình ảnh", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
@@ -285,7 +288,7 @@ class RepairPart(BaseModel):
     vietnamese_name = "Phụ tùng (sửa chữa)"
     class Meta:
         ordering = ['-created_at', 'part_provider', 'part_name']
-    part_provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
+    part_provider = models.ForeignKey(PartProvider, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Nhà cung cấp")
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại xe")
     part_number = models.CharField(max_length=255, verbose_name="Mã phụ tùng", unique=True)
     part_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
@@ -320,7 +323,7 @@ class VehicleMaintenanceRepairPart(BaseModel):
         ('not_done', 'Chưa xong'),
     )
 
-    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Phiếu sửa chữa")
     repair_part = models.ForeignKey(RepairPart, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Bộ phận")
     quantity = models.IntegerField(verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)])
     received_status = models.CharField(max_length=50, choices=RECEIVED_STATUS_CHOICES, default='not_received', verbose_name="Trạng thái nhận hàng")
@@ -375,8 +378,8 @@ class PaymentRecord(BaseModel):
         ('bh_company', 'Công ty BH'),
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Người tạo phiếu")
-    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Phiếu sửa chữa")
-    provider = models.ForeignKey(PartProvider, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Nhà cung cấp")
+    vehicle_maintenance = models.ForeignKey(VehicleMaintenance, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Phiếu sửa chữa")
+    provider = models.ForeignKey(PartProvider, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Nhà cung cấp")
     status = models.CharField(max_length=50, choices=PAID_STATUS_CHOICES, default='not_requested', verbose_name="Trạng thái thanh toán")
 
     purchase_amount= models.IntegerField(verbose_name="Tổng tiền trên phiếu sửa chữa", default=0, validators=[MinValueValidator(0)])
@@ -412,9 +415,6 @@ class PaymentRecord(BaseModel):
                 fields.remove(field)
         return fields
 
-    def delete(self, *args, **kwargs):
-        # Không cho phép xóa, vì Payment được tạo tự động
-        pass
 
     def save(self, *args, **kwargs):
         # Delete to test

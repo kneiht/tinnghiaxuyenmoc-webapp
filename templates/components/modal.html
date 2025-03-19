@@ -32,7 +32,6 @@
                 {% else %}
                     <script>
                         function toggleModalEdit() {
-                            console.log("Hellosakhdfsdkfasjkl");
                             const modal = document.getElementById('modal');
                             modal.querySelectorAll('.hidable').forEach(el => el.classList.remove('hidden'));
                             modal.querySelectorAll('.auto-field').forEach(el => el.disabled = false);
@@ -122,7 +121,7 @@
                 
             {% endif %}
             <!-- Result could be a html card if success or a new form modal with error if fail, if success, the card will be added right after the div cards, else the form will be the same place but display as fixed -->
-            <form enctype="multipart/form-data" method="post"
+            <form id="modal_form" enctype="multipart/form-data" method="post"
                    action="{{ form_url }}" up-submit
                     {% if record %}
                         up-target="#modal:maybe, #record_{{ record.pk }}:maybe"
@@ -137,6 +136,9 @@
                     {% endfor %}
                 </div>  
                 {% endif %}
+                <p id="fileError" class="px-6 py-3 text-red-500 hidden"></p>
+
+
 
                 {% if form.fields|length >= 13 or modal == 'modal_VehicleMaintenance'  or modal == 'modal_SupplyOrder' %}
                 <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[1100px] gap-4 px-6">
@@ -233,8 +235,17 @@
                     {% if record and model != "PaymentRecord" and model != "SupplyPaymentRecord" %}
                         <button type="button" class="btn btn-danger rounded-full w-28 "
                             onclick="if (confirm('Thao tác này sẽ xóa dữ liệu hoàn toàn, và không thể khôi phục.\n\nBạn có thực sự muốn xóa dữ liệu này không?')) { 
-                                document.getElementById('archived').value='true';
-                                document.getElementById('submit-form').click();}">
+                                // One more alert to confirm by type if modal = modal_VehicleMaintenance
+                                {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' %}
+                                    if (confirm('Xác nhận xóa dữ liệu.\n\n Toàn bộ các dự liệu Thanh toán và hình ảnh liên quan sẽ bị xóa theo.')) {
+                                        document.getElementById('archived').value='true';
+                                        document.getElementById('submit-form').click();
+                                    }
+                                {% else %}
+                                    document.getElementById('archived').value='true';
+                                    document.getElementById('submit-form').click();
+                                {% endif %}
+                            }">
                             Xóa
                             <input name="archived" id="archived" class="hidden">
                         </button>

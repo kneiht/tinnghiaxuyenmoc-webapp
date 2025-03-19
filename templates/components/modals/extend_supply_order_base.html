@@ -29,7 +29,7 @@
                         {% elif record.approval_status == "rejected" %}
                             <option value="rejected">Từ chối</option>
                         {% endif %}
-                    </select>
+                    </select>   
                     {% else %}
                     <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
                         {% if record.approval_status == "scratch" %}
@@ -72,7 +72,10 @@
 
 
 <div class="w-full pt-4 px-6">
-    <p class="text-center text-theme"> Lưu ý: các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật </p>
+    <p class="text-center text-theme"> Chỉ có vị trí giám sát dự án mới đặt được vật tư. </p>
+    <p class="text-center text-theme"> Chỉ có kế toán dự án mới chọn được nhà cung cấp. </p>
+    <p class="text-center text-theme"> Sau khi được duyệt, kế toán mới có thể nhập SL Thanh toán và SL Đã nhận. </p>
+    <p class="text-center text-theme"> Các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật. </p>
     <div class="flex flex-row justify-between gap-5 items-center py-1">
         <div class="flex flex-row gap-5 items-end py-2">
             
@@ -93,9 +96,8 @@
     <div class="form-input flex flex-col h-fit h-max-[500px] gap-4 pt-4 pb-6 overflow-auto sm:w-[1100px]">
         <div class="border-b pb-0.5 flex font-semibold w-fit">
             <span class="w-72"> Vật tư </span>
-            
+            <span class="w-56 text-center"> Nhà cung cấp </span>
             {% if role == 'accountant' %}
-                <span class="w-40 text-center"> Nhà cung cấp </span>
                 <span class="w-28 text-center"> Đơn giá </span>
                 <span class="w-28 text-center"> Thành tiền </span>
             {% endif %}
@@ -117,20 +119,36 @@
                     <input type="hidden" name="supply_quantity_{{ order_supply.base_supply.pk }}" value="{{ order_supply.quantity }}">
                     {% endif %}
                     <span class="w-72"> {{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</span>
-                        
+                    
+                    {% if role != 'accountant' %}
+                    <span class="w-56 text-center">                             
+                        {% if order_supply.detail_supply %}
+                            {{ order_supply.detail_supply.supply_provider.name }} - {{ order_supply.detail_supply.supply_brand.name }}
+                        {% else %}
+                            Chưa chọn
+                        {% endif %}
+                    </span>
+                    {% endif %}
+
+                    
                     {% if role == 'accountant' %}
-                    <div class="w-40 text-center">
-                        <button class="btn btn-outline hidable approve-hidable hidden" onclick="showProviderModal('{{ order_supply.base_supply.pk }}')">
-                            {% if order_supply.detail_supply.supply_provider %}
-                                {{ order_supply.detail_supply.supply_provider }}
+                    <div class="w-56 flex justify-center">
+                        
+                        <button class="btn btn-outline hidable hidden text-center" onclick="showProviderModal('{{ order_supply.base_supply.pk }}')">
+                            {% if order_supply.detail_supply %}
+                                {{ order_supply.detail_supply.supply_provider.name }} - {{ order_supply.detail_supply.supply_brand.name }}
                             {% else %}
                                 Chưa chọn
                             {% endif %}
                         </button>
-                        <span class="hidable approve-hidable">
-                            {{ order_supply.detail_supply.supply_provider }}
+                        <span class="hidable text-center">
+                            {% if order_supply.detail_supply %}
+                                {{ order_supply.detail_supply.supply_provider.name }} - {{ order_supply.detail_supply.supply_brand.name }}
+                            {% else %}
+                                Chưa chọn
+                            {% endif %}
                         </span>
-                        <input class="hidden" id="provider_{{ order_supply.base_supply.pk }}" name="provider_{{ order_supply.base_supply.pk }}" value="{{ order_supply.detail_supply.supply_provider.pk }}">
+                        <input class="hidden" id="detail_supply_{{ order_supply.base_supply.pk }}" name="detail_supply_{{ order_supply.base_supply.pk }}" value="{{ order_supply.detail_supply.pk }}">
                     </div>
                     <div class="w-28 text-center">
                         {{ order_supply.detail_supply.supply_price|format_money }}
@@ -141,28 +159,36 @@
                     {% endif %}
                     
                     <!-- Provider Modal -->
-                    <div id="provider-modal-{{ order_supply.base_supply.pk }}" class="hidden fixed inset-0 bg-gray-600 bg-opacity-30 flex justify-center items-center z-50">
+                    <div id="select-modal-{{ order_supply.base_supply.pk }}" class="hidden fixed inset-0 bg-gray-600 bg-opacity-30 flex justify-center items-center z-50">
                         <div class="card p-4 w-1/3 max-h-[80vh] overflow-y-auto">
                             <h3 class="text-lg font-bold mb-4 text-center">Chọn Nhà Cung Cấp</h3>
+                            <h3 class="text-lg font-bold mb-4 text-center">{{ order_supply.base_supply.supply_number }} - {{ order_supply.base_supply.supply_name }}</h3>
                             <ul>
-                                {% for provider, detail_supply_list in order_supply.base_supply.get_dict_of_detail_supplies.items %}
-                                    <li class="py-2 border-b">
-                                        <div class="flex justify-between items-center">
-                                            <span>{{ provider.name }}</span>
-                                            <button class="text-blue-500" onclick="selectProvider('{{ provider.pk }}', '{{ provider.name }}', '{{ order_supply.base_supply.pk }}')">
-                                                Chọn
-                                            </button>
-                                        </div>
-                                        <ul class="pl-4 mt-2">
-                                            {% for detail_supply in detail_supply_list %}
-                                                <li class="py-1 text-gray-600 dark:text-gray-400">
-                                                    <span class="">Giá: {{ detail_supply.supply_price|format_money }}</span>
-                                                    <span class="ml-4">Ngày: {{ detail_supply.created_at|date:"d/m/Y" }}</span>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </li>
-                                {% endfor %}
+                                {% if order_supply.base_supply.get_dict_of_detail_supplies %}
+                                    {% for detail_supply_key, detail_supply_list in order_supply.base_supply.get_dict_of_detail_supplies.items %}
+                                        <li class="py-2 border-b">
+                                            <div class="flex justify-between items-center">
+                                                <span> {{ detail_supply_key }}</span>
+                                                <button class="text-blue-500" onclick="selectProvider('{{ detail_supply_list.0.pk }}', '{{ detail_supply_key }}', '{{ order_supply.base_supply.pk }}')">
+                                                    Chọn
+                                                </button>
+                                            </div>
+                                            <ul class="pl-4 mt-2">
+                                                {% for detail_supply in detail_supply_list %}
+                                                    <li class="py-1 text-gray-600 dark:text-gray-400">
+                                                        <span class="">Giá: {{ detail_supply.supply_price|format_money }}</span>
+                                                        <span class="ml-4">Ngày: {{ detail_supply.created_at|date:"d/m/Y" }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="py-2 text-red-600 text-center flex flex-col justify-center text-lg">
+                                        <span>Không tìm thấy dữ liệu vật tư chi tiết chi vật tư này.</span>
+                                        <span>Vui lòng thêm vật tư chi tiết trước.</span>
+                                    </div>
+                                {% endif %}
                             </ul>
                             <div class="flex flex-row justify-center mt-5">
                             <button class="mt-4 btn btn-secondary px-3" onclick="closeProviderModal('{{ order_supply.base_supply.pk }}')">Đóng</button>
@@ -176,17 +202,17 @@
                     <span class="w-28 text-center"> {{ order_supply.quantity }} </span>
                     {% if role == 'accountant' %}
                     <div class="w-28 text-center">
-                        <span class="hidable approve-hidable">{{ order_supply.paid_quantity }}</span>
+                        <span class=" approve-hidable">{{ order_supply.paid_quantity }}</span>
                         <input type="number" name="paid_quantity_{{ order_supply.base_supply.pk }}" 
-                               class="form-input hidable approve-hidable hidden no-readable" 
+                               class="form-input approve-hidable hidden no-readable" 
                                value="{{ order_supply.paid_quantity }}"
                                min="0"
                                max="{{ order_supply.quantity }}">
                     </div>
                     <div class="w-28 text-center">
-                        <span class="hidable approve-hidable">{{ order_supply.received_quantity }}</span>
+                        <span class=" approve-hidable">{{ order_supply.received_quantity }}</span>
                         <input type="number" name="received_quantity_{{ order_supply.base_supply.pk }}" 
-                               class="form-input hidable approve-hidable hidden no-readable" 
+                               class="form-input  approve-hidable hidden no-readable" 
                                value="{{ order_supply.received_quantity }}"
                                min="0"
                                max="{{ order_supply.quantity }}">
@@ -223,24 +249,24 @@
         function showProviderModal(baseSupplyPk) {
             // Prevent submit
             event.preventDefault();
-            document.getElementById('provider-modal-' + baseSupplyPk).classList.remove('hidden');
+            document.getElementById('select-modal-' + baseSupplyPk).classList.remove('hidden');
         }
     
         function closeProviderModal(baseSupplyPk) {
             event.preventDefault();
-            document.getElementById('provider-modal-' + baseSupplyPk).classList.add('hidden');
+            document.getElementById('select-modal-' + baseSupplyPk).classList.add('hidden');
         }
     
-        function selectProvider(providerPk, providerName, baseSupplyPk) {
+        function selectProvider(detailSupplyPk, providerBrand, baseSupplyPk) {
             event.preventDefault();
             // Update the button text with the selected provider name
             const button = document.querySelector(`button[onclick="showProviderModal('${baseSupplyPk}')"]`);
-            button.textContent = providerName;
+            button.textContent = providerBrand;
     
             // Optionally, update a hidden input or perform an AJAX request to save the selection
             // Example: document.getElementById('selected-provider-' + baseSupplyPk).value = providerPk;
             // Update the hidden input value when selecting provider
-            document.getElementById('provider_' + baseSupplyPk).value = providerPk;
+            document.getElementById('detail_supply_' + baseSupplyPk).value = detailSupplyPk;
             closeProviderModal(baseSupplyPk);
         }
 

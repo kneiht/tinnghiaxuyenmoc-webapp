@@ -2,7 +2,6 @@
     "liveServer.settings.multiRootWorkspaceName": "django-tinnghiaxuyenmoc",
     "workbench.tree.indent": 25,
     "files.exclude": {
-        ".venv": true,
         "app_accounts": true,
         ".vscode": false,
         "jstoolchain": true,

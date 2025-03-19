@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import requests
 import pandas as pd
+import traceback
 
 from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup
@@ -58,13 +59,44 @@ def decide_permission(request, action, params):
             message_type = "red"
             return render_message(request, message=message, message_type=message_type)
         else:
+            if model == "SupplyOrder":
+                # Check if project user
+                project_id = get_valid_id(params.get("project_id", 0))
+                project = Project.objects.filter(pk=project_id).first()
+                if not project:
+                    message = "Dự án không tồn tại. \n Vui lòng liên hệ admin."
+                    message_type = "red"
+                    return render_message(request, message=message, message_type=message_type)
+                
+                project_user = ProjectUser.objects.filter(user=user, project=project).first()
+                if not project_user or project_user.role not in ["supervisor", "accountant"]:
+                    message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                    message_type = "red"
+                    return render_message(request, message=message, message_type=message_type)
+
             return None
+
     elif action == "update":
         if not permission.update:
             message = "Cập nhật dữ liệu không thành công vì chưa được cấp quyền. \n\n Vui lòng liên hệ admin cấp quyền."
             message_type = "red"
             return render_message(request, message=message, message_type=message_type)
         else:
+            if model == "SupplyOrder":
+                # Check if project user
+                project_id = get_valid_id(params.get("project_id", 0))
+                project = Project.objects.filter(pk=project_id).first()
+                if not project:
+                    message = "Dự án không tồn tại. \n Vui lòng liên hệ admin."
+                    message_type = "red"
+                    return render_message(request, message=message, message_type=message_type)
+                
+                project_user = ProjectUser.objects.filter(user=request.user, project=project).first()
+                if not project_user or project_user.role not in ["supervisor", "accountant"]:
+                    message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                    message_type = "red"
+                    return render_message(request, message=message, message_type=message_type)
+
             return None
 
     elif action == "delete":
@@ -113,39 +145,37 @@ def handle_form(request, model, pk=0):
             return HttpResponse(forbit_html)
         
         try:
-            record = instance
-            # Get related records
-            related_records = []
-            for related_object in record._meta.related_objects:
-                related_manager = getattr(record, related_object.get_accessor_name())
-                related_records.extend(list(related_manager.all()))
-            
-            # If there are related records, show warning
-            if related_records:
-                # Create list of related records
-                related_records_info = []
-                for related_record in related_records:
-                    # Skip MaintenanceImage records
-                    if related_record._meta.model_name.lower() == "maintenanceimage":
-                        continue
-
-                    try:    
-                        display_name = related_record.vietnamese_name
-                    except:
-                        display_name = related_record._meta.verbose_name
-                    record_info = f"{display_name}: {str(related_record)}"
-                    related_records_info.append(record_info)
+            # if record is VechicleMaintenance":
+            if model != "VehicleMaintenance" and model != "SupplyOrder":
+                record = instance
+                # Get related records
+                related_records = []
+                for related_object in record._meta.related_objects:
+                    related_manager = getattr(record, related_object.get_accessor_name())
+                    related_records.extend(list(related_manager.all()))
                 
-                # Create message with related records
-                message = "Không thể xóa dữ liệu vì có các bản ghi liên quan.\n Nếu muốn xóa dữ liệu này, phải xóa các dữ liệu liên quan trước để đảm bảo toàn vẹn dữ liệu:\n\n"
-                message += "🔹 " + "\n🔹 ".join(related_records_info)
-                
-                html_message = render_message(
-                    request,
-                    message=message,
-                    message_type="red",
-                )
-                return HttpResponse(html_message)
+                # If there are related records, show warning
+                if related_records:
+                    # Create list of related records
+                    related_records_info = []
+                    for related_record in related_records:
+                        try:    
+                            display_name = related_record.vietnamese_name
+                        except:
+                            display_name = related_record._meta.verbose_name
+                        record_info = f"{display_name}: {str(related_record)}"
+                        related_records_info.append(record_info)
+                    
+                    # Create message with related records
+                    message = "Không thể xóa dữ liệu vì có các bản ghi liên quan.\n Nếu muốn xóa dữ liệu này, phải xóa các dữ liệu liên quan trước để đảm bảo toàn vẹn dữ liệu:\n\n"
+                    message += "🔹 " + "\n🔹 ".join(related_records_info)
+                    
+                    html_message = render_message(
+                        request,
+                        message=message,
+                        message_type="red",
+                    )
+                    return HttpResponse(html_message)
 
 
             record = instance
@@ -166,7 +196,9 @@ def handle_form(request, model, pk=0):
                 message="Xóa dữ liệu thất bại.\n\n" + str(e),
                 message_type="red",
             )
-        
+            # panic
+            print(traceback.format_exc())
+
             return HttpResponse(html_message)
     elif request.POST.get("archived") == "false":
         # CHECK PERMISSIONS
@@ -184,22 +216,24 @@ def handle_form(request, model, pk=0):
         # Handle the case of the project is created and need to be assigned to a user
         # instance_form.user = request.user
         # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, "create", {"model": model})
+        forbit_html = decide_permission(request, "create", {"model": model, "project_id": project_id})
         if forbit_html:
             return HttpResponse(forbit_html)
 
         if model == "VehicleMaintenance" or model == "SupplyOrder":
             # set approval status to make sure there no injection hacking
             form.instance.approval_status = "scratch"
+
+
     else:  # update
         # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, "update", {"model": model})
+        forbit_html = decide_permission(request, "update", {"model": model, "project_id": project_id})
         if forbit_html:
             return HttpResponse(forbit_html)
 
         if model == "PaymentRecord":
             # check if the use have the right to modify approval status
-            forbit_html = decide_permission(request, "approve", {"model": model})
+            forbit_html = decide_permission(request, "approve", {"model": model, "project_id": project_id})
             lock = request.POST.get("lock")
             if lock and forbit_html:
                 message = "Bạn không được cấp quyền khóa phiếu. \n\n Vui lí liên hệ admin cấp quyền."
@@ -208,7 +242,7 @@ def handle_form(request, model, pk=0):
                 )
                 return HttpResponse(html_message)
 
-        elif model == "VehicleMaintenance":
+        elif model == "VehicleMaintenance" or model == "SupplyOrder":
             current_approval_status = (
                 model_class.objects.filter(pk=pk).first().approval_status
             )
@@ -256,20 +290,38 @@ def handle_form(request, model, pk=0):
             elif current_approval_status == "approved":
                 if forbit_html:
                     if form_approval_status in ("approved"):
-                        # Update status up each VehicleMaintenanceRepairPart
-                        vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
-                        for vehicle_part_id in vehicle_part_post_ids:
-                            vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
-                                id=vehicle_part_id
-                            ).first()
-                            # Get fields
-                            vehicle_part.received_status = request.POST.get(
-                                f"received_status_{vehicle_part_id}"
-                            )
-                            vehicle_part.done_status = request.POST.get(
-                                f"done_status_{vehicle_part_id}"
-                            )
-                            vehicle_part.save()
+                        if model == "VehicleMaintenance":
+                            # Update status up each VehicleMaintenanceRepairPart
+                            vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
+                            for vehicle_part_id in vehicle_part_post_ids:
+                                vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
+                                    id=vehicle_part_id
+                                ).first()
+                                # Get fields
+                                vehicle_part.received_status = request.POST.get(
+                                    f"received_status_{vehicle_part_id}"
+                                )
+                                vehicle_part.done_status = request.POST.get(
+                                    f"done_status_{vehicle_part_id}"
+                                )
+                                vehicle_part.save()
+                        
+                        elif model == "SupplyOrder":
+                            order = instance
+                            # Update status up each SupplyOrderSupply
+                            order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+                            for order_supply in order_supplies:
+                                # Update paid and received quantities
+                                paid_quantity = float(request.POST.get(f"paid_quantity_{order_supply.id}", 0))
+                                if paid_quantity:
+                                    order_supply.paid_quantity = paid_quantity
+
+                                received_quantity = float(request.POST.get(f"received_quantity_{order_supply.id}", 0))
+                                if received_quantity:
+                                    order_supply.received_quantity = received_quantity
+
+                                order_supply.save()
+
                         record = instance
                         record.save()
                         record.style = "just-updated"
@@ -289,24 +341,41 @@ def handle_form(request, model, pk=0):
 
                 else:
                     if form_approval_status in ("need_update", "approved", "rejected"):
-                        # Update status up each VehicleMaintenanceRepairPart
-                        vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
-                        for vehicle_part_id in vehicle_part_post_ids:
-                            vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
-                                id=vehicle_part_id
-                            ).first()
-                            # Get fields
-                            vehicle_part.received_status = request.POST.get(
-                                f"received_status_{vehicle_part_id}"
-                            )
-                            vehicle_part.paid_status = request.POST.get(
-                                f"paid_status_{vehicle_part_id}"
-                            )
-                            vehicle_part.done_status = request.POST.get(
-                                f"done_status_{vehicle_part_id}"
-                            )
-                            vehicle_part.save()
+                        if model == "VehicleMaintenance":
+                            # Update status up each VehicleMaintenanceRepairPart
+                            vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
+                            for vehicle_part_id in vehicle_part_post_ids:
+                                vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
+                                    id=vehicle_part_id
+                                ).first()
+                                # Get fields
+                                vehicle_part.received_status = request.POST.get(
+                                    f"received_status_{vehicle_part_id}"
+                                )
+                                vehicle_part.paid_status = request.POST.get(
+                                    f"paid_status_{vehicle_part_id}"
+                                )
+                                vehicle_part.done_status = request.POST.get(
+                                    f"done_status_{vehicle_part_id}"
+                                )
+                                vehicle_part.save()
 
+                        elif model == "SupplyOrder":
+                            order = instance
+                            # Update status up each SupplyOrderSupply
+                            order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+                            for order_supply in order_supplies:
+                                # Update paid and received quantities
+                                paid_quantity = float(request.POST.get(f"paid_quantity_{order_supply.id}", 0))
+                                if paid_quantity:
+                                    order_supply.paid_quantity = paid_quantity
+
+                                received_quantity = float(request.POST.get(f"received_quantity_{order_supply.id}", 0))
+                                if received_quantity:
+                                    order_supply.received_quantity = received_quantity
+
+                                order_supply.save()
+                                
                         record = instance
                         record.approval_status = form_approval_status
                         record.save()
@@ -357,8 +426,9 @@ def handle_form(request, model, pk=0):
 
     if form.is_valid():
         instance_form = form.save(commit=False)
-        instance_form.save()
+        
         if model == "VehicleMaintenance":
+            instance_form.save()
             # Update the  list of VehicleMaintenanceRepairPart
             vehicle_maintenance = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
@@ -392,6 +462,7 @@ def handle_form(request, model, pk=0):
                         )
 
         elif model == "SupplyOrder":
+            instance_form.save()
             order = instance_form
             # get the list of vehicle_parts VehicleMaintenanceRepairPart
             order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
@@ -411,43 +482,55 @@ def handle_form(request, model, pk=0):
                     ).first()
                 # Update
                 if order_supply:  # Update quantity
-                    order_supply.quantity = request.POST.get(
-                        f"supply_quantity_{supply_id}", 0
-                    )
-
-                    # Update paid and received quantities
-                    paid_quantity = request.POST.get(f"paid_quantity_{supply_id}")
-                    if paid_quantity:
-                        order_supply.paid_quantity = paid_quantity
-                    received_quantity = request.POST.get(
-                        f"received_quantity_{supply_id}"
-                    )
-                    if received_quantity:
-                        order_supply.received_quantity = received_quantity
+                    quantity = float(request.POST.get(f"supply_quantity_{supply_id}", 0))
+                    order_supply.quantity = quantity
 
                     # add detail supply
-                    supply_provider = request.POST.get(f"provider_{supply_id}")
-                    if supply_provider:
-                        detail_supply = (
-                            supply.get_list_of_detail_supplies_of_a_provider(
-                                supply_provider
-                            ).first()
-                        )
-                        if detail_supply:
-                            order_supply.detail_supply = detail_supply
-                        else:
-                            order_supply.detail_supply = None
-                    else:
-                        order_supply.detail_supply = None
+                    detail_supply_id = get_valid_id(request.POST.get(f"detail_supply_{supply_id}"))
+                    detail_supply = DetailSupply.objects.filter(id=detail_supply_id).first()
+                    if detail_supply:
+                        order_supply.detail_supply = detail_supply
+
                     order_supply.save()
 
                 else:  # create new
                     if supply:
+                        quantity = float(request.POST.get(f"supply_quantity_{supply_id}", 0))
                         SupplyOrderSupply.objects.create(
                             supply_order=order,
                             base_supply=supply,
-                            quantity=request.POST.get(f"supply_quantity_{supply_id}"),
+                            quantity=quantity,
                         )
+
+            # Update approval status if the approval status has changed
+            if order.approval_status == "wait_for_approval":
+                
+                # Check if order_supples  count > 0
+                order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+                if order_supplies.count() == 0:
+                    record = instance_form
+                    record.style = "just-updated"
+                    record.approval_status = "scratch"
+                    record.save()
+                    html_record = render_display_records(
+                        request, model=model, records=[record], update="True", project_id=project_id
+                    )
+                    html_message = render_message(request, message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua vật tư này vì không có vật tư nào được chọn")
+                    return HttpResponse(html_message + html_record)
+                else:
+                    for order_supply in order_supplies:
+                        if not order_supply.detail_supply:                        
+                            record = instance_form
+                            record.style = "just-updated"
+                            record.approval_status = "scratch"
+                            record.save()
+                            html_record = render_display_records(
+                                request, model=model, records=[record], update="True", project_id=project_id
+                            )
+                            html_message = render_message(request, message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua này vì có vật tư chưa được chọn nhà cung cấp.\n\n Vui lòng liên hệ kế toán để thêm nhà cung cấp.")
+                            return HttpResponse(html_message + html_record)
+                            
+
 
         instance_form.save()
 
@@ -1812,6 +1895,7 @@ def page_home(request, sub_page=None):
         "display_name_dict": display_name_dict,
         "model": sub_page,
         "current_url": request.path,
+        "header_title": display_name_dict.get(sub_page, "Trang chủ"),
     }
     return render(request, "pages/page_home.html", context)
 
@@ -1838,6 +1922,7 @@ def page_general_data(request, sub_page=None):
         "model": sub_page,
         "display_name_dict": display_name_dict,
         "current_url": request.path,
+        "header_title": display_name_dict.get(sub_page, "Dữ liệu chung"),
     }
     return render(request, "pages/page_general_data.html", context)
 
@@ -1883,6 +1968,7 @@ def page_transport_department(request, sub_page=None):
         "start_date": start_date,
         "end_date": end_date,
         "check_month": check_month,
+        "header_title": display_name_dict.get(sub_page, "Phòng vận tải"),
     }
     return render(request, "pages/page_transport_department.html", context)
 
@@ -1895,6 +1981,7 @@ def page_projects(request, sub_page=None):
     display_name_dict = {
         "Project": "Dự án",
         "SupplyProvider": "Nhà cung cấp vật tư",
+        "SupplyBrand": "Thương hiệu vật tư",
         "BaseSupply": "Vật tư",
         "DetailSupply": "Vật tư chi tiết",
         "SupplyPaymentRecord": "LS thanh toán vật tư",
@@ -1907,6 +1994,7 @@ def page_projects(request, sub_page=None):
         "model": sub_page,
         "display_name_dict": display_name_dict,
         "current_url": request.path,
+        "header_title": display_name_dict.get(sub_page, "Dự án"),
     }
     return render(request, "pages/page_projects.html", context)
 
@@ -1949,4 +2037,19 @@ def clean(request):
     records = PartProvider.objects.all()
     for record in records:
         record.save()
+
+    # do the same for supply
+    orphan_records = SupplyPaymentRecord.objects.filter(supply_order__isnull=True)
+    # Delete the orphaned records
+    deleted_count = orphan_records.count()
+    orphan_records.delete()
+    result += f"\nDeleted {deleted_count} SupplyPaymentRecord records with null foreign keys"
+
+    # supply order supply
+    orphan_records = SupplyOrderSupply.objects.filter(supply_order__isnull=True)
+    # Delete the orphaned records
+    deleted_count = orphan_records.count()
+    orphan_records.delete()
+    result += f"\nDeleted {deleted_count} SupplyOrderSupply records with null foreign keys"
+
     return HttpResponse(result)

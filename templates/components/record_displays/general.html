@@ -40,13 +40,23 @@
                                     class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Chưa khóa</span>
                             {% endif %}
 
-
                         {% elif field == 'image' and record.image %} 
                             <div class="relative group">
                                 <a href="{{ record.image.url }}" target="_blank">
                                     <img src="{{ record.image.url }}" alt="image" class="h-10 rounded-sm cursor-pointer">
                                 </a>
                             </div>
+                        {% elif field == 'image_prove' and record.image_prove %} 
+                        <div class="relative group">
+                            <a href="{{ record.image_prove.url }}" target="_blank">
+                                {% if record.image_prove.url|slice:"-4:" == ".pdf" %}
+                                    <img src="{% static 'images/icons/pdf.png' %}?v={{ STATIC_VERSION }}" alt="PDF" class="h-10 rounded-sm cursor-pointer">
+                                {% else %}
+                                    <img src="{{ record.image_prove.url }}" alt="image" class="h-10 rounded-sm cursor-pointer">
+                                {% endif %}
+                            </a>
+                        </div>
+
                         {% elif field == 'image1' %} 
                         <div class="flex flex-row gap-2" style="width: 100px;">
                             {% if record.image1 %}
