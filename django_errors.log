@@ -8557,3 +8557,2456 @@ Traceback (most recent call last):
     ^^^^^^^^^^^^^^^^^^^
 AttributeError: 'QuerySet' object has no attribute 'save'
 ERROR 2025-03-19 21:21:36,981 basehttp "POST /api/handle-form/SupplyOrder/11 HTTP/1.1" 500 76841
+ERROR 2025-03-23 14:09:30,533 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'app_dashboard_permission.subjobbrand' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 616, in load_elements
+    html_display_records = render_display_records(request, **params)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 345, in render_display_records
+    html = render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 197, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'app_dashboard_permission.subjobbrand' in 'field list'")
+ERROR 2025-03-23 14:09:30,543 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfaG9tZSIsICJtb2RlbCI6ICJQZXJtaXNzaW9uIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 323932
+ERROR 2025-03-23 14:12:22,112 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 616, in load_elements
+    html_display_records = render_display_records(request, **params)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 345, in render_display_records
+    html = render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 197, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+ERROR 2025-03-23 14:12:22,124 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfcHJvamVjdHMiLCAibW9kZWwiOiAiRGV0YWlsU3ViSm9iIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 301963
+ERROR 2025-03-23 14:12:22,937 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 616, in load_elements
+    html_display_records = render_display_records(request, **params)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 345, in render_display_records
+    html = render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 197, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+ERROR 2025-03-23 14:12:22,941 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfcHJvamVjdHMiLCAibW9kZWwiOiAiRGV0YWlsU3ViSm9iIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 301969
+ERROR 2025-03-23 14:12:24,586 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 616, in load_elements
+    html_display_records = render_display_records(request, **params)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 345, in render_display_records
+    html = render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 197, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+ERROR 2025-03-23 14:12:24,589 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfcHJvamVjdHMiLCAibW9kZWwiOiAiRGV0YWlsU3ViSm9iIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 301966
+ERROR 2025-03-23 14:12:46,022 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 616, in load_elements
+    html_display_records = render_display_records(request, **params)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 345, in render_display_records
+    html = render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 197, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 75, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'app_dashboard_detailsubjob.sub_contractor_id' in 'field list'")
+ERROR 2025-03-23 14:12:46,025 basehttp "GET /api/load-elements?q=eyJwYWdlIjogInBhZ2VfcHJvamVjdHMiLCAibW9kZWwiOiAiRGV0YWlsU3ViSm9iIiwgImVsZW1lbnRzIjogInRvb2xfYmFyfGRpc3BsYXlfcmVjb3JkcyJ9 HTTP/1.1" 500 301849
+ERROR 2025-03-23 14:19:32,341 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1878, in form_sub_job_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1871, in render_modal
+    return render(request, "components/modal_sub_job_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: components/modal_sub_job_cost_estimation_table.html
+ERROR 2025-03-23 14:19:32,348 basehttp "GET /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 91918
+ERROR 2025-03-23 14:19:33,622 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1878, in form_sub_job_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1871, in render_modal
+    return render(request, "components/modal_sub_job_cost_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: components/modal_sub_job_cost_estimation_table.html
+ERROR 2025-03-23 14:19:33,623 basehttp "GET /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 91918
+ERROR 2025-03-23 14:20:12,674 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1878, in form_sub_job_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1871, in render_modal
+    return render(request, "components/modal_sub_job_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 960, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 481, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 479, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 693, in __init__
+    filter_func = parser.find_filter(filter_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 603, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'get_attr'
+ERROR 2025-03-23 14:20:12,681 basehttp "GET /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 220492
+ERROR 2025-03-23 14:20:12,934 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1878, in form_sub_job_cost_estimation_table
+    return render_modal(project_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1871, in render_modal
+    return render(request, "components/modal_sub_job_estimation_table.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 860, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 960, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 481, in parse
+    raise self.error(token, e)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 479, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 693, in __init__
+    filter_func = parser.find_filter(filter_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 603, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'get_attr'
+ERROR 2025-03-23 14:20:12,937 basehttp "GET /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 220492
+ERROR 2025-03-23 14:22:17,154 log Internal Server Error: /api/download-excel-template/sub_job_cost_estimation_table
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1137, in download_excel_template
+    shutil.copy(original_excel_path, temp_excel_path)  # Copy original file
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 435, in copy
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 260, in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/staticfiles/excel/mau-bang-du-toan-cong-viec-thau-phu.xlsx'
+ERROR 2025-03-23 14:22:17,156 basehttp "GET /api/download-excel-template/sub_job_cost_estimation_table?project_id=4 HTTP/1.1" 500 82580
+ERROR 2025-03-23 14:23:45,872 log Internal Server Error: /api/download-excel-template/sub_job_cost_estimation_table
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 1137, in download_excel_template
+    shutil.copy(original_excel_path, temp_excel_path)  # Copy original file
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 435, in copy
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/shutil.py", line 260, in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/staticfiles/excel/mau-bang-du-toan-cong-viec-thau-phu.xlsx'
+ERROR 2025-03-23 14:23:45,875 basehttp "GET /api/download-excel-template/sub_job_cost_estimation_table?project_id=4 HTTP/1.1" 500 82751
+ERROR 2025-03-23 14:24:17,968 log Internal Server Error: /api/download-excel-template/sub_job_cost_estimation_table
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 204, in _get_response
+    self.check_response(response, callback)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view app_dashboard.views.download_excel_template didn't return an HttpResponse object. It returned None instead.
+ERROR 2025-03-23 14:24:17,969 basehttp "GET /api/download-excel-template/sub_job_cost_estimation_table?project_id=4 HTTP/1.1" 500 68168
+ERROR 2025-03-23 14:24:21,241 log Internal Server Error: /api/download-excel-template/sub_job_cost_estimation_table
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 204, in _get_response
+    self.check_response(response, callback)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view app_dashboard.views.download_excel_template didn't return an HttpResponse object. It returned None instead.
+ERROR 2025-03-23 14:24:21,242 basehttp "GET /api/download-excel-template/sub_job_cost_estimation_table?project_id=4 HTTP/1.1" 500 68168
+ERROR 2025-03-23 14:49:02,291 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 2029, in form_sub_job_cost_estimation_table
+    job_number_list.append(supply_number)
+                           ^^^^^^^^^^^^^
+NameError: name 'supply_number' is not defined
+ERROR 2025-03-23 14:49:02,333 basehttp "POST /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 71585
+ERROR 2025-03-23 14:52:15,806 log Internal Server Error: /api/form_sub_job_cost_estimation_table/4/
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 2072, in form_sub_job_cost_estimation_table
+    cost_estimation.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 419, in save
+    self.orderable_quantity = self.get_orderable_quantity()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SubJobEstimation' object has no attribute 'get_orderable_quantity'. Did you mean: 'orderable_quantity'?
+ERROR 2025-03-23 14:52:15,815 basehttp "POST /api/form_sub_job_cost_estimation_table/4/ HTTP/1.1" 500 76359
+ERROR 2025-03-23 15:13:29,973 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 697, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 358, in render_form
+    form_class = globals()[model + 'Form']
+                 ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'SubJobOrderForm'
+ERROR 2025-03-23 15:13:29,976 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIn0= HTTP/1.1" 500 79832
+ERROR 2025-03-23 15:13:30,155 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 697, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 358, in render_form
+    form_class = globals()[model + 'Form']
+                 ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'SubJobOrderForm'
+ERROR 2025-03-23 15:13:30,156 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIn0= HTTP/1.1" 500 79832
+ERROR 2025-03-23 15:13:36,578 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 697, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 358, in render_form
+    form_class = globals()[model + 'Form']
+                 ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'SubJobOrderForm'
+ERROR 2025-03-23 15:13:36,579 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIn0= HTTP/1.1" 500 79832
+ERROR 2025-03-23 15:13:37,734 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 697, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 358, in render_form
+    form_class = globals()[model + 'Form']
+                 ~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'SubJobOrderForm'
+ERROR 2025-03-23 15:13:37,735 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIn0= HTTP/1.1" 500 79832
+ERROR 2025-03-23 17:01:16,905 log Internal Server Error: /api/handle-form/SubJobOrder/0
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 610, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 547, in save
+    order_sub_jobs = SubJobOrderSubJob.objects.filter(order_sub_job=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'order_sub_job' into field. Choices are: archived, base_sub_job, base_sub_job_id, detail_sub_job, detail_sub_job_id, id, last_saved, paid_quantity, quantity, received_quantity, received_status, sub_job_order, sub_job_order_id
+ERROR 2025-03-23 17:01:16,910 basehttp "POST /api/handle-form/SubJobOrder/0 HTTP/1.1" 500 124136
+ERROR 2025-03-23 17:37:48,307 log Internal Server Error: /api/form_base_sub_jobs
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: form_base_sub_jobs() missing 1 required positional argument: 'project_id'
+ERROR 2025-03-23 17:37:48,308 basehttp "GET /api/form_base_sub_jobs?project=4 HTTP/1.1" 500 63686
+ERROR 2025-03-23 17:37:49,635 log Internal Server Error: /api/handle-form/SubJobOrder/0
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 610, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 564, in save
+    order_sub_jobs = SubJobOrderSubJob.objects.filter(order_sub_job=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'order_sub_job' into field. Choices are: archived, base_sub_job, base_sub_job_id, detail_sub_job, detail_sub_job_id, id, last_saved, paid_quantity, quantity, received_quantity, received_status, sub_job_order, sub_job_order_id
+ERROR 2025-03-23 17:37:49,639 basehttp "POST /api/handle-form/SubJobOrder/0 HTTP/1.1" 500 124136
+ERROR 2025-03-23 17:49:14,880 log Internal Server Error: /api/form_base_sub_jobs
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: form_base_sub_jobs() missing 1 required positional argument: 'project_id'
+ERROR 2025-03-23 17:49:14,881 basehttp "GET /api/form_base_sub_jobs?project=4 HTTP/1.1" 500 63686
+ERROR 2025-03-23 17:49:17,409 log Internal Server Error: /api/form_base_sub_jobs
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: form_base_sub_jobs() missing 1 required positional argument: 'project_id'
+ERROR 2025-03-23 17:49:17,410 basehttp "GET /api/form_base_sub_jobs?project=4 HTTP/1.1" 500 63686
+ERROR 2025-03-23 19:33:56,895 log Internal Server Error: /api/handle-form/SubJobOrder/2
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 677, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 564, in save
+    order_sub_jobs = SubJobOrderSubJob.objects.filter(order_sub_job=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'order_sub_job' into field. Choices are: archived, base_sub_job, base_sub_job_id, detail_sub_job, detail_sub_job_id, id, last_saved, paid_quantity, quantity, received_quantity, received_status, sub_job_order, sub_job_order_id
+ERROR 2025-03-23 19:33:56,899 basehttp "POST /api/handle-form/SubJobOrder/2 HTTP/1.1" 500 124909
+ERROR 2025-03-23 19:34:27,758 log Internal Server Error: /api/handle-form/SubJobOrder/0
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 677, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 564, in save
+    order_sub_jobs = SubJobOrderSubJob.objects.filter(order_sub_job=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'order_sub_job' into field. Choices are: archived, base_sub_job, base_sub_job_id, detail_sub_job, detail_sub_job_id, id, last_saved, paid_quantity, quantity, received_quantity, received_status, sub_job_order, sub_job_order_id
+ERROR 2025-03-23 19:34:27,760 basehttp "POST /api/handle-form/SubJobOrder/0 HTTP/1.1" 500 124222
+ERROR 2025-03-23 19:50:24,057 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 721, in handle_form
+    SubJobOrderSubJob.objects.create(
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 677, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 842, in save
+    cost_estimation.save()
+    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QuerySet' object has no attribute 'save'
+ERROR 2025-03-23 19:50:24,060 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 90622
+ERROR 2025-03-23 20:24:18,772 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 767, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 569, in save
+    if order_sub_job.detail_subjob:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SubJobOrderSubJob' object has no attribute 'detail_subjob'. Did you mean: 'detail_sub_job'?
+ERROR 2025-03-23 20:24:18,777 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 82225
+ERROR 2025-03-23 21:16:07,901 log Internal Server Error: /api/handle-form/ProjectUser/3
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 727, in handle_form
+    if order.approval_status == "wait_for_approval":
+       ^^^^^
+UnboundLocalError: cannot access local variable 'order' where it is not associated with a value
+ERROR 2025-03-23 21:16:07,903 basehttp "POST /api/handle-form/ProjectUser/3 HTTP/1.1" 500 75478
+ERROR 2025-03-23 21:47:22,940 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 225, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractor()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BaseSubJob' object has no attribute 'get_sub_contractor'. Did you mean: 'get_sub_contractors'?
+ERROR 2025-03-23 21:47:22,949 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 201608
+ERROR 2025-03-23 21:47:23,896 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 225, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractor()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BaseSubJob' object has no attribute 'get_sub_contractor'. Did you mean: 'get_sub_contractors'?
+ERROR 2025-03-23 21:47:23,902 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 201608
+ERROR 2025-03-23 21:48:05,153 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2112, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'tuple'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 225, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractors()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 202, in get_sub_contractors
+    sub_contractor = SubContractor.objects.get(pk=sub_contractor)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 633, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1548, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1378, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 30, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 362, in get_prep_lookup
+    return super().get_prep_lookup()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 88, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2114, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got (2,).
+ERROR 2025-03-23 21:48:05,161 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 275856
+ERROR 2025-03-23 21:51:55,487 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2112, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'tuple'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 226, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractors()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 203, in get_sub_contractors
+    sub_contractor = SubContractor.objects.get(pk=sub_contractor)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 633, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1548, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1378, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 30, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 362, in get_prep_lookup
+    return super().get_prep_lookup()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 88, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2114, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got (2,).
+ERROR 2025-03-23 21:51:55,494 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 275847
+ERROR 2025-03-23 21:54:02,739 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2112, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'tuple'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 224, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractors()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 201, in get_sub_contractors
+    sub_contractor = SubContractor.objects.get(pk=sub_contractor)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 633, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1548, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1378, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 30, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 362, in get_prep_lookup
+    return super().get_prep_lookup()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 88, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2114, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got (2,).
+ERROR 2025-03-23 21:54:02,747 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 275958
+ERROR 2025-03-23 21:55:08,886 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 224, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractors()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 200, in get_sub_contractors
+    for sub_contractor, _ in sub_contractor_ids:
+        ^^^^^^^^^^^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+ERROR 2025-03-23 21:55:08,891 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 205385
+ERROR 2025-03-23 21:55:49,497 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2112, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'tuple'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 225, in get_dict_of_detail_sub_jobs
+    sub_contractors = self.get_sub_contractors()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 202, in get_sub_contractors
+    sub_contractor = SubContractor.objects.get(pk=sub_contractor)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 633, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1548, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1378, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 30, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 362, in get_prep_lookup
+    return super().get_prep_lookup()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/lookups.py", line 88, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 2114, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got (2,).
+ERROR 2025-03-23 21:55:49,507 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 276006
+ERROR 2025-03-23 21:57:33,508 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 234, in get_dict_of_detail_sub_jobs
+    detail_sub_job_dict[DetailSubJobKey(sub_contractor)] = detail_sub_jobs
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 604, in __hash__
+    if self.pk is None:
+       ^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 655, in _get_pk_val
+    return getattr(self, meta.pk.attname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query_utils.py", line 199, in __get__
+    val = self._check_parent_chain(instance)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query_utils.py", line 219, in _check_parent_chain
+    return getattr(instance, link_field.attname)
+                             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attname'
+ERROR 2025-03-23 21:57:33,514 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 218389
+ERROR 2025-03-23 22:37:10,188 log Internal Server Error: /api/load-elements
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 854, in load_elements
+    html_modal_form = render_form(request, **params)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/renders.py", line 389, in render_form
+    return render_to_string(template, context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 325, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 241, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 318, in render
+    match = condition.eval(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 884, in eval
+    return self.value.resolve(context, ignore_failures=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+              ^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 232, in get_dict_of_detail_sub_jobs
+    detail_sub_job_dict[DetailSubJobKey(sub_contractor)] = detail_sub_jobs
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 604, in __hash__
+    if self.pk is None:
+       ^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 655, in _get_pk_val
+    return getattr(self, meta.pk.attname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query_utils.py", line 199, in __get__
+    val = self._check_parent_chain(instance)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query_utils.py", line 219, in _check_parent_chain
+    return getattr(instance, link_field.attname)
+                             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attname'
+ERROR 2025-03-23 22:37:10,194 basehttp "GET /api/load-elements?q=eyJtb2RlbCI6ICJTdWJKb2JPcmRlciIsICJjaGVja19kYXRlIjogIjIwMjUtMDMtMjMiLCAicHJvamVjdF9pZCI6IDQsICJlbGVtZW50cyI6ICJtb2RhbF9mb3JtIiwgInBrIjogMX0= HTTP/1.1" 500 218339
+ERROR 2025-03-23 23:14:20,606 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 714, in handle_form
+    order_sub_job.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 817, in save
+    new_provider.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 76, in save
+    order_sub_jobs = SubJobOrderSubJob.objects.filter(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'detail_supply' into field. Choices are: archived, base_sub_job, base_sub_job_id, detail_sub_job, detail_sub_job_id, id, last_saved, paid_quantity, quantity, received_quantity, received_status, sub_job_order, sub_job_order_id
+ERROR 2025-03-23 23:14:20,611 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 132173
+ERROR 2025-03-23 23:15:39,594 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 714, in handle_form
+    order_sub_job.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 817, in save
+    new_provider.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 90, in save
+    payment_records = SubJobPaymentRecord.objects.filter(provider=self)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1602, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1634, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1484, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1296, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/db/models/sql/query.py", line 1761, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'provider' into field. Choices are: archived, created_at, debt, id, image1, image2, last_saved, lock, money_source, note, payment_date, previous_debt, purchase_amount, requested_amount, requested_date, status, sub_contractor, sub_contractor_id, sub_job_order, sub_job_order_id, transferred_amount, user, user_id
+ERROR 2025-03-23 23:15:39,599 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 132955
+ERROR 2025-03-23 23:16:37,994 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 767, in handle_form
+    instance_form.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 552, in save
+    order_sub_job.detail_sub_job.subjob_price * order_sub_job.quantity
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DetailSubJob' object has no attribute 'subjob_price'. Did you mean: 'sub_job_price'?
+ERROR 2025-03-23 23:16:37,999 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 83344
+ERROR 2025-03-23 23:17:14,348 log Internal Server Error: /api/handle-form/SubJobOrder/1
+Traceback (most recent call last):
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/views.py", line 714, in handle_form
+    order_sub_job.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 817, in save
+    new_provider.save()
+  File "/Users/kay/KAY/Coding/django-tinnghiaxuyenmoc/app_dashboard/models/subcontractor.py", line 83, in save
+    if order_sub_job.detail_supply:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SubJobOrderSubJob' object has no attribute 'detail_supply'. Did you mean: 'detail_sub_job'?
+ERROR 2025-03-23 23:17:14,354 basehttp "POST /api/handle-form/SubJobOrder/1 HTTP/1.1" 500 87706

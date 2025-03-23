@@ -345,9 +345,6 @@ class CostEstimation(BaseModel):
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
 
-    # Danh mục công việc
-    # category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Nhóm công việc")
-
     base_supply = models.ForeignKey(
         BaseSupply,
         on_delete=models.SET_NULL,
@@ -568,10 +565,6 @@ class SupplyOrder(BaseModel):
 
         self.order_amount = total_amount
 
-        print(">>>>", order_supplies.count())
-        print(">>>>", order_supplies.filter(received_status="received").count())
-        print(">>>>", order_supplies.filter(received_status="partial_received").count())
-
         # Check received status
         if order_supplies.count()>0 and order_supplies.count == order_supplies.filter(received_status="received").count():
             self.received_status = "received"
@@ -606,9 +599,6 @@ class SupplyOrder(BaseModel):
                 self.paid_status = "partial_paid"
             else:
                 self.paid_status = "not_paid"
-        print("total_purchase_amount", total_purchase_amount)
-        print("total_transferred_amount", total_transferred_amount)
-        print("total_debt_amount", total_debt_amount)
         super().save()
 
         # Prevent recursion from payment records
@@ -658,9 +648,6 @@ class SupplyOrder(BaseModel):
 
         elif self.approval_status == "rejected":
             SupplyPaymentRecord.objects.filter(supply_order=self).delete()
-
-
-
 
     @classmethod
     def get_display_fields(self):

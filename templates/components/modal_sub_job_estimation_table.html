@@ -2,7 +2,7 @@
 
 <div id="display-records" class="w-full overflow-scroll">
 
-    <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Bảng dự toán vật tư</h3>
+    <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Bảng dự toán công việc tổ đội/ nhà thầu phụ</h3>
 
     <div class="h-full">
         {% csrf_token %}
@@ -12,7 +12,7 @@
                 <div class="flex flex-col justify-center gap-5">
                     <div class="flex justify-center gap-5">
 
-                        <form up-target="#modal:maybe, #display-records, #tool-bar" action="{% url 'form_cost_estimation_table' project_id=project_id %}" method="post"
+                        <form up-target="#modal:maybe, #display-records, #tool-bar" action="{% url 'form_sub_job_cost_estimation_table' project_id=project_id %}" method="post"
                             enctype="multipart/form-data" id="upload-form"
                             class="flex flex-row whitespace-nowrap gap-2">
                             {% csrf_token %}
@@ -29,7 +29,7 @@
 
 
                         <!-- download_backup.html -->
-                        <a href="{% url 'download_excel_template' 'cost_estimation_table' %}?project_id={{ project_id }}"
+                        <a href="{% url 'download_excel_template' 'sub_job_cost_estimation_table' %}?project_id={{ project_id }}"
                             class="whitespace-nowrap">
                             {% csrf_token %}
                             <button class="btn btn-primary nowrap">

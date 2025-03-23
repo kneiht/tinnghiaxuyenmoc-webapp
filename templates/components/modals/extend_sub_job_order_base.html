@@ -1,0 +1,268 @@
+{% load custom_tags %}
+<div class="w-full pt-4 px-6 pt-5- pb-2">
+    <div class="flex flex-row gap-5 items-end py-2">
+        <label for="students" class="text-theme">Trạng thái phiếu đặt công việc</label>
+    </div>
+    <div class="form-input flex flex-col h-fit h-max-[300px] overflow-y-scroll">
+        <div class="flex justify-between w-full font-semibold">
+            <span class="w-4/12 text-center"> Trạng thái duyệt </span>
+            <span class="w-4/12 text-center"> Trạng thái nhận hàng </span>
+            <span class="w-4/12 text-center"> Trạng thái thanh toán </span>
+        </div> 
+        <div class="pt-3 pb-1 flex justify-between items-center w-full">
+            <div class="w-4/12 flex justify-center">
+                {% if record %}
+                    <span class="{{ record|get_value:'approval_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">{{ record|format_display:'approval_status' }}</span>
+        
+                    {% if not permissions.approve %}
+                    <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                        {% if record.approval_status == "scratch" %}
+                            <option selected value="scratch">Bảng nháp</option>
+                            <option value="wait_for_approval">Chờ duyệt</option>
+                            
+                        {% elif record.approval_status == "wait_for_approval" %}
+                            <option selected value="wait_for_approval">Chờ duyệt</option>
+                            
+                        {% elif record.approval_status == "approved" %}
+                            <option selected value="approved">Đã duyệt</option>
+
+                        {% elif record.approval_status == "rejected" %}
+                            <option value="rejected">Từ chối</option>
+                        {% endif %}
+                    </select>   
+                    {% else %}
+                    <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                        {% if record.approval_status == "scratch" %}
+                            <option selected value="scratch">Bảng nháp</option>
+                            <option value="wait_for_approval">Chờ duyệt</option>
+
+                        {% elif record.approval_status == "wait_for_approval" %}
+                            <option selected value="wait_for_approval">Chờ duyệt</option>
+                            <option value="approved">Đã duyệt</option>
+                            <option value="rejected">Từ chối</option>
+
+                        {% elif record.approval_status == "approved" %}
+                            <option selected value="approved">Đã duyệt</option>
+
+                        {% elif record.approval_status == "rejected" %}
+                            <option selected value="rejected">Từ chối</option>
+                        {% endif %}
+                    
+                    </select>
+                    {% endif %}
+                    {% else %}
+                        <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                            
+                            <option selected value="scratch">Bảng nháp</option>
+                        </select>
+                            <!-- <span class="scratch text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">Bản nháp</span> -->
+                    {% endif %}
+            </div>
+            {% if record %}
+            <div class="w-4/12 text-center">
+                <span class="{{ record|get_value:'received_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'received_status' }}</span>
+            </div>
+            <div class="w-4/12 text-center">
+                <span class="{{ record|get_value:'paid_status' }} text-white p-1 rounded-md shadow-2xl px-2 text-nowrap">{{ record|format_display:'paid_status' }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class="w-full pt-4 px-6">
+    <p class="text-center text-theme"> Chỉ có vị trí giám sát dự án mới đặt được vật tư. </p>
+    <p class="text-center text-theme"> Chỉ có kế toán dự án mới chọn được nhà cung cấp. </p>
+    <p class="text-center text-theme"> Sau khi được duyệt, kế toán mới có thể nhập SL Thanh toán và SL Đã nhận. </p>
+    <p class="text-center text-theme"> Các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật. </p>
+    <div class="flex flex-row justify-between gap-5 items-center py-1">
+        <div class="flex flex-row gap-5 items-end py-2">
+            
+            <label for="students" class="text-theme">Bảng công việc</label>
+
+            {% if role != 'accountant' %}
+                <a href="{% url 'form_base_sub_jobs' %}?project={{ project_id }}" class="btn btn-success h-7 hidable hidden"
+                    up-preload="insert" up-target="#modal-sub:maybe">
+                    <span> Chọn công việc </span>
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+    
+    <div class="form-input flex flex-col h-fit h-max-[500px] gap-4 pt-4 pb-6 overflow-auto sm:w-[1100px]">
+        <div class="border-b pb-0.5 flex font-semibold w-fit">
+            <span class="w-72"> Công việc </span>
+            <span class="w-56 text-center"> Tổ đội/ nhà thầu phụ </span>
+            {% if role == 'accountant' %}
+                <span class="w-28 text-center"> Đơn giá </span>
+                <span class="w-28 text-center"> Thành tiền </span>
+            {% endif %}
+            <span class="w-28 text-center"> SL dự toán </span>
+            <span class="w-28 text-center"> SL thiếu </span>
+            <span class="w-28 text-center"> SL đặt </span>
+            <span class="w-28 text-center"> SL T.toán </span>
+            <span class="w-28 text-center"> SL đã nhận </span>
+            <span class="w-28 text-center"> Ngày thêm </span>
+        </div> 
+        <div id="order-sub-jobs" class="overflow-y-auto w-fit">
+            {% for order_sub_job in record.get_sub_job_order_base_sub_job_list %}
+                <div  class="order-sub-job border-b py-2 flex items-center w-full"
+                        data-sub-job-id="{{ order_sub_job.base_sub_job.pk }}"
+                        data-sub-job-quantity="{{ order_sub_job.quantity }}">
+                    {% if record %}
+                    <input type="hidden" name="sub_job_id" value="{{ order_sub_job.base_sub_job.pk }}">
+                    <input type="hidden" name="sub_job_order_sub_job_id" value="{{ order_sub_job.pk }}">
+                    <input type="hidden" name="sub_job_quantity_{{ order_sub_job.base_sub_job.pk }}" value="{{ order_sub_job.quantity }}">
+                    {% endif %}
+                    <span class="w-72"> {{ order_sub_job.base_sub_job.job_number }} - {{ order_sub_job.base_sub_job.job_name }}</span>
+                    
+                    {% if role != 'accountant' %}
+                    <span class="w-56 text-center">                             
+                        {% if order_sub_job.detail_sub_job %}
+                            {{ order_sub_job.detail_sub_job.sub_contractor.name }}
+                        {% else %}
+                            Chưa chọn
+                        {% endif %}
+                    </span>
+                    {% endif %}
+
+                    {% if role == 'accountant' %}
+                    <div class="w-56 flex justify-center">
+                        
+                        <button class="btn btn-outline hidable hidden text-center" onclick="showProviderModal('{{ order_sub_job.base_sub_job.pk }}')">
+                            {% if order_sub_job.detail_sub_job %}
+                                {{ order_sub_job.detail_sub_job.sub_contractor.name }}
+                            {% else %}
+                                Chưa chọn
+                            {% endif %}
+                        </button>
+                        <span class="hidable text-center">
+                            {% if order_sub_job.detail_sub_job %}
+                                {{ order_sub_job.detail_sub_job.sub_contractor.name }}
+                            {% else %}
+                                Chưa chọn
+                            {% endif %}
+                        </span>
+                        <input class="hidden" id="detail_sub_job_{{ order_sub_job.base_sub_job.pk }}" name="detail_sub_job_{{ order_sub_job.base_sub_job.pk }}" value="{{ order_sub_job.detail_sub_job.pk }}">
+                    </div>
+                    <div class="w-28 text-center">
+                        {{ order_sub_job.detail_sub_job.sub_job_price|format_money }}
+                    </div>
+                    <div class="w-28 text-center">
+                        {{ order_sub_job.detail_sub_job.sub_job_price|multiply:order_sub_job.quantity|format_money }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Provider Modal -->
+                    <div id="select-modal-{{ order_sub_job.base_sub_job.pk }}" class="hidden fixed inset-0 bg-gray-600 bg-opacity-30 flex justify-center items-center z-50">
+                        <div class="card p-4 w-1/3 max-h-[80vh] overflow-y-auto">
+                            <h3 class="text-lg font-bold mb-4 text-center">Chọn Tổ đội/ nhà thầu phụ</h3>
+                            <h3 class="text-lg font-bold mb-4 text-center">{{ order_sub_job.base_sub_job.job_number }} - {{ order_sub_job.base_sub_job.job_name }}</h3>
+                            <ul>
+                                {% if order_sub_job.base_sub_job.get_dict_of_detail_sub_jobs %}
+                                    {% for detail_sub_job_key, detail_sub_job_list in order_sub_job.base_sub_job.get_dict_of_detail_sub_jobs.items %}
+                                        <li class="py-2 border-b">
+                                            <div class="flex justify-between items-center w-full">
+                                                <span class="w-72"> {{ detail_sub_job_key }}</span>
+                                                <button class="text-blue-500 w-28" onclick="selectProvider('{{ detail_sub_job_list.0.pk }}', '{{ detail_sub_job_key }}', '{{ order_sub_job.base_sub_job.pk }}')">
+                                                    Chọn
+                                                </button>
+                                            </div>
+                                            <ul class="pl-4 mt-2 w-full">
+                                                {% for detail_sub_job in detail_sub_job_list %}
+                                                    <li class="py-1 text-gray-600 dark:text-gray-400 w-full">
+                                                        <span class="">Giá: {{ detail_sub_job.sub_job_price|format_money }}</span>
+                                                        <span class="ml-4">Ngày: {{ detail_sub_job.created_at|date:"d/m/Y" }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="py-2 text-red-600 text-center flex flex-col justify-center text-lg">
+                                        <span>Không tìm thấy dữ liệu công việc chi tiết cho công việc này.</span>
+                                        <span>Vui lòng thêm công việc chi tiết trước.</span>
+                                    </div>
+                                {% endif %}
+                            </ul>
+                            <div class="flex flex-row justify-center mt-5">
+                            <button class="mt-4 btn btn-secondary px-3" onclick="closeProviderModal('{{ order_sub_job.base_sub_job.pk }}')">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <span class="w-28 text-center"> {{ order_sub_job.estimate_quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_sub_job.orderable_quantity }} </span>
+                    <span class="w-28 text-center"> {{ order_sub_job.quantity }} </span>
+                    {% if role == 'accountant' %}
+                    <div class="w-28 text-center">
+                        <span class=" approve-hidable">{{ order_sub_job.paid_quantity }}</span>
+                        <input type="number" name="paid_quantity_{{ order_sub_job.base_sub_job.pk }}" 
+                               class="form-input approve-hidable hidden no-readable" 
+                               value="{{ order_sub_job.paid_quantity }}"
+                               min="0"
+                               max="{{ order_sub_job.quantity }}">
+                    </div>
+                    <div class="w-28 text-center">
+                        <span class=" approve-hidable">{{ order_sub_job.received_quantity }}</span>
+                        <input type="number" name="received_quantity_{{ order_sub_job.base_sub_job.pk }}" 
+                               class="form-input  approve-hidable hidden no-readable" 
+                               value="{{ order_sub_job.received_quantity }}"
+                               min="0"
+                               max="{{ order_sub_job.quantity }}">
+                    </div>
+                    {% else %}
+                    <div class="w-28 text-center">
+                        <span>{{ order_sub_job.paid_quantity }}</span>
+                    </div>
+                    <div class="w-28 text-center">
+                        <span>{{ order_sub_job.received_quantity }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="w-28 flex justify-center">
+                        {{ record.last_saved|date:"d/m/Y" }}
+                    </div>
+                </div>
+            {% endfor %}    
+        </div>
+    </div>
+
+
+    <script>
+        function updateProviderSpan(selectElement) {
+            // Get span by sibling of the element
+            const spanElement = selectElement.nextElementSibling;
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            spanElement.textContent = selectedOption.text;
+        }
+    </script>
+    <script>
+        function showProviderModal(baseSubJobPk) {
+            // Prevent submit
+            event.preventDefault();
+            document.getElementById('select-modal-' + baseSubJobPk).classList.remove('hidden');
+        }
+    
+        function closeProviderModal(baseSubJobPk) {
+            event.preventDefault();
+            document.getElementById('select-modal-' + baseSubJobPk).classList.add('hidden');
+        }
+    
+        function selectProvider(detailSubJobPk, providerBrand, baseSubJobPk) {
+            event.preventDefault();
+            // Update the button text with the selected provider name
+            const button = document.querySelector(`button[onclick="showProviderModal('${baseSubJobPk}')"]`);
+            button.textContent = providerBrand;
+    
+            // Optionally, update a hidden input or perform an AJAX request to save the selection
+            // Example: document.getElementById('selected-provider-' + baseSubJobPk).value = providerPk;
+            // Update the hidden input value when selecting provider
+            document.getElementById('detail_sub_job_' + baseSubJobPk).value = detailSubJobPk;
+            closeProviderModal(baseSubJobPk);
+        }
+    </script>
+</div>

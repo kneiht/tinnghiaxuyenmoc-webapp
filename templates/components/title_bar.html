@@ -1,14 +1,13 @@
 {% load custom_tags %}
 
+{% if page == 'page_each_project' %}
+<div id="title-bar" class="flex flex-col justify-between mb-3 gap-3">
 
-<div id="title-bar" class="flex flex-nowrap justify-between mb-6 gap-5">
-    <div class="w-3/6 flex gap-4 justify-between items-center mt-2">
-        <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
-    </div>
-
-    <div class="flex gap-10 justify-end items-center mt-2">
-
-        {% if page == 'page_each_project' %}
+    <div class="flex flex-wrap gap-x-10 gap-y-5 justify-between items-center mt-2 w-full">
+        <div class="flex gap-4 justify-between items-center">
+            <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
+        </div>
+        <div class="flex flex-nowrap gap-10 justify-between items-center mt-2">
             <div id="project-display-mode" class="flex gap-3">
                 <a id="show-gantt-jobs" class="btn btn-primary text-nowrap cursor-pointer">
                     <i class="fas fa-bar-chart px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
@@ -26,26 +25,49 @@
                 </a>
             </div>
 
-            <div id="related-tables" class="flex gap-3">
+            <div class="flex gap-3">
                 <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' project_id=project_id model='SupplyOrder' elements='tool_bar|display_records' %}"
                     id="supply-order" class="btn btn-primary text-nowrap"
                     up-target="#modal:maybe, #display-records:maybe, #tool-bar:maybe">
                     <i class="fas fa-shopping-cart  px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block"> Đặt vật tư </span>
                 </a>
-
+            
                 <a href="{% url 'form_cost_estimation_table' project_id=project_id %}"
                     id="cost-estimation" class="btn btn-primary text-nowrap"
                     up-preload="insert" up-target="#modal:maybe, #display-records, #tool-bar">
                     <i class="fas fa-clipboard-list   px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Bảng dự toán </span>
+                    <span class="ms-3 hidden md:block">  Dự toán vật tư </span>
                 </a>
             </div>
+            <div class="flex gap-3">
+                <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' project_id=project_id model='SubJobOrder' elements='tool_bar|display_records' %}"
+                    id="sub-job-order" class="btn btn-primary text-nowrap"
+                    up-target="#modal:maybe, #display-records:maybe, #tool-bar:maybe">
+                    <i class="fas fa-hard-hat px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Đặt công việc </span>
+                </a>
+                <a href="{% url 'form_sub_job_cost_estimation_table' project_id=project_id %}"
+                    id="cost-estimation" class="btn btn-primary text-nowrap"
+                    up-preload="insert" up-target="#modal:maybe, #display-records, #tool-bar">
+                    <i class="fas fa-clipboard-list   px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Dự toán công việc </span>
+                </a>
 
+            </div>
 
-            <input id="check_date" type="date" name="check_date" class="form-input">
-        {% endif %}
-        
+            <input id="check_date" type="date" name="check_date" class="form-input w-36">
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div id="title-bar" class="flex flex-nowrap justify-between mb-6 gap-5">
+    <div class="w-3/6 flex gap-4 justify-between items-center mt-2">
+        <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
+    </div>
+
+    <div class="flex gap-10 justify-end items-center mt-2">
         {% if create_new_button_name %}
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="max-sm:hidden btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
@@ -55,3 +77,4 @@
     </div>
 </div>
 
+{% endif %}

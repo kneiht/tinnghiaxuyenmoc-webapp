@@ -1,0 +1,232 @@
+{% load custom_tags %}
+<div up-hungry id="modal-sub">
+    <div id="modal-sub-body" class="modal z-40 fixed inset-0 h-screen w-full flex justify-center overflow-auto bg-slate-600 bg-opacity-60">
+        <!-- Modal Content -->
+        <div class="relative top-10 mx-4 card h-12/12 w-11/12 mb-28">
+                <h3 class="mt-4 mb-4 text-xl font-bold leading-6 text-center text-theme">Danh sách công việc - Giám sát đặt</h3>
+
+                <button id='cancel-modal' type="button" class="cancel-modal absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-sub-body').remove();">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+
+                <div class="flex justify-center mb-4 mx-4 gap-5">
+
+                    <div id="search-bar" class="h-10 flex w-[300px]">
+                        <!-- Input field for filter values -->
+                        <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..." class="form-input rounded-lg h-full border-theme dark:border-gray-600 border-opacity-30 text-theme" autocomplete="off">
+                    </div>
+
+                    <button id="all-sub-jobs" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Tất cả công việc</button>
+                    <button id="selected-sub-jobs" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Công việc đã chọn</button>
+                    <button id="unselected-sub-jobs" type="button" class="btn btn-outline border-theme dark:border-gray-600 border-opacity-30 text-theme">Công việc chưa chọn</button>
+                </div>
+
+            
+                <div class="h-full">
+                    {% csrf_token %}
+                    <div class="flex flex-col h-full justify-between gap-5 text-sm text-theme">
+                        <p id="no-sub-jobs" class="hidden text-center mt-14 text-xl">Không tìm thấy công việc trong danh sách, vui lòng tìm kiếm công việc với từ khóa khác.</p>
+                        <div id="repair-part-cards" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
+                            {% for estimation in estimations %}
+                            <div class="relative card-sub-job card-sub-job-{{ estimation.base_sub_job.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" > 
+                                <div class="absolute top-20 w-full flex flex-row justify-center gap-1.5">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng dự toán">
+                                        <i class="fas fa-clipboard-list mr-1.5"></i>
+                                        <span class="font-bold">{{ estimation.get_estimate_quantity }}</span>
+                                        <span class="ml-1 opacity-80">{{ estimation.base_sub_job.unit }}</span>
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
+                                        <i class="fas fa-shopping-cart mr-1.5"></i>
+                                        <span class="orderable font-bold">{{ estimation.get_orderable_quantity }}</span>
+                                        <span class="ml-1 opacity-80">{{ estimation.base_sub_job.unit }}</span>
+                                    </span>
+                                </div>
+
+                                <div class="input-sub-job absolute top-28 w-full hidden flex flex-row justify-center">
+                                    <div class="bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl px-2 py-1 text-sm w-5/6 flex flex-row justify-center items-center">
+                                        <label class="mr-2">SL ({{  estimation.base_sub_job.unit }})</label>
+                                        <input type="hidden" name="sub_job_id" value="{{ estimation.base_sub_job.id }}">
+                                        <input type="hidden" name="sub_job_number" value="{{ estimation.base_sub_job.job_number }}">
+                                        <input type="hidden" name="sub_job_name" value="{{ estimation.base_sub_job.job_name }}">
+                                        <input type="number" name="sub_job_quantity" value="0" min="0" max="{{ estimation.get_orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                        <input type="hidden" name="estimate_quantity" value="{{ estimation.get_estimate_quantity }}">
+                                        <input type="hidden" name="orderable_quantity" value="{{ estimation.get_orderable_quantity }}">
+                                    </div>
+                                </div>
+
+                                <div style="height: 10rem;">
+                                    {% if estimation.base_sub_job.image %}
+                                    <img src="{{ estimation.base_sub_job.image.url }}" alt="{{ estimation.base_sub_job.job_name }}"
+                                        class="rounded-t-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                                    {% else %}
+                                    <img src="/static/images/default/default_part.webp" alt="Default Supply Image"
+                                        class="rounded-t-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50 h-full w-full object-cover" />
+                                    {% endif %}
+                                </div>
+
+                                <div class="flex justify-between items-center px-2 relative">
+                                    <div class="w-10/12">
+                                        <h3 class=" font-semibold text-theme text-center pl-1">
+                                            {{ estimation.base_sub_job.job_number }} - {{ estimation.base_sub_job.job_name }}
+                                        </h3>
+                                    </div>
+                                </div>
+                    
+                                <div class="flex flex-col text-sm px-2 pb-3 ">
+                                    <!-- Keep <p> for paragraphs of text -->
+                                    <div class="mt-1.5 note whitespace-pre-line">Mô tả: {{ estimation.base_sub_job.note }} </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex flex-col justify-center gap-5">
+                            <div class="flex justify-center gap-5">
+                                <button type="submit" id="submit-slections" class="submit btn btn-primary rounded-full w-28">
+                                    Cập nhật
+                                </button>
+                                <button id='cancel-modal' type="button" class="cancel-modal btn btn-secondary rounded-full w-28" onclick="document.getElementById('modal-sub-body').remove();">
+                                    Hủy bỏ
+                                </button>
+                            </div>
+                            <div class="h-28"></div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script>
+        function showNoItems() {
+            // If card-sub-job = car-part hidden => show "no-sub-jobs" else hidden
+            if (document.querySelectorAll('.card-sub-job:not(.hidden)').length == 0) {
+                document.getElementById('no-sub-jobs').classList.remove('hidden');
+            } else {
+                document.getElementById('no-sub-jobs').classList.add('hidden');
+            }
+        }
+
+
+        // Hide modal
+        document.getElementById('modal').classList.add('hidden');
+        document.querySelectorAll('.cancel-modal').forEach(el => {
+            el.addEventListener('click', function(){
+                document.getElementById('modal').classList.remove('hidden');
+            })
+        })
+
+        
+        // Click card-sub-job add class "selected" and input-sub-job show
+        document.querySelectorAll('.card-sub-job').forEach(el => {
+            el.addEventListener('click', function(){
+                this.classList.toggle('selected');
+                this.querySelector('.input-sub-job').classList.toggle('hidden');
+                this.querySelector('.input-sub-job').addEventListener('click', function(e){
+                    e.stopPropagation();
+                })
+            })
+        })
+
+        // Filter
+        document.getElementById('filter-input').addEventListener('keyup', function(){
+            const value = document.getElementById('filter-input').value.toLowerCase().trim();
+            document.querySelectorAll('.card-sub-job').forEach(el => {
+                const text = el.textContent.toLowerCase().trim();
+                if (text.includes(value)) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            })
+            showNoItems();
+        })
+        // Filter button all parts
+        document.getElementById('all-sub-jobs').addEventListener('click', function(){
+            document.querySelectorAll('.card-sub-job').forEach(el => {
+                    el.classList.remove('hidden');
+                    document.getElementById('filter-input').value = '';
+                    showNoItems();
+            })
+        })
+        // Filter button selected parts
+        document.getElementById('selected-sub-jobs').addEventListener('click', function(){
+            document.querySelectorAll('.card-sub-job').forEach(el => {
+                if (el.classList.contains('selected')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
+            })
+        })
+        // Filter button unselected parts
+        document.getElementById('unselected-sub-jobs').addEventListener('click', function(){
+            document.querySelectorAll('.card-sub-job').forEach(el => {
+                if (!el.classList.contains('selected')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+                document.getElementById('filter-input').value = '';
+                showNoItems();
+            })
+        })
+
+        // Select cards from data from maintanance
+        document.querySelectorAll('.order-sub-job').forEach(el => {
+            const subJobId = el.getAttribute('data-sub-job-id');
+            const subJobQuantity = el.getAttribute('data-sub-job-quantity');
+            const cardsubJob = document.querySelector(`.card-sub-job-${subJobId}`);
+            if (cardsubJob && subJobQuantity > 0) {
+                cardsubJob.classList.add('selected');
+                cardsubJob.querySelector('.input-sub-job').classList.remove('hidden');
+                cardsubJob.querySelectorAll('input[name="sub_job_quantity"]').forEach(el => {
+                    el.disabled = false;
+                    el.value = subJobQuantity;
+                    el.max = parseFloat(el.max) + parseFloat(subJobQuantity);
+                })
+                cardsubJob.querySelectorAll('input[name="orderable_quantity"]').forEach(el => {
+                    el.disabled = false;
+                    el.value = (parseFloat(el.value) + parseFloat(subJobQuantity)).toString();
+                    
+                })
+                cardsubJob.querySelector('.orderable').textContent = (parseFloat(cardsubJob.querySelector('.orderable').textContent) + parseFloat(subJobQuantity)).toString();
+            
+            }
+        })
+
+        // Submit form
+        document.getElementById('submit-slections').addEventListener('click', function(){
+            let orderSubJobs = [];
+            document.querySelectorAll('.card-sub-job.selected').forEach(el => {
+                const subJobId = el.querySelector('input[name="sub_job_id"]').value;
+                const subJobNumber = el.querySelector('input[name="sub_job_number"]').value;
+                const subJobName = el.querySelector('input[name="sub_job_name"]').value;
+                // Make partPrice human readable
+                const subJobQuantity = el.querySelector('input[name="sub_job_quantity"]').value;
+                const estimateQuantity = el.querySelector('input[name="estimate_quantity"]').value;
+                const orderableQuantity = el.querySelector('input[name="orderable_quantity"]').value;
+                orderSubJobs.push(`
+                    <div class="order-sub-job border-b py-2 flex items-center w-full" data-sub-job-id="${subJobId}" data-sub-job-quantity="${subJobQuantity}">
+                        <input type="hidden" name="sub_job_id" value="${subJobId}">
+                        <input type="hidden" name="sub_job_quantity_${subJobId}" value="${subJobQuantity}">
+                        <span class="w-72">${subJobNumber} - ${subJobName} </span>
+                        <span class="w-56 text-center"></span>      
+                            
+
+                        <div class="w-28 flex justify-center">${estimateQuantity}</div>
+                        <div class="w-28 flex justify-center">${orderableQuantity}</div>
+                        <span class="w-28 text-center">${subJobQuantity}</span>
+                        <div class="w-28 flex justify-center"></div>  
+                        <div class="w-28 flex justify-center"></div>
+                        <div class="w-28 flex justify-center"></div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('order-sub-jobs').innerHTML = orderSubJobs.join('');
+            // Click cancel model to close this modal
+            document.querySelector('.cancel-modal').click();
+        })
+    </script>
+</div>

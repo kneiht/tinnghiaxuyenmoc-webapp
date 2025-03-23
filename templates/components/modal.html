@@ -9,8 +9,7 @@
                 <i class=" fa fa-times" aria-hidden="true"></i>
             </button>
 
-    
-            {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder" %}
+            {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder" or modal == "modal_SubJobOrder" %}
                 {% if record %}
                     <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
                             onclick="toggleModalEdit(this)">
@@ -40,8 +39,6 @@
                     </script>
                 {% endif %}
 
-
-                
                 {% if record.approval_status == "scratch" or record.approval_status == "need_update" %}
                     <script>
                     function toggleModalEdit(button) {
@@ -140,7 +137,7 @@
 
 
 
-                {% if form.fields|length >= 13 or modal == 'modal_VehicleMaintenance'  or modal == 'modal_SupplyOrder' %}
+                {% if form.fields|length >= 13 or modal == 'modal_VehicleMaintenance'  or modal == 'modal_SupplyOrder' or modal == 'modal_SubJobOrder' %}
                 <div class="grid grid-cols-1 sm:grid-cols-3 sm:w-[1100px] gap-4 px-6">
                 
                 {% elif form.fields|length >= 6 and form.fields|length < 13 %}
@@ -223,6 +220,9 @@
                 {% elif modal == "modal_SupplyOrder" %}
                     {% include 'components/modals/extend_supply_order_base.html' with role=project|get_project_role:user %}
 
+                {% elif modal == "modal_SubJobOrder" %}
+                    {% include 'components/modals/extend_sub_job_order_base.html' with role=project|get_project_role:user %}
+
                 {% elif modal == 'modal_PaymentRecord' %}
                     {% include 'components/modals/payment_record.html' %}
 
@@ -230,13 +230,13 @@
 
 
                 <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable approve-hidable
-                {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder" %} hidden {% endif %}
+                {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder"  or modal == "modal_SubJobOrder" %} hidden {% endif %}
                 {% if record.lock %} hidden {% endif %}">
-                    {% if record and model != "PaymentRecord" and model != "SupplyPaymentRecord" %}
+                    {% if record and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
                         <button type="button" class="btn btn-danger rounded-full w-28 "
                             onclick="if (confirm('Thao tác này sẽ xóa dữ liệu hoàn toàn, và không thể khôi phục.\n\nBạn có thực sự muốn xóa dữ liệu này không?')) { 
                                 // One more alert to confirm by type if modal = modal_VehicleMaintenance
-                                {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' %}
+                                {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' or modal == 'modal_SubJobOrder' %}
                                     if (confirm('Xác nhận xóa dữ liệu.\n\n Toàn bộ các dự liệu Thanh toán và hình ảnh liên quan sẽ bị xóa theo.')) {
                                         document.getElementById('archived').value='true';
                                         document.getElementById('submit-form').click();

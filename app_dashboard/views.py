@@ -24,7 +24,6 @@ from .renders import *
 from .utils import *
 
 
-
 @login_required
 def decide_permission(request, action, params):
     # CHECK PERMISSIONS
@@ -66,13 +65,22 @@ def decide_permission(request, action, params):
                 if not project:
                     message = "Dự án không tồn tại. \n Vui lòng liên hệ admin."
                     message_type = "red"
-                    return render_message(request, message=message, message_type=message_type)
-                
-                project_user = ProjectUser.objects.filter(user=user, project=project).first()
-                if not project_user or project_user.role not in ["supervisor", "accountant"]:
+                    return render_message(
+                        request, message=message, message_type=message_type
+                    )
+
+                project_user = ProjectUser.objects.filter(
+                    user=user, project=project
+                ).first()
+                if not project_user or project_user.role not in [
+                    "supervisor",
+                    "accountant",
+                ]:
                     message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
                     message_type = "red"
-                    return render_message(request, message=message, message_type=message_type)
+                    return render_message(
+                        request, message=message, message_type=message_type
+                    )
 
             return None
 
@@ -89,13 +97,22 @@ def decide_permission(request, action, params):
                 if not project:
                     message = "Dự án không tồn tại. \n Vui lòng liên hệ admin."
                     message_type = "red"
-                    return render_message(request, message=message, message_type=message_type)
-                
-                project_user = ProjectUser.objects.filter(user=request.user, project=project).first()
-                if not project_user or project_user.role not in ["supervisor", "accountant"]:
+                    return render_message(
+                        request, message=message, message_type=message_type
+                    )
+
+                project_user = ProjectUser.objects.filter(
+                    user=request.user, project=project
+                ).first()
+                if not project_user or project_user.role not in [
+                    "supervisor",
+                    "accountant",
+                ]:
                     message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
                     message_type = "red"
-                    return render_message(request, message=message, message_type=message_type)
+                    return render_message(
+                        request, message=message, message_type=message_type
+                    )
 
             return None
 
@@ -143,40 +160,41 @@ def handle_form(request, model, pk=0):
         forbit_html = decide_permission(request, "delete", {"model": model})
         if forbit_html:
             return HttpResponse(forbit_html)
-        
+
         try:
             # if record is VechicleMaintenance":
-            if model != "VehicleMaintenance" and model != "SupplyOrder":
+            if model != "VehicleMaintenance" and model != "SupplyOrder" and model != "SubJobOrder":
                 record = instance
                 # Get related records
                 related_records = []
                 for related_object in record._meta.related_objects:
-                    related_manager = getattr(record, related_object.get_accessor_name())
+                    related_manager = getattr(
+                        record, related_object.get_accessor_name()
+                    )
                     related_records.extend(list(related_manager.all()))
-                
+
                 # If there are related records, show warning
                 if related_records:
                     # Create list of related records
                     related_records_info = []
                     for related_record in related_records:
-                        try:    
+                        try:
                             display_name = related_record.vietnamese_name
                         except:
                             display_name = related_record._meta.verbose_name
                         record_info = f"{display_name}: {str(related_record)}"
                         related_records_info.append(record_info)
-                    
+
                     # Create message with related records
                     message = "Không thể xóa dữ liệu vì có các bản ghi liên quan.\n Nếu muốn xóa dữ liệu này, phải xóa các dữ liệu liên quan trước để đảm bảo toàn vẹn dữ liệu:\n\n"
                     message += "🔹 " + "\n🔹 ".join(related_records_info)
-                    
+
                     html_message = render_message(
                         request,
                         message=message,
                         message_type="red",
                     )
                     return HttpResponse(html_message)
-
 
             record = instance
             record.style = "hidden"
@@ -186,7 +204,11 @@ def handle_form(request, model, pk=0):
                 message_type="green",
             )
             html_record = render_display_records(
-                request, model=model, records=[record], update="True", project_id=project_id
+                request,
+                model=model,
+                records=[record],
+                update="True",
+                project_id=project_id,
             )
             record.delete()
             return HttpResponse(html_message + html_record)
@@ -216,7 +238,9 @@ def handle_form(request, model, pk=0):
         # Handle the case of the project is created and need to be assigned to a user
         # instance_form.user = request.user
         # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, "create", {"model": model, "project_id": project_id})
+        forbit_html = decide_permission(
+            request, "create", {"model": model, "project_id": project_id}
+        )
         if forbit_html:
             return HttpResponse(forbit_html)
 
@@ -224,16 +248,19 @@ def handle_form(request, model, pk=0):
             # set approval status to make sure there no injection hacking
             form.instance.approval_status = "scratch"
 
-
     else:  # update
         # CHECK PERMISSIONS
-        forbit_html = decide_permission(request, "update", {"model": model, "project_id": project_id})
+        forbit_html = decide_permission(
+            request, "update", {"model": model, "project_id": project_id}
+        )
         if forbit_html:
             return HttpResponse(forbit_html)
 
-        if model == "PaymentRecord":
+        if model == "PaymentRecord" or model == "SupplyPaymentRecord" or model == "SubJobPaymentRecord":
             # check if the use have the right to modify approval status
-            forbit_html = decide_permission(request, "approve", {"model": model, "project_id": project_id})
+            forbit_html = decide_permission(
+                request, "approve", {"model": model, "project_id": project_id}
+            )
             lock = request.POST.get("lock")
             if lock and forbit_html:
                 message = "Bạn không được cấp quyền khóa phiếu. \n\n Vui lí liên hệ admin cấp quyền."
@@ -242,7 +269,7 @@ def handle_form(request, model, pk=0):
                 )
                 return HttpResponse(html_message)
 
-        elif model == "VehicleMaintenance" or model == "SupplyOrder":
+        elif model == "VehicleMaintenance" or model == "SupplyOrder" or model == "SubJobOrder":
             current_approval_status = (
                 model_class.objects.filter(pk=pk).first().approval_status
             )
@@ -292,11 +319,15 @@ def handle_form(request, model, pk=0):
                     if form_approval_status in ("approved"):
                         if model == "VehicleMaintenance":
                             # Update status up each VehicleMaintenanceRepairPart
-                            vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
+                            vehicle_part_post_ids = request.POST.getlist(
+                                "vehicle_part_id"
+                            )
                             for vehicle_part_id in vehicle_part_post_ids:
-                                vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
-                                    id=vehicle_part_id
-                                ).first()
+                                vehicle_part = (
+                                    VehicleMaintenanceRepairPart.objects.filter(
+                                        id=vehicle_part_id
+                                    ).first()
+                                )
                                 # Get fields
                                 vehicle_part.received_status = request.POST.get(
                                     f"received_status_{vehicle_part_id}"
@@ -305,22 +336,57 @@ def handle_form(request, model, pk=0):
                                     f"done_status_{vehicle_part_id}"
                                 )
                                 vehicle_part.save()
-                        
+
                         elif model == "SupplyOrder":
                             order = instance
                             # Update status up each SupplyOrderSupply
-                            order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+                            order_supplies = SupplyOrderSupply.objects.filter(
+                                supply_order=order
+                            )
                             for order_supply in order_supplies:
                                 # Update paid and received quantities
-                                paid_quantity = float(request.POST.get(f"paid_quantity_{order_supply.id}", 0))
+                                paid_quantity = float(
+                                    request.POST.get(
+                                        f"paid_quantity_{order_supply.id}", 0
+                                    )
+                                )
                                 if paid_quantity:
                                     order_supply.paid_quantity = paid_quantity
 
-                                received_quantity = float(request.POST.get(f"received_quantity_{order_supply.id}", 0))
+                                received_quantity = float(
+                                    request.POST.get(
+                                        f"received_quantity_{order_supply.id}", 0
+                                    )
+                                )
                                 if received_quantity:
                                     order_supply.received_quantity = received_quantity
 
                                 order_supply.save()
+                        elif model == "SubJobOrder":
+                            order = instance
+                            # Update status up each SubJobOrder
+                            order_sub_jobs = SubJobOrder.objects.filter(
+                                sub_job_order=order
+                            )
+                            for order_sub_job in order_sub_jobs:
+                                # Update paid and received quantities
+                                paid_quantity = float(
+                                    request.POST.get(
+                                        f"paid_quantity_{order_sub_job.id}", 0
+                                    )
+                                )
+                                if paid_quantity:
+                                    order_sub_job.paid_quantity = paid_quantity
+                                
+                                received_quantity = float(
+                                    request.POST.get(
+                                        f"received_quantity_{order_sub_job.id}", 0
+                                    )
+                                )
+                                if received_quantity:
+                                    order_sub_job.received_quantity = received_quantity
+                                
+                                order_sub_job.save()
 
                         record = instance
                         record.save()
@@ -343,11 +409,15 @@ def handle_form(request, model, pk=0):
                     if form_approval_status in ("need_update", "approved", "rejected"):
                         if model == "VehicleMaintenance":
                             # Update status up each VehicleMaintenanceRepairPart
-                            vehicle_part_post_ids = request.POST.getlist("vehicle_part_id")
+                            vehicle_part_post_ids = request.POST.getlist(
+                                "vehicle_part_id"
+                            )
                             for vehicle_part_id in vehicle_part_post_ids:
-                                vehicle_part = VehicleMaintenanceRepairPart.objects.filter(
-                                    id=vehicle_part_id
-                                ).first()
+                                vehicle_part = (
+                                    VehicleMaintenanceRepairPart.objects.filter(
+                                        id=vehicle_part_id
+                                    ).first()
+                                )
                                 # Get fields
                                 vehicle_part.received_status = request.POST.get(
                                     f"received_status_{vehicle_part_id}"
@@ -363,19 +433,29 @@ def handle_form(request, model, pk=0):
                         elif model == "SupplyOrder":
                             order = instance
                             # Update status up each SupplyOrderSupply
-                            order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
+                            order_supplies = SupplyOrderSupply.objects.filter(
+                                supply_order=order
+                            )
                             for order_supply in order_supplies:
                                 # Update paid and received quantities
-                                paid_quantity = float(request.POST.get(f"paid_quantity_{order_supply.id}", 0))
+                                paid_quantity = float(
+                                    request.POST.get(
+                                        f"paid_quantity_{order_supply.id}", 0
+                                    )
+                                )
                                 if paid_quantity:
                                     order_supply.paid_quantity = paid_quantity
 
-                                received_quantity = float(request.POST.get(f"received_quantity_{order_supply.id}", 0))
+                                received_quantity = float(
+                                    request.POST.get(
+                                        f"received_quantity_{order_supply.id}", 0
+                                    )
+                                )
                                 if received_quantity:
                                     order_supply.received_quantity = received_quantity
 
                                 order_supply.save()
-                                
+
                         record = instance
                         record.approval_status = form_approval_status
                         record.save()
@@ -391,6 +471,47 @@ def handle_form(request, model, pk=0):
                             project_id=project_id,
                         )
                         return HttpResponse(html_message + html_record)
+
+                    elif model == "SubJobOrder":
+                        # Update status up each SubJobOrder
+                        order_sub_jobs = SubJobOrder.objects.filter(
+                            sub_job_order=order
+                        )
+                        for order_sub_job in order_sub_jobs:
+                            # Update paid and received quantities
+                            paid_quantity = float(
+                                request.POST.get(
+                                    f"paid_quantity_{order_sub_job.id}", 0
+                                )
+                            )
+                            if paid_quantity:
+                                order_sub_job.paid_quantity = paid_quantity
+                            
+                            received_quantity = float(
+                                request.POST.get(
+                                    f"received_quantity_{order_sub_job.id}", 0
+                                )
+                            )
+                            if received_quantity:
+                                order_sub_job.received_quantity = received_quantity
+                            
+                            order_sub_job.save()
+
+                            record = instance
+                            record.style = "just-updated"
+                            html_message = render_message(
+                                request, message="Cập nhật thành công"
+                            )
+                            html_record = render_display_records(
+                                request,
+                                model=model,
+                                records=[record],
+                                update="True",
+                                project_id=project_id,
+                            )
+                            return HttpResponse(html_message + html_record)
+
+
                     else:
                         message = 'Chỉ có thể chọn trạng thái duyệt "Cần sửa lại" hoặc "Từ chối"'
                         html_message = render_message(
@@ -426,7 +547,7 @@ def handle_form(request, model, pk=0):
 
     if form.is_valid():
         instance_form = form.save(commit=False)
-        
+
         if model == "VehicleMaintenance":
             instance_form.save()
             # Update the  list of VehicleMaintenanceRepairPart
@@ -482,12 +603,18 @@ def handle_form(request, model, pk=0):
                     ).first()
                 # Update
                 if order_supply:  # Update quantity
-                    quantity = float(request.POST.get(f"supply_quantity_{supply_id}", 0))
+                    quantity = float(
+                        request.POST.get(f"supply_quantity_{supply_id}", 0)
+                    )
                     order_supply.quantity = quantity
 
                     # add detail supply
-                    detail_supply_id = get_valid_id(request.POST.get(f"detail_supply_{supply_id}"))
-                    detail_supply = DetailSupply.objects.filter(id=detail_supply_id).first()
+                    detail_supply_id = get_valid_id(
+                        request.POST.get(f"detail_supply_{supply_id}")
+                    )
+                    detail_supply = DetailSupply.objects.filter(
+                        id=detail_supply_id
+                    ).first()
                     if detail_supply:
                         order_supply.detail_supply = detail_supply
 
@@ -495,7 +622,9 @@ def handle_form(request, model, pk=0):
 
                 else:  # create new
                     if supply:
-                        quantity = float(request.POST.get(f"supply_quantity_{supply_id}", 0))
+                        quantity = float(
+                            request.POST.get(f"supply_quantity_{supply_id}", 0)
+                        )
                         SupplyOrderSupply.objects.create(
                             supply_order=order,
                             base_supply=supply,
@@ -504,8 +633,8 @@ def handle_form(request, model, pk=0):
 
             # Update approval status if the approval status has changed
             if order.approval_status == "wait_for_approval":
-                
-                # Check if order_supples  count > 0
+
+                # Check if order_supplies  count > 0
                 order_supplies = SupplyOrderSupply.objects.filter(supply_order=order)
                 if order_supplies.count() == 0:
                     record = instance_form
@@ -513,24 +642,127 @@ def handle_form(request, model, pk=0):
                     record.approval_status = "scratch"
                     record.save()
                     html_record = render_display_records(
-                        request, model=model, records=[record], update="True", project_id=project_id
+                        request,
+                        model=model,
+                        records=[record],
+                        update="True",
+                        project_id=project_id,
                     )
-                    html_message = render_message(request, message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua vật tư này vì không có vật tư nào được chọn")
+                    html_message = render_message(
+                        request,
+                        message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua vật tư này vì không có vật tư nào được chọn",
+                    )
                     return HttpResponse(html_message + html_record)
                 else:
                     for order_supply in order_supplies:
-                        if not order_supply.detail_supply:                        
+                        if not order_supply.detail_supply:
                             record = instance_form
                             record.style = "just-updated"
                             record.approval_status = "scratch"
                             record.save()
                             html_record = render_display_records(
-                                request, model=model, records=[record], update="True", project_id=project_id
+                                request,
+                                model=model,
+                                records=[record],
+                                update="True",
+                                project_id=project_id,
                             )
-                            html_message = render_message(request, message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua này vì có vật tư chưa được chọn nhà cung cấp.\n\n Vui lòng liên hệ kế toán để thêm nhà cung cấp.")
+                            html_message = render_message(
+                                request,
+                                message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua này vì có vật tư chưa được chọn nhà cung cấp.\n\n Vui lòng liên hệ kế toán để thêm nhà cung cấp.",
+                            )
                             return HttpResponse(html_message + html_record)
-                            
 
+        elif model == "SubJobOrder":
+            instance_form.save()
+            order = instance_form
+            # get the list of sub_job_order_sub_job records for this project and sub_job
+            order_sub_jobs = SubJobOrderSubJob.objects.filter(
+                sub_job_order=order
+            )
+            sub_job_ids = request.POST.getlist("sub_job_id")
+
+            # check if the id is in the list, if not delete it
+            for order_sub_job in order_sub_jobs:
+                if str(order_sub_job.base_sub_job.id) not in sub_job_ids:
+                    order_sub_job.delete()
+
+            for sub_job_id in sub_job_ids:
+                # get the instance SubJobOrderSubJob which has the sub_job.id == sub_job_id
+                sub_job = BaseSubJob.objects.filter(id=sub_job_id).first()
+                if sub_job:
+                    order_sub_job = SubJobOrderSubJob.objects.filter(
+                        sub_job_order=order, base_sub_job=sub_job
+                    ).first()
+                # Update
+                if order_sub_job:  # Update quantity
+                    quantity = float(
+                        request.POST.get(f"sub_job_quantity_{sub_job_id}", 0)
+                    )
+                    order_sub_job.quantity = quantity
+
+                    # add detail sub_job
+                    detail_sub_job_id = get_valid_id(
+                        request.POST.get(f"detail_sub_job_{sub_job_id}")
+                    )
+                    detail_sub_job = DetailSubJob.objects.filter(
+                        id=detail_sub_job_id
+                    ).first()
+                    if detail_sub_job:
+                        order_sub_job.detail_sub_job = detail_sub_job
+
+                    order_sub_job.save()
+
+                else:  # create new
+                    if sub_job:
+                        quantity = float(
+                            request.POST.get(f"sub_job_quantity_{sub_job_id}", 0)
+                        )
+                        SubJobOrderSubJob.objects.create(
+                            sub_job_order=order,
+                            base_sub_job=sub_job,
+                            quantity=quantity,
+                        )
+            # Update approval status if the approval status has changed
+            if order.approval_status == "wait_for_approval":
+                # Check if order_sub_jobs  count > 0
+                order_sub_jobs = SubJobOrderSubJob.objects.filter(sub_job_order=order)
+                if order_sub_jobs.count() == 0:
+                    record = instance_form
+                    record.style = "just-updated"
+                    record.approval_status = "scratch"
+                    record.save()
+                    html_record = render_display_records(
+                        request,
+                        model=model,
+                        records=[record],
+                        update="True",
+                        project_id=project_id,
+                    )
+                    html_message = render_message(
+                        request,
+                        message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua vật tư này vì không có vật tư nào được chọn",
+                    )
+                    return HttpResponse(html_message + html_record)
+                else:
+                    for order_sub_job in order_sub_jobs:
+                        if not order_sub_job.detail_sub_job:
+                            record = instance_form
+                            record.style = "just-updated"
+                            record.approval_status = "scratch"
+                            record.save()
+                            html_record = render_display_records(
+                                request,
+                                model=model,
+                                records=[record],
+                                update="True",
+                                project_id=project_id,
+                            )
+                            html_message = render_message(
+                                request,
+                                message="Cập nhật thành công nhưng không thể gửi duyệt đơn mua này vì có vật tư chưa chọn nhà cung cấp.\n\n Vui lòng liên hệ kế toán để thêm nhà cung cấp.",
+                            )
+                            return HttpResponse(html_message + html_record)
 
         instance_form.save()
 
@@ -591,7 +823,7 @@ def load_elements(request):
     for key, value in request.GET.items():
         if key != "q":
             params[key] = value
-    print('\n>>>>>>>>>> elements params:', params)
+    print("\n>>>>>>>>>> elements params:", params)
     html = '<div id="load-elements" class"hidden"></div>'
 
     # CHECK PERMISSIONS
@@ -624,8 +856,8 @@ def load_elements(request):
         elif element == "gantt_chart":
             pass
         elif element == "weekplan_table":
-            project_id = get_valid_id(params.get('project_id', 0))
-            check_date = get_valid_date(params.get('check_date', ''))
+            project_id = get_valid_id(params.get("project_id", 0))
+            check_date = get_valid_date(params.get("check_date", ""))
             html_weekplan_table = render_weekplan_table(request, project_id, check_date)
             html += html_weekplan_table
 
@@ -740,7 +972,7 @@ def handle_weekplan_form(request):
 def handle_date_report_form(request):
     if request.method != "POST":
         return HttpResponseForbidden()
-    
+
     form = request.POST
     check_date = form.get("check_date")
     try:
@@ -751,7 +983,6 @@ def handle_date_report_form(request):
     monday = check_date - timedelta(days=check_date.weekday())
     sunday = check_date + timedelta(days=6 - check_date.weekday())
 
-    
     try:
         check_date = form.get("check_date")
         project_id = form.get("project_id")
@@ -1059,7 +1290,7 @@ def download_excel_template(request, template_name):
     if template_name == "jobs":
         # Get the Excel file from media/excel/Mẫu công việc trong dự án.xlsx
         excel_file = os.path.join(
-            settings.MEDIA_ROOT, "excel", f"cong-viec-trong-du-an.xlsx"
+            settings.STATIC_ROOT, "excel", f"cong-viec-trong-du-an.xlsx"
         )
         # Return the file
         with open(excel_file, "rb") as f:
@@ -1074,7 +1305,7 @@ def download_excel_template(request, template_name):
 
     elif template_name == "cost_estimation_table":
         original_excel_path = os.path.join(
-            settings.MEDIA_ROOT, "excel", f"mau-bang-du-toan.xlsx"
+            settings.STATIC_ROOT, "excel", f"mau-bang-du-toan-vat-tu.xlsx"
         )
 
         # Create a temporary copy of the file to avoid race conditions
@@ -1110,31 +1341,57 @@ def download_excel_template(request, template_name):
         for row in supplies:
             sheet.append(row)
 
-        # GET JOB CATEGORIES
-        # Modify or create the "Nhóm công việc" sheet
-        # if "Nhóm công việc" in wb.sheetnames:
-        #     sheet = wb["Nhóm công việc"]
-        #     sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
-        # else:
-        #     sheet = wb.create_sheet("Nhóm công việc")
+        # Save modifications to the temporary file
+        wb.save(temp_excel_path)
 
-        # lấy project id từ query
-        project_id = request.GET.get("project_id")
-        if not project_id:
-            html_message = render_message(
-                request, message="Thiếu mã dự án", message_type="red"
+        # Open the modified file and return it as a response
+        with open(temp_excel_path, "rb") as f:
+            response = HttpResponse(
+                f.read(),
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
-            return HttpResponse(html_message)
+            response["Content-Disposition"] = (
+                'attachment; filename="mau-bang-du-toan-vat-tu.xlsx"'
+            )
 
-        # Get category_list from Job
-        jobs = Job.objects.filter(project=project_id)
-        category_list = []
-        for job in jobs:
-            if job.category not in category_list:
-                category_list.append([job.category])
+        # Cleanup: Delete the temporary file after sending the response
+        os.remove(temp_excel_path)
 
-        # Append new data to the "data" sheet
-        for row in category_list:
+    elif template_name == "sub_job_cost_estimation_table":
+        original_excel_path = os.path.join(
+            settings.STATIC_ROOT, "excel", f"mau-bang-du-toan-cong-viec-thau-phu.xlsx"
+        )
+        # Create a temporary copy of the file to avoid race conditions
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_file:
+            temp_excel_path = temp_file.name
+            shutil.copy(original_excel_path, temp_excel_path)  # Copy original file
+
+        # Load the copied file (not the original) to preserve formatting
+        wb = load_workbook(temp_excel_path)
+
+        # Modify or create the "data" sheet
+        if "Công việc" in wb.sheetnames:
+            sheet = wb["Công việc"]
+            sheet.delete_rows(2, sheet.max_row)  # Clear existing data (except headers)
+        else:
+            sheet = wb.create_sheet("Công việc")
+
+        # Get all data from BaseSubJob
+        records = BaseSubJob.objects.all()
+        # convert to data
+        sub_jobs = []
+        for record in records:
+            sub_jobs.append(
+                [
+                    record.job_number + " " + record.job_name,
+                    record.unit,
+                    "#" + record.job_number,
+                    record.job_type,
+                ]
+            )
+
+        # Write data to the sheet
+        for row in sub_jobs:
             sheet.append(row)
 
         # Save modifications to the temporary file
@@ -1147,10 +1404,9 @@ def download_excel_template(request, template_name):
                 content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
             response["Content-Disposition"] = (
-                'attachment; filename="mau-bang-du-toan.xlsx"'
+                'attachment; filename="mau-bang-du-toan-cong-viec-thau-phu.xlsx"'
             )
 
-        # Cleanup: Delete the temporary file after sending the response
         os.remove(temp_excel_path)
 
     return response
@@ -1158,7 +1414,7 @@ def download_excel_template(request, template_name):
 
 @login_required
 def upload_project(request, project_id):
-    
+
     if request.method != "POST":
         return "API này chỉ dùng POST"
 
@@ -1175,21 +1431,33 @@ def upload_project(request, project_id):
             request, message="Dự án này không tồn tại", message_type="red"
         )
         return HttpResponse(html_message)
-    
+
     # Read the data from the Excel file then save as job record
     df = pd.read_excel(excel_file, header=1)
 
     # Check if header is in the second row
-    required_headers = ["STT", "Danh mục", "Tên công việc", "Mô tả", "Trạng thái", 
-                       "Bắt đầu", "Kết thúc", "Đơn vị", "Khối lượng", "Đơn giá", 
-                       "Mã hiệu đơn giá"]
-    
-    missing_headers = [header for header in required_headers if header not in df.columns]
+    required_headers = [
+        "STT",
+        "Danh mục",
+        "Tên công việc",
+        "Mô tả",
+        "Trạng thái",
+        "Bắt đầu",
+        "Kết thúc",
+        "Đơn vị",
+        "Khối lượng",
+        "Đơn giá",
+        "Mã hiệu đơn giá",
+    ]
+
+    missing_headers = [
+        header for header in required_headers if header not in df.columns
+    ]
     if missing_headers:
         html_message = render_message(
-            request, 
-            message=f"File Excel không đúng mẫu. Thiếu các cột: {', '.join(missing_headers)}.\nLưu ý: Tên cột phải ở dòng số 2.", 
-            message_type="red"
+            request,
+            message=f"File Excel không đúng mẫu. Thiếu các cột: {', '.join(missing_headers)}.\nLưu ý: Tên cột phải ở dòng số 2.",
+            message_type="red",
         )
         return HttpResponse(html_message)
 
@@ -1661,6 +1929,18 @@ def form_base_supplies(request):
     }
     return render(request, "components/modal_base_supplies.html", context)
 
+def form_base_sub_jobs(request):
+    project_id = request.GET.get("project")
+    # Get cost estimations for the project
+    estimations = SubJobEstimation.objects.filter(project_id=project_id)
+    base_sub_jobs = BaseSubJob.objects.filter(
+        id__in=estimations.values_list("base_sub_job_id", flat=True)
+    )
+    context = {
+        "estimations": estimations,
+        "project_id": project_id,
+    }
+    return render(request, "components/modal_base_sub_jobs.html", context)
 
 def form_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type="green"):
@@ -1694,8 +1974,6 @@ def form_cost_estimation_table(request, project_id):
         else:
             return render_modal(project_id)
 
-
-    
     if request.method == "POST":
         forbit_html = decide_permission(request, "create", {"model": "CostEstimation"})
         if forbit_html:
@@ -1778,43 +2056,186 @@ def form_cost_estimation_table(request, project_id):
                     message_type="red",
                 )
 
-            # # Xử lý nhóm công việc
-            # category = row["Nhóm công việc"]
-            # # check category
-            # job = Job.objects.filter(category=category).first()
-            # if job:
-            #     cost_estimation.category = category
-            # else:
-            #     return render_modal(
-            #         project_id,
-            #         message="Không tìm thấy nhóm công việc: "
-            #         + str(category)
-            #         + "\nVui lòng kiểm tra lại danh sách công việc trong dự án.",
-            #         message_type="red",
-            #     )
-            print("cost_estimation: ", cost_estimation)
             # if every field is valid, append to the list
             cost_estimation_list.append(cost_estimation)
-            
+
         # delete old records, save new records
-        old_cost_estimnations = CostEstimation.objects.filter(project=project)
-        for old_cost_estimation in old_cost_estimnations:
+        old_cost_estimations = CostEstimation.objects.filter(project=project)
+        for old_cost_estimation in old_cost_estimations:
             if old_cost_estimation.get_ordered_quantity() != 0:
                 # check if the old cost estimation is not in the new list, by checking if the supply_base is in the list
-                if old_cost_estimation.base_supply not in [cost_estimation.base_supply for cost_estimation in cost_estimation_list]:
+                if old_cost_estimation.base_supply not in [
+                    cost_estimation.base_supply
+                    for cost_estimation in cost_estimation_list
+                ]:
                     # apeend old cost estimation to the list
                     old_cost_estimation.note = "Không có trong bảng dự toán được tải lên nhưng được giữ lại vì đã phát sinh khối lượng được đặt."
                     # make a copy to save to the list and delete from the databaes
-                    cost_estimation_list.append(CostEstimation(
-                        project=old_cost_estimation.project,
-                        base_supply=old_cost_estimation.base_supply,
-                        quantity=old_cost_estimation.quantity,
-                        note=old_cost_estimation.note,
-                        # Copy other fields as needed
-                    ))
+                    cost_estimation_list.append(
+                        CostEstimation(
+                            project=old_cost_estimation.project,
+                            base_supply=old_cost_estimation.base_supply,
+                            quantity=old_cost_estimation.quantity,
+                            note=old_cost_estimation.note,
+                            # Copy other fields as needed
+                        )
+                    )
         # Delete old records after appending the necessary records
-        old_cost_estimnations.delete()
-                
+        old_cost_estimations.delete()
+
+        # Save the records
+        for cost_estimation in cost_estimation_list:
+            cost_estimation.save()
+
+        return render_modal(
+            project_id, message="Cập nhật thành công", message_type="green"
+        )
+
+
+def form_sub_job_cost_estimation_table(request, project_id):
+    def render_modal(project_id, message=None, message_type="green"):
+        # Get fields to be displayed by using record meta
+        # If there is get_display_fields method, use that method
+        fields = []
+        headers = []
+        if hasattr(SubJobEstimation, "get_display_fields"):
+            for field in SubJobEstimation.get_display_fields():
+                fields.append(field)
+                headers.append(SubJobEstimation._meta.get_field(field).verbose_name)
+
+        # Get the list of repair parts
+        records = SubJobEstimation.objects.filter(project=project_id)
+        context = {
+            "records": records,
+            "fields": fields,
+            "headers": headers,
+            "project_id": project_id,
+            "message": message,
+            "message_type": message_type,
+        }
+
+        return render(
+            request, "components/modal_sub_job_estimation_table.html", context
+        )
+
+    if request.method == "GET":
+        forbit_html = decide_permission(request, "read", {"model": "SubJobEstimation"})
+        if forbit_html:
+            return HttpResponse(forbit_html)
+        else:
+            return render_modal(project_id)
+
+    if request.method == "POST":
+        forbit_html = decide_permission(
+            request, "create", {"model": "SubJobEstimation"}
+        )
+        if forbit_html:
+            return HttpResponse(forbit_html)
+
+        excel_file = request.FILES.get("file")
+        project = Project.objects.filter(pk=project_id).first()
+
+        if not excel_file:
+            html_message = render_message(
+                request, message="Vui lý nhập file Excel", message_type="red"
+            )
+            return HttpResponse(html_message)
+        if not project:
+            html_message = render_message(
+                request, message="Dự án này không tồn tại", message_type="red"
+            )
+            return HttpResponse(html_message)
+
+        # Read the data from the Excel file then save as job record
+        df = pd.read_excel(excel_file, header=1)
+
+        cost_estimation_list = []
+        job_number_list = []
+        category_list = []
+        # Loop over each row in the Excel file
+        for index, row in df.iterrows():
+            if row["STT"] == "":
+                continue
+            cost_estimation = SubJobEstimation()
+            cost_estimation.project = project
+
+            # Make sure "STT", "Khối lượng", "Mã vật tư", "Ghi chú" are in the row
+            if not all(
+                field in row for field in ["STT", "Khối lượng", "Mã công việc", "Ghi chú"]
+            ):
+                return render_modal(
+                    project_id,
+                    message="File excel không đúng mẫu, vui lòng kiểm tra lại",
+                    message_type="red",
+                )
+
+            # check quantity
+            try:
+                int(row["Khối lượng"])
+                cost_estimation.quantity = row["Khối lượng"]
+            except:
+                return render_modal(
+                    project_id,
+                    message="Vui lòng kiểm tra lại cột khối lượng, tất cả phải là số",
+                    message_type="red",
+                )
+
+            # check note
+            cost_estimation.note = row["Ghi chú"] if row["Ghi chú"] else ""
+            # check if the note is nan => set it empty
+            if pd.isna(cost_estimation.note):
+                cost_estimation.note = ""
+
+            # because there is a "#" at the beginning of the string to make sure the string is not number
+            # so we need to remove it, also check if supply number is duplicate
+            job_number = row["Mã công việc"][1:]
+            if job_number in job_number_list:
+                return render_modal(
+                    project_id,
+                    message='Mã công việc "' + str(job_number) + '" bị trùng lập',
+                    message_type="red",
+                )
+            job_number_list.append(job_number)
+
+            # check base_sub_job
+            base_sub_job = BaseSubJob.objects.filter(job_number=job_number).first()
+            print(base_sub_job)
+            if base_sub_job:
+                cost_estimation.base_sub_job = base_sub_job
+            else:
+                return render_modal(
+                    project_id,
+                    message="Không tìm thấy công việc: " + str(job_number),
+                    message_type="red",
+                )
+
+            # if every field is valid, append to the list
+            cost_estimation_list.append(cost_estimation)
+
+        # delete old records, save new records
+        old_cost_estimations = SubJobEstimation.objects.filter(project=project)
+        for old_cost_estimation in old_cost_estimations:
+            if old_cost_estimation.get_ordered_quantity() != 0:
+                # check if the old cost estimation is not in the new list, by checking if the supply_base is in the list
+                if old_cost_estimation.base_sub_job not in [
+                    cost_estimation.base_sub_job
+                    for cost_estimation in cost_estimation_list
+                ]:
+                    # apeend old cost estimation to the list
+                    old_cost_estimation.note = "Không có trong bảng dự toán được tải lên nhưng được giữ lại vì đã phát sinh khối lượng được đặt."
+                    # make a copy to save to the list and delete from the databaes
+                    cost_estimation_list.append(
+                        SubJobEstimation(
+                            project=old_cost_estimation.project,
+                            base_supply=old_cost_estimation.base_sub_job,
+                            quantity=old_cost_estimation.quantity,
+                            note=old_cost_estimation.note,
+                            # Copy other fields as needed
+                        )
+                    )
+        # Delete old records after appending the necessary records
+        old_cost_estimations.delete()
+
         # Save the records
         for cost_estimation in cost_estimation_list:
             cost_estimation.save()
@@ -1985,7 +2406,7 @@ def page_projects(request, sub_page=None):
         "BaseSupply": "Vật tư",
         "DetailSupply": "Vật tư chi tiết",
         "SupplyPaymentRecord": "LS thanh toán vật tư",
-        "Subcontractor": "Tổ đội/ nhà thầu phụ",
+        "SubContractor": "Tổ đội/ nhà thầu phụ",
         "BaseSubJob": "Công việc của tổ đội/ nhà thầu phụ",
         "DetailSubJob": "Công việc chi tiết của tổ đội/ nhà thầu phụ",
     }
@@ -2016,7 +2437,6 @@ def test(request):
     return render(request, "pages/test.html")
 
 
-
 def clean(request):
     result = ""
     # Find MaintenanceImage records with null vehicle_maintenance
@@ -2026,8 +2446,9 @@ def clean(request):
     orphaned_images.delete()
     result = f"Deleted {deleted_count} MaintenanceImage records with null foreign keys."
 
-
-    orphan_records = VehicleMaintenanceRepairPart.objects.filter(vehicle_maintenance__isnull=True)
+    orphan_records = VehicleMaintenanceRepairPart.objects.filter(
+        vehicle_maintenance__isnull=True
+    )
     # Delete the orphaned records
     deleted_count = orphan_records.count()
     orphan_records.delete()
@@ -2043,13 +2464,17 @@ def clean(request):
     # Delete the orphaned records
     deleted_count = orphan_records.count()
     orphan_records.delete()
-    result += f"\nDeleted {deleted_count} SupplyPaymentRecord records with null foreign keys"
+    result += (
+        f"\nDeleted {deleted_count} SupplyPaymentRecord records with null foreign keys"
+    )
 
     # supply order supply
     orphan_records = SupplyOrderSupply.objects.filter(supply_order__isnull=True)
     # Delete the orphaned records
     deleted_count = orphan_records.count()
     orphan_records.delete()
-    result += f"\nDeleted {deleted_count} SupplyOrderSupply records with null foreign keys"
+    result += (
+        f"\nDeleted {deleted_count} SupplyOrderSupply records with null foreign keys"
+    )
 
     return HttpResponse(result)

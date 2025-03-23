@@ -11,6 +11,45 @@ from django.core.exceptions import ValidationError
 
 
 
+class PermissionForm(forms.ModelForm):
+    class Meta:
+        model = Permission
+        # All fields except archived and last_saved
+        fields = [field.name for field in Permission._meta.fields if field.name not in ['archived', 'last_saved', 'created_at']]
+
+        # You can define labels and widgets for known fields
+        labels = {
+            'user': 'Tài khoản',
+            'note': 'Ghi chú',
+            'created_at': 'Ngày tạo',
+        }
+
+        widgets = {
+            'user': forms.Select(attrs={
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+            }),
+            'created_at': forms.DateTimeInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'readonly': 'readonly',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically set widgets for permission fields
+        for field_name in self.fields:
+            if field_name not in ['user', 'note', 'created_at', 'last_saved', 'archived']:
+                self.fields[field_name].widget = forms.Select(attrs={
+                    'class': 'form-input',
+                }, choices=self.fields[field_name].choices)
+            
+
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -1395,9 +1434,9 @@ class DetailSupplyForm(forms.ModelForm):
 
 
 
-class SubcontractorForm(forms.ModelForm):
+class SubContractorForm(forms.ModelForm):
     class Meta:
-        model = Subcontractor
+        model = SubContractor
         fields = ['name', 'bank_name', 'account_number', 'account_holder_name', 'phone_number', 'address', 'note']
         labels = {
             'name': 'Tổ đội/ nhà thầu phụ',
@@ -1481,9 +1520,9 @@ class BaseSubJobForm(forms.ModelForm):
 class DetailSubJobForm(forms.ModelForm):
     class Meta:
         model = DetailSubJob
-        fields = ['subcontractor', 'base_sub_job', 'sub_job_price', 'valid_from', 'image_prove', 'note']
+        fields = ['sub_contractor', 'base_sub_job', 'sub_job_price', 'valid_from', 'image_prove', 'note']
         labels = {
-            'subcontractor': 'Tổ đội/ nhà thầu phụ',
+            'sub_contractor': 'Tổ đội/ nhà thầu phụ',
             'base_sub_job': 'Công việc',
             'unit': 'Đơn vị',
             'note': 'Ghi chú',
@@ -1491,7 +1530,7 @@ class DetailSubJobForm(forms.ModelForm):
             'valid_from': 'Ngày áp dụng',
         }
         widgets = {
-            'subcontractor': forms.Select(attrs={
+            'sub_contractor': forms.Select(attrs={
                 'class': 'form-input',
                 'required': 'required',
             }),
@@ -1667,42 +1706,153 @@ class SupplyPaymentRecordForm(forms.ModelForm):
             }),
         }
 
-
-
-class PermissionForm(forms.ModelForm):
+class SubJobOrderForm(forms.ModelForm):
     class Meta:
-        model = Permission
-        # All fields except archived and last_saved
-        fields = [field.name for field in Permission._meta.fields if field.name not in ['archived', 'last_saved', 'created_at']]
-
-        # You can define labels and widgets for known fields
+        model = SubJobOrder
+        fields = ['user', 'order_code', 'project', 'approval_status', 'note']
         labels = {
-            'user': 'Tài khoản',
+            'order_code': 'Mã phiếu',
+            'project': 'Dự án',
+            'order_amount': 'Tổng tiền',
+            'approval_status': 'Duyệt',
+            'received_status': 'Nhận hàng',
+            'paid_status': 'Thanh toán',
             'note': 'Ghi chú',
-            'created_at': 'Ngày tạo',
+            'created_at': 'Ngày tạo phiếu',
+            'sub_contractors': 'Các nhà cung cấp',
         }
-
         widgets = {
-            'user': forms.Select(attrs={
+            'order_code': forms.TextInput(attrs={
+                'placeholder': 'Tự động sau khi lưu',
+                'class': 'form-input',
+                'readonly': 'readonly',
+            }), 
+            'project': forms.Select(attrs={
+                'placeholder': 'Chọn dự án',
                 'class': 'form-input',
                 'required': 'required',
             }),
+            'order_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tổng tiền',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'approval_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái phê duyệt',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SubJobOrder.APPROVAL_STATUS_CHOICES),
+            'received_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái nhận hàng',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SubJobOrder.RECEIVED_STATUS_CHOICES),
+            'paid_status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SubJobOrder.PAID_STATUS_CHOICES),
             'note': forms.Textarea(attrs={
                 'class': 'form-input h-20',
+                'rows': 2
             }),
             'created_at': forms.DateTimeInput(attrs={
                 'class': 'form-input',
                 'type': 'date',
+                'required': 'required',
                 'readonly': 'readonly',
+            }),
+            'sub_contractors': forms.Textarea(attrs={
+                'class': 'form-input h-20',
+                'rows': 2
+            })
+        }
+
+class SubJobPaymentRecordForm(forms.ModelForm):
+    class Meta:
+        model = SubJobPaymentRecord
+        fields = [
+            'sub_job_order', 'sub_contractor', 'requested_amount',
+            'requested_date', 'transferred_amount', 
+            'payment_date', 'image1', 'image2', 'money_source','lock', 'note']
+        labels = {
+            'sub_job_order': 'Phiếu mua hàng',
+            'sub_contractor': 'Nhà tổ đội/ nhà thầu phụ',
+            'status': 'Trạng thái thanh toán',
+            'purchase_amount': 'Tổng tiền trên phiếu',
+            'requested_amount': 'Số tiền đề nghị',
+            'reqested_date': 'Ngày đề nghị',
+            'transferred_amount': 'Tiền thanh toán',
+            'payment_date': 'Ngày thanh toán',
+            'debt': 'Nợ còn lại',
+            'image1': 'Hình 1',
+            'image2': 'Hình 2',
+            'lock': 'Khoá phiếu thanh toán',
+            'money_souce': 'Nguồn tiền',
+            'note': 'Ghi chú',
+        }
+        widgets = {
+            'sub_job_order': forms.Select(attrs={
+                'placeholder': 'Chọn phiếu mua hàng',
+                'class': 'form-input',
+                'required': 'required',
+                'readonly': 'readonly',
+            }),
+            'sub_contractor': forms.Select(attrs={
+                'placeholder': 'Chọn tổ đội/ nhà thầu phụ',
+                'class': 'form-input',
+                'required': 'required',
+                'readonly': 'readonly',
+            }),
+            'status': forms.Select(attrs={
+                'placeholder': 'Chọn trạng thái',
+                'class': 'form-input',
+                'required': 'required',
+            }, choices=SubJobPaymentRecord.PAID_STATUS_CHOICES),
+            'purchase_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tổng tiền trên phiếu',
+                'class': 'form-input',
+                'required': 'required',
+            }),
+            'requested_amount': forms.NumberInput(attrs={
+                'placeholder': 'Số tiền đề nghị',
+                'class': 'form-input text-2xl',
+                'required': 'required',
+            }),
+            'requested_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày đề nghị',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'transferred_amount': forms.NumberInput(attrs={
+                'placeholder': 'Tiền thanh toán',
+                'class': 'form-input text-2xl',
+                'required': 'required',
+            }),
+            'payment_date': forms.DateInput(attrs={
+                'placeholder': 'Ngày thanh toán',
+                'class': 'form-input',
+                'required': 'required',
+                'type': 'date'
+            }),
+            'lock': forms.CheckboxInput(attrs={
+                'class': 'form-input checkbox',
+            }),
+            'money_source': forms.Select(attrs={
+                'placeholder': 'Chọn nguồn tiền',
+                'class': 'form-input text-lg',
+                'required': 'required',
+            }, choices=SubJobPaymentRecord.MONEY_SOURCE_CHOICES),
+            'image1': forms.FileInput(attrs={
+                    'class': 'form-input-file',}),
+                    
+            'image2': forms.FileInput(attrs={
+                    'class': 'form-input-file',}),
+            'note': forms.Textarea(attrs={
+                'class': 'form-input text-lg',
+                'required': False,
+                'style': 'height: 80px;'
             }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Dynamically set widgets for permission fields
-        for field_name in self.fields:
-            if field_name not in ['user', 'note', 'created_at', 'last_saved', 'archived']:
-                self.fields[field_name].widget = forms.Select(attrs={
-                    'class': 'form-input',
-                }, choices=self.fields[field_name].choices)
-            

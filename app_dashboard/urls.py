@@ -46,14 +46,14 @@ urlpatterns = [
     path('api/form_repair_parts', views.form_repair_parts, name='form_repair_parts'),
     path('api/form_detailed_supplies', views.form_detailed_supplies, name='form_detailed_supplies'),
     path('api/form_base_supplies', views.form_base_supplies, name='form_base_supplies'),
-
+    path('api/form_base_sub_jobs', views.form_base_sub_jobs, name='form_base_sub_jobs'),
 
     path('api/form_maintenance_images/<int:maintenance_id>/', views.form_maintenance_images, name='form_maintenance_images'),
     path('api/form_maintenance_payment_request', views.form_maintenance_payment_request, name='form_maintenance_payment_request'),
     
     
     path('api/form_cost_estimation_table/<int:project_id>/', views.form_cost_estimation_table, name='form_cost_estimation_table'),
-
+    path('api/form_sub_job_cost_estimation_table/<int:project_id>/', views.form_sub_job_cost_estimation_table, name='form_sub_job_cost_estimation_table'),
 
     path('clean', views.clean, name='clean'),
 
