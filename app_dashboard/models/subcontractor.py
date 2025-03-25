@@ -149,7 +149,7 @@ class BaseSubJob(BaseModel):
     job_number = models.CharField(
         max_length=255, verbose_name="Mã công việc", unique=True
     )
-    job_name = models.CharField(max_length=255, verbose_name="Tên đầy đủ")
+    job_name = models.CharField(max_length=1000, verbose_name="Tên đầy đủ")
     unit = models.CharField(
         max_length=255,
         verbose_name="Đơn vị",

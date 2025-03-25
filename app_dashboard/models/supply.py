@@ -285,7 +285,7 @@ class DetailSupply(BaseModel):
         max_length=255, verbose_name="Mã vật tư", null=True, blank=True
     )
     supply_name = models.CharField(
-        max_length=255, verbose_name="Tên đầy đủ", null=True, blank=True
+        max_length=1000, verbose_name="Tên đầy đủ", null=True, blank=True
     )
     unit = models.CharField(
         max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True
