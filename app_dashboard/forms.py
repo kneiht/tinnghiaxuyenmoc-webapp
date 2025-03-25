@@ -1520,7 +1520,7 @@ class BaseSubJobForm(forms.ModelForm):
 class DetailSubJobForm(forms.ModelForm):
     class Meta:
         model = DetailSubJob
-        fields = ['sub_contractor', 'base_sub_job', 'sub_job_price', 'valid_from', 'image_prove', 'note']
+        fields = ['sub_contractor', 'base_sub_job', 'valid_from', 'image_prove', 'note']
         labels = {
             'sub_contractor': 'Tổ đội/ nhà thầu phụ',
             'base_sub_job': 'Công việc',
@@ -1535,11 +1535,6 @@ class DetailSubJobForm(forms.ModelForm):
                 'required': 'required',
             }),
             'base_sub_job': forms.Select(attrs={
-                'class': 'form-input',
-                'required': 'required',
-            }),
-            'sub_job_price': forms.NumberInput(attrs={
-                'placeholder': 'Đơn giá',
                 'class': 'form-input',
                 'required': 'required',
             }),
@@ -1715,7 +1710,7 @@ class SubJobOrderForm(forms.ModelForm):
             'project': 'Dự án',
             'order_amount': 'Tổng tiền',
             'approval_status': 'Duyệt',
-            'received_status': 'Nhận hàng',
+            'received_status': 'Hoàn thành',
             'paid_status': 'Thanh toán',
             'note': 'Ghi chú',
             'created_at': 'Ngày tạo phiếu',
@@ -1743,7 +1738,7 @@ class SubJobOrderForm(forms.ModelForm):
                 'required': 'required',
             }, choices=SubJobOrder.APPROVAL_STATUS_CHOICES),
             'received_status': forms.Select(attrs={
-                'placeholder': 'Chọn trạng thái nhận hàng',
+                'placeholder': 'Chọn trạng thái hoàn thành',
                 'class': 'form-input',
                 'required': 'required',
             }, choices=SubJobOrder.RECEIVED_STATUS_CHOICES),

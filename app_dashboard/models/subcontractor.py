@@ -80,9 +80,9 @@ class SubContractor(BaseModel):
         # Calculate total purchase amount
         purchase_amount = 0
         for order_sub_job in order_sub_jobs:
-            if order_sub_job.detail_sub_job:
+            if order_sub_job:
                 purchase_amount += (
-                    order_sub_job.detail_sub_job.sub_job_price * order_sub_job.quantity 
+                    order_sub_job.sub_job_price * order_sub_job.quantity 
                 )
 
         # Calculate total transferred amount from payment records
@@ -160,6 +160,9 @@ class BaseSubJob(BaseModel):
     image = models.ImageField(
         verbose_name="Hình ảnh", default="", null=True, blank=True
     )
+    reference = models.CharField(
+        max_length=255, verbose_name="Công trình tham khảo", default="", null=True, blank=True
+    )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -168,7 +171,7 @@ class BaseSubJob(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ["job_number", "job_type", "job_name", "unit", "image", "note"]
+        fields = ["job_number", "job_type", "job_name", "unit", "image", "reference", "note"]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -211,18 +214,34 @@ class BaseSubJob(BaseModel):
             sub_contractor=sub_contractor
         ).order_by("-valid_from")
         return detail_sub_jobs
+    
+    def get_history(
+        self, sub_contractor
+    ):
+        """Get list of sub job order sub jobs that have this base sub job"""
+        sub_job_order_sub_jobs = SubJobOrderSubJob.objects.filter(
+            base_sub_job=self,
+            detail_sub_job__sub_contractor=sub_contractor
+        ).order_by("-created_at")
 
+        return [
+            {
+                "price": sub_job_order_sub_job.sub_job_price,
+                "create_at": sub_job_order_sub_job.created_at,
+                "project": sub_job_order_sub_job.sub_job_order.project
+            } for sub_job_order_sub_job in sub_job_order_sub_jobs
+        ]
 
     def get_dict_of_detail_sub_jobs(self):
         sub_contractors = self.get_sub_contractors()
-        print(sub_contractors)
         detail_sub_job_dict = {}
         for sub_contractor in sub_contractors:
             detail_sub_jobs = self.get_list_of_detail_sub_jobs_of_a_sub_contractor(
                 sub_contractor
             )
+            sub_contractor.history = self.get_history(sub_contractor)
             detail_sub_job_dict[sub_contractor] = detail_sub_jobs
-        print(detail_sub_job_dict)
+
         return detail_sub_job_dict
 
 
@@ -247,10 +266,6 @@ class DetailSubJob(BaseModel):
         null=True,
         blank=True,
         verbose_name="Công việc",
-    )
-
-    sub_job_price = models.IntegerField(
-        verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)]
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
@@ -297,7 +312,6 @@ class DetailSubJob(BaseModel):
             "job_number",
             "job_type",
             "job_name",
-            "sub_job_price",
             "unit",
             "image",
             "image_prove",
@@ -318,6 +332,8 @@ class DetailSubJob(BaseModel):
             self.unit = self.base_sub_job.unit
             self.image = self.base_sub_job.image
         super().save()
+
+
 
 
 class SubJobEstimation(BaseModel):
@@ -374,7 +390,7 @@ class SubJobEstimation(BaseModel):
     received_quantity = models.FloatField(
         default=0.0,
         validators=[MinValueValidator(0)],
-        verbose_name="Khối lượng đã nhận",
+        verbose_name="Khối lượng đã hoàn thành",
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
@@ -476,9 +492,9 @@ class SubJobOrder(BaseModel):
     )
 
     RECEIVED_STATUS_CHOICES = (
-        ("received", "Đã nhận"),
-        ("not_received", "Chưa nhận"),
-        ("partial_received", "Nhận một phần"),
+        ("received", "Đã H.Thành"),
+        ("not_received", "Chưa H.Thành"),    
+        ("partial_received", "H.Thành một phần"),
     )
 
     PAID_STATUS_CHOICES = (
@@ -512,7 +528,7 @@ class SubJobOrder(BaseModel):
         max_length=50,
         choices=RECEIVED_STATUS_CHOICES,
         default="not_received",
-        verbose_name="Nhận hàng",
+        verbose_name="Hoàn thành",
     )
     paid_status = models.CharField(
         max_length=50,
@@ -533,6 +549,7 @@ class SubJobOrder(BaseModel):
         return f"{self.order_code}"
 
     def save(self, *args, **kwargs):
+        print(">>>>>>>>>>>>>>>>order_sub_jobs")
         # Skip if user changed (keep first user)
         if self.pk:
             old_instance = SubJobOrder.objects.get(pk=self.pk)
@@ -547,9 +564,9 @@ class SubJobOrder(BaseModel):
         # Calculate total order amount
         total_amount = 0
         for order_sub_job in order_sub_jobs:
-            if order_sub_job.detail_sub_job:
+            if order_sub_job:
                 subjob_amount = (
-                    order_sub_job.detail_sub_job.sub_job_price * order_sub_job.quantity
+                    order_sub_job.sub_job_price * order_sub_job.quantity
                 )
                 total_amount += subjob_amount
 
@@ -605,6 +622,7 @@ class SubJobOrder(BaseModel):
 
         # Create or update payment records
         if self.approval_status == "approved":
+            print("self.approval_status", self.approval_status)
             all_provider_payment_state = self.calculate_all_provider_payment_states()
 
             for provider_id in all_provider_payment_state:
@@ -615,7 +633,7 @@ class SubJobOrder(BaseModel):
                 if len(payment_records) == 0:
                     payment_record = SubJobPaymentRecord.objects.create(
                         sub_job_order=self,
-                        sub_contractor=provider_id,
+                        sub_contractor_id=provider_id,
                         previous_debt=all_provider_payment_state[provider_id][
                             "debt_amount"
                         ],
@@ -689,9 +707,9 @@ class SubJobOrder(BaseModel):
                 detail_sub_job__sub_contractor=provider
             )
             for sub_job in provider_sub_jobs:
-                if sub_job.detail_sub_job:
+                if sub_job:
                     purchase_amount += (
-                        sub_job.detail_sub_job.sub_job_price * sub_job.quantity
+                        sub_job.sub_job_price * sub_job.quantity
                     )
 
             # Calculate transferred amount
@@ -744,9 +762,9 @@ class SubJobOrder(BaseModel):
 class SubJobOrderSubJob(BaseModel):
     vietnamese_name = "Công việc trong đơn đặt nhân công"
     RECEIVED_STATUS_CHOICES = (
-        ("received", "Đã nhận"),
-        ("not_received", "Chưa nhận"),
-        ("partial_received", "Nhận một phần"),
+        ("received", "Đã H.Thành"),
+        ("not_received", "Chưa H.Thành"),
+        ("partial_received", "H.Thành một phần"),
     )
 
     sub_job_order = models.ForeignKey(
@@ -768,6 +786,10 @@ class SubJobOrderSubJob(BaseModel):
         verbose_name="Công việc chi tiết",
     )
 
+    sub_job_price = models.IntegerField(
+        verbose_name="Đơn giá", default=0, validators=[MinValueValidator(0)]
+    )
+
     quantity = models.IntegerField(
         verbose_name="Số lượng", default=0, validators=[MinValueValidator(0)]
     )
@@ -777,14 +799,15 @@ class SubJobOrderSubJob(BaseModel):
         validators=[MinValueValidator(0)],
     )
     received_quantity = models.IntegerField(
-        verbose_name="Số lượng đã nhận", default=0, validators=[MinValueValidator(0)]
+        verbose_name="Số lượng đã H.Thành", default=0, validators=[MinValueValidator(0)]
     )
     received_status = models.CharField(
         max_length=50,
         choices=RECEIVED_STATUS_CHOICES,
         default="not_received",
-        verbose_name="Trạng thái nhận hàng",
+        verbose_name="Trạng thái hoàn thành",
     )
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.sub_job_order.order_code} - {self.base_sub_job}"

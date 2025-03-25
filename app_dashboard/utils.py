@@ -341,6 +341,8 @@ def progress_by_amount(record, check_date=None):
 
     elif record.__class__.__name__ == 'Job':
         total_amount = record.total_amount
+
+
         job_date_reports = JobDateReport.objects.filter(job=record, date__lte=check_date)
         total_amount_reported = job_date_reports.aggregate(Sum('date_amount'))['date_amount__sum'] or 0
 

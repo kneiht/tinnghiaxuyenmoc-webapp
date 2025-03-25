@@ -6,7 +6,7 @@
     <div class="form-input flex flex-col h-fit h-max-[300px] overflow-y-scroll">
         <div class="flex justify-between w-full font-semibold">
             <span class="w-4/12 text-center"> Trạng thái duyệt </span>
-            <span class="w-4/12 text-center"> Trạng thái nhận hàng </span>
+            <span class="w-4/12 text-center"> Trạng thái hoàn thành </span>
             <span class="w-4/12 text-center"> Trạng thái thanh toán </span>
         </div> 
         <div class="pt-3 pb-1 flex justify-between items-center w-full">
@@ -74,7 +74,7 @@
 <div class="w-full pt-4 px-6">
     <p class="text-center text-theme"> Chỉ có vị trí giám sát dự án mới đặt được vật tư. </p>
     <p class="text-center text-theme"> Chỉ có kế toán dự án mới chọn được nhà cung cấp. </p>
-    <p class="text-center text-theme"> Sau khi được duyệt, kế toán mới có thể nhập SL Thanh toán và SL Đã nhận. </p>
+    <p class="text-center text-theme"> Sau khi được duyệt, kế toán mới có thể nhập SL Thanh toán và SL Đã H.Thành. </p>
     <p class="text-center text-theme"> Các số liệu tài chính chỉ được tính toán sau khi bấm cập nhật. </p>
     <div class="flex flex-row justify-between gap-5 items-center py-1">
         <div class="flex flex-row gap-5 items-end py-2">
@@ -104,7 +104,7 @@
             <span class="w-28 text-center"> SL thiếu </span>
             <span class="w-28 text-center"> SL đặt </span>
             <span class="w-28 text-center"> SL T.toán </span>
-            <span class="w-28 text-center"> SL đã nhận </span>
+            <span class="w-28 text-center"> SL đã H.Thành </span>
             <span class="w-28 text-center"> Ngày thêm </span>
         </div> 
         <div id="order-sub-jobs" class="overflow-y-auto w-fit">
@@ -149,10 +149,16 @@
                         <input class="hidden" id="detail_sub_job_{{ order_sub_job.base_sub_job.pk }}" name="detail_sub_job_{{ order_sub_job.base_sub_job.pk }}" value="{{ order_sub_job.detail_sub_job.pk }}">
                     </div>
                     <div class="w-28 text-center">
-                        {{ order_sub_job.detail_sub_job.sub_job_price|format_money }}
+                        <div class="hidable hidden">
+                        <input type="number" name="sub_job_price_{{ order_sub_job.base_sub_job.pk }}" 
+                            class="form-input" 
+                            value="{{ order_sub_job.sub_job_price }}"
+                            min="0">
+                        </div>
+                        <span class="hidable">{{ order_sub_job.sub_job_price|format_money }}</span>
                     </div>
                     <div class="w-28 text-center">
-                        {{ order_sub_job.detail_sub_job.sub_job_price|multiply:order_sub_job.quantity|format_money }}
+                        {{ order_sub_job.sub_job_price|multiply:order_sub_job.quantity|format_money }}
                     </div>
                     {% endif %}
                     
@@ -163,19 +169,20 @@
                             <h3 class="text-lg font-bold mb-4 text-center">{{ order_sub_job.base_sub_job.job_number }} - {{ order_sub_job.base_sub_job.job_name }}</h3>
                             <ul>
                                 {% if order_sub_job.base_sub_job.get_dict_of_detail_sub_jobs %}
-                                    {% for detail_sub_job_key, detail_sub_job_list in order_sub_job.base_sub_job.get_dict_of_detail_sub_jobs.items %}
+                                    {% for sub_contractor, detail_sub_job_list in order_sub_job.base_sub_job.get_dict_of_detail_sub_jobs.items %}
                                         <li class="py-2 border-b">
                                             <div class="flex justify-between items-center w-full">
-                                                <span class="w-72"> {{ detail_sub_job_key }}</span>
-                                                <button class="text-blue-500 w-28" onclick="selectProvider('{{ detail_sub_job_list.0.pk }}', '{{ detail_sub_job_key }}', '{{ order_sub_job.base_sub_job.pk }}')">
+                                                <span class="w-72"> {{ sub_contractor }}</span>
+                                                <button class="text-blue-500 w-28" onclick="selectProvider('{{ detail_sub_job_list.0.pk }}', '{{ sub_contractor }}', '{{ order_sub_job.base_sub_job.pk }}')">
                                                     Chọn
                                                 </button>
                                             </div>
                                             <ul class="pl-4 mt-2 w-full">
-                                                {% for detail_sub_job in detail_sub_job_list %}
+                                                {% for each_item in sub_contractor.history %}
                                                     <li class="py-1 text-gray-600 dark:text-gray-400 w-full">
-                                                        <span class="">Giá: {{ detail_sub_job.sub_job_price|format_money }}</span>
-                                                        <span class="ml-4">Ngày: {{ detail_sub_job.created_at|date:"d/m/Y" }}</span>
+                                                        <span class="">Giá: {{ each_item.price|format_money }}</span>
+                                                        <span class="ml-4">Ngày: {{ each_item.create_at|date:"d/m/Y" }}</span>
+                                                        <span class="ml-4">Dự án: {{ each_item.project.name }}</span>
                                                     </li>
                                                 {% endfor %}
                                             </ul>

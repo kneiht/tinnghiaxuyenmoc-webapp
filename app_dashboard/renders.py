@@ -381,7 +381,7 @@ def render_form(request, **kwargs):
         'record': record
     }
 
-    if model in ['VehicleMaintenance', 'SupplyOrder']:
+    if model in ['VehicleMaintenance', 'SupplyOrder', 'SubJobOrder']:
         permissions = request.user.check_permission('VehicleMaintenance')
         context['permissions'] = permissions
 
@@ -415,8 +415,10 @@ def render_weekplan_table(request, project_id, check_date=None):
     jobs = Job.objects.filter(project=project)
 
     for job in jobs:
-        job.progress_left_by_quantity_upto_lastweek = job.quantity - progress_by_amount(job, check_date=last_sunday)['total_amount_reported']
-        
+        job.progress_left_by_quantity_upto_lastweek = job.quantity - progress_by_quantity(job, check_date=last_sunday)['total_quantity_reported']
+
+
+
         # Get jobplan in week
         jobplan_in_week = jobplans_in_week.filter(job=job).first()
         if jobplan_in_week:

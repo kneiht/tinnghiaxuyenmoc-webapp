@@ -456,48 +456,35 @@ def handle_form(request, model, pk=0):
 
                                 order_supply.save()
 
-                        record = instance
-                        record.approval_status = form_approval_status
-                        record.save()
-                        record.style = "just-updated"
-                        html_message = render_message(
-                            request, message="Cập nhật thành công"
-                        )
-                        html_record = render_display_records(
-                            request,
-                            model=model,
-                            records=[record],
-                            update="True",
-                            project_id=project_id,
-                        )
-                        return HttpResponse(html_message + html_record)
-
-                    elif model == "SubJobOrder":
-                        # Update status up each SubJobOrder
-                        order_sub_jobs = SubJobOrder.objects.filter(
-                            sub_job_order=order
-                        )
-                        for order_sub_job in order_sub_jobs:
-                            # Update paid and received quantities
-                            paid_quantity = float(
-                                request.POST.get(
-                                    f"paid_quantity_{order_sub_job.id}", 0
-                                )
+                        elif model == "SubJobOrder":
+                            order = instance
+                            # Update status up each SubJobOrderSubJob
+                            order_sub_jobs = SubJobOrderSubJob.objects.filter(
+                                sub_job_order=order
                             )
-                            if paid_quantity:
-                                order_sub_job.paid_quantity = paid_quantity
-                            
-                            received_quantity = float(
-                                request.POST.get(
-                                    f"received_quantity_{order_sub_job.id}", 0
+                            for order_sub_job in order_sub_jobs:
+                                # Update paid and received quantities
+                                paid_quantity = float(
+                                    request.POST.get(
+                                        f"paid_quantity_{order_sub_job.id}", 0
+                                    )
                                 )
-                            )
-                            if received_quantity:
-                                order_sub_job.received_quantity = received_quantity
-                            
-                            order_sub_job.save()
+                                if paid_quantity:
+                                    order_sub_job.paid_quantity = paid_quantity
+                                
+                                received_quantity = float(
+                                    request.POST.get(
+                                        f"received_quantity_{order_sub_job.id}", 0
+                                    )
+                                )
+                                if received_quantity:
+                                    order_sub_job.received_quantity = received_quantity
+                                
+                                order_sub_job.save()
 
                             record = instance
+                            record.approval_status = form_approval_status
+                            record.save()
                             record.style = "just-updated"
                             html_message = render_message(
                                 request, message="Cập nhật thành công"
@@ -510,7 +497,6 @@ def handle_form(request, model, pk=0):
                                 project_id=project_id,
                             )
                             return HttpResponse(html_message + html_record)
-
 
                     else:
                         message = 'Chỉ có thể chọn trạng thái duyệt "Cần sửa lại" hoặc "Từ chối"'
@@ -705,11 +691,18 @@ def handle_form(request, model, pk=0):
                     detail_sub_job_id = get_valid_id(
                         request.POST.get(f"detail_sub_job_{sub_job_id}")
                     )
+                    
                     detail_sub_job = DetailSubJob.objects.filter(
                         id=detail_sub_job_id
                     ).first()
                     if detail_sub_job:
                         order_sub_job.detail_sub_job = detail_sub_job
+
+                    # add sub_job_price
+                    sub_job_price = int(
+                        request.POST.get(f"sub_job_price_{sub_job_id}", 0)
+                    )
+                    order_sub_job.sub_job_price = sub_job_price
 
                     order_sub_job.save()
 
@@ -2409,6 +2402,7 @@ def page_projects(request, sub_page=None):
         "SubContractor": "Tổ đội/ nhà thầu phụ",
         "BaseSubJob": "Công việc của tổ đội/ nhà thầu phụ",
         "DetailSubJob": "Công việc chi tiết của tổ đội/ nhà thầu phụ",
+        "SubJobPaymentRecord": "LS thanh toán công việc của tổ đội/ nhà thầu phụ",
     }
     context = {
         "sub_page": sub_page,
@@ -2429,12 +2423,6 @@ def page_each_project(request, pk):
     context = {"project_id": project_id, "check_date": check_date, "project": project}
     return render(request, "pages/page_each_project.html", context)
 
-
-def test(request):
-    records = VehicleOperationRecord.objects.all()
-    for record in records:
-        record.delete()
-    return render(request, "pages/test.html")
 
 
 def clean(request):

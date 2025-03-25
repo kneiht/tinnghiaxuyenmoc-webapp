@@ -122,7 +122,17 @@ class SupplyBrand(BaseModel):
                 fields.remove(field)
         return fields
 
+class DetailSupplyKey:
+    provider: SupplyProvider
+    brand: SupplyBrand
+    
+    def __init__(self, provider: SupplyProvider, brand: SupplyBrand):
+        self.provider = provider
+        self.brand = brand
 
+    def __str__(self):
+        return f"{self.provider.name} - Thương hiệu: {self.brand.name}"
+    
 class BaseSupply(BaseModel):
     allow_display = True
     vietnamese_name = "Vật tư"
@@ -205,10 +215,12 @@ class BaseSupply(BaseModel):
         provider_and_brand_ids = detail_supplies.values_list(
             "supply_provider", "supply_brand"
         ).distinct()
+        print("provider_and_brand_ids", provider_and_brand_ids)
         for provider, brand in provider_and_brand_ids:
             provider = SupplyProvider.objects.get(pk=provider)
             brand = SupplyBrand.objects.get(pk=brand)
             provider_and_brands.append((provider, brand))
+        print("provider_and_brands", provider_and_brands)
         return provider_and_brands
 
     def get_list_of_detail_supplies_of_a_provider_and_a_brand(self, provider, brand):
@@ -218,18 +230,9 @@ class BaseSupply(BaseModel):
         ).order_by("-valid_from")
 
     def get_dict_of_detail_supplies(self):
-        class DetailSupplyKey:
-            provider: SupplyProvider
-            brand: SupplyBrand
-            
-            def __init__(self, provider: SupplyProvider, brand: SupplyBrand):
-                self.provider = provider
-                self.brand = brand
-
-            def __str__(self):
-                return f"{self.provider.name} - Thương hiệu: {self.brand.name}"
-            
         provider_and_brands = self.get_provider_and_brands()
+        print("provider_and_brands")
+
         detail_supply_dict = {}
         for provider, brand in provider_and_brands:
             detail_supplies = self.get_list_of_detail_supplies_of_a_provider_and_a_brand(
