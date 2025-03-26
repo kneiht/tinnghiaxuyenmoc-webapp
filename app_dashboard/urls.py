@@ -65,5 +65,6 @@ urlpatterns = [
     
 
     path('api/db_table/', views_backup.db_table, name='db_table'),
+    path('gps', views.gps, name='gps'),
 
 ]

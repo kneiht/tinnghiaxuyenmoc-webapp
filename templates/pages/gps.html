@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #location {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Geolocation API Demo</h1>
+    <button onclick="getLocation()">Get My Location</button>
+    <p id="location">Click the button to get your location.</p>
+
+    <script>
+        function getLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        console.log(lat, lon);
+                        document.getElementById("location").innerText = `Latitude: ${lat}, Longitude: ${lon}`;
+                    },
+                    (error) => {
+                        console.log(error);
+                        document.getElementById("location").innerText = `Error: ${error.message}`;
+                    }
+                );
+            } else {
+                console.log("Geolocation is not supported by your browser.");
+                document.getElementById("location").innerText = "Geolocation is not supported by your browser.";
+            }
+        }
+    </script>
+
+</body>
+</html>

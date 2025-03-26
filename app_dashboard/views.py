@@ -347,7 +347,7 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_supply.id}", 0
+                                        f"paid_quantity_{order_supply.base_supply.id}", 0
                                     )
                                 )
                                 if paid_quantity:
@@ -355,7 +355,7 @@ def handle_form(request, model, pk=0):
 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_supply.id}", 0
+                                        f"received_quantity_{order_supply.base_supply.id}", 0
                                     )
                                 )
                                 if received_quantity:
@@ -372,7 +372,7 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_sub_job.id}", 0
+                                        f"paid_quantity_{order_sub_job.base_sub_job.id}", 0
                                     )
                                 )
                                 if paid_quantity:
@@ -380,7 +380,7 @@ def handle_form(request, model, pk=0):
                                 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_sub_job.id}", 0
+                                        f"received_quantity_{order_sub_job.base_sub_job.id}", 0
                                     )
                                 )
                                 if received_quantity:
@@ -432,6 +432,7 @@ def handle_form(request, model, pk=0):
 
                         elif model == "SupplyOrder":
                             order = instance
+
                             # Update status up each SupplyOrderSupply
                             order_supplies = SupplyOrderSupply.objects.filter(
                                 supply_order=order
@@ -440,19 +441,17 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_supply.id}", 0
+                                        f"paid_quantity_{order_supply.base_supply.id}", 0
                                     )
                                 )
-                                if paid_quantity:
-                                    order_supply.paid_quantity = paid_quantity
+                                order_supply.paid_quantity = paid_quantity
 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_supply.id}", 0
+                                        f"received_quantity_{order_supply.base_supply.id}", 0
                                     )
                                 )
-                                if received_quantity:
-                                    order_supply.received_quantity = received_quantity
+                                order_supply.received_quantity = received_quantity
 
                                 order_supply.save()
 
@@ -466,19 +465,17 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_sub_job.id}", 0
+                                        f"paid_quantity_{order_sub_job.base_sub_job.id}", 0
                                     )
                                 )
-                                if paid_quantity:
-                                    order_sub_job.paid_quantity = paid_quantity
+                                order_sub_job.paid_quantity = paid_quantity
                                 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_sub_job.id}", 0
+                                        f"received_quantity_{order_sub_job.base_sub_job.id}", 0
                                     )
                                 )
-                                if received_quantity:
-                                    order_sub_job.received_quantity = received_quantity
+                                order_sub_job.received_quantity = received_quantity
                                 
                                 order_sub_job.save()
 
@@ -2466,3 +2463,7 @@ def clean(request):
     )
 
     return HttpResponse(result)
+
+
+def gps(request):
+    return render(request, "pages/gps.html")

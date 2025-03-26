@@ -215,11 +215,11 @@ class BaseSupply(BaseModel):
         provider_and_brand_ids = detail_supplies.values_list(
             "supply_provider", "supply_brand"
         ).distinct()
-        print("provider_and_brand_ids", provider_and_brand_ids)
         for provider, brand in provider_and_brand_ids:
-            provider = SupplyProvider.objects.get(pk=provider)
-            brand = SupplyBrand.objects.get(pk=brand)
-            provider_and_brands.append((provider, brand))
+            if provider and brand:
+                provider = SupplyProvider.objects.get(pk=provider)
+                brand = SupplyBrand.objects.get(pk=brand)
+                provider_and_brands.append((provider, brand))
         print("provider_and_brands", provider_and_brands)
         return provider_and_brands
 
