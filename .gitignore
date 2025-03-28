@@ -20,3 +20,5 @@ tasks.py
 get_api_multiple.py
 /local
 django_errors.log
+.qodo
+.vscode
