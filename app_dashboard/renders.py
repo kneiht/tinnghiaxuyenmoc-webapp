@@ -202,6 +202,8 @@ def render_display_records(request, **kwargs):
     end_date = get_valid_date(params.get("end_date", start_date))
     search_phrase = request.GET.get("all", "")
     filter_vehicle = params.get("filter_vehicle", None)
+    current_page = 0
+    max_page = 0
     if filter_vehicle == "None":
         filter_vehicle = None
 
