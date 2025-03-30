@@ -150,9 +150,20 @@ def handle_form(request, model, pk=0):
 
     # project_id
     project_id = get_valid_id(request.POST.get("project", 0))
+
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
     form = form_class(request.POST, request.FILES, instance=instance)
+
+    # Add missing data if there's an instance
+    if instance:
+        post_data = request.POST.copy()
+        for field_name in form_class.Meta.fields:
+            if not post_data.get(field_name) and hasattr(instance, field_name):
+                field_value = getattr(instance, field_name)
+                if field_value:
+                    post_data[field_name] = field_value
+        form = form_class(post_data, request.FILES, instance=instance)
 
     # Delete and restore
     if request.POST.get("archived") == "true":
@@ -163,7 +174,11 @@ def handle_form(request, model, pk=0):
 
         try:
             # if record is VechicleMaintenance":
-            if model != "VehicleMaintenance" and model != "SupplyOrder" and model != "SubJobOrder":
+            if (
+                model != "VehicleMaintenance"
+                and model != "SupplyOrder"
+                and model != "SubJobOrder"
+            ):
                 record = instance
                 # Get related records
                 related_records = []
@@ -244,7 +259,11 @@ def handle_form(request, model, pk=0):
         if forbit_html:
             return HttpResponse(forbit_html)
 
-        if model == "VehicleMaintenance" or model == "SupplyOrder":
+        if (
+            model == "VehicleMaintenance"
+            or model == "SupplyOrder"
+            or model == "SubJobOrder"
+        ):
             # set approval status to make sure there no injection hacking
             form.instance.approval_status = "scratch"
 
@@ -256,7 +275,11 @@ def handle_form(request, model, pk=0):
         if forbit_html:
             return HttpResponse(forbit_html)
 
-        if model == "PaymentRecord" or model == "SupplyPaymentRecord" or model == "SubJobPaymentRecord":
+        if (
+            model == "PaymentRecord"
+            or model == "SupplyPaymentRecord"
+            or model == "SubJobPaymentRecord"
+        ):
             # check if the use have the right to modify approval status
             forbit_html = decide_permission(
                 request, "approve", {"model": model, "project_id": project_id}
@@ -269,7 +292,11 @@ def handle_form(request, model, pk=0):
                 )
                 return HttpResponse(html_message)
 
-        elif model == "VehicleMaintenance" or model == "SupplyOrder" or model == "SubJobOrder":
+        elif (
+            model == "VehicleMaintenance"
+            or model == "SupplyOrder"
+            or model == "SubJobOrder"
+        ):
             current_approval_status = (
                 model_class.objects.filter(pk=pk).first().approval_status
             )
@@ -347,7 +374,8 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_supply.base_supply.id}", 0
+                                        f"paid_quantity_{order_supply.base_supply.id}",
+                                        0,
                                     )
                                 )
                                 if paid_quantity:
@@ -355,7 +383,8 @@ def handle_form(request, model, pk=0):
 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_supply.base_supply.id}", 0
+                                        f"received_quantity_{order_supply.base_supply.id}",
+                                        0,
                                     )
                                 )
                                 if received_quantity:
@@ -372,20 +401,22 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_sub_job.base_sub_job.id}", 0
+                                        f"paid_quantity_{order_sub_job.base_sub_job.id}",
+                                        0,
                                     )
                                 )
                                 if paid_quantity:
                                     order_sub_job.paid_quantity = paid_quantity
-                                
+
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_sub_job.base_sub_job.id}", 0
+                                        f"received_quantity_{order_sub_job.base_sub_job.id}",
+                                        0,
                                     )
                                 )
                                 if received_quantity:
                                     order_sub_job.received_quantity = received_quantity
-                                
+
                                 order_sub_job.save()
 
                         record = instance
@@ -441,14 +472,16 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_supply.base_supply.id}", 0
+                                        f"paid_quantity_{order_supply.base_supply.id}",
+                                        0,
                                     )
                                 )
                                 order_supply.paid_quantity = paid_quantity
 
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_supply.base_supply.id}", 0
+                                        f"received_quantity_{order_supply.base_supply.id}",
+                                        0,
                                     )
                                 )
                                 order_supply.received_quantity = received_quantity
@@ -465,18 +498,20 @@ def handle_form(request, model, pk=0):
                                 # Update paid and received quantities
                                 paid_quantity = float(
                                     request.POST.get(
-                                        f"paid_quantity_{order_sub_job.base_sub_job.id}", 0
+                                        f"paid_quantity_{order_sub_job.base_sub_job.id}",
+                                        0,
                                     )
                                 )
                                 order_sub_job.paid_quantity = paid_quantity
-                                
+
                                 received_quantity = float(
                                     request.POST.get(
-                                        f"received_quantity_{order_sub_job.base_sub_job.id}", 0
+                                        f"received_quantity_{order_sub_job.base_sub_job.id}",
+                                        0,
                                     )
                                 )
                                 order_sub_job.received_quantity = received_quantity
-                                
+
                                 order_sub_job.save()
 
                             record = instance
@@ -532,6 +567,7 @@ def handle_form(request, model, pk=0):
         instance_form = form.save(commit=False)
 
         if model == "VehicleMaintenance":
+            print("\n\n>>>>>>>>>>>>>>", instance_form.id)
             instance_form.save()
             # Update the  list of VehicleMaintenanceRepairPart
             vehicle_maintenance = instance_form
@@ -660,9 +696,7 @@ def handle_form(request, model, pk=0):
             instance_form.save()
             order = instance_form
             # get the list of sub_job_order_sub_job records for this project and sub_job
-            order_sub_jobs = SubJobOrderSubJob.objects.filter(
-                sub_job_order=order
-            )
+            order_sub_jobs = SubJobOrderSubJob.objects.filter(sub_job_order=order)
             sub_job_ids = request.POST.getlist("sub_job_id")
 
             # check if the id is in the list, if not delete it
@@ -688,7 +722,7 @@ def handle_form(request, model, pk=0):
                     detail_sub_job_id = get_valid_id(
                         request.POST.get(f"detail_sub_job_{sub_job_id}")
                     )
-                    
+
                     detail_sub_job = DetailSubJob.objects.filter(
                         id=detail_sub_job_id
                     ).first()
@@ -1919,6 +1953,7 @@ def form_base_supplies(request):
     }
     return render(request, "components/modal_base_supplies.html", context)
 
+
 def form_base_sub_jobs(request):
     project_id = request.GET.get("project")
     # Get cost estimations for the project
@@ -1931,6 +1966,7 @@ def form_base_sub_jobs(request):
         "project_id": project_id,
     }
     return render(request, "components/modal_base_sub_jobs.html", context)
+
 
 def form_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type="green"):
@@ -2151,7 +2187,8 @@ def form_sub_job_cost_estimation_table(request, project_id):
 
             # Make sure "STT", "Khối lượng", "Mã vật tư", "Ghi chú" are in the row
             if not all(
-                field in row for field in ["STT", "Khối lượng", "Mã công việc", "Ghi chú"]
+                field in row
+                for field in ["STT", "Khối lượng", "Mã công việc", "Ghi chú"]
             ):
                 return render_modal(
                     project_id,
@@ -2419,7 +2456,6 @@ def page_each_project(request, pk):
     # Should check if the project is belong to the user
     context = {"project_id": project_id, "check_date": check_date, "project": project}
     return render(request, "pages/page_each_project.html", context)
-
 
 
 def clean(request):

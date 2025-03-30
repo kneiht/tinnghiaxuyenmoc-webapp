@@ -31,6 +31,29 @@
         </tr>
 
     </thead>
+    <tfoot>
+        <tr class="text-sm leading-normal text-theme shadow-md bg-white dark:bg-slate-800
+        border border-slate-300 dark:border-slate-900 border-opacity-50">
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">Tổng</td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-hours"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-revenue"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-fuel"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-oil"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-repair"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-depreciation"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-interest"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-base-salary"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-hourly-salary"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-cost"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300" id="total-profit"></td>
+            <td class="px-6 py-3 border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300"></td>
+        </tr>
+    </tfoot>
+
+
     {% if update %}
         {% for row in rows %}
             <tbody id="{{ row.row_id }}">
