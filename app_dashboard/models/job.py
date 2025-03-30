@@ -46,8 +46,20 @@ class Job(SecondaryIDMixin, BaseModel):
     def clean(self):
         errors = ""
 
-        # check if the job name is unique within the project
-        # if the job is new
+        # Check if job has associated plans or reports and is being modified
+        if not self._state.adding:  # Only check for existing jobs being modified
+            original_job = Job.objects.get(pk=self.pk)
+            has_plans = JobPlan.objects.filter(job=self).exists()
+            has_reports = JobDateReport.objects.filter(job=self).exists()
+            
+            if (has_plans or has_reports) and (
+                original_job.name != self.name or
+                original_job.unit != self.unit or
+                original_job.unit_price != self.unit_price or
+                original_job.quantity != self.quantity or
+                original_job.category != self.category
+            ):
+                errors += "- Không thể thay đổi thông tin công việc đã có kế hoạch tuần hoặc báo cáo ngày.\n"
 
         if self._state.adding:
             if Job.objects.filter(project=self.project, name=self.name, category=self.category).exists():

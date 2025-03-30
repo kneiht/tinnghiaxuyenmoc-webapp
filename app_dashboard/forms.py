@@ -223,7 +223,7 @@ class VehicleTypeForm(forms.ModelForm):
         fields = ["vehicle_type", "allowed_to_display_in_revenue_table", "note"]
         labels = {
             "vehicle_type": "Loại xe",
-            "allowed_to_display_in_revenue_table": "Cho phép hiển thị trong bảng P&L",
+            "allowed_to_display_in_revenue_table": "Cho phép lấy dữ liệu GPS",
             "note": "Ghi chú",
         }
         widgets = {

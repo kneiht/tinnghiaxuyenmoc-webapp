@@ -906,6 +906,13 @@ class SubJobPaymentRecord(BaseModel):
         blank=True,
         verbose_name="Người tạo",
     )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Dự án",
+    )
     sub_job_order = models.ForeignKey(
         SubJobOrder,
         on_delete=models.CASCADE,
@@ -975,6 +982,7 @@ class SubJobPaymentRecord(BaseModel):
     @classmethod
     def get_display_fields(self):
         fields = [
+            "project",
             "sub_job_order",
             "sub_contractor",
             "status",
@@ -994,6 +1002,7 @@ class SubJobPaymentRecord(BaseModel):
         return [field for field in fields if hasattr(self, field)]
 
     def save(self, *args, **kwargs):
+        self.project = self.sub_job_order.project
         # Update status based on amounts
         if self.requested_amount > 0:
             self.status = "requested"

@@ -1,5 +1,5 @@
 up.compiler('#modal_form', function (modalForm) {
-    modalForm.addEventListener('submit', function(submitEvent) {
+    modalForm.addEventListener('submit', function (submitEvent) {
         // Find all file input elements inside the modal
         const fileInputs = modalForm.querySelectorAll('input[type="file"]');
 
@@ -11,7 +11,7 @@ up.compiler('#modal_form', function (modalForm) {
                 fileErrorText = document.getElementById('fileError');
                 fileErrorText.textContent = "File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.";
                 fileErrorText.classList.remove("hidden")
-                
+
                 submitEvent.preventDefault(); // Prevent form submission
                 enableSubmitButton();
             } else {
@@ -568,7 +568,7 @@ function handleNewSelectElement(select) {
     select.style.width = '100px';
     select.style.opacity = '0';
     select.style.pointerEvents = 'none';
-    
+
 
 
     // Toggle dropdown on card click
@@ -751,6 +751,90 @@ up.compiler('#display-table-records', function (table) {
 function calculatePLTotals() {
     const table = document.getElementById('display-table-records');
     if (!table) return false;
+
+    // Define column indices and their corresponding total element IDs
+    const columnMappings = {
+        4: 'total-hours',
+        5: 'total-revenue',
+        6: 'total-fuel',
+        7: 'total-oil',
+        8: 'total-repair',
+        9: 'total-depreciation',
+        10: 'total-interest',
+        11: 'total-base-salary',
+        12: 'total-hourly-salary',
+        13: 'total-cost',
+        14: 'total-profit'
+    };
+
+    // Get all rows in <tbody>
+    const rows = table.querySelectorAll('tbody tr');
+
+    // Initialize totals for each column
+    const totals = {};
+    Object.keys(columnMappings).forEach(index => {
+        totals[index] = 0;
+    });
+
+    // Function to extract numeric value from a cell
+    const extractNumber = (text) => {
+        if (!text) return 0;
+        return parseFloat(text.replace(/[^0-9.-]+/g, '')) || 0;
+    };
+
+    // Calculate totals for each column
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 15) {
+            Object.keys(columnMappings).forEach(index => {
+                const cell = cells[index];
+                if (cell) {
+                    totals[index] += extractNumber(cell.textContent);
+                }
+            });
+        }
+    });
+
+    // Update the footer cells with formatted totals
+    Object.keys(columnMappings).forEach(index => {
+        const elementId = columnMappings[index];
+        const element = document.getElementById(elementId);
+        if (element) {
+            // Format with 2 decimal places for hours, 0 for others
+            const value = index == 4 ? totals[index].toFixed(2) : totals[index].toFixed(0);
+            element.textContent = formatNumber(value);
+
+        }
+    });
+
+    // For backward compatibility, also update the old display elements if they exist
+    const totalRevenueElement = document.getElementById('total-revenue-display');
+    const totalInterestElement = document.getElementById('total-interest-display');
+
+    if (totalRevenueElement) {
+        totalRevenueElement.innerHTML = `Tổng doanh thu: ${formatNumber(totals[5])} VNĐ`;
+    }
+
+    if (totalInterestElement) {
+        if (totals[14] < 0) {
+            totalInterestElement.classList.add('text-red-700');
+            totalInterestElement.classList.add('bg-red-100');
+        } else {
+            totalInterestElement.classList.remove('text-red-700');
+            totalInterestElement.classList.remove('bg-red-100');
+        }
+        totalInterestElement.innerHTML = `Tổng lợi nhuận: ${formatNumber(totals[14])} VNĐ`;
+    }
+
+    return true;
+}
+
+
+
+
+function calculatePLTotalsToolbar() {
+    const table = document.getElementById('display-table-records');
+    if (!table) return false;
     const headerRow = table.querySelector('thead tr');
     const revenueColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Doanh thu");
     const revenueIndex = revenueColumn ? Array.from(headerRow.children).indexOf(revenueColumn) : -1;
@@ -792,9 +876,9 @@ function calculatePLTotals() {
 
 
     // Display the sum in this innerText
-    const totalRevenueElement = document.getElementById('total-revenue')
-    const totalCostElement = document.getElementById('total-cost')
-    const totalInterestElement = document.getElementById('total-interest')
+    const totalRevenueElement = document.getElementById('total-revenue-toolbar')
+    const totalCostElement = document.getElementById('total-cost-toolbar')
+    const totalInterestElement = document.getElementById('total-interest-toolbar')
 
     if (totalInterest < 0) {
         totalInterestElement.classList.add('text-red-700');
@@ -815,6 +899,7 @@ up.compiler('#display-table-records', function (table) {
             for (const mutation of mutationsList) {
                 if (mutation.type === 'childList') {
                     calculatePLTotals();
+                    calculatePLTotalsToolbar();
                 }
             }
         });
@@ -822,6 +907,26 @@ up.compiler('#display-table-records', function (table) {
     }
 
 })
+
+
+
+up.compiler('#display-table-records', function (table) {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('ConstructionReportPL') || currentUrl.includes('vehicle_revenue')) {
+        // Calculate totals initially
+        calculatePLTotals();
+
+        // Set up observer to recalculate when table content changes
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    calculatePLTotals();
+                }
+            }
+        });
+        observer.observe(table, { childList: true, subtree: true });
+    }
+});
 
 
 function adjustDisplayRecordsHeight() {
@@ -836,20 +941,26 @@ function adjustDisplayRecordsHeight() {
 
 
     let newDisplayRecordsHeight = currentDisplayRecordsHeight - (bodyHeight - viewportHeight);
-    // console.log(newDisplayRecordsHeight)
+    console.log(newDisplayRecordsHeight)
     displayRecords.style.height = `${newDisplayRecordsHeight - bottomMargin}px`;
 }
 
 
 up.compiler('#display-records', function (display) {
     adjustDisplayRecordsHeight();
+    // Delay 1 second
+    setTimeout(function () {
+        adjustDisplayRecordsHeight();
+        // load-more opacity = 100
+        document.getElementById('load-more').classList.remove('opacity-0');
+        document.getElementById('load-more').classList.add('opacity-100');
+    }, 1);
 });
 window.addEventListener("resize", adjustDisplayRecordsHeight);
 
 
-
-up.compiler('button[type="submit"]', function(button) {
-    button.addEventListener('click', function(e) {
+up.compiler('button[type="submit"]', function (button) {
+    button.addEventListener('click', function (e) {
         const form = button.closest('form'); // Find the form containing the button
 
         if (!form.checkValidity()) {
@@ -870,12 +981,15 @@ up.compiler('button[type="submit"]', function(button) {
         this.classList.add('disabled');
         this.style.opacity = '0.5';
         this.innerHTML = 'Đang xử lý...';
+
+
+
     });
-}); 
+});
 
 
 
-up.compiler('#modal-message', function(el) {
+up.compiler('#modal-message', function (el) {
     // revert all button submit "Đang xử lý ..." to normal function
     enableSubmitButton();
 });

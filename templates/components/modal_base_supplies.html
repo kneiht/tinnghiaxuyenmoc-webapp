@@ -29,17 +29,30 @@
                         <div id="repair-part-cards" class="flex flex-wrap justify-center gap-6 px-6 h-fit overflow-y-scroll">
                             {% for estimation in estimations %}
                             <div class="relative card-supply card-supply-{{ estimation.base_supply.id }} bg-gray-50 dark:bg-gray-700 border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl" style="width: 15rem;" > 
-                                <div class="absolute top-20 w-full flex flex-row justify-center gap-1.5">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng dự toán">
+                                
+                                <div class="absolute top-5  w-full px-10 flex flex-col justify-center gap-1.5">
+                                    <span class="inline-flex justify-center items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng dự toán">
                                         <i class="fas fa-clipboard-list mr-1.5"></i>
+                                        <span class="mr-1">Dự toán</span>
                                         <span class="font-bold">{{ estimation.get_estimate_quantity }}</span>
                                         <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
                                     </span>
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
+
+
+                                    <span class="inline-flex justify-center items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
                                         <i class="fas fa-shopping-cart mr-1.5"></i>
+                                        <span class="mr-1">Thực nhận</span>
+                                        <span class="receiced_quantity font-bold">{{ estimation.get_received_quantity }}</span>
+                                        <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
+                                    </span>
+
+                                    <span class="inline-flex justify-center items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm" title="Số lượng có thể đặt">
+                                        <i class="fas fa-shopping-cart mr-1.5"></i>
+                                        <span class="mr-1">Có thể đặt</span>
                                         <span class="orderable font-bold">{{ estimation.get_orderable_quantity }}</span>
                                         <span class="ml-1 opacity-80">{{ estimation.base_supply.unit }}</span>
                                     </span>
+
                                 </div>
 
                                 <div class="input-supply absolute top-28 w-full hidden flex flex-row justify-center">
@@ -51,7 +64,15 @@
                                         <input type="number" name="supply_quantity" value="0" min="0" max="{{ estimation.get_orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
                                         <input type="hidden" name="estimate_quantity" value="{{ estimation.get_estimate_quantity }}">
                                         <input type="hidden" name="orderable_quantity" value="{{ estimation.get_orderable_quantity }}">
-
+                                        <script>
+                                            // Check if the input is more than max, alert
+                                            document.currentScript.parentElement.querySelector('input[name="supply_quantity"]').addEventListener('input', function(){
+                                                if (parseFloat(this.value) > parseFloat(this.max)) {
+                                                    alert('Số lượng đặt không được vượt quá số lượng có thể đặt');
+                                                    this.value = this.max;
+                                                }
+                                            })
+                                        </script>
                                     </div>
                                 </div>
 

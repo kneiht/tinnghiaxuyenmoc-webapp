@@ -2109,12 +2109,24 @@ def form_cost_estimation_table(request, project_id):
         # Delete old records after appending the necessary records
         old_cost_estimations.delete()
 
+        # Add Vật tư phụ/ Biện pháp thi công to the list of cost_estimation_list
+        # Create a BaseSupply instance for "Vật tư phụ/ Biện pháp thi công"
+        auxiliary_supplies = BaseSupply.objects.filter(material_type="Vật tư phụ/ Biện pháp thi công")
+        for auxiliary_supply in auxiliary_supplies:
+            cost_estimation_list.append(
+                CostEstimation(
+                    project=project,
+                    base_supply=auxiliary_supply,
+                    quantity=999999,
+                    note="Tự động thêm vào dự toán",
+                )
+            )
         # Save the records
         for cost_estimation in cost_estimation_list:
             cost_estimation.save()
 
         return render_modal(
-            project_id, message="Cập nhật thành công", message_type="green"
+            project_id, message='Cập nhật thành công. \n\n Lưu ý: "Tất cả Vật tư phụ/ Biện pháp thi công được tự động thêm vào dự toán với số lượng 999.999" ', message_type="green"
         )
 
 

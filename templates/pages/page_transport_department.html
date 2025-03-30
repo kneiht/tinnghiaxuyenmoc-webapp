@@ -56,13 +56,13 @@
 
         {% elif sub_page == 'ConstructionDriverSalary' %}
             <div id="load-elements" up-defer="insert" up-cache="True"
-            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}"
+            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' check_month=check_month group_by='driver' tab='driver_salary' elements='tool_bar|display_records' %}">
                 <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
             </div>
 
         {% elif sub_page == 'ConstructionReportPL' %}
             <div id="load-elements" up-defer="insert" up-cache="True"
-            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_revenue' elements='tool_bar|display_records' %}"
+            up-href="{% url 'load_elements' %}?q={% encode_params page='page_transport_department' model='VehicleOperationRecord' start_date=start_date end_date=end_date tab='vehicle_revenue' elements='tool_bar|display_records' %}">
                 <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
             </div>
 

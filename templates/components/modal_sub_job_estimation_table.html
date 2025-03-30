@@ -52,9 +52,22 @@
                             </span>
                         </div>
                     {% endif %}
+                    
+                    <!-- Job Type Filter Tabs -->
+                    <div class="tabs-container mb-4">
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <button class="job-type-tab btn btn-sm btn-outline active" data-filter="all">Tất cả công việc</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Hạ tầng kỹ thuật">Hạ tầng kỹ thuật</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Giao thông">Giao thông</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Dân dụng và công nghiệp">Dân dụng và công nghiệp</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Thủy lợi">Thủy lợi</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Điện trung hạ thế">Điện trung hạ thế</button>
+                            <button class="job-type-tab btn btn-sm btn-outline" data-filter="Điện chiếu sáng">Điện chiếu sáng</button>
+                        </div>
+                    </div>
 
                     <div class="w-full overflow-scroll">
-                        <table
+                        <table id="sub-job-estimation-table"
                             class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
                             {% if not update %}
                             <thead>
@@ -92,8 +105,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 <div id="tool-bar">

@@ -441,6 +441,9 @@ class CostEstimation(BaseModel):
         return self.quantity
 
     def get_orderable_quantity(self):
+        # If marterial_type is "Vật tư phụ / Biện pháp thi công", return 999999
+        if self.material_type == "Vật tư phụ / Biện pháp thi công":
+            return 9999999
         # Get all supply orders for this project and supply
         existing_orders = SupplyOrderSupply.objects.filter(
             supply_order__project=self.project, base_supply=self.base_supply
@@ -474,6 +477,9 @@ class CostEstimation(BaseModel):
             supply_order__project=self.project, base_supply=self.base_supply
         )
         total_received = sum(order.received_quantity for order in existing_orders)
+        for order in existing_orders:
+            print("order", order, order.received_quantity)
+        print("total_received", total_received)
         return total_received
 
 
@@ -747,6 +753,9 @@ class SupplyOrder(BaseModel):
         return supply_order_supply_dict
 
 
+
+
+
 class SupplyOrderSupply(BaseModel):
     vietnamese_name = "Vật tư trong phiếu đặt"
     RECEIVED_STATUS_CHOICES = (
@@ -891,6 +900,14 @@ class SupplyPaymentRecord(BaseModel):
         blank=True,
         verbose_name="Người tạo phiếu",
     )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Dự án",
+    )
+
     supply_order = models.ForeignKey(
         SupplyOrder,
         on_delete=models.CASCADE,
@@ -968,6 +985,7 @@ class SupplyPaymentRecord(BaseModel):
     @classmethod
     def get_display_fields(self):
         fields = [
+            "project",
             "supply_order",
             "provider",
             "status",
@@ -987,6 +1005,8 @@ class SupplyPaymentRecord(BaseModel):
         return [field for field in fields if hasattr(self, field)]
 
     def save(self, *args, **kwargs):
+        self.project = self.supply_order.project
+
         # Update status based on amounts
         if self.requested_amount > 0:
             self.status = "requested"

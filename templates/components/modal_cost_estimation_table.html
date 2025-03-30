@@ -52,9 +52,30 @@
                             </span>
                         </div>
                     {% endif %}
+                    
+                    <!-- Material Type Filter Tabs -->
+                    <div class="tabs-container mb-4">
+                        <div class="flex flex-wrap justify-center gap-2 mb-2">
+                            <button class="material-tab btn btn-sm btn-outline active" data-filter="all">Tất cả vật tư</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư thông thường">Vật tư thông thường</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư sắt thép">Vật tư sắt thép</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư cát, đá, xi măng">Vật tư cát, đá, xi măng</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư bê tông">Vật tư bê tông</button>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư nhựa">Vật tư nhựa</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư điện">Vật tư điện</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư nước">Vật tư nước</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Cây xanh">Cây xanh</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư đặc thù">Vật tư đặc thù</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư biển báo, cọc tiêu, cơ khí">Vật tư biển báo, cọc tiêu, cơ khí</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư phụ/ Biện pháp thi công">Vật tư phụ/ Biện pháp thi công</button>
+                            <button class="material-tab btn btn-sm btn-outline" data-filter="Vật tư gồm nhân công thi công">Vật tư gồm nhân công thi công</button>
+                        </div>
+                    </div>
 
                     <div class="w-full overflow-scroll">
-                        <table
+                        <table id="cost-estimation-table"
                             class="table-auto w-full overflow-hidden border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
                             {% if not update %}
                             <thead>
@@ -92,10 +113,7 @@
             </div>
         </div>
     </div>
-
-
 </div>
-
 <div id="tool-bar">
 
 </div>

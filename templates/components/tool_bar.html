@@ -141,6 +141,8 @@
                             <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
                             <script>
                                 document.getElementById('start_date').addEventListener('change', function() {
+                                    // Change inner html in the element display_records
+                                    document.getElementById('display-records').innerHTML = '<p class="text-green-600 text-center text-2xl my-10">Đang tải dữ liệu ...</p>';   
                                     // Press search-button
                                     document.getElementById('search-button').click();
                                 });
@@ -149,6 +151,8 @@
                                 <input id="check_month" type="month" name="check_month" value="{{ check_month }}" class="form-input w-fit">
                                 <script>
                                     document.getElementById('check_month').addEventListener('change', function() {
+                                        // Change inner html in the element display_records
+                                        document.getElementById('display-records').innerHTML = '<p class="text-green-600 text-center text-2xl my-10">Đang tải dữ liệu ...</p>';   
                                         // Press search-button
                                         document.getElementById('search-button').click();
                                     });

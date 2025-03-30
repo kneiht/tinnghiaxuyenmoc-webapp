@@ -31,7 +31,7 @@ class VehicleType(BaseModel):
     class Meta:
         ordering = ['vehicle_type']
     vehicle_type = models.CharField(max_length=255, verbose_name="Loại xe", unique=True)
-    allowed_to_display_in_revenue_table = models.CharField( max_length=20, choices=ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES , default="Cho phép", verbose_name="Cho phép hiển thị trong bảng P&L")
+    allowed_to_display_in_revenue_table = models.CharField( max_length=20, choices=ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES , default="Cho phép", verbose_name="Cho phép lấy dữ liệu GPS")
     note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
     created_at = models.DateTimeField(default=timezone.now)
     

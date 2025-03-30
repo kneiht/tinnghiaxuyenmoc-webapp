@@ -941,16 +941,22 @@ function adjustDisplayRecordsHeight() {
 
 
     let newDisplayRecordsHeight = currentDisplayRecordsHeight - (bodyHeight - viewportHeight);
-    // console.log(newDisplayRecordsHeight)
+    console.log(newDisplayRecordsHeight)
     displayRecords.style.height = `${newDisplayRecordsHeight - bottomMargin}px`;
 }
 
 
 up.compiler('#display-records', function (display) {
     adjustDisplayRecordsHeight();
+    // Delay 1 second
+    setTimeout(function () {
+        adjustDisplayRecordsHeight();
+        // load-more opacity = 100
+        document.getElementById('load-more').classList.remove('opacity-0');
+        document.getElementById('load-more').classList.add('opacity-100');
+    }, 1);
 });
 window.addEventListener("resize", adjustDisplayRecordsHeight);
-
 
 
 up.compiler('button[type="submit"]', function (button) {
