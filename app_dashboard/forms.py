@@ -1152,16 +1152,16 @@ class VehicleMaintenanceForm(forms.ModelForm):
             ),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        print("\n\n>>>>>>>>>>>>>>>>> before clean", cleaned_data)
-        # For each empty field, use the existing value
-        if self.instance and self.instance.pk:
-            for field_name in self.fields:
-                if not cleaned_data.get(field_name):
-                    cleaned_data[field_name] = getattr(self.instance, field_name)
-        print("\n\n>>>>>>>>>>>>>>>>> after clean", cleaned_data)
-        return cleaned_data
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     print("\n\n>>>>>>>>>>>>>>>>> before clean", cleaned_data)
+    #     # For each empty field, use the existing value
+    #     if self.instance and self.instance.pk:
+    #         for field_name in self.fields:
+    #             if not cleaned_data.get(field_name):
+    #                 cleaned_data[field_name] = getattr(self.instance, field_name)
+    #     print("\n\n>>>>>>>>>>>>>>>>> after clean", cleaned_data)
+    #     return cleaned_data
 
 
 class RepairPartForm(forms.ModelForm):

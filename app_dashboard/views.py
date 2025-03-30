@@ -156,13 +156,18 @@ def handle_form(request, model, pk=0):
     form = form_class(request.POST, request.FILES, instance=instance)
 
     # Add missing data if there's an instance
+    # Add missing data if there's an instance
     if instance:
         post_data = request.POST.copy()
         for field_name in form_class.Meta.fields:
             if not post_data.get(field_name) and hasattr(instance, field_name):
                 field_value = getattr(instance, field_name)
                 if field_value:
-                    post_data[field_name] = field_value
+                    # Check if field_value is a model instance and convert to ID
+                    if hasattr(field_value, 'pk'):
+                        post_data[field_name] = field_value.pk
+                    else:
+                        post_data[field_name] = field_value
         form = form_class(post_data, request.FILES, instance=instance)
 
     # Delete and restore
