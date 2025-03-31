@@ -1097,7 +1097,7 @@ class VehicleMaintenanceForm(forms.ModelForm):
                 attrs={
                     "placeholder": "Chọn xe",
                     "class": "form-input auto-field",
-                    # "required": "required",
+                    "required": "required",
                     "disabled": "disabled",
                 }
             ),
@@ -1121,18 +1121,16 @@ class VehicleMaintenanceForm(forms.ModelForm):
                 attrs={
                     "placeholder": "Ngày nhận sửa chữa",
                     "class": "form-input auto-field",
-                    # "required": "required",
+                    "required": "required",
                     "type": "date",
-                    "disabled": "disabled",
                 }
             ),
             "to_date": forms.DateInput(
                 attrs={
                     "placeholder": "Ngày xong sửa chữa",
                     "class": "form-input auto-field",
-                    # "required": "required",
+                    "required": "required",
                     "type": "date",
-                    "disabled": "disabled",
                 }
             ),
             "approval_status": forms.Select(
@@ -2433,4 +2431,135 @@ class SubJobPaymentRecordForm(forms.ModelForm):
                     "style": "height: 80px;",
                 }
             ),
+        }
+
+
+class ProjectPaymentRequestForm(forms.ModelForm):
+    class Meta:
+        model = ProjectPaymentRequest
+        fields = [
+            'request_number',
+            'request_date', 
+            'requester_name',
+            'department',
+            'position',
+            'amount',
+            'note',
+            'project',
+            'payment_method',
+            'recipient_name',
+            'bank_name',
+            'account_number', 
+            'account_holder',
+            'approval_status'
+        ]
+        
+        labels = {
+            'request_number': 'Số đề nghị',
+            'request_date': 'Ngày đề nghị',
+            'requester_name': 'Người đề nghị',
+            'department': 'Bộ phận',
+            'position': 'Chức vụ',
+            'amount': 'Số tiền đề nghị',
+            'note': 'Lý do thanh toán',
+            'project': 'Công trình',
+            'payment_method': 'Hình thức thanh toán',
+            'recipient_name': 'Người nhận',
+            'bank_name': 'Ngân hàng',
+            'account_number': 'Số tài khoản',
+            'account_holder': 'Chủ tài khoản',
+            'approval_status': 'Trạng thái'
+        }
+
+        widgets = {
+            'request_number': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập số đề nghị',
+                    'class': 'form-input',
+                    'type': 'text',
+                    'required':'required'
+                }
+            ),
+            'request_date': forms.DateInput(
+                attrs={
+                    'class': 'form-input',
+                    'type': 'date',
+                    'required': 'required'
+                }
+            ),
+            'requester_name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập tên người đề nghị',
+                    'class': 'form-input',
+                    'required': 'required'
+                }
+            ),
+            'department': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập bộ phận',
+                    'class': 'form-input',
+                    'required': 'required'
+                }
+            ),
+            'position': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập chức vụ',
+                    'class': 'form-input',
+                    'required': 'required'
+                }
+            ),
+            'amount': forms.NumberInput(
+                attrs={
+                    'placeholder': 'Nhập số tiền',
+                    'class': 'form-input text-2xl',
+                    'required': 'required'
+                }
+            ),
+            'note': forms.Textarea(
+                attrs={
+                    'placeholder': 'Nhập lý do thanh toán',
+                    'class': 'form-input h-20',
+                    'required': 'required',
+                    'rows': 2
+                }
+            ),
+            'payment_method': forms.Select(
+                attrs={
+                    'class': 'form-input',
+                    'required': 'required'
+                },
+                choices=ProjectPaymentRequest.PAYMENT_METHOD_CHOICES
+            ),
+            'recipient_name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập tên người nhận',
+                    'class': 'form-input',
+                    'required': 'required'
+                }
+            ),
+            'bank_name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập tên ngân hàng',
+                    'class': 'form-input'
+                }
+            ),
+            'account_number': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập số tài khoản',
+                    'class': 'form-input'
+                }
+            ),
+            'account_holder': forms.TextInput(
+                attrs={
+                    'placeholder': 'Nhập tên chủ tài khoản',
+                    'class': 'form-input'
+                }
+            ),
+            'approval_status': forms.Select(
+                attrs={
+                    'class': 'form-input',
+                    'required': 'required'
+                },
+                choices=ProjectPaymentRequest.STATUS_CHOICES
+            )
         }

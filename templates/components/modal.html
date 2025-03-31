@@ -176,6 +176,21 @@
                                     
                                 </div>
                         </div>
+                        {% elif field.name == 'approval_status' and model == 'ProjectPaymentRequest' %}
+                        <div class="">
+                            <div>
+                                <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
+                                {{ field }}    
+                            
+                                {% if field.help_text %}
+                                    <p class="text-blue-500 px-3">{{ field.help_text }}</p>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p class="text-red-500 px-3">{{ error }}</p>
+                                {% endfor %}
+                                
+                            </div>
+                        </div>
                         {% endif %}
                     {% endfor %}
 

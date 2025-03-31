@@ -228,10 +228,35 @@
         {% endif %}
 
         {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" %}
+
+        {% comment %} <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
+            class="flex flex-row whitespace-nowrap gap-2">
+            {% csrf_token %}
+            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
+                accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
+            <input type="hidden" name="project" value="{{ project_id }}">
+            <button class="btn btn-primary" id="upload-button">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Upload excel </span>
+            </button>
+        </form>
+
+
+        <!-- download_backup.html -->
+        <a href="{% url 'download_excel' model %}"  class="whitespace-nowrap">
+            {% csrf_token %}
+            <button class="btn btn-primary">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Download excel </span>
+            </button>
+        </a> {% endcomment %}
+
+
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="me-3"> {{ create_new_button_name }} </span>
         </a>
+    
         {% endif %} 
 
         <!-- {% if display_trashcan %}

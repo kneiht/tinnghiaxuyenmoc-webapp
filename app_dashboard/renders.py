@@ -37,7 +37,7 @@ def render_title_bar(request, **kwargs):
         context["title"] = translate(f"{project.name}")
 
     if model != "Job":
-        context["create_new_button_name"] = translate(f"Thêm {model}")
+        context["create_new_button_name"] = "Thêm dữ liệu mới"
 
     # Render
     template = "components/title_bar.html"
@@ -86,7 +86,7 @@ def render_tool_bar(request, **kwargs):
         "display_trashcan": display_trashcan,
     }
     if model not in ["VehicleOperationRecord"]:
-        context["create_new_button_name"] = translate(f"Thêm {model}")
+        context["create_new_button_name"] = "Thêm dữ liệu mới"
     # Render
     template = "components/tool_bar.html"
     return render_to_string(template, context, request)
@@ -436,7 +436,7 @@ def render_form(request, **kwargs):
     context = {
         "submit_button_name": "Cập nhật" if record else "Tạo mới",
         "title": (
-            translate(f"Cập nhật {model}") if record else translate(f"Tạo {model} mới")
+            "Cập nhật dữ liệu" if record else translate(f"Tạo dữ liệu mới")
         ),
         "form_url": reverse("handle_form", kwargs={"model": model, "pk": pk}),
         "model": model,

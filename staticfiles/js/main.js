@@ -777,10 +777,26 @@ function calculatePLTotals() {
     });
 
     // Function to extract numeric value from a cell
+    // const extractNumber = (text) => {
+    //     if (!text) return 0;
+    //     return parseFloat(text.replace(/[^0-9.-]+/g, '')) || 0;
+    // };
+
+    // Function to extract numeric value from a cell
     const extractNumber = (text) => {
         if (!text) return 0;
-        return parseFloat(text.replace(/[^0-9.-]+/g, '')) || 0;
+        
+        // Find all numbers in the text (including negative numbers)
+        const numbers = text.match(/-?[\d,]+(\.\d+)?/g) || [];
+        
+        // Sum all found numbers
+        return numbers.reduce((sum, numStr) => {
+            // Convert each number string to a float
+            const value = parseFloat(numStr.replace(/[^0-9.-]+/g, '')) || 0;
+            return sum + value;
+        }, 0);
     };
+
 
     // Calculate totals for each column
     rows.forEach(row => {

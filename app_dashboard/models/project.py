@@ -71,3 +71,70 @@ class ProjectUser(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
+
+
+class ProjectPaymentRequest(BaseModel):
+    allow_display = True
+    vietnamese_name = "Đề xuất thanh toán"
+    
+    PAYMENT_METHOD_CHOICES = (
+        ('cash', 'Tiền mặt'),
+        ('personal_transfer', 'Chuyển khoản cá nhân'),
+        ('company_transfer', 'Chuyển khoản công ty'),
+    )
+    
+    STATUS_CHOICES = (
+        ('scratch', 'Bảng nháp'),
+        ('wait_for_approval', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('rejected', 'Từ chối'),
+        ('paid', 'Đã thanh toán'),
+    )
+    
+    request_number = models.CharField(max_length=50, verbose_name="Số đề nghị", unique=True)
+    request_date = models.DateField(default=timezone.now, verbose_name="Ngày đề nghị")
+    requester_name = models.CharField(max_length=255, verbose_name="Người đề nghị")
+    department = models.CharField(max_length=255, verbose_name="Bộ phận")
+    position = models.CharField(max_length=255, verbose_name="Chức vụ")
+    amount = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="Số tiền đề nghị")
+    note = models.TextField(verbose_name="Lý do thanh toán")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Công trình", related_name="payment_requests")
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, verbose_name="Hình thức thanh toán")
+    recipient_name = models.CharField(max_length=255, verbose_name="Người nhận")
+    
+    # Bank information (for transfers)
+    bank_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Ngân hàng")
+    account_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="Số tài khoản")
+    account_holder = models.CharField(max_length=255, blank=True, null=True, verbose_name="Chủ tài khoản")
+    
+    # Approval information
+    approval_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Trạng thái")
+    
+    # Timestamps
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"Đề nghị thanh toán #{self.request_number} - {self.requester_name} - {self.amount}"
+    
+    class Meta:
+        ordering = ['-request_date', '-created_at']
+        
+    def clean(self):
+        # Only allow changes to status if update
+        if self.pk:
+            original = ProjectPaymentRequest.objects.get(pk=self.pk)
+            # iterate through all fields and check if they are changed
+            for field in self._meta.fields:
+                if field.name not in ['approval_status']:
+                    if getattr(self, field.name) != getattr(original, field.name):
+                        raise ValidationError(f"Chỉ có thể thay đổi trạng thái của đề nghị thanh toán sau khi tạo phiếu. \n Vui lòng xóa và tạo lại phiếu khác nếu cần thay đổi thông tin.")
+
+        # Validate that bank information is provided for bank transfers
+        if self.payment_method in ['personal_transfer', 'company_transfer']:
+            if not self.bank_name or not self.account_number or not self.account_holder:
+                raise ValidationError("Thông tin ngân hàng là bắt buộc cho hình thức chuyển khoản")
+                
+    @classmethod
+    def get_display_fields(self):
+        return ['project', 'request_number', 'request_date', 'approval_status', 'requester_name', 'amount'
+                , 'payment_method', 'recipient_name' ]

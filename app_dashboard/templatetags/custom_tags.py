@@ -118,7 +118,7 @@ def format_display(record, field=None):
             return "Không cho phép"
 
 
-    if field in {'unit_price', 'total_amount'}:
+    if field in {'unit_price', 'total_amount', 'amount'}:
         return "{:,}".format(int(value))
     
     _type = type(value)

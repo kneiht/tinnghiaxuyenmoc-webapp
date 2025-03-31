@@ -474,6 +474,11 @@ class RepairPart(BaseModel):
                 fields.remove(field)
         return fields
 
+    def clean(self):
+        # if update => not allow to update
+        if self.pk:
+            raise ValidationError("Vui lòng xóa phụ tùng này và tạo mới vì phụ tùng không cho thay đổi thông tin.")
+        super().clean()
 
 class VehicleMaintenanceRepairPart(BaseModel):
     vietnamese_name = "Phụ tùng trong phiếu sửa chữa"
