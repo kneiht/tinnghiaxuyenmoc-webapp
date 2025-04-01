@@ -900,8 +900,8 @@ function calculatePLTotalsToolbar() {
         totalInterestElement.classList.add('text-red-700');
         totalInterestElement.classList.add('bg-red-100');
     }
-    totalRevenueElement.innerHTML = `Tổng doanh thu: ${formatNumber(totalRevenue)} VNĐ`;
-    totalInterestElement.innerHTML = `Tổng lợi nhuận: ${formatNumber(totalInterest)} VNĐ`;
+    totalRevenueElement.innerHTML = `Tổng doanh thu: ${formatNumber(totalRevenue.toFixed(0))} VNĐ`;
+    totalInterestElement.innerHTML = `Tổng lợi nhuận: ${formatNumber(totalInterest.toFixed(0))} VNĐ`;
 
 };
 

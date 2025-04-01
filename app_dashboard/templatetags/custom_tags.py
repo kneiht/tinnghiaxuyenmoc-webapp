@@ -144,12 +144,14 @@ def calculate_vehicle_part_total_purchase(vehice_parts):
     return format_money(total)
 
 
+def format_money_PL(value):
+    number = value
+    return "{:,.2f}".format(number)
+
 @register.filter(name='format_money')
 def format_money(value):
     numner = get_valid_int(value)
     return "{:,}".format(numner)
-
-
 
 
 @register.filter
@@ -572,6 +574,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name):
 
 
 
+
 # TAGS FOR VEHICLE OPERATION RECORD
 @register.inclusion_tag('components/calculate_revenue_report.html')
 def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_date, select_end_date, update=False):
@@ -619,7 +622,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         vehicle_instance = VehicleDetail.objects.get(gps_name=gps_name)
         vehicle_revenue_inputs_record = VehicleRevenueInputs.objects.filter(vehicle_type=vehicle_instance.vehicle_type)
         for input_record in vehicle_revenue_inputs_record:
-            revenue_base_display += "- " + input_record.valid_from.strftime("%d/%m/%Y") + ": " + str(format_money(input_record.revenue_day_price)) + " VND - " + str(input_record.number_of_hours) + " giờ" + "\n"
+            revenue_base_display += "- " + input_record.valid_from.strftime("%d/%m/%Y") + ": " + str(format_money_PL(input_record.revenue_day_price)) + " VND - " + str(input_record.number_of_hours) + " giờ" + "\n"
         revenue_base_display = revenue_base_display.strip();
         
         # Because the revenue is different for each day, so we need to calculate revenue for each day
@@ -717,20 +720,20 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
                 monthly_salary = salary_data['data']['monthly_salary']['total_monthly_salary']
                 hourly_salary = salary_data['data']['hourly_salary']['total_hourly_salary']
                 total_cost += monthly_salary + hourly_salary
-                monthly_salary = format_money(monthly_salary)
-                hourly_salary = format_money(hourly_salary)
+                monthly_salary = format_money_PL(monthly_salary)
+                hourly_salary = format_money_PL(hourly_salary)
                 monthly_salary_display += f'- {driver.full_name}: {monthly_salary}\n'
                 hourly_salary_display = f'- {driver.full_name}: {hourly_salary}\n'
             
         total_revenue = revenue
         if type(revenue_base) != str:
-            revenue_base = format_money(revenue_base)
+            revenue_base = format_money_PL(revenue_base)
 
         if type(revenue) != str:
-            revenue = format_money(revenue)
+            revenue = format_money_PL(revenue)
         
         if type(total_revenue) != str: 
-            total_interest = format_money(total_revenue - total_cost)
+            total_interest = format_money_PL(total_revenue - total_cost)
         else:
             total_interest = total_revenue
 
@@ -741,14 +744,14 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             "Lịch sử đơn giá": revenue_base_display,
             "Số giờ làm": round(total_working_hours, 2),
             "Doanh thu": revenue,
-            "Nhiên liệu": format_money(fuel_filling_cost_amount),  
-            "Nhớt": format_money(other_filling_cost_amount),  
-            "Sửa xe + mua vật tư": format_money(maintenance_amount),
-            "Khấu hao xe": format_money(depreciation_amount),
-            "Lãi ngân hàng": format_money(bank_interest_amount),
+            "Nhiên liệu": format_money_PL(fuel_filling_cost_amount),  
+            "Nhớt": format_money_PL(other_filling_cost_amount),  
+            "Sửa xe + mua vật tư": format_money_PL(maintenance_amount),
+            "Khấu hao xe": format_money_PL(depreciation_amount),
+            "Lãi ngân hàng": format_money_PL(bank_interest_amount),
             "Lương cơ bản": monthly_salary_display.strip(),
             "Lương theo giờ": hourly_salary_display.strip(),
-            "Tổng chi phí": format_money(total_cost),
+            "Tổng chi phí": format_money_PL(total_cost),
             "Lợi  nhuận": total_interest,
             "Ghi chú": "",
             "row_id": f"row-{vehicle_instance.pk}"
