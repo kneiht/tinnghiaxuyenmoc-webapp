@@ -1,6 +1,6 @@
 import datetime
 
-
+from django.apps import apps
 from datetime import timedelta
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -69,10 +69,13 @@ def render_tool_bar(request, **kwargs):
     else:
         display_trashcan = True
 
+    model_class = apps.get_model('app_dashboard', model)
     context = {
         "page": page,
         "sub_page": sub_page,
         "model": model,
+        "excel_downloadable": model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False,
+        "excel_uploadable": model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False,
         "project_id": project_id,
         "check_date": (
             check_date if check_date else datetime.now().date().strftime("%Y-%m-%d")

@@ -15,6 +15,8 @@ from PIL import Image
 
 class BaseModel(models.Model):
     allow_display = False
+    excel_downloadable = False
+    excel_uploadable = False
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
     archived = models.BooleanField(default=False)
 

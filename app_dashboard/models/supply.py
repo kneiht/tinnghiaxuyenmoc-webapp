@@ -12,6 +12,20 @@ from django.core.exceptions import ValidationError
 class SupplyProvider(BaseModel):
     allow_display = True
     vietnamese_name = "Nhà cung cấp vật tư"
+    excel_downloadable = True
+    excel_uploadable = True
+    excel_columns = [
+        "name",
+        "phone_number",
+        "address",
+        "bank_name",
+        "account_number",
+        "account_holder_name",
+        "total_purchase_amount",
+        "total_transferred_amount",
+        "total_outstanding_debt",
+        "note",
+    ]
     # Driver Information Fields
     name = models.CharField(
         max_length=255, verbose_name="Tên nhà cung cấp", unique=True
