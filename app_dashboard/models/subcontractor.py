@@ -11,6 +11,8 @@ from django.core.exceptions import ValidationError
 
 class SubContractor(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Tổ đội/ Nhà thầu phụ"
 
     # Driver Information Fields
@@ -103,6 +105,7 @@ class SubContractor(BaseModel):
 
 class SubJobBrand(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Thương hiệu công việc"
     name = models.CharField(max_length=255, verbose_name="Tên thương hiệu", unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
@@ -126,6 +129,8 @@ class SubJobBrand(BaseModel):
 
 class BaseSubJob(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Công việc của tổ đội/ nhà thầu phụ"
 
     JOB_TYPE_CHOICES = (
@@ -247,6 +252,8 @@ class BaseSubJob(BaseModel):
 
 class DetailSubJob(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Công việc chi tiết của tổ đội/ nhà thầu phụ"
 
     class Meta:
@@ -338,6 +345,7 @@ class DetailSubJob(BaseModel):
 
 class SubJobEstimation(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Dự toán công việc tổ đội/ nhà thầu phụ"
 
     class Meta:
@@ -482,6 +490,7 @@ class SubJobEstimation(BaseModel):
 
 class SubJobOrder(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Đặt công việc"
 
     APPROVAL_STATUS_CHOICES = (
@@ -878,6 +887,7 @@ class SubJobOrderSubJob(BaseModel):
 
 class SubJobPaymentRecord(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Thanh toán công việc"
 
     class Meta:

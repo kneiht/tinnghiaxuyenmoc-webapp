@@ -1,6 +1,6 @@
 {% load custom_tags %}
 
-<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5">
+<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5 mt-3">
     <!-- Toolbar for database interactions -->
     <div class="flex flex-row items-end gap-5">
        
@@ -220,38 +220,41 @@
     
     <div class="flex flex-row items-end gap-5">
 
-        {% if page == 'page_each_project' and model == "Job" %}
+        {% comment %} {% if page == 'page_each_project' and model == "Job" %}
         <button id="excel-button" class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
             <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
             <span class="me-3"> Excel </span>
         </button>
-        {% endif %}
+        {% endif %} {% endcomment %}
 
         {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" %}
 
-        {% if excel_uploadable %}
+        {% if excel_uploadable and request.user.is_superuser %}
         <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
             <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
                 accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
-            <input type="hidden" name="project" value="{{ project_id }}">
+            <input type="hidden" name="project_id" value="{{ project_id }}">
             <button class="btn btn-primary" id="upload-button">
-                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Upload excel </span>
+                <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span> Upload </span>         
             </button>
-        </form>
+        </form> 
         {% endif %}
 
         {% if excel_downloadable %}
-        <a href="{% url 'download_excel' model %}"  class="whitespace-nowrap">
+        <form action="{% url 'download_excel' model %}" method="post" enctype="multipart/form-data" id="download-form"
+            class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
-            <button class="btn btn-primary">
-                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span class="me-3"> Download excel </span>
+            <input type="hidden" name="project_id" value="{{ project_id }}">
+            <button class="btn btn-primary" id="download-button">
+                <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span> Download </span>         
             </button>
-        </a>
-        {% endif %}
+        </form> 
+
+        {% endif %} 
 
 
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
@@ -281,7 +284,7 @@
 
 </div>
 
-{% if page == 'page_each_project' %}
+{% comment %} {% if page == 'page_each_project' %}
 <div id="extra-tool-bar" class="flex justify-center hidden">
     <div class="hidden" id="project-id" data-id="{{ project_id }}"></div>
     <div class="card w-fit p-5 mb-4 flex flex-row justify-center items-center gap-4">
@@ -315,4 +318,4 @@
     </div>
 
 </div>
-{% endif %}
+{% endif %} {% endcomment %}

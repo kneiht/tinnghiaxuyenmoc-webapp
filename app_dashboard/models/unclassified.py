@@ -23,6 +23,8 @@ def get_valid_date(date):
 
 class VehicleType(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Loại xe"
     ALLOWED_TO_DISPLAY_IN_REVENUE_TABLE_CHOICES = (
         ('Cho phép', 'Cho phép'),
@@ -50,6 +52,8 @@ class VehicleType(BaseModel):
 
 class StaffData(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Thông tin nhân viên"
     STATUS_CHOICES = (
         ('active', 'Đang làm việc'),
@@ -103,6 +107,8 @@ class StaffData(BaseModel):
 
 class VehicleRevenueInputs(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "DL tính doanh thu" 
     class Meta:
         ordering = ['vehicle_type']
@@ -154,6 +160,8 @@ class VehicleRevenueInputs(BaseModel):
 
 class DriverSalaryInputs(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "DL tính lương xe cơ giới"    
     class Meta:
         ordering = ['driver']
@@ -211,6 +219,8 @@ class DriverSalaryInputs(BaseModel):
 
 class VehicleDetail(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Xe chi tiết"    
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, verbose_name="Loại xe")
     license_plate = models.CharField(max_length=255, verbose_name="Biển kiểm soát", default="",  unique=True)
@@ -243,6 +253,8 @@ class VehicleDetail(BaseModel):
 
 class DumbTruckPayRate(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "DL tính lương xe ben"    
     xe = models.ForeignKey(
         VehicleDetail,
@@ -289,6 +301,8 @@ class DumbTruckPayRate(BaseModel):
 
 class DumbTruckRevenueData(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "DL tính DT xe ben"    
     # Choices for 'Loại chạy'
     LOAI_CHAY_CHOICES = [
@@ -354,6 +368,8 @@ class DumbTruckRevenueData(BaseModel):
 
 class Location(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Địa điểm"    
     TYPE_OF_LOCATION_CHOICES = [
         ('du_an', 'Dự án/công trình'),
@@ -386,6 +402,8 @@ class Location(BaseModel):
 
 class NormalWorkingTime(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Thời gian làm việc"    
     # gotta get valid normal working time based on the valid date so that old data can be updated (from a button click manually)
     class Meta:
@@ -442,6 +460,8 @@ class NormalWorkingTime(BaseModel):
 
 class Holiday(BaseModel):  
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Ngày lễ"    
     class Meta:
         ordering = ['-date']
@@ -474,6 +494,7 @@ class Holiday(BaseModel):
 
 class VehicleOperationRecord(BaseModel):
     allow_display = True
+    
     vietnamese_name = "DL HĐ xe công trình / ngày"
     SOURCE_CHOICES = [
         ('gps', 'GPS'),
@@ -599,6 +620,8 @@ class VehicleOperationRecord(BaseModel):
 
 class LiquidUnitPrice(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Đơn giá nhiên liệu/nhớt"
     TYPE_CHOICES = [
         ('diesel', 'Dầu diesel (lít)'),
@@ -650,6 +673,8 @@ class LiquidUnitPrice(BaseModel):
 
 class FillingRecord(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "LS đổ nhiên liệu/nhớt"    
     class Meta:
         ordering = ['-fill_date']
@@ -703,6 +728,8 @@ class FillingRecord(BaseModel):
 
 class VehicleDepreciation(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Khấu hao xe"    
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     depreciation_amount = models.IntegerField(verbose_name="Khấu hao theo ngày", default=0, validators=[MinValueValidator(0)])
@@ -735,6 +762,8 @@ class VehicleDepreciation(BaseModel):
 
 class VehicleBankInterest(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Lãi ngân hàng"    
     vehicle = models.ForeignKey(VehicleDetail, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xe")
     interest_amount = models.IntegerField(verbose_name="Lãi suất theo ngày", default=0, validators=[MinValueValidator(0)])

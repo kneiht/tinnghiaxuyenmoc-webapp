@@ -37,7 +37,7 @@ def render_title_bar(request, **kwargs):
         context["title"] = translate(f"{project.name}")
 
     if model != "Job":
-        context["create_new_button_name"] = "Thêm dữ liệu mới"
+        context["create_new_button_name"] = "Thêm mới"
 
     # Render
     template = "components/title_bar.html"
@@ -89,7 +89,7 @@ def render_tool_bar(request, **kwargs):
         "display_trashcan": display_trashcan,
     }
     if model not in ["VehicleOperationRecord"]:
-        context["create_new_button_name"] = "Thêm dữ liệu mới"
+        context["create_new_button_name"] = "Thêm mới"
     # Render
     template = "components/tool_bar.html"
     return render_to_string(template, context, request)

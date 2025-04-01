@@ -116,6 +116,8 @@ class SupplyProvider(BaseModel):
 
 class SupplyBrand(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Thương hiệu vật tư"
     name = models.CharField(max_length=255, verbose_name="Tên thương hiệu", unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
@@ -150,6 +152,9 @@ class DetailSupplyKey:
 class BaseSupply(BaseModel):
     allow_display = True
     vietnamese_name = "Vật tư"
+    excel_downloadable = True
+    excel_uploadable = True
+
     MATERIAL_CHOICES = (
         ("Vật tư thông thường", "Vật tư thông thường"),
         ("Vật tư sắt thép", "Vật tư sắt thép"),
@@ -259,6 +264,8 @@ class BaseSupply(BaseModel):
 
 class DetailSupply(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Vật tư chi tiết"
 
     class Meta:
@@ -504,6 +511,7 @@ class CostEstimation(BaseModel):
 
 class SupplyOrder(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Đặt vật tư"
 
     APPROVAL_STATUS_CHOICES = (
@@ -891,6 +899,7 @@ class SupplyOrderSupply(BaseModel):
 
 class SupplyPaymentRecord(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Thanh toán vật tư"
 
     class Meta:

@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 class VehicleMaintenance(BaseModel):
 
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Sửa Chữa"
 
     MAINTENANCE_CATEGORY_CHOICES = (
@@ -332,6 +333,8 @@ class MaintenanceImage(BaseModel):
 
 class PartProvider(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "NCC phụ tùng (sửa chữa)"
     # Driver Information Fields
     name = models.CharField(
@@ -418,6 +421,8 @@ class PartProvider(BaseModel):
 
 class RepairPart(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Phụ tùng (sửa chữa)"
 
     class Meta:
@@ -556,6 +561,7 @@ class VehicleMaintenanceRepairPart(BaseModel):
 
 class PaymentRecord(BaseModel):
     allow_display = True
+    excel_downloadable = True
     vietnamese_name = "Thanh toán (sửa chữa)"
 
     class Meta:

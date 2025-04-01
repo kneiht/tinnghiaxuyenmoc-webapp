@@ -13,6 +13,10 @@ from .project import Project
 class Job(SecondaryIDMixin, BaseModel):
     allow_display = True
     vietnamese_name = "Công việc trong dự án"
+    excel_downloadable = True
+    excel_uploadable = True
+
+
     class Meta:
         verbose_name = "Công việc trong dự án"
     STATUS_CHOICES = (
@@ -22,7 +26,7 @@ class Job(SecondaryIDMixin, BaseModel):
         ('pending', 'Tạm hoãn'),
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress", verbose_name="Trạng thái")
-    price_code = models.CharField(max_length=255, default="", verbose_name="Mã hiệu đơn giá")
+    # price_code = models.CharField(max_length=255, default="", verbose_name="Mã hiệu đơn giá")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=1000, verbose_name="Tên công việc")
     category = models.CharField(max_length=1000, default="Chưa phân loại", verbose_name="Danh mục")
@@ -59,7 +63,7 @@ class Job(SecondaryIDMixin, BaseModel):
                 original_job.quantity != self.quantity or
                 original_job.category != self.category
             ):
-                errors += "- Không thể thay đổi thông tin công việc đã có kế hoạch tuần hoặc báo cáo ngày.\n"
+                errors += "- Không thể thay đổi thông tin công việc đã có kế hoạch tuần hoặc báo cáo ngày. \n- Ngoại trừ: Ghi chú, Ngày bắt đầu và Ngày kết thúc công việc.\n"
 
         if self._state.adding:
             if Job.objects.filter(project=self.project, name=self.name, category=self.category).exists():

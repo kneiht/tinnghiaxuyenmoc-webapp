@@ -8,6 +8,8 @@ from .base import models, BaseModel
 
 class Project(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Dự án"    
     STATUS_CHOICES = (
         ('not_started', 'Chưa bắt đầu'),
@@ -75,7 +77,10 @@ class ProjectUser(BaseModel):
 
 class ProjectPaymentRequest(BaseModel):
     allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
     vietnamese_name = "Đề xuất thanh toán"
+    
     
     PAYMENT_METHOD_CHOICES = (
         ('cash', 'Tiền mặt'),
