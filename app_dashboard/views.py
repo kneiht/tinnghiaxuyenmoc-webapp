@@ -902,8 +902,9 @@ def load_elements(request):
         elif element == "weekplan_table":
             project_id = get_valid_id(params.get("project_id", 0))
             check_date = get_valid_date(params.get("check_date", ""))
+            html_tool_bar = '<div up-hungry id="tool-bar"></div>'
             html_weekplan_table = render_weekplan_table(request, project_id, check_date)
-            html += html_weekplan_table
+            html += html_weekplan_table + html_tool_bar
 
     return HttpResponse(html)
 

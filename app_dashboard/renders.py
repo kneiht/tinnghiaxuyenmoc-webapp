@@ -205,8 +205,8 @@ def render_display_records(request, **kwargs):
     end_date = get_valid_date(params.get("end_date", start_date))
     search_phrase = request.GET.get("all", "")
     filter_vehicle = params.get("filter_vehicle", None)
-    current_page = 0
-    max_page = 0
+    current_page = 1
+    max_page = 1
     if filter_vehicle == "None":
         filter_vehicle = None
 
@@ -374,7 +374,7 @@ def render_display_records(request, **kwargs):
                 record.payment_date = ""
 
     # Add pagination logic for general records
-    if not update and not group_by and model_class not in [VehicleOperationRecord]:
+    if not update and not group_by and model_class not in [VehicleOperationRecord, Job]:
         # Get pagination parameters
         items_per_page = 20  # Adjust this number as needed
         current_page = max(1, get_valid_id(params.get("current_page", 1)))
