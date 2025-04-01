@@ -227,7 +227,7 @@
         </button>
         {% endif %} {% endcomment %}
 
-        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" %}
+        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
 
         {% if excel_uploadable and request.user.is_superuser %}
         <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
