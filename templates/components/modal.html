@@ -4,6 +4,16 @@
         <!-- Modal Content -->
         <div class="relative top-16 mx-4 card h-fit w-full sm:w-fit mb-28  pb-8">
             <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ title }}</h3>
+            
+            {% if form.project.name == 'project' and form.project.value|get_project %}  
+                <div class="mb-3 flex items-center w-full flex-col justify-center">
+                    <h3 class="text-lg font-bold text-green-600  uppercase tracking-wide"> {{ form.project.value|get_project }} </h3>
+                </div>
+            {% elif project_id %}  
+            <div class="mb-3 flex items-center w-full flex-col justify-center">
+                <h3 class="text-lg font-bold text-green-600  uppercase tracking-wide"> {{ project_id|get_project }} </h3>
+            </div>
+            {% endif %}
 
             <button id='cancel-modal' type="button" class="absolute top-5 right-4 btn btn-secondary rounded-full text-nowrap h-6 w-6 text-sm" onclick="document.getElementById('modal-body').remove();">
                 <i class=" fa fa-times" aria-hidden="true"></i>
@@ -238,7 +248,7 @@
                 {% elif modal == "modal_SubJobOrder" %}
                     {% include 'components/modals/extend_sub_job_order_base.html' with role=project|get_project_role:user %}
 
-                {% elif modal == 'modal_PaymentRecord' %}
+                {% elif modal == 'modal_PaymentRecord' or modal == 'modal_SupplyPaymentRecord' or modal == 'modal_SubJobPaymentRecord'  %}
                     {% include 'components/modals/payment_record.html' %}
 
                 {%  endif %}

@@ -21,6 +21,38 @@ def get_valid_date(date):
     return date
 
 
+class Location(BaseModel):
+    allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
+    vietnamese_name = "Địa điểm"    
+    TYPE_OF_LOCATION_CHOICES = [
+        ('du_an', 'Dự án/công trình'),
+        ('kho_noi_bo', 'Kho nội bộ'),
+        ('bat_dong_san_noi_bo', 'Bất động sản nội bộ'),
+        ('khach_hang_dau_ra', 'Khách hàng đầu ra'),
+        ('khach_hang_dau_vao', 'Khách hàng đầu vào'),
+    ]
+    name = models.CharField(max_length=500, verbose_name="Tên địa điểm")
+    address = models.CharField(max_length=1000, verbose_name="Địa chỉ")
+    type_of_location = models.CharField(max_length=255, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại hình")
+    created_at = models.DateTimeField(default=timezone.now)
+    note = models.TextField(blank=True, null=True, default='', verbose_name="Ghi chú")
+    @classmethod
+    def get_display_fields(self):
+        fields = ['name', 'address', 'type_of_location', "note"]
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def __str__(self):
+        return self.name
+
+
+
+
 class VehicleType(BaseModel):
     allow_display = True
     excel_downloadable = True
@@ -366,37 +398,6 @@ class DumbTruckRevenueData(BaseModel):
         return fields
 
 
-class Location(BaseModel):
-    allow_display = True
-    excel_downloadable = True
-    excel_uploadable = True
-    vietnamese_name = "Địa điểm"    
-    TYPE_OF_LOCATION_CHOICES = [
-        ('du_an', 'Dự án/công trình'),
-        ('kho_noi_bo', 'Kho nội bộ'),
-        ('bat_dong_san_noi_bo', 'Bất động sản nội bộ'),
-        ('khach_hang_dau_ra', 'Khách hàng đầu ra'),
-        ('khach_hang_dau_vao', 'Khách hàng đầu vào'),
-    ]
-
-    name = models.CharField(max_length=500, verbose_name="Tên địa điểm")
-    address = models.CharField(max_length=1000, verbose_name="Địa chỉ")
-    type_of_location = models.CharField(max_length=255, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại hình")
-    created_at = models.DateTimeField(default=timezone.now)
-
-    @classmethod
-    def get_display_fields(self):
-        fields = ['name', 'address', 'type_of_location']
-        # Check if the field is in the model
-        for field in fields:
-            if not hasattr(self, field):
-                fields.remove(field)
-        return fields
-    
-    def __str__(self):
-        return self.name
-
-
 
 
 
@@ -544,6 +545,7 @@ class VehicleOperationRecord(BaseModel):
             text += f"    - Note: {self.note}\n"
             text += f"    - Image: {self.image}\n"
             text += f"    - Allow Overtime: {self.allow_overtime}\n"
+            text += f"    - Allow Revenue Overtime: {self.allow_revenue_overtime}\n"
             text += f"    - Fuel Allowance: {self.fuel_allowance}\n"
             text += f"    - Overtime: {self.overtime}\n"
             text += f"    - Normal Working Time: {self.normal_working_time}\n"
@@ -796,4 +798,5 @@ class VehicleBankInterest(BaseModel):
     
     def __str__(self):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
+
 

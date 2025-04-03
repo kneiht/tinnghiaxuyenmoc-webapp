@@ -320,7 +320,8 @@
 
         {% if excel_uploadable and request.user.is_superuser %}
         <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
-            class="flex flex-row whitespace-nowrap gap-2">
+            class="flex flex-row whitespace-nowrap gap-2"
+            up-cache="auto">
             {% csrf_token %}
             <input type="file" class="hidden" id="file" name="file"
                 accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
@@ -329,8 +330,7 @@
                 <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span> Upload </span>         
             </button>
-            <button type="submit" class="btn btn-primary hidden" id="upload-button">
-                <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
+            <button class="hidden" id="upload-button">
                 <span> Submit </span>         
             </button>
         </form> 
@@ -363,25 +363,17 @@
             <span class="me-3"> {{ create_new_button_name }} </span>
         </a>
         {% endif %} 
-
-        <!-- {% if display_trashcan %}
-        <button id="archived-items" class="btn btn-outline text-nowrap" onclick="
-            var archivedInput = document.getElementById('delete');
-            var createNewButton = document.getElementById('create-new');
-            var searchButton = document.getElementById('search-button');
-            archivedInput.value = archivedInput.value === 'true' ? 'false' : 'true';
-            this.classList.toggle('btn-outline');
-            this.classList.toggle('btn-success');
-            this.querySelector('span').innerText = this.querySelector('span').innerText === 'Thùng rác (tắt)' ? 'Thùng rác (bật)' : 'Thùng rác (tắt)';
-            createNewButton.classList.toggle('hidden');
-            searchButton.click();
-        ">
-            <i class="fas fa-trash-can me-3" style="font-size: 16px;"></i>
-            <span class="me-3"> Thùng rác (tắt) </span>
-        </button>
-        {% endif %} -->
+        
+        <!-- Add download button and SheetJS library -->
+         {% if tab == "vehicle_revenue" %}
+        <div>
+            <button onclick="downloadPLTableAsExcel()" class="btn btn-primary text-nowrap">
+                <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                Tải xuống báo cáo
+            </button>
+        </div>
+        {% endif %}
     </div>
-
 </div>
 
 {% comment %} {% if page == 'page_each_project' %}

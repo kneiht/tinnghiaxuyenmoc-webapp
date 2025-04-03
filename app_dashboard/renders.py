@@ -69,8 +69,8 @@ def render_tool_bar(request, **kwargs):
     else:
         display_trashcan = True
 
+    model_class = apps.get_model('app_dashboard', model)
     try:
-        model_class = apps.get_model('app_dashboard', model)
         excel_downloadable = model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False
         excel_uploadable = model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False
     except LookupError:

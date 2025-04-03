@@ -991,3 +991,102 @@ function enableSubmitButton() {
 }
 
 
+function downloadPLTableAsExcel() {
+    const table = document.getElementById('display-table-records');
+    const wb = XLSX.utils.book_new();
+    
+    // Prepare the data array
+    const data = [];
+    
+    // Get both header rows
+    const headerRows = table.querySelectorAll('thead tr');
+    
+    // First row - handle colspan and rowspan
+    const firstRow = [];
+    headerRows[0].querySelectorAll('th').forEach(th => {
+        const colspan = th.getAttribute('colspan') || 1;
+        const rowspan = th.getAttribute('rowspan') || 1;
+        const text = th.textContent.trim();
+        
+        // If rowspan is 2, add to first row only
+        if (rowspan === '2') {
+            firstRow.push(text);
+        } 
+        // If colspan is > 1, repeat the header
+        else if (colspan > 1) {
+            for (let i = 0; i < colspan; i++) {
+                firstRow.push(text);
+            }
+        }
+        // Normal cell
+        else {
+            firstRow.push(text);
+        }
+    });
+    data.push(firstRow);
+    
+    // Second row - align with first row structure
+    const secondRow = Array(firstRow.length).fill('');
+    let currentIndex = 0;
+    headerRows[0].querySelectorAll('th').forEach(th => {
+        const rowspan = th.getAttribute('rowspan') || 1;
+        if (rowspan === '2') {
+            currentIndex++;
+        }
+    });
+    
+    headerRows[1].querySelectorAll('th').forEach(th => {
+        secondRow[currentIndex] = th.textContent.trim();
+        currentIndex++;
+    });
+    data.push(secondRow);
+    
+    // Get data rows
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const rowData = Array.from(row.querySelectorAll('td')).map(cell => cell.textContent.trim());
+        if (rowData.length > 1) { // Skip loading rows
+            data.push(rowData);
+        }
+    });
+    
+    // Get footer
+    const footerRow = table.querySelector('tfoot tr');
+    if (footerRow) {
+        const footerData = Array.from(footerRow.querySelectorAll('td')).map(cell => cell.textContent.trim());
+        data.push(footerData);
+    }
+    
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // Set column widths and styles
+    const colWidths = firstRow.map(() => ({ wch: 15 }));
+    ws['!cols'] = colWidths;
+    
+    // Merge cells for headers with colspan and rowspan
+    ws['!merges'] = [];
+    let colIndex = 0;
+    headerRows[0].querySelectorAll('th').forEach(th => {
+        const colspan = parseInt(th.getAttribute('colspan') || 1);
+        const rowspan = parseInt(th.getAttribute('rowspan') || 1);
+        
+        if (colspan > 1 || rowspan > 1) {
+            ws['!merges'].push({
+                s: { r: 0, c: colIndex },
+                e: { r: rowspan - 1, c: colIndex + colspan - 1 }
+            });
+        }
+        colIndex += colspan;
+    });
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Báo cáo doanh thu");
+    
+    // Get current date for filename
+    const today = new Date();
+    const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    
+    // Download the file
+    XLSX.writeFile(wb, `Bao-cao-P&L-${date}.xlsx`);
+}

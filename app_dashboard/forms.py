@@ -71,6 +71,7 @@ class ProjectForm(forms.ModelForm):
         fields = [
             "name",
             "status",
+            "address",
             "image",
             "func_source",
             "description",
@@ -81,6 +82,7 @@ class ProjectForm(forms.ModelForm):
         labels = {
             "name": "Tên dự án",
             "status": "Trạng thái",
+            "address": "Địa chỉ",
             "func_source": "Nguồn vốn",
             "description": "Mô tả",
             "image": "Hình ảnh",
@@ -92,6 +94,13 @@ class ProjectForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "placeholder": "Nhập tên dự án",
+                    "required": "required",
+                    "class": "form-input",
+                }
+            ),
+            "address": forms.TextInput(
+                attrs={
+                    "placeholder": "Nhập địa chỉ",
                     "required": "required",
                     "class": "form-input",
                 }
@@ -861,11 +870,12 @@ class DumbTruckRevenueDataForm(forms.ModelForm):
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["name", "address", "type_of_location"]
+        fields = ["name", "address", "type_of_location", "note"]
         labels = {
             "name": "Tên địa điểm",
             "address": "Địa chỉ",
             "type_of_location": "Loại hình",
+            "note": "Ghi chú",
         }
         widgets = {
             "name": forms.TextInput(
@@ -884,6 +894,12 @@ class LocationForm(forms.ModelForm):
             ),
             "type_of_location": forms.Select(
                 attrs={"class": "form-input", "required": "required"}
+            ),
+            "note": forms.TextInput(
+                attrs={
+                    "placeholder": "Nhập ghi chú",
+                    "class": "form-input",
+                }
             ),
         }
 
@@ -2108,6 +2124,7 @@ class SupplyPaymentRecordForm(forms.ModelForm):
     class Meta:
         model = SupplyPaymentRecord
         fields = [
+            "project",
             "supply_order",
             "provider",
             "requested_amount",
@@ -2311,6 +2328,7 @@ class SubJobPaymentRecordForm(forms.ModelForm):
     class Meta:
         model = SubJobPaymentRecord
         fields = [
+            "project",
             "sub_job_order",
             "sub_contractor",
             "requested_amount",

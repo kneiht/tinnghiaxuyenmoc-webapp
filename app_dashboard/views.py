@@ -1176,6 +1176,9 @@ def handle_vehicle_operation_form(request):
             record.allow_overtime = (
                 False if not form.get(f"allow_overtime_{id}", False) else True
             )
+            record.allow_revenue_overtime = (
+                False if not form.get(f"allow_revenue_overtime_{id}", False) else True
+            )
             if record.source == "manual":
                 try:
                     # duration seconds
@@ -1243,7 +1246,7 @@ def handle_vehicle_operation_form(request):
                 else True
             )
             allow_revenue_overtime_new = (
-                True
+                False
                 if not form.get(f"allow_revenue_overtime_new_{new_index}", False)
                 else True
             )
@@ -1284,6 +1287,7 @@ def handle_vehicle_operation_form(request):
             fuel_allowance = get_valid_int(fuel_allowance_new)
             note = note_new
             allow_overtime = allow_overtime_new
+            allow_revenue_overtime = allow_revenue_overtime_new
 
             if not driver:
                 continue
@@ -1301,6 +1305,7 @@ def handle_vehicle_operation_form(request):
                 driver=driver,
                 location=location,
                 allow_overtime=allow_overtime,
+                allow_revenue_overtime=allow_revenue_overtime,
             )
             ids.append(new_record.id)
 

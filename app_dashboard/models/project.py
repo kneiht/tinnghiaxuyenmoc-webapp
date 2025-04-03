@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 
 from .base import models, BaseModel
+from .unclassified import Location
 
 class Project(BaseModel):
     allow_display = True
@@ -19,16 +20,17 @@ class Project(BaseModel):
         ('archived', 'Lưu trữ'),
     )
 
-    name = models.CharField(max_length=1000, default="Dự án chưa được đặt tên")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress")
-    description = models.TextField(blank=True, null=True, default='')
-    image = models.ImageField(upload_to='images/projects/', blank=True, null=True, default='images/default/default_project.webp')
+    name = models.CharField(max_length=1000, default="Dự án chưa được đặt tên", verbose_name="Tên dự án")
+    address = models.CharField(max_length=1000, verbose_name="Địa chỉ", default="Chưa thêm địa chỉ")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_progress", verbose_name="Trạng thái")
+    description = models.TextField(blank=True, null=True, default='', verbose_name="Mô tả")
+    image = models.ImageField(upload_to='images/projects/', blank=True, null=True, default='images/default/default_project.webp', verbose_name="Hình ảnh")
     users = models.ManyToManyField(User, through='ProjectUser')
-    start_date = models.DateField(default=timezone.now)
-    end_date = models.DateField(default=timezone.now)
-    func_source = models.CharField(max_length=255, default="")
+    start_date = models.DateField(default=timezone.now, verbose_name="Ngày bắt đầu")
+    end_date = models.DateField(default=timezone.now, verbose_name="Ngày kết thúc")
+    func_source = models.CharField(max_length=255, default="", verbose_name="Nguồn vốn")
     created_at = models.DateTimeField(default=timezone.now)
-
+    location = models.OneToOneField(Location, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Địa điểm (dùng để cập nhật địa điểm)")
     class Meta:
         ordering = ['name']
 
@@ -43,6 +45,42 @@ class Project(BaseModel):
             'in_progress': self.job_set.filter(status='in_progress').count(),
             'pending': self.job_set.filter(status='pending').count(),
         }
+
+    def save(self, *args, **kwargs):
+        # Create a new location or update the existing one
+        if not self.pk:
+            # Create a new location
+            location = Location.objects.create(
+                name=self.name,
+                address=self.address,
+                type_of_location='du_an',
+                note="Được tạo tự động từ Dự Án",
+            )
+            location.save()
+            self.location = location
+        else:
+            # Update the existing location
+            if self.location:
+                self.location.name = self.name
+                self.location.address = self.address
+                self.location.type_of_location = 'du_an'
+                self.location.note = "Được tạo tự động từ Dự Án"
+                self.location.save()
+
+            else:
+                # Create a new location
+                location = Location.objects.create(
+                    name=self.name,
+                    address=self.address,
+                    type_of_location='du_an',
+                    note="Được tạo tự động từ Dự Án",
+                )
+                location.save()
+                self.location = location
+        # Save the project
+        super().save(*args, **kwargs)
+
+
 
 
 class ProjectUser(BaseModel):

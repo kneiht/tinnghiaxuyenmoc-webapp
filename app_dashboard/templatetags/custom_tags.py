@@ -111,12 +111,11 @@ def format_display(record, field=None):
         seconds = value % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
 
-    if field == 'allow_overtime':
+    if field == 'allow_overtime' or field == 'allow_revenue_overtime':
         if value:
             return "Cho phép"
         else:
             return "Không cho phép"
-
 
     if field in {'unit_price', 'total_amount', 'amount'}:
         return "{:,}".format(int(value))
@@ -212,31 +211,41 @@ def calculate_total_operation_time(vehicle_operation_records, gps_name):
     drivers = vehicle_operation_records.filter(driver__isnull=False).values_list('driver', flat=True).distinct()
     unique_values = set(drivers)
     
+
     driver_working_times = []
+    unallowed_revenue_overtime = 0
     for driver in unique_values:
         total_normal_woring_time = 0
         total_overtime = 0
         filtered_records = vehicle_operation_records.filter(driver=driver)
         for filtered_record in filtered_records:
             normal_woring_time, overtime = filtered_record.calculate_working_time()
+
+            if not filtered_record.allow_revenue_overtime:
+                unallowed_revenue_overtime += overtime
+
             if not filtered_record.allow_overtime:
                 overtime = 0
 
             total_normal_woring_time += normal_woring_time
             total_overtime += overtime
-        
+
         driver_working_times.append({
             'driver': StaffData.objects.get(pk=driver).full_name,
             'total_normal_woring_time': format_time(total_normal_woring_time),
             'total_overtime': format_time(total_overtime)
         })
 
+    if total_driver_time_seconds == None:
+        total_driver_time_seconds = 0
+    if total_vehicle_time_seconds == None:
+        total_vehicle_time_seconds = 0
 
     data = {
         "total_vehicle_time": format_time(total_vehicle_time_seconds),
-        "total_driver_time": format_time(total_driver_time_seconds),
+        "total_driver_time": format_time(total_driver_time_seconds - unallowed_revenue_overtime),
         "total_vehicle_time_seconds": total_vehicle_time_seconds,
-        "total_driver_time_seconds": total_driver_time_seconds,
+        "total_driver_time_seconds": total_driver_time_seconds - unallowed_revenue_overtime,
         "gps_name": gps_name,
         "driver_working_times": driver_working_times
     }
@@ -620,7 +629,6 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         seconds = time_seconds % 60
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
     
-
     rows = []
     # Use vehicle_operation_records to get 2 capped dates
     min_start_date = datetime.strptime(select_start_date, '%Y-%m-%d').date()
@@ -665,6 +673,12 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             vehicle_records_with_driver_for_date = vehicle_records_with_driver.filter(start_time__date=start_date)
             # calculate total time which has driver
             working_time_seconds = vehicle_records_with_driver_for_date.aggregate(models.Sum('duration_seconds'))['duration_seconds__sum']
+            unallowed_revenue_overtime = 0
+            for record in vehicle_records_with_driver_for_date:
+                normal_woring_time, overtime = record.calculate_working_time()
+                if not record.allow_revenue_overtime:
+                    unallowed_revenue_overtime += overtime
+
             if working_time_seconds == None:
                 working_time_seconds = 0
             # Calculate for the case when adding data munally
@@ -677,7 +691,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             #         overtime_seconds = 0
             #     working_time_seconds = normal_working_time_seconds + overtime_seconds
 
-            working_time_hours = working_time_seconds/3600
+            working_time_hours = (working_time_seconds - unallowed_revenue_overtime) /3600
             total_working_hours += working_time_hours
             
             date_vehicle_revenue_inputs_record = VehicleRevenueInputs.get_valid_record(vehicle_instance.vehicle_type, start_date)
@@ -699,8 +713,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
 
         # calculate fuel cost
         filling_records = FillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
-        # print(">>>>>>>>>>>>>>>>>", "From date:", min_start_date, "to date:", max_end_date, "vehicle:", vehicle_instance)
-        # print(">>>>>>>>>>>>>>>>>> filling_records:", filling_records)
+
         if filling_records:
             fuel_filling_cost_amount = filling_records.filter(liquid_type__in=['diesel', 'gasoline']).aggregate(models.Sum('total_amount'))['total_amount__sum']
             other_filling_cost_amount = filling_records.exclude(liquid_type__in=['diesel', 'gasoline']).aggregate(models.Sum('total_amount'))['total_amount__sum']
@@ -881,3 +894,13 @@ def get_field_name_from_verbose(model_name, verbose_name):
         return verbose_name  # Return the verbose name if no match is found
     except Exception:
         return verbose_name
+
+@register.filter(name='get_project')
+def get_project(project_id):
+    """
+    Get project object from project ID
+    """
+    try:
+        return Project.objects.get(id=project_id)
+    except Project.DoesNotExist:
+        return None
