@@ -251,7 +251,15 @@ def calculate_total_operation_time(vehicle_operation_records, gps_name):
 
 
 @register.inclusion_tag('components/calculate_driver_salary.html')
-def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_for_PL=False):
+def calculate_driver_salary(vehicle_operation_records, driver_name, select_start_date=None, select_end_date=None):
+    if not vehicle_operation_records:
+        return {"success": "false",
+                "message": "Không tìm thấy dữ liệu",
+                "driver_name": driver_name
+                }
+
+    # get the list of vehicle
+    vehicles = vehicle_operation_records.values_list('vehicle', flat=True).distinct()
     def get_vehicle_types(vehicle_operation_records):
         records = vehicle_operation_records
         if not records:
@@ -293,7 +301,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_fo
         driver_salary_input = driver_salary_inputs.order_by('-valid_from').first()
         return driver_salary_input
 
-    def calculate_monthly_salary(records, driver_salary_input):
+    def calculate_monthly_salary(records, driver_salary_input, select_start_date=None, select_end_date=None):
         # print debug records
         print("records: ", records)
         if not records:
@@ -306,7 +314,17 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_fo
 
         # Get list of all the dates from start_time of the records then remove duplicates
         working_dates = list(set([record.start_time.date() for record in records]))
-        print("working_dates:", working_dates)
+        # Calculate paid_dates from select_start_date to select_end_date
+        paid_dates = None
+        if select_start_date:
+            paid_dates = []
+            select_start_date = datetime.strptime(select_start_date, "%Y-%m-%d").date()
+            select_end_date = datetime.strptime(select_end_date, "%Y-%m-%d").date()
+            current_paid_date = select_start_date
+            while current_paid_date <= select_end_date:
+                paid_dates.append(current_paid_date)
+                current_paid_date += timedelta(days=1)
+
         SUNDAY = 6
         count_days_of_month = 0
         count_sundays_of_month = 0
@@ -317,14 +335,8 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_fo
 
         count_working_days = 0
 
-        if calculate_for_PL:
-            # Tính cho trường hợp lượng trong ngày
-            records = records.order_by('start_time')
-            start_date = records.first().start_time.date()
-            end_date = records.last().start_time.date()
-        else:
-            # Tính cho trường hợp lương trong tháng
-            start_date, end_date = get_start_end_of_the_month(month, year)
+
+        start_date, end_date = get_start_end_of_the_month(month, year)
         # Loop through each day from start_date to end_date
         current_date = start_date
         while current_date <= end_date:
@@ -345,23 +357,33 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_fo
                     if Holiday.is_holiday(current_date):
                         count_holiday_working_days += 1
                     else:
-                        print("Not sunday")
                         count_normal_working_days += 1
             else: # not working day
-                if current_date.weekday() == SUNDAY:
-                    if Holiday.is_holiday(current_date):
-                        pass # Không tính gì cả
+                if paid_dates: # chỉ tính trường hợp này cho PL
+                    if current_date in paid_dates:
+                        if current_date.weekday() == SUNDAY:
+                            if Holiday.is_holiday(current_date):
+                                pass # Không tính gì cả
+                            else: # Not sunday
+                                pass # Không tính gì cả
+                        else: # Not sunday
+                            if Holiday.is_holiday(current_date):
+                                count_normal_working_days += 1
+                            else:
+                                pass # Không tính gì cả
+                else:
+                    if current_date.weekday() == SUNDAY:
+                        if Holiday.is_holiday(current_date):
+                            pass # Không tính gì cả
+                        else: # Not sunday
+                            pass # Không tính gì cả
                     else: # Not sunday
-                        pass # Không tính gì cả
-                else: # Not sunday
-                    if Holiday.is_holiday(current_date):
-                        print("Holiday")
-                        count_normal_working_days += 1
-                    else:
-                        pass # Không tính gì cả
-            print(current_date)
-            print(end_date)
-            print(count_normal_working_days)
+                        if Holiday.is_holiday(current_date):
+                            count_normal_working_days += 1
+                        else:
+                            pass # Không tính gì cả
+                
+
             current_date += timedelta(days=1)
 
 
@@ -547,7 +569,7 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, calculate_fo
                 }
 
     data_hourly_salary = calculate_hourly_salary(vehicle_operation_records, driver_salary_input)
-    data_monthly_salary = calculate_monthly_salary(vehicle_operation_records, driver_salary_input)
+    data_monthly_salary = calculate_monthly_salary(vehicle_operation_records, driver_salary_input, select_start_date, select_end_date)
     total_fixed_allowance = \
         driver_salary_input.fixed_allowance \
         * min(1, data_monthly_salary['count_working_days'] / (data_monthly_salary['count_days_of_month'] - data_monthly_salary['count_sundays_of_month']))
@@ -722,7 +744,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         for driver in drivers:
 
             vehicle_records_per_driver = vehicle_records_with_driver.filter(driver=driver)
-            salary_data = calculate_driver_salary(vehicle_records_per_driver, None, True)
+            salary_data = calculate_driver_salary(vehicle_records_per_driver, None, select_start_date, select_end_date)
             if salary_data['success'] == 'false':
                 monthly_salary = salary_data['message']
                 hourly_salary = salary_data['message']
@@ -750,11 +772,6 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         else:
             total_profit = total_revenue
             
-
-        print(">>>>>>>>>>>>>", select_start_date, select_end_date)
-        print(">>>>>>>>>>>>>", salary_data)
-
-
 
         rows.append({
             "STT": len(rows) + 1,
