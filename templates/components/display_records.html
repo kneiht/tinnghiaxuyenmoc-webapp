@@ -20,7 +20,7 @@
 
 {% endif %}
 
-
+{% if not update  %}
 <div up-hungry id="load-more" class="flex justify-center items-center gap-4 my-4 pagination-container {% if current_page == 1 %} opacity-0 {% endif %}">
     {% if max_page >= 2 %}
     {% if current_page > 1 %}
@@ -125,9 +125,5 @@
             checkExtraInfo();
         }
     </script>
-
 </div>
-
-
-
-
+{% endif %}
