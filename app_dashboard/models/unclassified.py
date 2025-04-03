@@ -524,6 +524,9 @@ class VehicleOperationRecord(BaseModel):
     
     # add over time
     allow_overtime = models.BooleanField(verbose_name="Cho phép tính lương tăng ca", default=False)
+    # add over time
+    allow_revenue_overtime = models.BooleanField(verbose_name="Cho phép tính doanh thu tăng ca", default=True)
+
 
     def __str__(self):
         return f'{self.vehicle} - {self.start_time} - {self.end_time}'
@@ -559,7 +562,7 @@ class VehicleOperationRecord(BaseModel):
     @classmethod
     def get_display_fields(self):
         fields = ['vehicle', 'start_time', 'end_time', 'duration_seconds', 'source', 
-                  'driver', 'location', 'normal_working_time', 'overtime', 'allow_overtime', 'fuel_allowance', 'image', 'note']
+                  'driver', 'location', 'normal_working_time', 'overtime', 'allow_overtime', 'allow_revenue_overtime','fuel_allowance', 'image', 'note']
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):

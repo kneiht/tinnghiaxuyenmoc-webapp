@@ -1242,6 +1242,14 @@ def handle_vehicle_operation_form(request):
                 if not form.get(f"allow_overtime_new_{new_index}", False)
                 else True
             )
+            allow_revenue_overtime_new = (
+                True
+                if not form.get(f"allow_revenue_overtime_new_{new_index}", False)
+                else True
+            )
+
+
+
             try:
                 # duration seconds
                 duration_seconds_str = duration_seconds_new

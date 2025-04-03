@@ -152,6 +152,12 @@
                                                 <span class="display {{ record|get_value:field }}">{{ record|format_display:field }}</span>
                                                 <input type="checkbox" name="{{ field }}_{{ record.pk }}" class="form-input input hidden" {% if record|get_value:field %}checked{% endif %}>
 
+                                            {% elif field == 'allow_revenue_overtime' %}
+                                                <span class="display {{ record|get_value:field }}">{{ record|format_display:field }}</span>
+                                                <input type="checkbox" name="{{ field }}_{{ record.pk }}" class="form-input input hidden" {% if record|get_value:field %}checked{% endif %}>
+
+
+
                                             {% else %}
                                                 {{ record|format_display:field }}
                                             {% endif %} 
@@ -235,6 +241,12 @@
                                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                                         <div class="flex flex-row">
                                             <input disabled type="checkbox" name="allow_overtime_new" class="form-input input hidden" id="id_allow_overtime_new"/>
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                                        <div class="flex flex-row">
+                                            <input disabled type="checkbox" name="allow_revenue_overtime_new" class="form-input input hidden" id="id_allow_revenue_overtime_new"/>
                                         </div>
                                     </td>
 
