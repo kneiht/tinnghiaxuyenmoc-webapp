@@ -702,32 +702,10 @@ function filterTable(cell, filterText) {
     });
     document.getElementById('current-filter-text').innerText = 'Đang lọc: ' + filterText;
     document.getElementById('current-filter').classList.remove('hidden');
-
-    // Process for table PaymentRecord
-    totalRequestedAmountDisplay();
 }
 
-function totalRequestedAmountDisplay() {
-    const table = document.getElementById('display-table-records');
-    const headerRow = table.querySelector('thead tr');
-    const requestedAmountColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Số tiền đề nghị");
-    const requestedAmountIndex = requestedAmountColumn ? Array.from(headerRow.children).indexOf(requestedAmountColumn) : -1;
-    if (requestedAmountIndex !== -1) {
-        // Get all rows in <tbody>
-        const rows = table.querySelectorAll('tbody tr');
-        // Calculate sum of the values in that column
-        let sum = 0;
-        rows.forEach(row => {
-            if (row.style.display !== "none") { // Only sum rows that are visible
-                const cell = row.children[requestedAmountIndex];
-                if (cell) {
-                    const value = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, '')); // Remove non-numeric characters
-                    if (!isNaN(value)) {
-                        sum += value;
-                    }
-                }
-            }
-        });
+function totalRequestedAmountDisplay(sum) {
+    console.log("Tổng tiền đề nghị: " + sum);
         // humanize sum
         sum = formatNumber(sum);
         // Display the sum in this innerText
@@ -736,15 +714,7 @@ function totalRequestedAmountDisplay() {
             extraInfoElement.innerHTML = `Tổng tiền đề nghị: ${sum} VNĐ`;
         }
     };
-};
 
-up.compiler('#display-table-records', function (table) {
-    const headerRow = table.querySelector('thead tr');
-    const requestedAmountColumn = Array.from(headerRow.children).find(th => th.textContent.trim() === "Số tiền đề nghị");
-    if (requestedAmountColumn) {
-        totalRequestedAmountDisplay();
-    }
-})
 
 
 
@@ -1019,3 +989,5 @@ function enableSubmitButton() {
         button.innerHTML = button.getAttribute('original-text') || 'Xác nhận';
     });
 }
+
+

@@ -4,16 +4,18 @@
 
 
 <div id="display-records" class="w-full overflow-scroll mt-4">
+    
     <table id="display-table-records" class="relative table-auto w-full border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
         <thead class="sticky top-0">
             <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 {% for header in headers %}
-                    <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                    <th class="px-6 py-3 text-left font-semibold cursor-pointer">
+                        {{ header }}
+                    </th>
                 {% endfor %}
-
-                    <th></th>
+                <th></th>
             </tr>
         </thead>
         {% endif %}
@@ -26,19 +28,18 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             
                         {% if 'status' in field  %} 
-                            <span onclick="filterTable(this, '{{ record|format_display:field }}')"
-                                class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">
+                            <a  class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"
+                                up-target="#display-records, #load-more:maybe"
+                                href="{% url 'load_elements' %}?q={% encode_params page=page model=model start_date=start_date end_date=end_date check_date=check_date check_month=check_month group_by=group_by tab=tab elements='display_records' project_id=project_id %}{% for field_name, value in search_queries.items %}&{{ field_name }}={{ value }}{% endfor %}&sort={{sort}}&{{field}}={{ record|format_display:field }}">
                                 {{ record|format_display:field }}
-                            </span>
+                            </a>
                 
                         {% elif field == 'lock' %} 
-                            {% if record|get_value:field == True  %} 
-                            <span onclick="filterTable(this, 'Phiếu đã khóa')"
-                                    class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Đã khóa</span>
-                            {% else %}
-                            <span onclick="filterTable(this, 'Phiếu chưa khóa')"
-                                    class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">Chưa khóa</span>
-                            {% endif %}
+                            <a class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"
+                               up-target="#display-records, #load-more:maybe"
+                               href="{% url 'load_elements' %}?q={% encode_params page=page model=model start_date=start_date end_date=end_date check_date=check_date check_month=check_month group_by=group_by tab=tab elements='display_records' project_id=project_id %}{% for field_name, value in search_queries.items %}&{{ field_name }}={{ value }}{% endfor %}&sort={{sort}}&{{field}}={{ record|format_display:field }}">
+                                {% if record|get_value:field == True %}Đã khóa{% else %}Chưa khóa{% endif %}
+                            </a>
 
                         {% elif field == 'image' and record.image %} 
                             <div class="relative group">

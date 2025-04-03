@@ -25,10 +25,11 @@
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-xs text-gray-700 dark:text-gray-300 text-nowrap whitespace-pre-line">
                             
                         {% if 'status' in field  %} 
-                            <span onclick="filterTable(this, '{{ record|format_display:field }}')"
-                                class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap">
+                            <a class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"
+                                up-target="#display-records, #load-more:maybe"
+                                href="{% url 'load_elements' %}?q={% encode_params page=page model=model start_date=start_date end_date=end_date check_date=check_date check_month=check_month group_by=group_by tab=tab elements='display_records' project_id=project_id %}{% for field_name, value in search_queries.items %}&{{ field_name }}={{ value }}{% endfor %}&sort={{sort}}&{{field}}={{ record|get_value:field }}">
                                 {{ record|format_display:field }}
-                            </span>
+                            </a>
                 
                         {% else %}
                             {{ record|format_display:field }}

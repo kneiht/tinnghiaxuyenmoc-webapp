@@ -239,7 +239,6 @@ class BaseSupply(BaseModel):
                 provider = SupplyProvider.objects.get(pk=provider)
                 brand = SupplyBrand.objects.get(pk=brand)
                 provider_and_brands.append((provider, brand))
-        print("provider_and_brands", provider_and_brands)
         return provider_and_brands
 
     def get_list_of_detail_supplies_of_a_provider_and_a_brand(self, provider, brand):
@@ -250,7 +249,6 @@ class BaseSupply(BaseModel):
 
     def get_dict_of_detail_supplies(self):
         provider_and_brands = self.get_provider_and_brands()
-        print("provider_and_brands")
 
         detail_supply_dict = {}
         for provider, brand in provider_and_brands:
@@ -503,9 +501,7 @@ class CostEstimation(BaseModel):
             supply_order__project=self.project, base_supply=self.base_supply
         )
         total_received = sum(order.received_quantity for order in existing_orders)
-        for order in existing_orders:
-            print("order", order, order.received_quantity)
-        print("total_received", total_received)
+
         return total_received
 
 
@@ -757,7 +753,7 @@ class SupplyOrder(BaseModel):
         order_supplies = SupplyOrderSupply.objects.filter(
             supply_order=self, base_supply__isnull=False
         )
-        print(order_supplies)
+
         return order_supplies
 
     def get_supply_order_detail_supply_list(self):

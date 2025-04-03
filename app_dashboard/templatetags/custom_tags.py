@@ -661,9 +661,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             revenue_base = date_vehicle_revenue_inputs_record.revenue_day_price
             date_revenue = (date_vehicle_revenue_inputs_record.revenue_day_price/date_vehicle_revenue_inputs_record.number_of_hours)*working_time_hours
             revenue += date_revenue
-            # print(">>>>>>>>>>>>>>>>>> revenue_based:", revenue_base)
-            # print(">>>>>>>>>>>>>>>>>> date_revenue:", date_revenue)
-            # print(">>>>>>>>>>>>>>>>>> revenue:", revenue)
+
 
         # calculate fuel cost
         filling_records = FillingRecord.objects.filter(vehicle=vehicle_instance, fill_date__gte=min_start_date, fill_date__lte=max_end_date)
@@ -694,6 +692,8 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
         
 
         total_cost = fuel_filling_cost_amount + other_filling_cost_amount + maintenance_amount + depreciation_amount + bank_interest_amount
+
+        
         monthly_salary_display = ""
         hourly_salary_display = ""
         
@@ -714,7 +714,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
                 monthly_salary = salary_data['message']
                 hourly_salary = salary_data['message']
                 monthly_salary_display += f'- {driver.full_name}: {monthly_salary}\n'
-                hourly_salary_display = f'- {driver.full_name}: {hourly_salary}\n'
+                hourly_salary_display += f'- {driver.full_name}: {hourly_salary}\n'
 
             else:
                 monthly_salary = salary_data['data']['monthly_salary']['total_monthly_salary']
@@ -723,7 +723,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
                 monthly_salary = format_money_PL(monthly_salary)
                 hourly_salary = format_money_PL(hourly_salary)
                 monthly_salary_display += f'- {driver.full_name}: {monthly_salary}\n'
-                hourly_salary_display = f'- {driver.full_name}: {hourly_salary}\n'
+                hourly_salary_display += f'- {driver.full_name}: {hourly_salary}\n'
             
         total_revenue = revenue
         if type(revenue_base) != str:
@@ -733,10 +733,10 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             revenue = format_money_PL(revenue)
         
         if type(total_revenue) != str: 
-            total_interest = format_money_PL(total_revenue - total_cost)
+            total_profit = format_money_PL(total_revenue - total_cost)
         else:
-            total_interest = total_revenue
-
+            total_profit = total_revenue
+            
         rows.append({
             "STT": len(rows) + 1,
             "Tên nhận dạng khi mua": vehicle_instance.vehicle_name,
@@ -752,7 +752,7 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             "Lương cơ bản": monthly_salary_display.strip(),
             "Lương theo giờ": hourly_salary_display.strip(),
             "Tổng chi phí": format_money_PL(total_cost),
-            "Lợi  nhuận": total_interest,
+            "Lợi nhuận": total_profit,
             "Ghi chú": "",
             "row_id": f"row-{vehicle_instance.pk}"
         })
@@ -825,5 +825,23 @@ def calculate_total_payment_state(maintenance_record):
         'total_transferred_amount': total_transferred_amount,
         'total_debt_amount': total_debt_amount
     }
-    
-    
+
+
+@register.filter(name='get_verbose_name')
+def get_verbose_name(model_name, field_name):
+    try:
+        model_class = globals()[model_name]
+        return model_class._meta.get_field(field_name).verbose_name
+    except Exception:
+        return field_name
+
+@register.filter(name='get_field_name_from_verbose')
+def get_field_name_from_verbose(model_name, verbose_name):
+    try:
+        model_class = globals()[model_name]
+        for field in model_class._meta.fields:
+            if field.verbose_name == verbose_name:
+                return field.name
+        return verbose_name  # Return the verbose name if no match is found
+    except Exception:
+        return verbose_name

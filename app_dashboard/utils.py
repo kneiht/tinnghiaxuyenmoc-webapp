@@ -453,52 +453,70 @@ def filter_records(request, records, model_class, **kwargs):
         # filter records which has start time 
         records = records.filter(start_time__date__range=[start_date, end_date])
 
-
+    # Get all text fields (CharField and TextField) from the model
+    text_fields = [f.name for f in model_class._meta.fields if isinstance(f, (models.CharField, models.TextField))]
+    foreign_key_fields = [(f.name, f.related_model) for f in model_class._meta.fields if isinstance(f, models.ForeignKey)]
     
-    # Determine the fields to be used as filter options based on the selected page
-    fields = [field.name for field in model_class._meta.get_fields() if 
-                  isinstance(field, (models.CharField, models.TextField))]
+    # Get fields with choices
+    choice_fields = {f.name: dict(f.choices) for f in model_class._meta.fields if f.choices}
 
-    # Add fields from forein keys
-    for field in model_class._meta.get_fields():
-        if isinstance(field, models.ForeignKey):
-            # iterate all fields in foreign key,check if it is a CharField or TextField
-            for foreign_field in field.related_model._meta.get_fields():
-                if isinstance(foreign_field, (models.CharField, models.TextField)):
-                    fields.append(f"{field.name}__{foreign_field.name}")
-
-
-
-
-    # Construct Q objects for filtering
+    # Initialize Q objects for filtering
     combined_query = Q()
+
+    # Handle the 'all' parameter for text search across all fields
     if 'all' in query_params:
-        specified_fields = fields
-        all_fields_query = Q()
-        for value in query_params['all']:
-            if value == '':
-                continue
-            for specified_field in specified_fields:
-                all_fields_query |= Q(**{f"{specified_field}__icontains": value})
-        combined_query &= all_fields_query
-        
-    else:
-        for field, values in query_params.items():
-            if field in fields:
-                try:
-                    model_class._meta.get_field(field)
-                    field_query = Q()
-                    for value in values:
-                        if value == '':
-                            continue
-                        field_query |= Q(**{f"{field}__icontains": value})
-                    combined_query &= field_query
-                except FieldDoesNotExist:
-                    print(f"Ignoring invalid field: {field}")
+        search_term = query_params['all'][0]
+        if search_term:
+            # Create a Q object for text fields
+            text_query = Q()
+            for field in text_fields:
+                text_query |= Q(**{f"{field}__icontains": search_term})
+            
+            # Create a Q object for foreign key fields using their searchable fields
+            fk_query = Q()
+            for field_name, related_model in foreign_key_fields:
+                # Get text fields from related model
+                related_text_fields = [f.name for f in related_model._meta.fields 
+                                     if isinstance(f, (models.CharField, models.TextField))]
+                for related_field in related_text_fields:
+                    fk_query |= Q(**{f"{field_name}__{related_field}__icontains": search_term})
+            
+            combined_query &= (text_query | fk_query)
+
+    # Handle other field-specific filters
+    for param, values in query_params.items():
+        if param not in ["all", "q", "check_month", "start_date", "end_date"] and values[0]:  # Skip empty values
+            if param in choice_fields:
+                # For fields with choices, find any choice value that partially matches the input
+                search_value = values[0].lower()
+                # Try to find a matching choice value (either key or display value)
+                matching_values = [k for k, v in choice_fields[param].items() 
+                                 if search_value in str(k).lower() or search_value in str(v).lower()]
+                if matching_values:
+                    # If matches found, create a query that matches any of the matching values
+                    choice_query = Q()
+                    for value in matching_values:
+                        choice_query |= Q(**{param: value})
+                    combined_query &= choice_query
+                else:
+                    # If no matches in choices, fall back to direct partial matching
+                    combined_query &= Q(**{f"{param}__icontains": search_value})
+            elif param in text_fields:
+                combined_query &= Q(**{f"{param}__icontains": values[0]})
+            elif param in [f[0] for f in foreign_key_fields]:
+                # Get the related model for this field
+                related_model = next(rm for fn, rm in foreign_key_fields if fn == param)
+                # Get text fields from related model
+                related_text_fields = [f.name for f in related_model._meta.fields 
+                                     if isinstance(f, (models.CharField, models.TextField))]
+                # Create a query that searches all text fields in the related model
+                fk_query = Q()
+                for related_field in related_text_fields:
+                    fk_query |= Q(**{f"{param}__{related_field}__icontains": values[0]})
+                combined_query &= fk_query
+
     # Filter records based on the query
     records_filtered = records.filter(combined_query)
-
-
 
     # Fix bug no records when searching driver because driver must be searched in full_name
     if model_class == VehicleOperationRecord:
@@ -513,3 +531,93 @@ def filter_records(request, records, model_class, **kwargs):
             
     return records
 
+
+
+# def filter_records(request, records, model_class, **kwargs):
+#     # Get all query parameters except 'sort' as they are assumed to be field filters
+#     query_params = {k: v for k, v in request.GET.lists() if k != 'sort'} 
+#     if model_class == VehicleOperationRecord:
+#         if 'check_month' not in query_params:
+#             check_month = kwargs.get('check_month', '')
+#         else:
+#             check_month = query_params['check_month'][0]
+        
+
+#         if check_month != '':
+#             year, month = check_month.split('-')
+#             start_date, end_date = get_start_end_of_the_month(int(month), int(year))
+#         else:
+#             # Add start_date and end_date form params to query_params if they are not present
+#             if 'start_date' not in query_params:
+#                 start_date = get_valid_date(kwargs.get('start_date', ''))
+#             else:
+#                 start_date = query_params['start_date'][0]
+
+
+#             if 'end_date' not in query_params:
+#                 end_date = get_valid_date(kwargs.get('end_date', ''))
+#             else:
+#                 end_date = query_params['end_date'][0]
+
+#         # filter records which has start time 
+#         records = records.filter(start_time__date__range=[start_date, end_date])
+
+#     print(query_params)
+    
+#     # Determine the fields to be used as filter options based on the selected page
+#     fields = [field.name for field in model_class._meta.get_fields() if 
+#                   isinstance(field, (models.CharField, models.TextField))]
+
+#     # Add fields from forein keys
+#     for field in model_class._meta.get_fields():
+#         if isinstance(field, models.ForeignKey):
+#             # iterate all fields in foreign key,check if it is a CharField or TextField
+#             for foreign_field in field.related_model._meta.get_fields():
+#                 if isinstance(foreign_field, (models.CharField, models.TextField)):
+#                     fields.append(f"{field.name}__{foreign_field.name}")
+
+#     combined_query = Q()
+#     for field, values in query_params.items():
+#         if field in fields:
+#             try:
+#                 model_class._meta.get_field(field)
+#                 field_query = Q()
+#                 for value in values:
+#                     if value == '':
+#                         continue
+#                     field_query |= Q(**{f"{field}__icontains": value})
+#                 combined_query &= field_query
+#             except FieldDoesNotExist:
+#                 print(f"Ignoring invalid field: {field}")
+#     records_filtered = records.filter(combined_query)
+
+#     # Construct Q objects for filtering
+#     combined_query = Q()
+#     if 'all' in query_params:
+#         specified_fields = fields
+#         all_fields_query = Q()
+#         for value in query_params['all']:
+#             if value == '':
+#                 continue
+#             for specified_field in specified_fields:
+#                 all_fields_query |= Q(**{f"{specified_field}__icontains": value})
+#         combined_query &= all_fields_query
+        
+
+#     # Filter records based on the query
+#     records_filtered = records_filtered.filter(combined_query)
+
+
+
+#     # Fix bug no records when searching driver because driver must be searched in full_name
+#     if model_class == VehicleOperationRecord:
+#         driver_name = request.GET.get('all', [''])
+#         records_have_driver = records.filter(driver__full_name__icontains=driver_name)
+#         records = records_filtered | records_have_driver
+#     else:
+#         records = records_filtered
+
+#     if request.GET.get('sort'):
+#         records = records.order_by(request.GET.get('sort'))
+            
+#     return records

@@ -244,7 +244,7 @@ def handle_form(request, model, pk=0):
                 message_type="red",
             )
             # panic
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
 
             return HttpResponse(html_message)
     elif request.POST.get("archived") == "false":
@@ -2093,7 +2093,7 @@ def form_cost_estimation_table(request, project_id):
 
             # check base_supply
             base_supply = BaseSupply.objects.filter(supply_number=supply_number).first()
-            print(base_supply)
+
             if base_supply:
                 cost_estimation.base_supply = base_supply
             else:
@@ -2259,7 +2259,7 @@ def form_sub_job_cost_estimation_table(request, project_id):
 
             # check base_sub_job
             base_sub_job = BaseSubJob.objects.filter(job_number=job_number).first()
-            print(base_sub_job)
+
             if base_sub_job:
                 cost_estimation.base_sub_job = base_sub_job
             else:

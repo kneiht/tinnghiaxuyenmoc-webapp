@@ -23,14 +23,103 @@
                         <!-- Search bar and filter options -->
                         <div id="search-bar" class="flex h-10 w-[500px]">
                             <!-- Input field for filter values -->
-                            <input id="filter-input" name="all" type="text" placeholder="Nhập để tìm kiếm ..."
+                            <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..."
                                 class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme"
                                 autocomplete="off"/>
+                            
+                            <!-- List of select input for choice field with specific id to switch -->
+                            <div id="choice-selects" class="flex-1 hidden">
+                                {% for field, choices in choice_fields.items %}
+                                    <select id="{{ field }}-select" class="form-input h-full rounded-l-lg rounded-r-none border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme w-full hidden">
+                                        {% for value, label in choices.items %}
+                                            <option value="{{ label }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Field select for filtering -->
+                            <select id="field-select" class="form-input h-full rounded-none border-theme dark:border-gray-600 border-opacity-50 text-theme w-[200px]">
+                                <option value="all" selected>Tất cả</option>
+                                {% for field in filter_fields %}
+                                    <option value="{{ field }}">{{ model|get_verbose_name:field }}</option>
+                                {% endfor %}
+                            </select>
+                        
                             <!-- Button to submit search -->
                             <button id="search-button"
                                 class="btn btn-outline rounded-l-none h-full shadow-none">
                                 <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
                             </button>
+                            <!-- Button to submit search -->
+                            <button id="submit-search-button" class="hidden"></button>
+                            <script>
+                                // Function to handle field selection change
+                                document.getElementById('field-select').addEventListener('change', function() {
+                                    const selectedField = this.value;
+                                    const filterInput = document.getElementById('filter-input');
+                                    const choiceSelects = document.getElementById('choice-selects');
+                                    
+                                    // Hide all choice selects first
+                                    choiceSelects.querySelectorAll('select').forEach(select => {
+                                        select.classList.add('hidden');
+                                    });
+                                    
+                                    // Show/hide appropriate input based on field selection
+                                    const fieldSelect = document.getElementById(`${selectedField}-select`);
+                                    if (fieldSelect) {
+                                        filterInput.classList.add('hidden');
+                                        choiceSelects.classList.remove('hidden');
+                                        fieldSelect.classList.remove('hidden');
+                                    } else {
+                                        filterInput.classList.remove('hidden');
+                                        choiceSelects.classList.add('hidden');
+                                    }
+                                });
+
+                                function removeFilter(field) {
+                                    // Remove the hidden input if it exists
+                                    const input = document.querySelector(`input[name="${field}"]`);
+                                    if (input) {
+                                        input.remove();
+                                    }
+                                    // Click the search button to trigger the search
+                                    document.getElementById('submit-search-button').click();
+                                }
+
+                                document.getElementById('search-button').addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    const filterInput = document.getElementById('filter-input');
+                                    const fieldSelect = document.getElementById('field-select');
+                                    const form = this.closest('form');
+                                    const selectedField = fieldSelect.value;
+
+                                    // Remove any existing hidden input with the same name
+                                    const existingInput = form.querySelector(`input[name="${selectedField}"]`);
+                                    if (existingInput) {
+                                        existingInput.remove();
+                                    }
+
+                                    // Check if there's a visible choice select for the current field
+                                    const choiceSelect = document.getElementById(`${selectedField}-select`);
+                                    let inputValue;
+                                    if (choiceSelect && !choiceSelect.classList.contains('hidden')) {
+                                        inputValue = choiceSelect.value;
+                                    } else {
+                                        inputValue = filterInput.value;
+                                    }
+
+                                    // Create and add new hidden input
+                                    const hiddenInput = document.createElement('input');
+                                    hiddenInput.type = 'hidden';
+                                    hiddenInput.name = selectedField;
+                                    hiddenInput.value = inputValue;
+                                    form.appendChild(hiddenInput);
+
+                                    // Submit the form
+                                    document.getElementById('submit-search-button').click();
+                                });
+                            </script>
                         </div>
 
                         {% if page == 'page_each_project' %}
@@ -176,21 +265,22 @@
 
                         
                     </div>
-                    <div id="current-filter" class="form-input text-sm flex flex-nowrap items-center gap-2 hidden text-nowrap">
-                        <span class="text-theme" id="current-filter-text"></span>
-                        <button type="button" class=" text-red-500" id="clear-filter" 
-                            onclick="
-                                document.getElementById('current-filter-text').innerHTML='';
-                                document.getElementById('current-filter').classList.add('hidden');
-                                document.getElementById('search-button').click();">
-                            <i class="fas fa-times mt-1" style="font-size: 23px;"></i>
-                        </button>
+
+                    <!-- Filter options -->
+                    <div id="search-queries" class="flex flex-nowrap items-center justify-center gap-2 h-full mx-3 hidden">
+                        <div class="filter-tag bg-green-100 text-green-800 px-3 rounded-md flex items-center gap-2 text-sm text-nowrap h-full border border-green-300">
+                            {% comment %} <span></span>
+                            <button onclick="removeFilter('{{ field }}')" class="text-green-600 hover:text-green-800">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button> {% endcomment %}
+                        </div>
                     </div>
 
-                    {% if model == 'PaymentRecord' %}
-                    <div id="extra-info" class="extra-info flex flex-nowrap items-center gap-2 text-nowrap"></div>
-                    <script>totalRequestedAmountDisplay();</script>
-                    {% endif %}
+
+                    <div id="extra-info" class="hidden extra-info flex flex-nowrap items-center gap-2 text-nowrap"></div>
+
 
                 </div>
                 {% if page == 'page_transport_department' and tab == 'vehicle_revenue' %}
@@ -227,20 +317,31 @@
         </button>
         {% endif %} {% endcomment %}
 
-        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
 
         {% if excel_uploadable and request.user.is_superuser %}
         <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
             class="flex flex-row whitespace-nowrap gap-2">
             {% csrf_token %}
-            <input type="file" class="form-input-file file-input file-input-bordered w-full max-w-xs" id="file" name="file"
+            <input type="file" class="hidden" id="file" name="file"
                 accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
             <input type="hidden" name="project_id" value="{{ project_id }}">
-            <button class="btn btn-primary" id="upload-button">
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('file').click()">
                 <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
                 <span> Upload </span>         
             </button>
+            <button type="submit" class="btn btn-primary hidden" id="upload-button">
+                <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span> Submit </span>         
+            </button>
         </form> 
+
+        <script>
+            document.getElementById('file').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    document.getElementById('upload-button').click();
+                }
+            });
+        </script>
         {% endif %}
 
         {% if excel_downloadable %}
@@ -256,12 +357,11 @@
 
         {% endif %} 
 
-
+        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="me-3"> {{ create_new_button_name }} </span>
         </a>
-    
         {% endif %} 
 
         <!-- {% if display_trashcan %}
@@ -319,3 +419,5 @@
 
 </div>
 {% endif %} {% endcomment %}
+
+

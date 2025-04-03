@@ -558,7 +558,6 @@ class SubJobOrder(BaseModel):
         return f"{self.order_code}"
 
     def save(self, *args, **kwargs):
-        print(">>>>>>>>>>>>>>>>order_sub_jobs")
         # Skip if user changed (keep first user)
         if self.pk:
             old_instance = SubJobOrder.objects.get(pk=self.pk)
@@ -631,7 +630,6 @@ class SubJobOrder(BaseModel):
 
         # Create or update payment records
         if self.approval_status == "approved":
-            print("self.approval_status", self.approval_status)
             all_provider_payment_state = self.calculate_all_provider_payment_states()
 
             for provider_id in all_provider_payment_state:
@@ -745,7 +743,6 @@ class SubJobOrder(BaseModel):
         order_sub_jobs = SubJobOrderSubJob.objects.filter(
             sub_job_order=self, base_sub_job__isnull=False
         )
-        print(order_sub_jobs)
         return order_sub_jobs
 
     def get_sub_job_order_detail_sub_job_list(self):

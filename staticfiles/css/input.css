@@ -241,11 +241,11 @@
 
     /* width */
     ::-webkit-scrollbar {
-      width: 5px;
+      width: 10px;
     }
     /* Width for horizontal scrollbar */
     ::-webkit-scrollbar:horizontal {
-        height: 5px; /* Height of the horizontal scrollbar */
+        height: 10px; /* Height of the horizontal scrollbar */
     }
     /* Track */
     ::-webkit-scrollbar-track {

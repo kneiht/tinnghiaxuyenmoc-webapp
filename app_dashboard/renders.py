@@ -69,13 +69,32 @@ def render_tool_bar(request, **kwargs):
     else:
         display_trashcan = True
 
-    model_class = apps.get_model('app_dashboard', model)
+    try:
+        model_class = apps.get_model('app_dashboard', model)
+        excel_downloadable = model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False
+        excel_uploadable = model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False
+    except LookupError:
+        excel_downloadable = False
+        excel_uploadable = False
+
+    # Get all text fields (CharField and TextField) from the model
+    text_fields = [f.name for f in model_class._meta.fields if isinstance(f, (models.CharField, models.TextField))]
+    foreign_key_fields = [f.name for f in model_class._meta.fields if isinstance(f, models.ForeignKey)]
+    choice_fields = {f.name: dict(f.choices) for f in model_class._meta.fields if f.choices}
+
+    # Create a dict for all choices fields, mapping field names to their choices
+    choice_fields_dict = {field_name: choices for field_name, choices in choice_fields.items()}
+
+    filter_fields = text_fields + foreign_key_fields
+
     context = {
+        "filter_fields": filter_fields,
+        "choice_fields": choice_fields_dict,  # Add choice_fields to context
         "page": page,
         "sub_page": sub_page,
         "model": model,
-        "excel_downloadable": model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False,
-        "excel_uploadable": model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False,
+        "excel_downloadable": excel_downloadable,
+        "excel_uploadable": excel_uploadable,
         "project_id": project_id,
         "check_date": (
             check_date if check_date else datetime.now().date().strftime("%Y-%m-%d")
@@ -203,7 +222,14 @@ def render_display_records(request, **kwargs):
     check_date = get_valid_date(params.get("check_date", ""))
     start_date = get_valid_date(params.get("start_date", ""))
     end_date = get_valid_date(params.get("end_date", start_date))
-    search_phrase = request.GET.get("all", "")
+    
+    # Get all search queries from request.GET
+    search_queries = {}
+    for key, value in request.GET.items():
+        if key not in ['q', 'sort', 'page', 'check_date', 'start_date', 'end_date', 'check_month']:
+            search_queries[key] = value
+    
+    sort = request.GET.get("sort", "")
     filter_vehicle = params.get("filter_vehicle", None)
     current_page = 1
     max_page = 1
@@ -246,6 +272,15 @@ def render_display_records(request, **kwargs):
             check_date=check_date,
             check_month=check_month,
         )
+
+    requested_amount = 0
+    # If the field requested_amount is in the model, calculate the total amount
+    
+    if hasattr(model_class, "requested_amount"):
+        requested_amount = sum(
+            record.requested_amount for record in records if record.requested_amount
+        )
+
 
     groups = []
     if group_by:
@@ -373,6 +408,8 @@ def render_display_records(request, **kwargs):
                 record.transferred_amount = "chưa thanh toán"
                 record.payment_date = ""
 
+
+
     # Add pagination logic for general records
     if not update and not group_by and model_class not in [VehicleOperationRecord, Job]:
         # Get pagination parameters
@@ -381,16 +418,17 @@ def render_display_records(request, **kwargs):
             
         # Count total records
         total_records = records.count()
-        
+
         # Calculate max page
         max_page = max(1, (total_records + items_per_page - 1) // items_per_page)
-        
+
         # Slice the records for the current page
         records = records[(current_page-1) * items_per_page:current_page * items_per_page]
         
 
     
     template = "components/display_records.html"
+    # Update context dictionary
     context = {
         "model": model,
         "records": records,
@@ -407,11 +445,13 @@ def render_display_records(request, **kwargs):
         "check_month": check_month,
         "tab": tab,
         "current_page": current_page,
-        "max_page": max_page,  # Add max_page to context
-        "search_phrase": search_phrase,
+        "max_page": max_page,
+        "search_queries": search_queries,  # Replace search_phrase with search_queries
+        "filter_vehicle": filter_vehicle,
+        "sort": sort,
         "vehicle": filter_vehicle,
+        "requested_amount": requested_amount,
     }
-
     html = render_to_string(template, context, request)
     return html
 
