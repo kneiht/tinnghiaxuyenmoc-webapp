@@ -11,6 +11,9 @@ up.compiler("#project-display-mode", function () {
       "gantt-chart-container"
     );
     ganttChartContainer.classList.add("hidden");
+    // Remove h-screen and overflow-scroll from main
+    const main = document.querySelector("main");
+    main.classList.remove("h-screen", "overflow-scroll");
   }
 
   const arrayButtons = [
@@ -31,6 +34,9 @@ up.compiler("#project-display-mode", function () {
     displayRecords = document.getElementById("display-records");
     ganttChartContainer.classList.remove("hidden");
     displayRecords.classList.add("hidden");
+    // add h-screen and overflow-scroll to main
+    const main = document.querySelector("main");
+    main.classList.add("h-screen", "overflow-scroll");
     fetchAndDrawGanttChart();
   });
 });

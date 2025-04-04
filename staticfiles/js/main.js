@@ -450,7 +450,7 @@ up.compiler('.form-input', function (inputfield) {
 
 function handleNewSelectElement(select) {
     // If there are only about 5 options, don't create the wrapper
-    if (select.options.length <= 6 && !select.hasAttribute('readonly')) {
+    if ((select.options.length <= 6 && !select.hasAttribute('readonly')) && !select.classList.contains('new-select')) {
         return;
     }
 
@@ -565,7 +565,7 @@ function handleNewSelectElement(select) {
     select.parentNode.insertBefore(wrapper, select.nextSibling);
     // select.style.display = 'none'; // Hide the original select
     select.style.position = 'absolute';
-    select.style.width = '100px';
+    // select.style.width = '100px';
     select.style.opacity = '0';
     select.style.pointerEvents = 'none';
 
@@ -615,7 +615,9 @@ function handleNewSelectElement(select) {
     });
 }
 
-
+up.compiler('#navbar-database-selection select', function (select) {
+    handleNewSelectElement(select);
+})
 
 // Set up a MutationObserver
 const observer = new MutationObserver((mutationsList) => {
@@ -924,10 +926,7 @@ function adjustDisplayRecordsHeight() {
     const viewportHeight = window.innerHeight;
 
     const bottomMargin = 40;
-
-
     let newDisplayRecordsHeight = currentDisplayRecordsHeight - (bodyHeight - viewportHeight);
-    console.log(newDisplayRecordsHeight)
     displayRecords.style.height = `${newDisplayRecordsHeight - bottomMargin}px`;
 }
 
