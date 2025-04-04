@@ -90,7 +90,44 @@ def get_sign(record, field):
 def format_display(record, field=None):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
-        
+    
+
+    # if field in ["total_purchase_amount", "total_transferred_amount", "total_outstanding_debt"]:
+    #     model_name = record._meta.model_name
+    #     if model_name.lower() == 'partprovider':
+    #         def get_total_purchase_amount(provider):
+    #             # Get all VehicleMaintenanceRepairPart
+    #             repair_parts = VehicleMaintenanceRepairPart.objects.filter(
+    #                 repair_part__part_provider=provider
+    #             )
+    #             # Calculate the purchase amount
+    #             purchase_amount = 0
+    #             for repair_part in repair_parts:
+    #                 purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
+    #             return purchase_amount
+
+    #         def get_total_transferred_amount(provider):
+    #             # Calculate the transferred amount
+    #             transferred_amount = 0
+    #             payment_records = PaymentRecord.objects.filter(provider=provider)
+    #             for payment_record in payment_records:
+    #                 transferred_amount += payment_record.transferred_amount
+    #             return transferred_amount
+
+    #         if field == "total_purchase_amount":
+    #             purchase_amount = get_total_purchase_amount(record)
+    #             return "{:,}".format(int(purchase_amount))
+
+    #         elif field == "total_transferred_amount":
+    #             transferred_amount = get_total_transferred_amount(record)
+    #             return "{:,}".format(int(transferred_amount))
+
+    #         elif field == "total_outstanding_debt":
+    #             purchase_amount = get_total_purchase_amount(record)
+    #             transferred_amount = get_total_transferred_amount(record)
+    #             return "{:,}".format(int(purchase_amount - transferred_amount))
+
+
     if record == None:
         return ""
     if field != None:
@@ -312,7 +349,6 @@ def calculate_driver_salary(vehicle_operation_records, driver_name, select_start
 
     def calculate_monthly_salary(records, driver_salary_input, select_start_date=None, select_end_date=None):
         # print debug records
-        print("records: ", records)
         if not records:
             return {}
         # Get the date of the first record

@@ -15,7 +15,7 @@ class PermissionForm(forms.ModelForm):
         fields = [
             field.name
             for field in Permission._meta.fields
-            if field.name not in ["archived", "last_saved", "created_at"]
+            if field.name not in ["archived", "last_saved", "created_at", "lock"]
         ]
 
         # You can define labels and widgets for known fields
@@ -56,6 +56,7 @@ class PermissionForm(forms.ModelForm):
                 "created_at",
                 "last_saved",
                 "archived",
+                "lock"
             ]:
                 self.fields[field_name].widget = forms.Select(
                     attrs={

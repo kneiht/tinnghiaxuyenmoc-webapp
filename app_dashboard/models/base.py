@@ -19,6 +19,7 @@ class BaseModel(models.Model):
     excel_uploadable = False
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
     archived = models.BooleanField(default=False)
+    lock = models.BooleanField(verbose_name="Khóa phiếu", default=False)
 
     class Meta:
         abstract = True  # Specify this model as Abstract
@@ -125,6 +126,9 @@ class BaseModel(models.Model):
         else:
             return cls.__name__
 
+    def save_lock(self):
+        # Tránh tính toán thừa mà chỉ lock thôi
+        super().save()
 
 class Thumbnail(models.Model):
     reference_url = models.CharField(max_length=255, blank=True, null=True)

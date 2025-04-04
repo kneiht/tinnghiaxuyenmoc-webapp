@@ -13,7 +13,7 @@
 
 {% block content %}
     <div id="modal" up-hungry></div>
-    <main>
+    <main class="">
         {% include 'components/nav_bar.html' %}
         <div id="load-elements" up-defer up-href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}">
             Loading content
@@ -27,12 +27,12 @@
         <div up-hungry id="display-records"></div>
         <div up-hungry id="load-more" class="flex justify-center items-center gap-4 my-6 pagination-container"></div>
           
-        <div id="gantt-chart-container" class="card w-full mt-5 rounded-2xl hidden">
+        <div id="gantt-chart-container" class="card w-full mt-5 rounded-2xl hidden h-full">
           <h3 class="px-6 py-3 text-xl font-semibold text-center text-theme border border-slate-300 dark:border-slate-900 border-opacity-50">
             Biểu đồ Gantt toàn dự án
           </h3>
           <div id="ganttChart" data-project-id="{{ project.pk }}" data-check-date="{{ check_date }}" class="w-full py-3 bg-gray-50 dark:bg-gray-800 overflow-auto"></div>
-
+      
         </div>
 
     </main>

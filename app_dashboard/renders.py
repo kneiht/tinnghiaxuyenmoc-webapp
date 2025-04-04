@@ -51,9 +51,15 @@ def render_tool_bar(request, **kwargs):
     model = params.get("model", "")
     project_id = get_valid_id(params.get("project_id", 0))
     check_date = get_valid_date(params.get("check_date", ""))
-    start_date = get_valid_date(params.get("start_date", ""))
-    end_date = get_valid_date(params.get("end_date", ""))
     check_month = params.get("check_month", "")
+
+    if model == "PartProvider":
+        start_date = get_valid_date(params.get("start_date", ""), "none")
+        end_date = get_valid_date(params.get("end_date", ""), "none")
+    else:
+        start_date = get_valid_date(params.get("start_date", ""))
+        end_date = get_valid_date(params.get("end_date", start_date))
+
 
     if check_month != "":
         check_month = get_valid_month(check_month)
@@ -69,7 +75,7 @@ def render_tool_bar(request, **kwargs):
     else:
         display_trashcan = True
 
-    model_class = apps.get_model('app_dashboard', model)
+    model_class = globals()[model]
     try:
         excel_downloadable = model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False
         excel_uploadable = model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False
@@ -222,7 +228,8 @@ def render_display_records(request, **kwargs):
     check_date = get_valid_date(params.get("check_date", ""))
     start_date = get_valid_date(params.get("start_date", ""))
     end_date = get_valid_date(params.get("end_date", start_date))
-    
+
+
     # Get all search queries from request.GET
     search_queries = {}
     for key, value in request.GET.items():
@@ -330,7 +337,8 @@ def render_display_records(request, **kwargs):
                                 start_date, "%Y-%m-%d"
                             ).date(),
                             "drivers": StaffData.objects.filter(
-                                position__icontains="driver"
+                                position__icontains="driver",
+                                status__in=["active", "on_leave"]
                             ),
                             "locations": Location.objects.all(),
                             "records": group_records,
@@ -425,8 +433,55 @@ def render_display_records(request, **kwargs):
         # Slice the records for the current page
         records = records[(current_page-1) * items_per_page:current_page * items_per_page]
         
+    if model_class == PartProvider:
+        def get_total_purchase_amount(provider, start_date, end_date):
+            # Get all VehicleMaintenanceRepairPart with date filter
+            query = VehicleMaintenanceRepairPart.objects.filter(
+                repair_part__part_provider=provider
+            )
+            
+            if start_date:
+                query = query.filter(vehicle_maintenance__to_date__gte=start_date)
+            if end_date:
+                query = query.filter(vehicle_maintenance__to_date__lte=end_date)
+            
+            # Calculate the purchase amount
+            purchase_amount = 0
+            for repair_part in query:
+                purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
+            return purchase_amount
 
+        def get_total_transferred_amount(provider, start_date, end_date):
+            # Get payment records with date filter
+            query = PaymentRecord.objects.filter(provider=provider)
+            
+            if start_date:
+                query = query.filter(payment_date__gte=start_date)
+            if end_date:
+                query = query.filter(payment_date__lte=end_date)
+            
+            # Calculate the transferred amount
+            transferred_amount = 0
+            for payment_record in query:
+                transferred_amount += payment_record.transferred_amount
+            return transferred_amount
+
+        start_date = get_valid_date(params.get("start_date", ""), "none")
+        end_date = get_valid_date(params.get("end_date", ""), "none")
+        for record in records:
+            purchase_amount = get_total_purchase_amount(record, start_date, end_date)
+            transferred_amount = get_total_transferred_amount(record, start_date, end_date)
+            record.total_purchase_amount = purchase_amount
+            record.total_transferred_amount = transferred_amount
+            record.total_outstanding_debt = purchase_amount - transferred_amount
     
+    elif model_class == VehicleMaintenanceAnalysis:
+        for record in records:
+            maintenance_amount = VehicleMaintenanceRepairPart.get_maintenance_amount(record.vehicle, start_date, end_date)
+            record.from_date = start_date if start_date else "Không xác định"
+            record.to_date = end_date if end_date else "Không xác định"
+            record.maintenance_amount = maintenance_amount
+
     template = "components/display_records.html"
     # Update context dictionary
     context = {

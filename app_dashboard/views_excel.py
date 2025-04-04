@@ -180,7 +180,7 @@ def upload_excel(request, model_name):
         
         # Get project_id from POST
         project_id = request.POST.get('project_id', None)
-        print(project_id)
+
         if project_id:
             try:
                 project_id = int(project_id)
@@ -190,7 +190,7 @@ def upload_excel(request, model_name):
                 raise e
                 project_id = None
 
-        print(project_id)
+
         # Check if model has project field and project_id is provided
         if project_id and not hasattr(model_class, 'project'):
             return HttpResponse(render_message(request, "Model không có trường project", message_type='red'))

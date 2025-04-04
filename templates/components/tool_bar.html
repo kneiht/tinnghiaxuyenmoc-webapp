@@ -249,7 +249,7 @@
 
                         {% elif page == 'page_transport_department' and tab == 'vehicle_revenue' %}
                             <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
-                            <span class="text-lg text-theme">đến</span>
+                            <span class="text-lg text-theme">➡️</span>
                             <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
                                 <script>
                                     document.getElementById('start_date').addEventListener('change', function() {
@@ -261,6 +261,22 @@
                                         document.getElementById('search-button').click();
                                     });
                                 </script>
+
+                            {% elif model == "PartProvider" or model == "VehicleMaintenanceAnalysis" %}
+                                <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
+                                <span class="text-lg text-theme">➡️</span>
+                                <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
+                                    <script>
+                                        document.getElementById('start_date').addEventListener('change', function() {
+                                            // Press search-button
+                                            document.getElementById('search-button').click();
+                                        });
+                                        document.getElementById('end_date').addEventListener('change', function() {
+                                            // Press search-button
+                                            document.getElementById('search-button').click();
+                                        });
+                                    </script>
+
                         {% endif %}
 
                         

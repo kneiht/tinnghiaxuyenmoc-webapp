@@ -10,7 +10,7 @@ gap-6 grid mt-5">
             <a up-preload href="{% url 'page_each_project' record.pk %}">
                 <div class="card-image-container">
                     {% if record.image %}
-                    <img src="{{ record.image.url }}" alt="{{ record.name }}"
+                    <img src="{{ record.image.url }}" alt="Project Image"
                         class="rounded-2xl border-b border-slate-300 dark:border-slate-900 border-opacity-50" />
                     {% else %}
                     <img src="/media/images/default/default_project.webp" alt="Default School Image"
@@ -20,26 +20,49 @@ gap-6 grid mt-5">
             </a>
 
             <div class="flex justify-between items-center px-2 relative">
-                <div class="w-10/12">
+                <div class="w-full">
                     <h3 class="text-md font-semibold text-theme text-center pl-1">
                         {{ record }}
                     </h3>
                 </div>
 
-                <div class="w-2/12 text-sm opacity-100 flex justify-end items-center">
-                    <div class="w-10 h-10 flex justify-end items-center">
-                        <a id="record-edit" class="flex flex-row justify-center items-center"
-                        up-preload="reveal" up-cache="auto"
-                        href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
-                            <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-6 h-6">
-                        </a>
-                    </div>  
-                </div>
             </div>
 
             <div class="flex flex-col text-cyan-600 dark:text-cyan-500 text-sm px-4 pb-3 ">
                 <!-- Use div for flex container, span for inline text elements -->
                 <span class="{{ record.status }} text-white p-1 rounded-md absolute shadow-2xl top-5 right-5 px-2">{{ record.get_status_display }}</span>
+
+                <div class="text-sm opacity-100 absolute top-16 right-5 bg-slate-600 rounded-md py-1 bg-opacity-60">
+                    <div class="w-20 h-10 flex flex-row justify-start items-center gap-2 bg-">
+                        <div class="w-10 h-10 flex justify-end items-center">
+                            <form class="flex flex-row justify-end items-center"
+                            action="{% url 'lock' model record.pk %}" up-submit
+                            method="post"
+                            up-target="#modal:maybe, #lock_{{ record.pk }}:maybe">
+                                {% csrf_token %}
+                                <button class="bg-transparent border-0 p-0 cursor-pointer pb-3">
+                                    {% if record.lock %}
+                                        <div id="lock_{{ record.pk }}">
+                                            <img src="{% static 'images/icons/lock.png' %}?v={{ STATIC_VERSION }}" alt="Lock" class="w-9 h-9">
+                                            <input type="hidden" name="lock" value="False">
+                                        </div>
+                                    {% else %}
+                                        <div id="lock_{{ record.pk }}">
+                                            <img src="{% static 'images/icons/unlock.png' %}?v={{ STATIC_VERSION }}" alt="Unlock" class="w-9 h-9">
+                                            <input type="hidden" name="lock" value="True">
+                                        </div>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>  
+
+                        <a id="record-edit" class="flex flex-row justify-center items-center"
+                        up-preload="reveal" up-cache="auto"
+                        href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.pk %}" up-target="#modal">
+                            <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-8 h-8">
+                        </a>
+                    </div>  
+                </div>
 
                 <div class="flex">
                     <div class="flex-1 mr-2 h-10 truncate flex items-center">

@@ -356,11 +356,6 @@ class DetailSupply(BaseModel):
             self.image = self.base_supply.image
         super().save()
 
-    def clean(self):
-        # if update => not allow to update
-        if self.pk:
-            raise ValidationError("Vui lòng xóa vật tư chi tiết này và tạo mới vì vật tư chi tiết không cho thay đổi thông tin.")
-        super().clean()
 
 class CostEstimation(BaseModel):
     allow_display = True

@@ -42,6 +42,7 @@ def check_permission(self, model):
         update = False
         delete = False
         approve = False
+        lock = False
 
     # Create a new instance of the ReturnPermission class
     return_permission = ReturnPermission()
@@ -53,6 +54,7 @@ def check_permission(self, model):
         return_permission.update = True
         return_permission.delete = True
         return_permission.approve = True
+        return_permission.lock = True
         return return_permission
     
     # Check if the  model is allowed to be displayed
@@ -88,7 +90,7 @@ def check_permission(self, model):
     model_permission = getattr(user_permission, model)
 
     # Check if the user has permission
-    for item in ["read", "create", "update", "delete", "approve"]:
+    for item in ["read", "create", "update", "delete", "approve", "lock"]:
         if item in model_permission:
             setattr(return_permission, item, True)
 
@@ -134,10 +136,11 @@ def create_dynamic_permission_model(model_name="Permission"):
     MODEL_PERMISSION_CHOICES = (  # pylint: disable=C0103
         ("none", "Không"),
         ("read", "Đọc"),
-        ("read_create", "Đọc - Tạo"),
-        ("read_create_update", "Đọc - Tạo - Sửa"),
-        ("read_create_update_delete", "Đọc - Tạo - Sửa - Xóa"),
-        ("read_create_update_delete_approve", "Đọc - Tạo - Sửa- Xóa - Duyệt"),
+        ("read_create", "Đọc/Tạo"),
+        ("read_create_update", "Đọc/Tạo/Sửa"),
+        ("read_create_update_delete", "Đọc/Tạo/Sửa/Xóa"),
+        ("read_create_update_delete_approve", "Đọc/Tạo/Sửa/Xóa/Duyệt"),
+        ("read_create_update_delete_approve_lock", "Đọc/Tạo/Sửa/Xóa/Duyệt/Khóa"),
     )
     attrs = {
         "vietnamese_name": "Cấp quyền sử dụng dữ liệu",

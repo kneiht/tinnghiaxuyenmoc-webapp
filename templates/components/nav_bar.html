@@ -1,3 +1,7 @@
+
+{% load static %}
+{% load custom_tags %}
+
 <!-- This is the navagation bar section, which contains the navigation elements. -->
 <div id="nav_bar" class="flex justify-between items-center gap-4 h-8 my-3">
 
@@ -28,6 +32,34 @@
                     <span class="fa fa-truck w-8" style="font-size: 18px;"></span>
                     Phòng vận tải
                 </a>
+
+                {% comment %} <div id="navbar-database-selection" class="flex items-center m-auto z-50">
+                    <select 
+                        up-submit
+                        class="form-input new-select w-[250px]"
+                        onchange="document.getElementById(this.value).click()">
+                        {% for each_sub_page, display_name in display_name_dict.items %}
+                        <option 
+                            value="{{ each_sub_page }}"
+                            {% if each_sub_page == sub_page %}selected{% endif %}>
+                            {{ display_name }}
+                        </option>
+                        {% endfor %}
+                        <script>
+                            var selectElement = document.querySelector('#navbar-database-selection select');
+                            handleNewSelectElement(selectElement);
+                        </script>
+                    </select>
+                    {% for each_sub_page, display_name in display_name_dict.items %}
+                    <div>
+                        <a id="{{ each_sub_page }}" up-preload="insert" href="{% url 'page_general_data' sub_page=each_sub_page %}"
+                            class="hidden change-page">
+                            {{ display_name }}
+                        </a>
+                        <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=each_sub_page elements='tool_bar|display_records' %}"></a>
+                    </div>
+                    {% endfor %}
+                </div> {% endcomment %}
 
                 <div id="nav_menu_more" class="menu hidden relative">
                     <button class="menu-button space-y-1 p-3  items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer">

@@ -32,6 +32,8 @@
             {% endfor %}
         </div>
 
+
+
         <div id="load-elements" up-defer="insert" up-cache="True" up-href="{% url 'load_elements' %}?q={% encode_params page='page_general_data' model=model elements='tool_bar|display_records' %}" class="w-full text-center">
             <span class="text-theme"> Đang tải dữ liệu, xin vui lòng chờ ...</span>
         </div>

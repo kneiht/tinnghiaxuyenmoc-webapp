@@ -12,11 +12,15 @@ from django.utils import timezone
 
 from .base import models, BaseModel
 
-def get_valid_date(date):
+def get_valid_date(date, start_date_mode="now"):
     try:
         date = datetime.strptime(date, '%Y-%m-%d').date()
     except:
-        date = timezone.now().date()
+        if start_date_mode == "now":
+            date = timezone.now().date()
+        elif start_date_mode == "none":
+            date = None
+            return date
     date = date.strftime('%Y-%m-%d')
     return date
 
@@ -275,10 +279,51 @@ class VehicleDetail(BaseModel):
                 fields.remove(field)
         return fields
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # create VehicleMaintenanceAnalysis
+        if not VehicleMaintenanceAnalysis.objects.filter(vehicle=self).exists():
+            VehicleMaintenanceAnalysis.objects.create(vehicle=self)
 
 
+class VehicleMaintenanceAnalysis(BaseModel):
+    allow_display = True
+    vietnamese_name = "Thống kê sửa chữa"
 
+    class Meta:
+        ordering = ["vehicle"]
 
+    vehicle = models.OneToOneField(
+        VehicleDetail,
+        on_delete=models.CASCADE,
+        verbose_name="Xe",
+    )
+    maintenance_amount = models.IntegerField(
+        verbose_name="Tổng chi phí sửa chữa", default=0, validators=[MinValueValidator(0)]
+    )
+
+    from_date = models.DateField(verbose_name="Từ ngày", default=timezone.now)
+    to_date = models.DateField(verbose_name="Đến ngày", default=timezone.now)
+    created_at = models.DateTimeField(
+        default=timezone.now, verbose_name="Ngày tạo phiếu"
+    )
+
+    def __str__(self):
+        return f"Thống kê sửa chữa xe {self.vehicle}"
+
+    @classmethod
+    def get_display_fields(self):
+        fields = [
+            "vehicle",
+            "maintenance_amount",
+            "from_date",
+            "to_date",
+        ]
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
 
 
 
@@ -571,7 +616,7 @@ class VehicleOperationRecord(BaseModel):
                 fields.remove(field)
         return fields
     def get_driver_choices(self):
-        drivers = StaffData.objects.filter(position__icontains='driver')
+        drivers = StaffData.objects.filter(position__icontains='driver', status__in=['active', 'on_leave'])
         # return a dict of choices with key id and name
         dict_drivers = [{'id': driver.id, 'name':driver.full_name} for driver in drivers]
         return dict_drivers
@@ -673,7 +718,6 @@ class LiquidUnitPrice(BaseModel):
         for filling_record in filling_records:
             filling_record.calculate_total_amount()
             filling_record.save()
-
 
 
 class FillingRecord(BaseModel):

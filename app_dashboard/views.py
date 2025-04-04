@@ -143,21 +143,28 @@ def decide_permission(request, action, params):
 # HANDLE FORMS ===============================================================
 @login_required
 def handle_form(request, model, pk=0):
-    print(request.POST)
+    # check if not Post => return 404
+    if request.method != "POST":
+        return HttpResponseForbidden()
+
+    # print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
     form_class = globals()[model + "Form"]
-
-    # check if not Post => return 404
-    if request.method != "POST":
-        return HttpResponseForbidden()
 
     # project_id
     project_id = get_valid_id(request.POST.get("project", 0))
 
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
+    
+    # check if instance is locked
+    if instance and instance.lock:
+        message = "Dữ liệu đã bị khóa, không thể cập nhật. \n\n Vui lòng liên hệ admin."
+        message_type = "red"
+        return HttpResponse(render_message(request, message=message, message_type=message_type))
+
     form = form_class(request.POST, request.FILES, instance=instance)
 
     # Add missing data if there's an instance
@@ -1144,7 +1151,7 @@ def handle_date_report_form(request):
         html = render_message(request, message="Có lỗi: " + str(e), message_type="red")
         return HttpResponse(html)
 
-
+@login_required
 def handle_vehicle_operation_form(request):
     def convert_time(time_str, time_sign):
         hours, minutes, seconds = map(int, time_str.split(":"))
@@ -1957,21 +1964,21 @@ def save_vehicle_operation_record(request):
         result += vehicle + "\n"
     return HttpResponse(check_date + " => done")
 
-
+@login_required
 def form_repair_parts(request):
     providers = PartProvider.objects.all()
     repair_parts = RepairPart.objects.all()
     context = {"repair_parts": repair_parts, "providers": providers}
     return render(request, "components/modal_repair_parts.html", context)
 
-
+@login_required
 def form_detailed_supplies(request):
     providers = SupplyProvider.objects.all()
     supplies = DetailSupply.objects.all()
     context = {"supplies": supplies, "providers": providers}
     return render(request, "components/modal_detail_supplies.html", context)
 
-
+@login_required
 def form_base_supplies(request):
     project_id = request.GET.get("project")
     # Get cost estimations for the project
@@ -1987,7 +1994,7 @@ def form_base_supplies(request):
     }
     return render(request, "components/modal_base_supplies.html", context)
 
-
+@login_required
 def form_base_sub_jobs(request):
     project_id = request.GET.get("project")
     # Get cost estimations for the project
@@ -2001,7 +2008,7 @@ def form_base_sub_jobs(request):
     }
     return render(request, "components/modal_base_sub_jobs.html", context)
 
-
+@login_required
 def form_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type="green"):
 
@@ -2163,7 +2170,7 @@ def form_cost_estimation_table(request, project_id):
             project_id, message='Cập nhật thành công. \n\n Lưu ý: "Tất cả Vật tư phụ/ Biện pháp thi công được tự động thêm vào dự toán với số lượng 999.999" ', message_type="green"
         )
 
-
+@login_required
 def form_sub_job_cost_estimation_table(request, project_id):
     def render_modal(project_id, message=None, message_type="green"):
         # Get fields to be displayed by using record meta
@@ -2317,7 +2324,7 @@ def form_sub_job_cost_estimation_table(request, project_id):
             project_id, message="Cập nhật thành công", message_type="green"
         )
 
-
+@login_required
 def form_maintenance_images(request, maintenance_id):
     # If Get
     if request.method == "GET":
@@ -2348,7 +2355,7 @@ def form_maintenance_images(request, maintenance_id):
         except:
             return JsonResponse({"success": False})
 
-
+@login_required
 def form_maintenance_payment_request(request):
     # If Get
     if request.method == "GET":
@@ -2433,6 +2440,7 @@ def page_transport_department(request, sub_page=None):
         "RepairPart": "Danh mục phụ tùng",
         "PaymentRecord": "LS thanh toán",
         "VehicleMaintenance": "Phiếu sửa chữa",
+        "VehicleMaintenanceAnalysis": "Thống kê sửa chữa",
         "VehicleDepreciation": "Khấu hao",
         "VehicleBankInterest": "Lãi ngân hàng",
         "VehicleOperationRecord": "DL HĐ xe công trình / ngày",
@@ -2503,7 +2511,7 @@ def page_each_project(request, pk):
     context = {"project_id": project_id, "check_date": check_date, "project": project}
     return render(request, "pages/page_each_project.html", context)
 
-
+@login_required
 def clean(request):
     result = ""
     # Find MaintenanceImage records with null vehicle_maintenance
@@ -2551,4 +2559,52 @@ def gps(request):
     return render(request, "pages/gps.html")
 
 
+@login_required
+def lock(request, model_name, pk):
+    # GET
+    if request.method == "GET":
+        return HttpResponse("Chỉ chấp nhận POST request")
+    # POST
+    if request.method == "POST":
+        user = request.user
+        permission = user.check_permission(model_name)
+        if not permission.lock:
+            message = "Bạn chưa được cấp quyền khóa/mở khóa dữ liệu trang này. \n Vui lòng liên hệ admin cấp quyền."
+            httml_message = render_message(request, message=message, message_type="red")
+            return HttpResponse(httml_message)
+
+        model_class = globals()[model_name]
+        lock = request.POST.get("lock", None)
+
+        if lock is None:
+            httml_message = render_message(request, message="Lỗi sai tên trường dữ liệu", message_type="red")
+            return HttpResponse(httml_message)
+
+        if model_class is None:
+            httml_message = render_message(request, message="Lỗi sai tên bảng dữ liệu", message_type="red")
+            return HttpResponse(httml_message)
+
+        record = model_class.objects.filter(pk=pk).first()
+        if record is None:
+            httml_message = render_message(request, message="Lỗi không tìm thấy dữ liệu này trên máy chủ", message_type="red")
+            return HttpResponse(httml_message)
+        
+        html_lock = ""
+        if lock == "True":
+            record.lock = True
+            html_lock = f'''
+                        <div id="lock_{record.pk}">
+                            <img src="/static/images/icons/lock.png" alt="Lock" class="w-9 h-9">
+                            <input type="hidden" name="lock" value="False">
+                        </div>'''
+        elif lock == "False":
+            html_lock = f'''
+                        <div id="lock_{record.pk}">
+                            <img src="/static/images/icons/unlock.png" alt="Lock" class="w-9 h-9">
+                            <input type="hidden" name="lock" value="True">
+                        </div>'''
+            record.lock = False
+        record.save_lock()
+    
+        return HttpResponse(html_lock)
 

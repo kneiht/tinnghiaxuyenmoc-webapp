@@ -32,11 +32,16 @@ def encode_base64(input_string):
     base64_string = base64_bytes.decode('utf-8')
     return base64_string
 
-def get_valid_date(date):
+
+def get_valid_date(date, start_date_mode="now"):
     try:
         date = datetime.strptime(date, '%Y-%m-%d').date()
     except:
-        date = timezone.now().date()
+        if start_date_mode == "now":
+            date = timezone.now().date()
+        elif start_date_mode == "none":
+            date = None
+            return date
     date = date.strftime('%Y-%m-%d')
     return date
 

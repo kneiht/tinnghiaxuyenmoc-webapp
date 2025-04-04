@@ -253,6 +253,14 @@
 
                 {%  endif %}
 
+                {% if record.lock %}
+                <div class="flex justify-center items-center my-4">
+                    <span class="text-red-500 font-bold">
+                        <i class="fas fa-lock me-3"></i>
+                        Bản ghi đã bị khóa và không thể chỉnh sửa
+                    </span>
+                </div>
+                {% endif %}
 
                 <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable approve-hidable
                 {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder"  or modal == "modal_SubJobOrder" %} hidden {% endif %}

@@ -65,6 +65,9 @@ urlpatterns = [
     path('api/upload-excel/<str:model_name>/', views_excel.upload_excel, name='upload_excel'),
     path('api/download-excel/<str:model_name>/', views_excel.download_excel, name='download_excel'),
 
+    # lock
+    path('api/lock/<str:model_name>/<int:pk>/', views.lock, name='lock'),
+
     path('api/db_table/', views_backup.db_table, name='db_table'),
     path('gps', views.gps, name='gps'),
 

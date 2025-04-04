@@ -70,7 +70,7 @@
                                                 <input type="hidden" name="id" value="{{ record.pk }}">
                                                 <span class="display">{{ record|format_display:field }}</span>
                                                 <select name="driver_{{ record.pk }}" class="form-input input input-driver hidden" id="id_driver" style="width: 180px;">
-                                                    <option value="" selected">----------</option>
+                                                    <option value="" selected>----------</option>
                                                     {% for driver in record.get_driver_choices %}
                                                         {% if driver.id == record.driver.id %}
                                                             <option selected value="{{ driver.id }}">{{ driver.name }}</option>
@@ -83,7 +83,7 @@
                                             {% elif field == 'location' %}
                                                 <span class="display">{{ record|format_display:field }}</span>
                                                 <select name="location_{{ record.pk }}" class="form-input input hidden" id="id_location" style="width: 180px;">
-                                                    <option value="" selected">----------</option>
+                                                    <option value="" selected>----------</option>
                                                     {% for location in record.get_location_choices %}
                                                         {% if location.id == record.location.id %}
                                                             <option selected value="{{ location.id }}">{{ location.name }}</option>
