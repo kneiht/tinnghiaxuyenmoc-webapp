@@ -27,7 +27,7 @@ from .forms import *
 from .models.models import *
 from .renders import *
 from .utils import *
-
+from .navbar import NAV_ITEMS
 
 @login_required
 def decide_permission(request, action, params):
@@ -44,7 +44,7 @@ def decide_permission(request, action, params):
         sub_page = "ConstructionReportPL"
 
     # FEATURES THAT ARE DEVELOPING
-    if sub_page in ("Task", "Announcement"):
+    if sub_page in ("Task"):
         message = "Không tìm thấy chức năng này. \n Có thể chức năng này đang được phát triển!"
         return render(request, "components/message_page.html", {"message": message})
 
@@ -63,7 +63,11 @@ def decide_permission(request, action, params):
             message_type = "red"
             return render_message(request, message=message, message_type=message_type)
         else:
-            if model == "SupplyOrder":
+            if (
+                model == "SupplyOrder"
+                or model == "SubJobOrder"
+                or model == "OperationOrder"
+            ):
                 # Check if project user
                 project_id = get_valid_id(params.get("project_id", 0))
                 project = Project.objects.filter(pk=project_id).first()
@@ -77,15 +81,26 @@ def decide_permission(request, action, params):
                 project_user = ProjectUser.objects.filter(
                     user=user, project=project
                 ).first()
-                if not project_user or project_user.role not in [
-                    "supervisor",
-                    "accountant",
-                ]:
-                    message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
-                    message_type = "red"
-                    return render_message(
-                        request, message=message, message_type=message_type
-                    )
+                if model == "SupplyOrder" or model == "SubJobOrder":
+                    if not project_user or project_user.role not in [
+                        "supervisor",
+                        "accountant",
+                    ]:
+                        message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                        message_type = "red"
+                        return render_message(
+                            request, message=message, message_type=message_type
+                        )
+                else:
+                    if not project_user or project_user.role in [
+                        "supervisor",
+                        "accountant",
+                    ]:
+                        message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                        message_type = "red"
+                        return render_message(
+                            request, message=message, message_type=message_type
+                        )
 
             return None
 
@@ -109,11 +124,8 @@ def decide_permission(request, action, params):
                 project_user = ProjectUser.objects.filter(
                     user=request.user, project=project
                 ).first()
-                if not project_user or project_user.role not in [
-                    "supervisor",
-                    "accountant",
-                ]:
-                    message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                if not project_user or project_user.role == "view_only":
+                    message = "Bạn không có quyền tạo phiếu. \n Vui lòng liên hệ admin cấp quyền."
                     message_type = "red"
                     return render_message(
                         request, message=message, message_type=message_type
@@ -147,7 +159,7 @@ def handle_form(request, model, pk=0):
     if request.method != "POST":
         return HttpResponseForbidden()
 
-    # print(request.POST)
+    print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -158,12 +170,14 @@ def handle_form(request, model, pk=0):
 
     # Get form
     instance = model_class.objects.filter(pk=pk).first()
-    
+
     # check if instance is locked
     if instance and instance.lock:
         message = "Dữ liệu đã bị khóa, không thể cập nhật. \n\n Vui lòng liên hệ admin."
         message_type = "red"
-        return HttpResponse(render_message(request, message=message, message_type=message_type))
+        return HttpResponse(
+            render_message(request, message=message, message_type=message_type)
+        )
 
     form = form_class(request.POST, request.FILES, instance=instance)
 
@@ -176,7 +190,7 @@ def handle_form(request, model, pk=0):
                 field_value = getattr(instance, field_name)
                 if field_value:
                     # Check if field_value is a model instance and convert to ID
-                    if hasattr(field_value, 'pk'):
+                    if hasattr(field_value, "pk"):
                         post_data[field_name] = field_value.pk
                     else:
                         post_data[field_name] = field_value
@@ -297,6 +311,7 @@ def handle_form(request, model, pk=0):
             model == "PaymentRecord"
             or model == "SupplyPaymentRecord"
             or model == "SubJobPaymentRecord"
+            or model == "OperationPaymentRecord"
         ):
             # check if the use have the right to modify approval status
             forbit_html = decide_permission(
@@ -457,7 +472,12 @@ def handle_form(request, model, pk=0):
                         return HttpResponse(forbit_html)
 
                 else:
-                    if form_approval_status in ("need_update", "approved", "rejected", "paid"):
+                    if form_approval_status in (
+                        "need_update",
+                        "approved",
+                        "rejected",
+                        "paid",
+                    ):
                         if model == "VehicleMaintenance":
                             # Update status up each VehicleMaintenanceRepairPart
                             vehicle_part_post_ids = request.POST.getlist(
@@ -551,7 +571,7 @@ def handle_form(request, model, pk=0):
                             return HttpResponse(html_message + html_record)
 
                     else:
-                        message = f'Không thể đổi sang trạng thái duyệt {form_approval_status}'
+                        message = f"Không thể đổi sang trạng thái duyệt {form_approval_status}"
                         html_message = render_message(
                             request, message=message, message_type="red"
                         )
@@ -561,7 +581,7 @@ def handle_form(request, model, pk=0):
                     return HttpResponse(forbit_html)
                 else:
                     if form_approval_status not in ("need_update"):
-                        message = 'Không thể thay đổi trạng thái'
+                        message = "Không thể thay đổi trạng thái"
                         html_message = render_message(
                             request, message=message, message_type="red"
                         )
@@ -1151,6 +1171,7 @@ def handle_date_report_form(request):
         html = render_message(request, message="Có lỗi: " + str(e), message_type="red")
         return HttpResponse(html)
 
+
 @login_required
 def handle_vehicle_operation_form(request):
     def convert_time(time_str, time_sign):
@@ -1257,8 +1278,6 @@ def handle_vehicle_operation_form(request):
                 if not form.get(f"allow_revenue_overtime_new_{new_index}", False)
                 else True
             )
-
-
 
             try:
                 # duration seconds
@@ -1964,6 +1983,7 @@ def save_vehicle_operation_record(request):
         result += vehicle + "\n"
     return HttpResponse(check_date + " => done")
 
+
 @login_required
 def form_repair_parts(request):
     providers = PartProvider.objects.all()
@@ -1971,12 +1991,14 @@ def form_repair_parts(request):
     context = {"repair_parts": repair_parts, "providers": providers}
     return render(request, "components/modal_repair_parts.html", context)
 
+
 @login_required
 def form_detailed_supplies(request):
     providers = SupplyProvider.objects.all()
     supplies = DetailSupply.objects.all()
     context = {"supplies": supplies, "providers": providers}
     return render(request, "components/modal_detail_supplies.html", context)
+
 
 @login_required
 def form_base_supplies(request):
@@ -1994,6 +2016,7 @@ def form_base_supplies(request):
     }
     return render(request, "components/modal_base_supplies.html", context)
 
+
 @login_required
 def form_base_sub_jobs(request):
     project_id = request.GET.get("project")
@@ -2007,6 +2030,7 @@ def form_base_sub_jobs(request):
         "project_id": project_id,
     }
     return render(request, "components/modal_base_sub_jobs.html", context)
+
 
 @login_required
 def form_cost_estimation_table(request, project_id):
@@ -2152,7 +2176,9 @@ def form_cost_estimation_table(request, project_id):
 
         # Add Vật tư phụ/ Biện pháp thi công to the list of cost_estimation_list
         # Create a BaseSupply instance for "Vật tư phụ/ Biện pháp thi công"
-        auxiliary_supplies = BaseSupply.objects.filter(material_type="Vật tư phụ/ Biện pháp thi công")
+        auxiliary_supplies = BaseSupply.objects.filter(
+            material_type="Vật tư phụ/ Biện pháp thi công"
+        )
         for auxiliary_supply in auxiliary_supplies:
             cost_estimation_list.append(
                 CostEstimation(
@@ -2167,8 +2193,11 @@ def form_cost_estimation_table(request, project_id):
             cost_estimation.save()
 
         return render_modal(
-            project_id, message='Cập nhật thành công. \n\n Lưu ý: "Tất cả Vật tư phụ/ Biện pháp thi công được tự động thêm vào dự toán với số lượng 999.999" ', message_type="green"
+            project_id,
+            message='Cập nhật thành công. \n\n Lưu ý: "Tất cả Vật tư phụ/ Biện pháp thi công được tự động thêm vào dự toán với số lượng 999.999" ',
+            message_type="green",
         )
+
 
 @login_required
 def form_sub_job_cost_estimation_table(request, project_id):
@@ -2324,6 +2353,7 @@ def form_sub_job_cost_estimation_table(request, project_id):
             project_id, message="Cập nhật thành công", message_type="green"
         )
 
+
 @login_required
 def form_maintenance_images(request, maintenance_id):
     # If Get
@@ -2355,6 +2385,7 @@ def form_maintenance_images(request, maintenance_id):
         except:
             return JsonResponse({"success": False})
 
+
 @login_required
 def form_maintenance_payment_request(request):
     # If Get
@@ -2384,46 +2415,26 @@ def page_home(request, sub_page=None):
     if sub_page is None:
         return redirect("page_home", sub_page="Announcement")
 
-    display_name_dict = {
-        "Announcement": "Thông báo",
-        "User": User.get_vietnamese_name(),
-        "Permission": Permission.get_vietnamese_name(),
-        "ProjectUser": ProjectUser.get_vietnamese_name(),
-    }
-
     context = {
+        "nav_items": NAV_ITEMS,
         "sub_page": sub_page,
-        "display_name_dict": display_name_dict,
         "model": sub_page,
         "current_url": request.path,
-        "header_title": display_name_dict.get(sub_page, "Trang chủ"),
+        "page_name": NAV_ITEMS.get("page_home").get("sub_pages").get(sub_page),
     }
     return render(request, "pages/page_home.html", context)
-
 
 @login_required
 def page_general_data(request, sub_page=None):
     if sub_page == None:
         return redirect("page_general_data", sub_page="VehicleType")
-
-    display_name_dict = {
-        "VehicleType": "DL loại xe",
-        "VehicleRevenueInputs": "DL tính DT theo loại xe",
-        "VehicleDetail": "DL xe chi tiết",
-        "StaffData": "DL nhân viên",
-        "DriverSalaryInputs": "DL mức lương tài xế",
-        "DumbTruckPayRate": "DL tính lương tài xế xe ben",
-        "DumbTruckRevenueData": "DL tính DT xe ben",
-        "Location": "DL địa điểm",
-        "NormalWorkingTime": "Thời gian làm việc",
-        "Holiday": "Ngày lễ",
-    }
+    
     context = {
         "sub_page": sub_page,
         "model": sub_page,
-        "display_name_dict": display_name_dict,
+        "nav_items": NAV_ITEMS,
         "current_url": request.path,
-        "header_title": display_name_dict.get(sub_page, "Dữ liệu chung"),
+        "page_name": NAV_ITEMS.get("page_general_data").get("sub_pages").get(sub_page),
     }
     return render(request, "pages/page_general_data.html", context)
 
@@ -2432,21 +2443,6 @@ def page_general_data(request, sub_page=None):
 def page_transport_department(request, sub_page=None):
     if sub_page == None:
         return redirect("page_transport_department", sub_page="LiquidUnitPrice")
-
-    display_name_dict = {
-        "LiquidUnitPrice": "Bảng đơn giá nhiên liệu/nhớt",
-        "FillingRecord": "LS đổ nhiên liệu/nhớt",
-        "PartProvider": "Nhà cung cấp phụ tùng",
-        "RepairPart": "Danh mục phụ tùng",
-        "PaymentRecord": "LS thanh toán",
-        "VehicleMaintenance": "Phiếu sửa chữa",
-        "VehicleMaintenanceAnalysis": "Thống kê sửa chữa",
-        "VehicleDepreciation": "Khấu hao",
-        "VehicleBankInterest": "Lãi ngân hàng",
-        "VehicleOperationRecord": "DL HĐ xe công trình / ngày",
-        "ConstructionDriverSalary": "Bảng lương",
-        "ConstructionReportPL": "Bảng BC P&L xe cơ giới",
-    }
 
     params = request.GET.copy()
     if "start_date" not in params:
@@ -2463,14 +2459,14 @@ def page_transport_department(request, sub_page=None):
         check_month = params["check_month"]
 
     context = {
+        "nav_items": NAV_ITEMS,
         "sub_page": sub_page,
         "model": sub_page,
-        "display_name_dict": display_name_dict,
         "current_url": request.path,
         "start_date": start_date,
         "end_date": end_date,
         "check_month": check_month,
-        "header_title": display_name_dict.get(sub_page, "Phòng vận tải"),
+        "page_name": NAV_ITEMS.get("page_transport_department").get("sub_pages").get(sub_page),
     }
     return render(request, "pages/page_transport_department.html", context)
 
@@ -2480,24 +2476,12 @@ def page_projects(request, sub_page=None):
     if sub_page == None:
         return redirect("page_projects", sub_page="Project")
 
-    display_name_dict = {
-        "Project": "Dự án",
-        "SupplyProvider": "Nhà cung cấp vật tư",
-        "SupplyBrand": "Thương hiệu vật tư",
-        "BaseSupply": "Vật tư",
-        "DetailSupply": "Vật tư chi tiết",
-        "SupplyPaymentRecord": "LS thanh toán vật tư",
-        "SubContractor": "Tổ đội/ nhà thầu phụ",
-        "BaseSubJob": "Công việc của tổ đội/ nhà thầu phụ",
-        "DetailSubJob": "Công việc chi tiết của tổ đội/ nhà thầu phụ",
-        "SubJobPaymentRecord": "LS thanh toán công việc của tổ đội/ nhà thầu phụ",
-    }
     context = {
+        "nav_items": NAV_ITEMS,
         "sub_page": sub_page,
         "model": sub_page,
-        "display_name_dict": display_name_dict,
         "current_url": request.path,
-        "header_title": display_name_dict.get(sub_page, "Dự án"),
+        "page_name": NAV_ITEMS.get("page_projects").get("sub_pages").get(sub_page),
     }
     return render(request, "pages/page_projects.html", context)
 
@@ -2508,8 +2492,13 @@ def page_each_project(request, pk):
     project_id = get_valid_id(pk)
     project = get_object_or_404(Project, pk=project_id)
     # Should check if the project is belong to the user
-    context = {"project_id": project_id, "check_date": check_date, "project": project}
+    context = {
+        "nav_items": NAV_ITEMS,
+        "project_id": project_id,
+        "check_date": check_date,
+        "project": project}
     return render(request, "pages/page_each_project.html", context)
+
 
 @login_required
 def clean(request):
@@ -2577,34 +2566,41 @@ def lock(request, model_name, pk):
         lock = request.POST.get("lock", None)
 
         if lock is None:
-            httml_message = render_message(request, message="Lỗi sai tên trường dữ liệu", message_type="red")
+            httml_message = render_message(
+                request, message="Lỗi sai tên trường dữ liệu", message_type="red"
+            )
             return HttpResponse(httml_message)
 
         if model_class is None:
-            httml_message = render_message(request, message="Lỗi sai tên bảng dữ liệu", message_type="red")
+            httml_message = render_message(
+                request, message="Lỗi sai tên bảng dữ liệu", message_type="red"
+            )
             return HttpResponse(httml_message)
 
         record = model_class.objects.filter(pk=pk).first()
         if record is None:
-            httml_message = render_message(request, message="Lỗi không tìm thấy dữ liệu này trên máy chủ", message_type="red")
+            httml_message = render_message(
+                request,
+                message="Lỗi không tìm thấy dữ liệu này trên máy chủ",
+                message_type="red",
+            )
             return HttpResponse(httml_message)
-        
+
         html_lock = ""
         if lock == "True":
             record.lock = True
-            html_lock = f'''
+            html_lock = f"""
                         <div id="lock_{record.pk}">
                             <img src="/static/images/icons/lock.png" alt="Lock" class="w-9 h-9">
                             <input type="hidden" name="lock" value="False">
-                        </div>'''
+                        </div>"""
         elif lock == "False":
-            html_lock = f'''
+            html_lock = f"""
                         <div id="lock_{record.pk}">
                             <img src="/static/images/icons/unlock.png" alt="Lock" class="w-9 h-9">
                             <input type="hidden" name="lock" value="True">
-                        </div>'''
+                        </div>"""
             record.lock = False
         record.save_lock()
-    
-        return HttpResponse(html_lock)
 
+        return HttpResponse(html_lock)

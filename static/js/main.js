@@ -82,42 +82,42 @@ const csrftoken = getCookie('csrftoken');
 
 
 // NAVIGATION BAR ITEMS =========================================
-up.compiler('#nav_bar', function (element) {
+// up.compiler('#nav_bar', function (element) {
 
-    function activeMenuItem(item) {
-        // Remove specific classes from all <a> elements within #nav_bar_left
-        document.querySelectorAll('#nav_bar_left a').forEach(link => {
-            link.classList.remove('border');
-            link.classList.remove('bg-gray-200');
-            link.classList.remove('border-gray-300');
-            link.classList.remove('dark:bg-gray-800');
-            link.classList.remove('dark:border-gray-700');
-        });
+//     function activeMenuItem(item) {
+//         // Remove specific classes from all <a> elements within #nav_bar_left
+//         document.querySelectorAll('#nav_bar_left a').forEach(link => {
+//             link.classList.remove('border');
+//             link.classList.remove('bg-gray-200');
+//             link.classList.remove('border-gray-300');
+//             link.classList.remove('dark:bg-gray-800');
+//             link.classList.remove('dark:border-gray-700');
+//         });
 
-        // Add classes to the clicked element (referred to as 'item')
-        item.classList.add('bg-gray-200');
-        item.classList.add('border');
-        item.classList.add('border-gray-300');
-        item.classList.add('dark:bg-gray-800');
-        item.classList.add('dark:border-gray-700');
-    }
+//         // Add classes to the clicked element (referred to as 'item')
+//         item.classList.add('bg-gray-200');
+//         item.classList.add('border');
+//         item.classList.add('border-gray-300');
+//         item.classList.add('dark:bg-gray-800');
+//         item.classList.add('dark:border-gray-700');
+//     }
 
-    // Add event listener to each navigation item
-    document.querySelectorAll('#nav_bar_left a').forEach(item => {
-        item.addEventListener('click', function () {
-            activeMenuItem(item);
-        });
+//     // Add event listener to each navigation item
+//     document.querySelectorAll('#nav_bar_left a').forEach(item => {
+//         item.addEventListener('click', function () {
+//             activeMenuItem(item);
+//         });
 
-        // Check if the item url equals to the current url => active the item
-        const itemUrl = item.getAttribute('href');
-        const currentUrl = window.location.pathname;
-        const currentUrlParts = currentUrl.split('/');
-        const itemUrlParts = itemUrl.split('/');
-        if (itemUrlParts[1] === currentUrlParts[1]) {
-            activeMenuItem(item);
-        }
-    });
-});
+//         // Check if the item url equals to the current url => active the item
+//         const itemUrl = item.getAttribute('href');
+//         const currentUrl = window.location.pathname;
+//         const currentUrlParts = currentUrl.split('/');
+//         const itemUrlParts = itemUrl.split('/');
+//         if (itemUrlParts[1] === currentUrlParts[1]) {
+//             activeMenuItem(item);
+//         }
+//     });
+// });
 
 
 
@@ -470,7 +470,7 @@ function handleNewSelectElement(select) {
     if (width) {
         wrapper.style.width = width;
     }
-    wrapper.classList.add('select-wrapper', 'relative'); // Add TailwindCSS classes for positioning and spacing
+    wrapper.classList.add('select-wrapper', 'relative', "z-50"); // Add TailwindCSS classes for positioning and spacing
 
 
     // Create the card element
@@ -478,7 +478,7 @@ function handleNewSelectElement(select) {
     Array.from(select.classList).forEach(c => {
         card.classList.add(c);
     });
-    card.classList.add('form-input', 'cursor-pointer');
+    card.classList.add('form-input', 'cursor-pointer', 'z-50');
     card.innerHTML = `
       <div class="card-body flex items-center justify-between">
         <span class="selected-option text-nowrap overflow-hidden">${select.options[select.selectedIndex]?.text || 'Select an option'}</span>
@@ -508,7 +508,7 @@ function handleNewSelectElement(select) {
         'rounded-md',
         'shadow-lg',
         'mt-1',
-        'z-10',
+        'z-50',
     );
 
     // Create the input for filtering
@@ -539,6 +539,7 @@ function handleNewSelectElement(select) {
     optionsContainer.classList.add(
         'overflow-y-auto',
         'max-h-64',
+        'z-50',
 
     );
     Array.from(select.options).forEach(option => {
@@ -615,9 +616,6 @@ function handleNewSelectElement(select) {
     });
 }
 
-up.compiler('#navbar-database-selection select', function (select) {
-    handleNewSelectElement(select);
-})
 
 // Set up a MutationObserver
 const observer = new MutationObserver((mutationsList) => {

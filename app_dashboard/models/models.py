@@ -1,5 +1,7 @@
 from .supply import * # pylint: disable=W0401
 from .subcontractor import * # pylint: disable=W0401
+from .operation import * # pylint: disable=W0401
+
 from .unclassified import * # pylint: disable=W0401
 from .project import * # pylint: disable=W0401
 from .job import *  # pylint: disable=W0401

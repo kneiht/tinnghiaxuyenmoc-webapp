@@ -84,6 +84,7 @@ class SupplyProvider(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         # calculate_payment_states
         # Get all SupplyOrderSupply records for this provider
         order_supplies = SupplyOrderSupply.objects.filter(
@@ -212,6 +213,9 @@ class BaseSupply(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        # First created, lock
+        if self._state.adding:
+            self.lock = True
         super().save(*args, **kwargs)
         DetailSupply.objects.filter(base_supply=self).update(
             material_type=self.material_type,
@@ -348,6 +352,9 @@ class DetailSupply(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        # First created, lock
+        if self._state.adding:
+            self.lock = True
         if self.base_supply:
             self.material_type = self.base_supply.material_type
             self.supply_number = self.base_supply.supply_number

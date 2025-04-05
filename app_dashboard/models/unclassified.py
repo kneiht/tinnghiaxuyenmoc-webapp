@@ -25,6 +25,8 @@ def get_valid_date(date, start_date_mode="now"):
     return date
 
 
+
+
 class Location(BaseModel):
     allow_display = True
     excel_downloadable = True
@@ -843,4 +845,48 @@ class VehicleBankInterest(BaseModel):
     def __str__(self):
         return f'{self.vehicle} - {self.from_date} - {self.to_date}'
 
+class Announcement(BaseModel):
+    allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
+    vietnamese_name = "Thông báo"
+    
+    PRIORITY_CHOICES = [
+        ('low', 'Thấp'),
+        ('medium', 'Trung bình'),
+        ('high', 'Cao'),
+        ('urgent', 'Khẩn cấp'),
+    ]
 
+    title = models.CharField(max_length=255, verbose_name="Tiêu đề")
+    content = models.TextField(verbose_name="Nội dung")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Người đăng")
+    publish_date = models.DateTimeField(verbose_name="Ngày đăng", default=timezone.now)
+    attachment = models.FileField(upload_to='announcements/', verbose_name="Tệp đính kèm", null=True, blank=True)
+    is_pinned = models.BooleanField(default=False, verbose_name="Ghim thông báo")
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
+    
+    class Meta:
+        ordering = ['-is_pinned', '-publish_date']
+    
+    def __str__(self):
+        return self.title + "- " + self.user + " - " + str(self.publish_date)
+    
+    @classmethod
+    def get_display_fields(self):
+        fields = ['title', 'content', 'user', 
+                  'publish_date', 'expiry_date', 'attachment', 'is_pinned']
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields
+    
+    def save(self):
+        # Skip if user changed (keep first user)
+        if self.pk:
+            old_instance = Announcement.objects.get(pk=self.pk)
+            if old_instance.user:
+                self.user = old_instance.user
+        super().save()

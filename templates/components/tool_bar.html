@@ -1,6 +1,6 @@
 {% load custom_tags %}
 
-<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5 mt-3">
+<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5 mt-3 z-30">
     <!-- Toolbar for database interactions -->
     <div class="flex flex-row items-end gap-5">
        
@@ -13,7 +13,7 @@
                 <div id='left-controls' class="flex justify-start gap-4 h-10 w-fit">
 
                     <!-- Controls to manage search and filter options -->
-                    <div id="search-control" class="z-10 w-full flex flex-row justify-between items-center gap-4">
+                    <div id="search-control" class="z-30 w-full flex flex-row justify-between items-center gap-4">
 
                         <!-- Toggle search bar in small screen
                         <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
@@ -21,7 +21,7 @@
                         </button> -->
 
                         <!-- Search bar and filter options -->
-                        <div id="search-bar" class="flex h-10 w-[500px]">
+                        <div id="search-bar" class="flex h-10 w-[500px] z-30">
                             <!-- Input field for filter values -->
                             <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..."
                                 class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme"
@@ -373,7 +373,7 @@
 
         {% endif %} 
 
-        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
+        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "OperationPaymentRecord"  %}
         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
             <span class="me-3"> {{ create_new_button_name }} </span>

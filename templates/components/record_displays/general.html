@@ -3,11 +3,11 @@
 {% load static %}
 
 
-<div id="display-records" class="w-full overflow-scroll mt-4">
+<div id="display-records" class="w-full overflow-scroll mt-4 z-0">
     
     <table id="display-table-records" class="relative table-auto w-full border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
         {% if not update %}
-        <thead class="sticky top-0 z-30">
+        <thead class="sticky top-0 z-10">
             <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 {% for header in headers %}
@@ -15,7 +15,7 @@
                         {{ header }}
                     </th>
                 {% endfor %}
-                <th class="sticky right-0 bg-white dark:bg-slate-800">
+                <th class="sticky right-0 bg-white dark:bg-slate-800 z-30">
 
                 </th>
             </tr>
@@ -78,9 +78,7 @@
                             {% endif %}
                         </div>
                         {% elif field == 'part_providers' or field == 'maintenance_category' or field == 'user' or field == 'vehicle' %}
-                            <div class="flex flex-row gap-2 whitespace-pre-line text-nowrap">
-                                {{ record|format_display:field }}
-                            </div>
+                            <div class="flex flex-row gap-2 whitespace-pre-line text-nowrap">{{ record|format_display:field }}</div>
                         {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 
@@ -90,7 +88,7 @@
     
                     <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 text-right sticky right-0 bg-inherit me-5 z-0">
                         <div class="flex flex-row gap-1 mr-3 justify-end z-0">
-                            {% if model != "User" and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "VehicleMaintenanceAnalysis" %}
+                            {% if model != "User" and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "OperationPaymentRecord" and model != "VehicleMaintenanceAnalysis" %}
                                 <div class="w-10 h-10 flex justify-end items-center">
                                     <form class="flex flex-row justify-end items-center"
                                     action="{% url 'lock' model record.pk %}" up-submit

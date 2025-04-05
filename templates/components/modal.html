@@ -4,7 +4,7 @@
         <!-- Modal Content -->
         <div class="relative top-16 mx-4 card h-fit w-full sm:w-fit mb-28  pb-8">
             <h3 class="mt-7 mb-6 text-xl font-bold leading-6 text-center text-theme">{{ title }}</h3>
-            
+
             {% if form.project.name == 'project' and form.project.value|get_project %}  
                 <div class="mb-3 flex items-center w-full flex-col justify-center">
                     <h3 class="text-lg font-bold text-green-600  uppercase tracking-wide"> {{ form.project.value|get_project }} </h3>
@@ -19,7 +19,7 @@
                 <i class=" fa fa-times" aria-hidden="true"></i>
             </button>
 
-            {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder" or modal == "modal_SubJobOrder" %}
+            {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder" or modal == "modal_SubJobOrder" or modal == "modal_OperationOrder" %}
                 {% if record %}
                     <button id="btn-edit" class="absolute top-5 left-4 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
                             onclick="toggleModalEdit(this)">
@@ -171,7 +171,7 @@
 
                     {% csrf_token %}
                     {% for field in form %}
-                        {% if model == 'Permission' and field.name != 'note'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != 'note' or model == "ProjectUser" and field.name == 'project' or model == 'ProjectUser' and field.name == 'user' %}
+                        {% if model == 'Permission' and field.name != 'note'  or  field.name != 'user' and field.name != 'approval_status' and field.name != 'project' and field.name != 'description' and field.name != "content" and field.name != 'note' or model == "ProjectUser" and field.name == 'project' or model == 'ProjectUser' and field.name == 'user' %}
                         <div class="">
                                 <div>
                                     <label for="{{ field.name }}" class="text-theme">{{ field.label }}</label>
@@ -218,24 +218,33 @@
                     </div>
                     {% endif %}
 
-                    {% if record.provider %}  
-                    <div class="col-span-full flex items-center w-full flex-col justify-center bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-blue-300 dark:border-blue-500">
-                        <span class="text-lg font-bold text-green-600  uppercase tracking-wide">
-                            🔹 Thông tin thanh toán 🔹
-                        </span>
-                        <div>
-                            <span class="text-xl text-gray-900 dark:text-gray-100 font-semibold mt-2">
-                                {{ record.provider.bank_name }} - 
-                            </span>
-                            <span class="text-xl text-blue-500 dark:text-blue-400 font-semibold">
-                                {{ record.provider.account_holder_name }} - 
-                            </span>
-                            <span class="text-xl text-red-500 dark:text-red-400 font-semibold">
-                                {{ record.provider.account_number }}
-                            </span>
-                        </div>
+                    {% if form.content.name == 'content' %}  
+                    <div class="col-span-full">
+                            <label for="note" class="text-theme">Nội dung</label>
+                            {{ form.content }}    
                     </div>
-                    
+                    {% endif %}
+
+
+                    {% if model != "OperationOrder" %}
+                        {% if record.provider or record.sub_contractor or record.operation_receiver %}  
+                        <div class="col-span-full flex items-center w-full flex-col justify-center bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-blue-300 dark:border-blue-500">
+                            <span class="text-lg font-bold text-green-600  uppercase tracking-wide">
+                                🔹 Thông tin thanh toán 🔹
+                            </span>
+                            <div>
+                                <span class="text-xl text-gray-900 dark:text-gray-100 font-semibold mt-2">
+                                    {{ record.provider.bank_name }}{{ record.sub_contractor.bank_name }}{{ record.operation_receiver.bank_name }} - 
+                                </span>
+                                <span class="text-xl text-blue-500 dark:text-blue-400 font-semibold">
+                                    {{ record.provider.account_holder_name }}{{ record.sub_contractor.account_holder_name }}{{ record.operation_receiver.account_holder_name }} - 
+                                </span>
+                                <span class="text-xl text-red-500 dark:text-red-400 font-semibold">
+                                    {{ record.provider.account_number }}{{ record.sub_contractor.account_number }}{{ record.operation_receiver.account_number }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
                     {% endif %}
                 </div>
 
@@ -248,7 +257,10 @@
                 {% elif modal == "modal_SubJobOrder" %}
                     {% include 'components/modals/extend_sub_job_order_base.html' with role=project|get_project_role:user %}
 
-                {% elif modal == 'modal_PaymentRecord' or modal == 'modal_SupplyPaymentRecord' or modal == 'modal_SubJobPaymentRecord'  %}
+                {% elif modal == "modal_OperationOrder" %}
+                    {% include 'components/modals/extend_operation_order_base.html' with role=project|get_project_role:user %}
+
+                {% elif modal == 'modal_PaymentRecord' or modal == 'modal_SupplyPaymentRecord' or modal == 'modal_SubJobPaymentRecord' or modal == "modal_OperationPaymentRecord" %}
                     {% include 'components/modals/payment_record.html' %}
 
                 {%  endif %}
@@ -263,13 +275,13 @@
                 {% endif %}
 
                 <div class="flex justify-center items-center gap-16 pt-8 px-6 hidable approve-hidable
-                {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder"  or modal == "modal_SubJobOrder" %} hidden {% endif %}
+                {% if modal == "modal_VehicleMaintenance" or modal == "modal_SupplyOrder"  or modal == "modal_SubJobOrder" or modal == "modal_OperationOrder" %} hidden {% endif %}
                 {% if record.lock %} hidden {% endif %}">
-                    {% if record and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" %}
+                    {% if record and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "OperationPaymentRecord" %}
                         <button type="button" class="btn btn-danger rounded-full w-28 "
                             onclick="if (confirm('Thao tác này sẽ xóa dữ liệu hoàn toàn, và không thể khôi phục.\n\nBạn có thực sự muốn xóa dữ liệu này không?')) { 
                                 // One more alert to confirm by type if modal = modal_VehicleMaintenance
-                                {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' or modal == 'modal_SubJobOrder' %}
+                                {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' or modal == 'modal_SubJobOrder' or modal == "modal_OperationOrder" %}
                                     if (confirm('Xác nhận xóa dữ liệu.\n\n Toàn bộ các dự liệu Thanh toán và hình ảnh liên quan sẽ bị xóa theo.')) {
                                         document.getElementById('archived').value='true';
                                         document.getElementById('submit-form').click();

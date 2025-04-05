@@ -1319,12 +1319,15 @@ def validate_username_length(value, min_length=6):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username", "first_name", "email", "is_superuser"]
+        fields = ["username", "first_name", "email", "department", "position", "is_superuser"]
         labels = {
             "username": "Tên tài khoản",
             "first_name": "Tên",
             "email": "Email",
             "is_superuser": "Quyền admin",
+            "department": "Bộ phận",
+            "position": "Chức vụ",
+
         }
         widgets = {
             "username": forms.TextInput(
@@ -1365,6 +1368,18 @@ class UserForm(forms.ModelForm):
             "is_superuser": forms.CheckboxInput(
                 attrs={
                     "class": "checkbox",
+                }
+            ),
+            "department": forms.TextInput(
+                attrs={
+                    "placeholder": "Bộ phận",
+                    "class": "form-input",
+                }
+            ),
+            "position": forms.TextInput(
+                attrs={
+                    "placeholder": "Chức vụ",
+                    "class": "form-input",
                 }
             ),
             "groups": forms.SelectMultiple(
@@ -2452,133 +2467,357 @@ class SubJobPaymentRecordForm(forms.ModelForm):
             ),
         }
 
-
-class ProjectPaymentRequestForm(forms.ModelForm):
+class OperationReceiverForm(forms.ModelForm):
     class Meta:
-        model = ProjectPaymentRequest
+        model = OperationReceiver
         fields = [
-            'request_number',
-            'request_date', 
-            'requester_name',
-            'department',
-            'position',
-            'amount',
-            'note',
-            'project',
-            'payment_method',
-            'recipient_name',
-            'bank_name',
-            'account_number', 
-            'account_holder',
-            'approval_status'
+            "name",
+            "bank_name",
+            "account_number",
+            "account_holder_name",
+            "phone_number",
+            "address",
+            "note",
         ]
-        
         labels = {
-            'request_number': 'Số đề nghị',
-            'request_date': 'Ngày đề nghị',
-            'requester_name': 'Người đề nghị',
-            'department': 'Bộ phận',
-            'position': 'Chức vụ',
-            'amount': 'Số tiền đề nghị',
-            'note': 'Lý do thanh toán',
-            'project': 'Công trình',
-            'payment_method': 'Hình thức thanh toán',
-            'recipient_name': 'Người nhận',
-            'bank_name': 'Ngân hàng',
-            'account_number': 'Số tài khoản',
-            'account_holder': 'Chủ tài khoản',
-            'approval_status': 'Trạng thái'
+            "name": "Tên bên thụ hưởng",
+            "bank_name": "Ngân hàng",
+            "account_number": "Số tài khoản",
+            "account_holder_name": "Tên chủ tài khoản",
+            "phone_number": "Số điện thoại",
+            "address": "Địa chỉ",
+            "note": "Ghi chú",
+        }
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "placeholder": "Tên bên thụ hưởng",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "bank_name": forms.TextInput(
+                attrs={
+                    "placeholder": "Ngân hàng",
+                    "class": "form-input",
+                }
+            ),
+            "account_number": forms.TextInput(
+                attrs={
+                    "placeholder": "Số tài khoản",
+                    "class": "form-input",
+                }
+            ),
+            "account_holder_name": forms.TextInput(
+                attrs={
+                    "placeholder": "Tên chủ tài khoản",
+                    "class": "form-input",
+                }
+            ),
+            "phone_number": forms.TextInput(
+                attrs={
+                    "placeholder": "Số điện thoại",
+                    "class": "form-input",
+                }
+            ),
+            "address": forms.TextInput(
+                attrs={
+                    "placeholder": "Địa chỉ",
+                    "class": "form-input",
+                }
+            ),
+            "note": forms.Textarea(
+                attrs={
+                    "class": "form-input h-20",
+                }
+            ),
         }
 
+class OperationOrderForm(forms.ModelForm):
+    class Meta:
+        model = OperationOrder
+        fields = [
+            "user",
+            "order_code",
+            "project",
+            "order_amount",
+            "approval_status",
+            "payment_method",
+            "operation_receiver",
+            "note",
+        ]
+        labels = {
+            "order_code": "Mã phiếu",
+            "project": "Dự án",
+            "order_amount": "Tổng tiền",
+            "approval_status": "Duyệt",
+            "paid_status": "Thanh toán",
+            "payment_method": "Hình thức thanh toán",
+            "operation_receiver": "Bên thụ hưởng",
+            "note": "Ghi chú",
+            "created_at": "Ngày tạo phiếu",
+        }
         widgets = {
-            'request_number': forms.TextInput(
+            "order_code": forms.TextInput(
                 attrs={
-                    'placeholder': 'Nhập số đề nghị',
-                    'class': 'form-input',
-                    'type': 'text',
-                    'required':'required'
+                    "placeholder": "Tự động sau khi lưu",
+                    "class": "form-input",
+                    "readonly": "readonly",
                 }
             ),
-            'request_date': forms.DateInput(
+            "project": forms.Select(
                 attrs={
-                    'class': 'form-input',
-                    'type': 'date',
-                    'required': 'required'
+                    "placeholder": "Chọn dự án",
+                    "class": "form-input",
+                    "required": "required",
                 }
             ),
-            'requester_name': forms.TextInput(
+            "order_amount": forms.NumberInput(
                 attrs={
-                    'placeholder': 'Nhập tên người đề nghị',
-                    'class': 'form-input',
-                    'required': 'required'
+                    "placeholder": "Tổng tiền",
+                    "class": "form-input text-2xl",
+                    "required": "required",
                 }
             ),
-            'department': forms.TextInput(
+            "approval_status": forms.Select(
                 attrs={
-                    'placeholder': 'Nhập bộ phận',
-                    'class': 'form-input',
-                    'required': 'required'
-                }
-            ),
-            'position': forms.TextInput(
-                attrs={
-                    'placeholder': 'Nhập chức vụ',
-                    'class': 'form-input',
-                    'required': 'required'
-                }
-            ),
-            'amount': forms.NumberInput(
-                attrs={
-                    'placeholder': 'Nhập số tiền',
-                    'class': 'form-input text-2xl',
-                    'required': 'required'
-                }
-            ),
-            'note': forms.Textarea(
-                attrs={
-                    'placeholder': 'Nhập lý do thanh toán',
-                    'class': 'form-input h-20',
-                    'required': 'required',
-                    'rows': 2
-                }
-            ),
-            'payment_method': forms.Select(
-                attrs={
-                    'class': 'form-input',
-                    'required': 'required'
+                    "placeholder": "Chọn trạng thái phê duyệt",
+                    "class": "form-input",
+                    "required": "required",
                 },
-                choices=ProjectPaymentRequest.PAYMENT_METHOD_CHOICES
+                choices=OperationOrder.APPROVAL_STATUS_CHOICES,
             ),
-            'recipient_name': forms.TextInput(
+            "paid_status": forms.Select(
                 attrs={
-                    'placeholder': 'Nhập tên người nhận',
-                    'class': 'form-input',
-                    'required': 'required'
-                }
-            ),
-            'bank_name': forms.TextInput(
-                attrs={
-                    'placeholder': 'Nhập tên ngân hàng',
-                    'class': 'form-input'
-                }
-            ),
-            'account_number': forms.TextInput(
-                attrs={
-                    'placeholder': 'Nhập số tài khoản',
-                    'class': 'form-input'
-                }
-            ),
-            'account_holder': forms.TextInput(
-                attrs={
-                    'placeholder': 'Nhập tên chủ tài khoản',
-                    'class': 'form-input'
-                }
-            ),
-            'approval_status': forms.Select(
-                attrs={
-                    'class': 'form-input',
-                    'required': 'required'
+                    "placeholder": "Chọn trạng thái thanh toán",
+                    "class": "form-input",
+                    "required": "required",
                 },
-                choices=ProjectPaymentRequest.STATUS_CHOICES
-            )
+                choices=OperationOrder.PAID_STATUS_CHOICES,
+            ),
+            "payment_method": forms.Select(
+                attrs={
+                    "placeholder": "Chọn hình thức thanh toán",
+                    "class": "form-input",
+                    "required": "required",
+                },
+                choices=OperationOrder.PAYMENT_METHOD_CHOICES,
+            ),
+            "operation_receiver": forms.Select(
+                attrs={
+                    "placeholder": "Bên thụ hưởng",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "note": forms.Textarea(
+                attrs={
+                    "class": "form-input h-20",
+                    "rows": 2,
+                }
+            ),
+            "created_at": forms.DateTimeInput(
+                attrs={
+                    "class": "form-input",
+                    "type": "date",
+                    "required": "required",
+                    "readonly": "readonly",
+                }
+            ),
+        }
+
+
+class OperationPaymentRecordForm(forms.ModelForm):
+    class Meta:
+        model = OperationPaymentRecord
+        fields = [
+            "project",
+            "operation_order",
+            "operation_receiver",
+            "requested_amount",
+            "requested_date",
+            "transferred_amount",
+            "payment_date",
+            "image1",
+            "image2",
+            "money_source",
+            "lock",
+            "note",
+        ]
+        labels = {
+            "operation_order": "Phiếu đề xuất",
+            "operation_receiver": "Bên thụ hưởng",
+            "status": "Trạng thái thanh toán",
+            "purchase_amount": "Tổng tiền trên phiếu",
+            "previous_debt": "Nợ kì trước",
+            "requested_amount": "Số tiền đề nghị",
+            "requested_date": "Ngày đề nghị",
+            "transferred_amount": "Tiền thanh toán",
+            "payment_date": "Ngày thanh toán",
+            "debt": "Nợ còn lại",
+            "image1": "Hình 1",
+            "image2": "Hình 2",
+            "lock": "Khoá phiếu thanh toán",
+            "money_source": "Nguồn tiền",
+            "note": "Ghi chú",
+        }
+        widgets = {
+            "operation_order": forms.Select(
+                attrs={
+                    "placeholder": "Chọn phiếu đề xuất",
+                    "class": "form-input",
+                    "required": "required",
+                    "readonly": "readonly",
+                }
+            ),
+            "operation_receiver": forms.Select(
+                attrs={
+                    "placeholder": "Chọn bên thụ hưởng",
+                    "class": "form-input",
+                    "required": "required",
+                    "readonly": "readonly",
+                }
+            ),
+            "status": forms.Select(
+                attrs={
+                    "placeholder": "Chọn trạng thái",
+                    "class": "form-input",
+                    "required": "required",
+                },
+                choices=OperationPaymentRecord.PAID_STATUS_CHOICES,
+            ),
+            "purchase_amount": forms.NumberInput(
+                attrs={
+                    "placeholder": "Tổng tiền trên phiếu",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "previous_debt": forms.NumberInput(
+                attrs={
+                    "placeholder": "Nợ kì trước",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "requested_amount": forms.NumberInput(
+                attrs={
+                    "placeholder": "Số tiền đề nghị",
+                    "class": "form-input text-2xl",
+                    "required": "required",
+                }
+            ),
+            "requested_date": forms.DateInput(
+                attrs={
+                    "placeholder": "Ngày đề nghị",
+                    "class": "form-input",
+                    "required": "required",
+                    "type": "date",
+                }
+            ),
+            "transferred_amount": forms.NumberInput(
+                attrs={
+                    "placeholder": "Tiền thanh toán",
+                    "class": "form-input text-2xl",
+                    "required": "required",
+                }
+            ),
+            "payment_date": forms.DateInput(
+                attrs={
+                    "placeholder": "Ngày thanh toán",
+                    "class": "form-input",
+                    "required": "required",
+                    "type": "date",
+                }
+            ),
+            "lock": forms.CheckboxInput(
+                attrs={
+                    "class": "form-input checkbox",
+                }
+            ),
+            "money_source": forms.Select(
+                attrs={
+                    "placeholder": "Chọn nguồn tiền",
+                    "class": "form-input text-lg",
+                    "required": "required",
+                },
+                choices=OperationPaymentRecord.MONEY_SOURCE_CHOICES,
+            ),
+            "image1": forms.FileInput(
+                attrs={
+                    "class": "form-input-file",
+                }
+            ),
+            "image2": forms.FileInput(
+                attrs={
+                    "class": "form-input-file",
+                }
+            ),
+            "note": forms.Textarea(
+                attrs={
+                    "class": "form-input text-lg",
+                    "required": False,
+                    "style": "height: 80px;",
+                }
+            ),
+        }
+
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = [
+            "title",
+            "content",
+            "user",
+            "attachment",
+            "is_pinned",
+        ]
+        labels = {
+            "title": "Tiêu đề",
+            "content": "Nội dung",
+            "user": "Người đăng",
+            "publish_date": "Ngày đăng",
+            "attachment": "Tệp đính kèm",
+            "is_pinned": "Ghim thông báo",
+        }
+        widgets = {
+            "title": forms.TextInput(
+                attrs={
+                    "placeholder": "Nhập tiêu đề thông báo",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "content": forms.Textarea(
+                attrs={
+                    "placeholder": "Nhập nội dung thông báo",
+                    "class": "form-input",
+                    "required": "required",
+                    "style": "height: 200px;",
+                }
+            ),
+            "user": forms.Select(
+                attrs={
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "publish_date": forms.DateTimeInput(
+                attrs={
+                    "class": "form-input",
+                    "type": "datetime-local",
+                    "required": "required",
+                }
+            ),
+            "attachment": forms.FileInput(
+                attrs={
+                    "class": "form-input-file",
+                }
+            ),
+            "is_pinned": forms.CheckboxInput(
+                attrs={
+                    "class": "form-input checkbox",
+                }
+            ),
         }

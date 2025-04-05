@@ -4,7 +4,7 @@
 
 
 {% block title %}
-    {{ header_title }}
+    {{ page_name }}
 {% endblock %}
 
 
@@ -17,7 +17,7 @@
     <main>
         {% include 'components/nav_bar.html' %}
 
-        <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll">
+        {% comment %} <div id="database-selection" class="flex items-center m-auto mb-2 overflow-scroll">
             {% for each_sub_page, display_name in display_name_dict.items %}
             <div>
                 <a up-preload="insert" href="{% url 'page_transport_department' sub_page=each_sub_page %}"
@@ -44,7 +44,7 @@
                 {% endif %}
             </div>
             {% endfor %}
-        </div>
+        </div> {% endcomment %}
 
 
         {% if sub_page == 'VehicleOperationRecord' %}

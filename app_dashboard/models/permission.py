@@ -29,7 +29,14 @@ def get_display_fields(self):
     the admin interface. The list will only include fields that are actually
     available in the User model.
     """
-    fields = ["username", "first_name", "email", "is_superuser"]
+    fields = [
+        "username",
+        "first_name",
+        "email",
+        "department",
+        "position",
+        "is_superuser",
+    ]
     # Create a new list with only valid fields
     return [field for field in fields if hasattr(self, field)]
 
@@ -56,7 +63,7 @@ def check_permission(self, model):
         return_permission.approve = True
         return_permission.lock = True
         return return_permission
-    
+
     # Check if the  model is allowed to be displayed
     try:
         model_class = apps.get_model("app_dashboard", model)
@@ -65,7 +72,7 @@ def check_permission(self, model):
 
     if not hasattr(model_class, "allow_display"):
         return return_permission
-    
+
     # Check if the model is allowed to be displayed
     if not model_class.allow_display:
         return return_permission
@@ -80,12 +87,12 @@ def check_permission(self, model):
     # Check if the user has permission
     if not user_permission:
         return return_permission
-    
+
     # Get permission of a model
     model = model.lower()
     if not hasattr(user_permission, model):
         return return_permission
-    
+
     # Get permission of a model
     model_permission = getattr(user_permission, model)
 
@@ -110,6 +117,28 @@ User.add_to_class("vietnamese_name", "Quản lý tài khoản")
 User.add_to_class("get_display_fields", get_display_fields)
 User.add_to_class("check_permission", check_permission)
 User.add_to_class("get_vietnamese_name", get_vietnamese_name)
+
+# Add department and position fields
+User.add_to_class(
+    "department",
+    models.CharField(max_length=255, verbose_name="Bộ phận", default="", blank=True),
+)
+User.add_to_class(
+    "position",
+    models.CharField(max_length=255, verbose_name="Chức vụ", default="", blank=True),
+)
+User.add_to_class(
+    "lock",
+    models.BooleanField(
+        verbose_name="Khóa sửa chữa",
+        default=False,
+    )
+)
+# Add verbose names for existing fields
+User._meta.get_field("username").verbose_name = "Tên đăng nhập"
+User._meta.get_field("first_name").verbose_name = "Tên người dùng"
+User._meta.get_field("email").verbose_name = "Email"
+User._meta.get_field("is_superuser").verbose_name = "Quyền admin"
 
 
 class UserExtra(BaseModel):
@@ -181,6 +210,7 @@ def create_dynamic_permission_model(model_name="Permission"):
             null=True,
             blank=True,
         )
+
     # Add get_display_fields method
     @classmethod
     def get_display_fields(cls):
@@ -192,25 +222,11 @@ def create_dynamic_permission_model(model_name="Permission"):
                 fields.append(field.name)
         return fields
 
-    attrs['get_display_fields'] = get_display_fields
+    attrs["get_display_fields"] = get_display_fields
 
     # Create the model dynamically
     return type(model_name, (BaseModel,), attrs)
 
 
-#Create Permission
+# Create Permission
 Permission = create_dynamic_permission_model()
-
-
-
-
-
-
-
-
-
-
-
-
-
-

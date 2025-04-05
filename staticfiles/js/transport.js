@@ -116,7 +116,7 @@ up.compiler('#start_date', function (element) {
         let newStartDate = startDate.value;
 
         // Find all <a> tags in database-selection
-        let databaseSelection = document.getElementById('database-selection');
+        let databaseSelection = document.getElementById('#nav_menu');
         let aTags = databaseSelection.querySelectorAll('a');
 
         // For each <a> tag

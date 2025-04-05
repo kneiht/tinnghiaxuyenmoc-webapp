@@ -50,13 +50,13 @@
                     
                     </select>
                     {% endif %}
-                    {% else %}
-                        <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
-                            
-                            <option selected value="scratch">Bảng nháp</option>
-                        </select>
-                            <!-- <span class="scratch text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">Bản nháp</span> -->
-                    {% endif %}
+                {% else %}
+                    <select name="approval_status" class="form-input hidable approve-hidable hidden" id="id_approval_status" style="width: 150px">
+                        
+                        <option selected value="scratch">Bảng nháp</option>
+                    </select>
+                        <!-- <span class="scratch text-white p-1 rounded-md shadow-2xl px-2 text-nowrap hidable approve-hidable">Bản nháp</span> -->
+                {% endif %}
             </div>
             {% if record %}
             <div class="w-4/12 text-center">

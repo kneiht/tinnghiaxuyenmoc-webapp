@@ -73,6 +73,7 @@ class SubContractor(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         # calculate_payment_states
         # Get all SubJobOrderSubJob records for this provider
         order_sub_jobs = SubJobOrderSubJob.objects.filter(
@@ -184,6 +185,9 @@ class BaseSubJob(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        # First created, lock
+        if self._state.adding:
+            self.lock = True
         super().save(*args, **kwargs)
         DetailSubJob.objects.filter(base_sub_job=self).update(
             job_type=self.job_type,
@@ -332,6 +336,9 @@ class DetailSubJob(BaseModel):
         return fields
 
     def save(self, *args, **kwargs):
+        # First created, lock
+        if self._state.adding:
+            self.lock = True
         if self.base_sub_job:
             self.job_type = self.base_sub_job.job_type
             self.job_number = self.base_sub_job.job_number

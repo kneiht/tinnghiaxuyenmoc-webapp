@@ -19,7 +19,7 @@ class BaseModel(models.Model):
     excel_uploadable = False
     last_saved = models.DateTimeField(default=timezone.now, blank=True, null=True)
     archived = models.BooleanField(default=False)
-    lock = models.BooleanField(verbose_name="Khóa phiếu", default=False)
+    lock = models.BooleanField(verbose_name="Khóa chỉnh sửa", default=False)
 
     class Meta:
         abstract = True  # Specify this model as Abstract

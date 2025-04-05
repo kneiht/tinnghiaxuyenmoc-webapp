@@ -546,8 +546,8 @@ def render_form(request, **kwargs):
         "record": record,
     }
 
-    if model in ["VehicleMaintenance", "SupplyOrder", "SubJobOrder"]:
-        permissions = request.user.check_permission("VehicleMaintenance")
+    if model in ["VehicleMaintenance", "SupplyOrder", "SubJobOrder", "OperationOrder"]:
+        permissions = request.user.check_permission(model)
         context["permissions"] = permissions
 
     template = "components/modal.html"

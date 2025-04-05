@@ -1,5 +1,7 @@
 from django import template
 from django.urls import reverse
+import markdown2
+from django.utils.safestring import mark_safe
 
 from app_dashboard.models.models import Thumbnail
 
@@ -86,47 +88,16 @@ def get_sign(record, field):
     else:
         return "-"
 
+@register.filter(name='markdown')
+def markdown_filter(text):
+    if not text:
+        return ''
+    return mark_safe(markdown2.markdown(text, extras=['fenced-code-blocks', 'tables', 'break-on-newline']))
+
 @register.filter(name='format_display')
 def format_display(record, field=None):
     if hasattr(record, 'get_{}_display'.format(field)):
         return getattr(record, 'get_{}_display'.format(field))()
-    
-
-    # if field in ["total_purchase_amount", "total_transferred_amount", "total_outstanding_debt"]:
-    #     model_name = record._meta.model_name
-    #     if model_name.lower() == 'partprovider':
-    #         def get_total_purchase_amount(provider):
-    #             # Get all VehicleMaintenanceRepairPart
-    #             repair_parts = VehicleMaintenanceRepairPart.objects.filter(
-    #                 repair_part__part_provider=provider
-    #             )
-    #             # Calculate the purchase amount
-    #             purchase_amount = 0
-    #             for repair_part in repair_parts:
-    #                 purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
-    #             return purchase_amount
-
-    #         def get_total_transferred_amount(provider):
-    #             # Calculate the transferred amount
-    #             transferred_amount = 0
-    #             payment_records = PaymentRecord.objects.filter(provider=provider)
-    #             for payment_record in payment_records:
-    #                 transferred_amount += payment_record.transferred_amount
-    #             return transferred_amount
-
-    #         if field == "total_purchase_amount":
-    #             purchase_amount = get_total_purchase_amount(record)
-    #             return "{:,}".format(int(purchase_amount))
-
-    #         elif field == "total_transferred_amount":
-    #             transferred_amount = get_total_transferred_amount(record)
-    #             return "{:,}".format(int(transferred_amount))
-
-    #         elif field == "total_outstanding_debt":
-    #             purchase_amount = get_total_purchase_amount(record)
-    #             transferred_amount = get_total_transferred_amount(record)
-    #             return "{:,}".format(int(purchase_amount - transferred_amount))
-
 
     if record == None:
         return ""
@@ -803,12 +774,12 @@ def calculate_revenue_report(vehicle_operation_records, vehicle, select_start_da
             else:
                 monthly_salary = salary_data['data']['monthly_salary']['total_monthly_salary']
                 hourly_salary = salary_data['data']['hourly_salary']['total_hourly_salary']
-                total_cost += monthly_salary + hourly_salary
-                monthly_salary = format_money_PL(monthly_salary)
-                hourly_salary = format_money_PL(hourly_salary)
-                monthly_salary_display += f'- {driver.full_name}: {monthly_salary}\n'
-                hourly_salary_display += f'- {driver.full_name}: {hourly_salary}\n'
-            
+                fixed_allowance = salary_data['data']['total_fixed_allowance']
+                fuel_allowance = salary_data['data']['fuel_allowance']
+                total_cost += monthly_salary + hourly_salary + fixed_allowance + fuel_allowance
+                monthly_salary_display += f'- {driver.full_name}: \n   + Lương {format_money_PL(monthly_salary)}\n   + Phụ cấp: {format_money_PL(fixed_allowance)}\n   + Trợ cấp nhiên liệu: {format_money_PL(fuel_allowance)}\n'
+                hourly_salary_display += f'- {driver.full_name}: {format_money_PL(hourly_salary)}\n'
+
         total_revenue = revenue
         if type(revenue_base) != str:
             revenue_base = format_money_PL(revenue_base)
