@@ -180,6 +180,13 @@ def handle_form(request, model, pk=0):
         )
 
     form = form_class(request.POST, request.FILES, instance=instance)
+    if form_class == AnnouncementForm:
+        if instance and request.user != instance.user:
+            message = "Bạn không có quyền chỉnh sửa thông báo này. \n\n Vui lòng liên hệ admin."
+            message_type = "red"
+            return HttpResponse(
+                render_message(request, message=message, message_type=message_type)
+            )
 
     # Add missing data if there's an instance
     # Add missing data if there's an instance
