@@ -3,15 +3,15 @@
 {% load custom_tags %}
 
 <!-- This is the navagation bar section, which contains the navigation elements. -->
-<div id="nav_bar" class="flex justify-between items-center gap-4 h-8 my-3">
-
+<div id="nav_bar" class="flex items-center gap-4 h-8 my-3">
+    <img src="/static/images/logo.png" alt="Logo" class="object-contain h-10 w-28">
     <!-- This is the left part of the navagation bar with the logo, buttons -->
-    <div id="nav_bar_left" class="flex justify-start items-center gap-5">
+    <div id="nav_bar_left" class="flex items-center gap-1 flex-grow">
     
-        <img src="/static/images/logo.png" alt="Logo" class="object-contain h-10 w-28">
+        
 
-            <div id="nav_menu" class="flex items-center m-auto gap-5">
-                <!-- Main navigation items based on nav_items -->
+            <div id="nav_menu" class="flex items-center gap-1">
+                    <!-- Main navigation items based on nav_items -->
                 {% for page_key, page_info in nav_items.items %}
                     <div class="relative group">
                         <div class="p-2 flex justify-start items-center rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 text-nowrap cursor-pointer text-theme {% if request.resolver_match.url_name == page_key %}bg-gray-200 dark:bg-gray-800{% endif %} nav-item" data-page="{{ page_key }}">
@@ -51,20 +51,19 @@
             
             <!-- Vertical separator and current table badge -->
             {% if page_name %}
-            <div class="flex items-center">
-                <div class="h-8 w-px bg-gray-300 dark:bg-gray-700 mx-4"></div>
-                <div class="flex whitespace-nowrap items-center gap-2 px-3 py-2 rounded-lg bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-100 text-md font-medium border border-cyan-300 dark:border-cyan-800">
+            <div class="h-8 w-px bg-gray-300 dark:bg-gray-700 mx-1 me-3"></div>
+            <div id="current-content" class="flex items-center flex-grow">
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-100 text-md font-medium border border-cyan-300 dark:border-cyan-800">
                     <i class="fa fa-table" aria-hidden="true"></i>
-                    Đang xem: <span>{{ page_name }}</span>
+                    <span class="text-nowrap"> Đang xem: </span>
+                    <span class="page-name text-ellipsis overflow-hidden whitespace-nowrap" style="text-overflow: ellipsis; display: inline-block; max-width: 400px">{{ page_name }}</span>
                 </div>
             </div>
             {% endif %}
     </div>
 
-
-
     <!-- This is the right part of the navagation bar with quick settings, and profile dropdown. -->
-    <div id="nav_bar_right" class="flex justify-end items-center gap-5">
+    <div id="nav_bar_right" class="flex items-center gap-5">
 
         <!-- Display user role with an icon and styled text -->
         <div id="user_role" class="flex justify-center items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 text-md font-semibold text-nowrap">
@@ -209,6 +208,3 @@
         }
     });
 </script>
-
-
-

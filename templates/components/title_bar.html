@@ -1,13 +1,13 @@
 {% load custom_tags %}
 
 {% if page == 'page_each_project' %}
-<div id="title-bar" class="flex flex-col justify-between mb-3 gap-3">
+<div id="title-bar" class="flex flex-row justify-items-center items-center text-center mb-3 gap-3 mx-auto container">
 
-    <div class="flex flex-wrap gap-x-10 gap-y-5 justify-between items-center mt-2 w-full">
-        <div class="flex gap-4 justify-between items-center">
+    <div class="flex flex-wrap gap-x-10 gap-y-3 justify-items-center items-center w-full">
+        {% comment %} <div class="flex gap-4 justify-between items-center">
             <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
-        </div>
-        <div class="flex flex-nowrap gap-10 justify-between items-center mt-2">
+        </div> {% endcomment %}
+        <div class="flex flex-wrap gap-x-10 gap-y-3 items-center">
             <div id="project-display-mode" class="flex gap-3">
                 <a id="show-gantt-jobs" class="btn btn-primary text-nowrap cursor-pointer">
                     <i class="fas fa-bar-chart px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
@@ -17,7 +17,7 @@
                 <a id="show-table-jobs" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-table px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block"> Xem Table </span>
-                </a>
+                </a>    
 
                 <a id="show-weekplan" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|infor_bar|weekplan_table' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-bullseye px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
@@ -69,7 +69,7 @@
 </div>
 
 {% else %}
-<div id="title-bar" class="flex flex-nowrap justify-between mb-6 gap-5">
+<div id="title-bar" class="flex flex-nowrap justify-between mb-6 gap-5 mx-auto container">
     <div class="w-3/6 flex gap-4 justify-between items-center mt-2">
         <p class="text-2xl text-center font-semibold text-theme truncate"> {{ title }} </p>
     </div>

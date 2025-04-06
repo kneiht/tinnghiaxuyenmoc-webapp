@@ -2503,7 +2503,9 @@ def page_each_project(request, pk):
         "nav_items": NAV_ITEMS,
         "project_id": project_id,
         "check_date": check_date,
-        "project": project}
+        "project": project,
+        "page_name": project.name,
+    }
     return render(request, "pages/page_each_project.html", context)
 
 
