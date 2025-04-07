@@ -470,7 +470,7 @@ function handleNewSelectElement(select) {
     if (width) {
         wrapper.style.width = width;
     }
-    wrapper.classList.add('select-wrapper', 'relative', "z-50"); // Add TailwindCSS classes for positioning and spacing
+    wrapper.classList.add('select-wrapper', 'relative'); // Add TailwindCSS classes for positioning and spacing
 
 
     // Create the card element
@@ -478,7 +478,7 @@ function handleNewSelectElement(select) {
     Array.from(select.classList).forEach(c => {
         card.classList.add(c);
     });
-    card.classList.add('form-input', 'cursor-pointer', 'z-50');
+    card.classList.add('form-input', 'cursor-pointer');
     card.innerHTML = `
       <div class="card-body flex items-center justify-between">
         <span class="selected-option text-nowrap overflow-hidden">${select.options[select.selectedIndex]?.text || 'Select an option'}</span>
@@ -508,7 +508,7 @@ function handleNewSelectElement(select) {
         'rounded-md',
         'shadow-lg',
         'mt-1',
-        'z-50',
+        'z-10',
     );
 
     // Create the input for filtering
@@ -539,7 +539,6 @@ function handleNewSelectElement(select) {
     optionsContainer.classList.add(
         'overflow-y-auto',
         'max-h-64',
-        'z-50',
 
     );
     Array.from(select.options).forEach(option => {
