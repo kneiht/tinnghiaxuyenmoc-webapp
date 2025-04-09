@@ -91,12 +91,11 @@ def decide_permission(request, action, params):
                         return render_message(
                             request, message=message, message_type=message_type
                         )
-                else:
+                elif model == "OperationOrder":
                     if not project_user or project_user.role in [
-                        "supervisor",
-                        "accountant",
+                        "view_only",
                     ]:
-                        message = "Chỉ có vị trí Giám sát và Kế toán mới có thể tạo và sửa phiếu. \n Vui lòng liên hệ admin cấp quyền."
+                        message = "Bạn chỉ có quyền xem dữ liệu, chưa được cấp vị trí thao tác trong dự án. \n Vui lòng liên hệ admin cấp quyền."
                         message_type = "red"
                         return render_message(
                             request, message=message, message_type=message_type
