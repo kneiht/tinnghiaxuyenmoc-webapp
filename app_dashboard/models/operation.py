@@ -282,6 +282,13 @@ class OperationOrder(BaseModel):
         }
         return state
 
+    def delete(self, *args, **kwargs):
+        operation_receiver = None
+        operation_receiver = self.operation_receiver
+        super().delete(*args, **kwargs)
+        if operation_receiver:
+            operation_receiver.save()
+
 
 class OperationPaymentRecord(BaseModel):
     allow_display = True

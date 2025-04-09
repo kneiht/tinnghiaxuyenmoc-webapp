@@ -29,6 +29,7 @@ from .renders import *
 from .utils import *
 from .navbar import NAV_ITEMS
 
+
 @login_required
 def decide_permission(request, action, params):
     # CHECK PERMISSIONS
@@ -2430,11 +2431,12 @@ def page_home(request, sub_page=None):
     }
     return render(request, "pages/page_home.html", context)
 
+
 @login_required
 def page_general_data(request, sub_page=None):
     if sub_page == None:
         return redirect("page_general_data", sub_page="VehicleType")
-    
+
     context = {
         "sub_page": sub_page,
         "model": sub_page,
@@ -2472,7 +2474,9 @@ def page_transport_department(request, sub_page=None):
         "start_date": start_date,
         "end_date": end_date,
         "check_month": check_month,
-        "page_name": NAV_ITEMS.get("page_transport_department").get("sub_pages").get(sub_page),
+        "page_name": NAV_ITEMS.get("page_transport_department")
+        .get("sub_pages")
+        .get(sub_page),
     }
     return render(request, "pages/page_transport_department.html", context)
 
@@ -2548,6 +2552,12 @@ def clean(request):
     result += (
         f"\nDeleted {deleted_count} SupplyOrderSupply records with null foreign keys"
     )
+
+    # do the same for operation
+    orphan_records = OperationPaymentRecord.objects.filter(operation_order__isnull=True)
+    deleted_count = orphan_records.count()
+    orphan_records.delete()
+    result += f"\nDeleted {deleted_count} OperationPaymentRecord records with null foreign keys"
 
     return HttpResponse(result)
 
