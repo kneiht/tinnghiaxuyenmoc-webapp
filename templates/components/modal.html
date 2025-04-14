@@ -36,6 +36,11 @@
                          up-preload="insert" up-target="#modal-sub:maybe">
                          Xem hình ảnh
                      </a>
+                    {% elif modal == "modal_SupplyOrder" or modal == "modal_SubJobOrder" or modal == "modal_OperationOrder" %}
+                    <a href="{% url 'form_project_order_images' model record.pk %}" class="absolute top-5 left-36 btn btn-primary rounded-full text-nowrap h-8 w-28 text-sm"
+                         up-preload="insert" up-target="#modal-sub:maybe">
+                         Xem hình ảnh
+                     </a>
                     {% endif %}
 
                 {% else %}

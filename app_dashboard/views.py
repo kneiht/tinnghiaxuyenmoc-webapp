@@ -2660,3 +2660,35 @@ def lock(request, model_name, pk):
         record.save_lock()
 
         return HttpResponse(html_lock)
+
+
+@login_required
+def form_project_order_images(request, model, order_id):
+    # If Get
+    model_class = globals()[model]
+    image_model_class = globals()[model + "Image"]
+    if request.method == "GET":
+        order = model_class.objects.get(pk=order_id)
+        # Get the list of images for the order record
+        order_images = image_model_class.objects.filter(order=order)
+
+        context = {
+            "order_id": order_id,
+            "model": model,
+            "order_images": order_images,
+        }
+        return render(request, "components/modal_project_order_gallery.html", context)
+    # If Post
+    elif request.method == "POST":
+        images = []
+        try:
+
+            # Save images to the database
+            for image in request.FILES.getlist("images[]"):
+                order_image = image_model_class.objects.create(
+                    order_id=order_id, image=image
+                )
+                images.append({"id": order_image.id, "url": order_image.image.url})
+            return JsonResponse({"success": True, "images": images})
+        except:
+            return JsonResponse({"success": False})

@@ -44,6 +44,14 @@ def backup_db(db, name, app_name):
     print(f"Backing up {db} to {backup_path}...")
     os.system(cmd)
 
+    # In ra kích thước file backup
+    if os.path.exists(backup_path):
+        file_size_bytes = os.path.getsize(backup_path)
+        file_size_mb = file_size_bytes / (1024 * 1024)
+        print(
+            f"📊 Kích thước file backup: {file_size_mb:.2f} MB ({file_size_bytes:,} bytes)"
+        )
+
     # Upload to Google Drive using rclone
     upload_cmd = f"/home/minhthienk/.local/bin/rclone copy {backup_path} gdrive:/BACKUPS/{app_name}/db/"
     print(f"Uploading {backup_path} to Google Drive...")
@@ -87,6 +95,14 @@ def zip_and_upload_media(filename_prefix, source_folder, app_name):
 
     print(f"📦 Zip created: {zip_path}")
 
+    # In ra kích thước file zip
+    if os.path.exists(zip_path):
+        file_size_bytes = os.path.getsize(zip_path)
+        file_size_mb = file_size_bytes / (1024 * 1024)
+        print(
+            f"📊 Kích thước file zip: {file_size_mb:.2f} MB ({file_size_bytes:,} bytes)"
+        )
+
     # Upload to Google Drive
     upload_cmd = f"/home/minhthienk/.local/bin/rclone copy {zip_path} gdrive:/BACKUPS/{app_name}/media/"
     print(f"☁️ Uploading media backup to Google Drive...")
@@ -109,6 +125,68 @@ def zip_and_upload_media(filename_prefix, source_folder, app_name):
         print(upload_result.stderr)
 
 
+def zip_and_upload_entire_folder(
+    filename_prefix, source_folder, app_name, destination_folder="full_backup"
+):
+    """
+    Zip toàn bộ nội dung của một thư mục và upload lên Google Drive.
+
+    Args:
+        filename_prefix (str): Tiền tố cho tên file zip
+        source_folder (str): Đường dẫn đến thư mục cần zip
+        app_name (str): Tên ứng dụng (dùng để phân loại trong Google Drive)
+        destination_folder (str): Thư mục đích trên Google Drive (mặc định là "full_backup")
+    """
+    date_time_str = get_date_time()
+    zip_filename = f"{filename_prefix}_full_{date_time_str}.zip"
+    zip_path = os.path.join("backups", zip_filename)
+
+    print(f"🔍 Đang nén toàn bộ thư mục {source_folder} vào {zip_path}...")
+
+    # Tạo thư mục backups nếu chưa tồn tại
+    os.makedirs("backups", exist_ok=True)
+
+    # Tạo file zip
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk(source_folder):
+            for file in files:
+                filepath = os.path.join(root, file)
+                arcname = os.path.relpath(filepath, source_folder)
+                # print(f"  ➕ Thêm file: {arcname}")
+                zipf.write(filepath, arcname=arcname)
+
+    print(f"📦 Đã tạo file zip: {zip_path}")
+
+    # In ra kích thước file zip
+    if os.path.exists(zip_path):
+        file_size_bytes = os.path.getsize(zip_path)
+        file_size_mb = file_size_bytes / (1024 * 1024)
+        print(
+            f"📊 Kích thước file zip: {file_size_mb:.2f} MB ({file_size_bytes:,} bytes)"
+        )
+
+    # Upload lên Google Drive
+    upload_cmd = f"/home/minhthienk/.local/bin/rclone copy {zip_path} gdrive:/BACKUPS/{app_name}/{destination_folder}/"
+    print(f"☁️ Đang upload file backup lên Google Drive...")
+    upload_result = subprocess.run(
+        upload_cmd, shell=True, capture_output=True, text=True
+    )
+
+    if upload_result.returncode == 0:
+        print("✅ Upload thành công.")
+
+        # Xóa file zip sau khi upload
+        try:
+            os.remove(zip_path)
+            print(f"🗑️ Đã xóa file zip cục bộ: {zip_path}")
+        except Exception as e:
+            print(f"⚠️ Không thể xóa file zip: {e}")
+
+    else:
+        print("❌ Upload thất bại:")
+        print(upload_result.stderr)
+
+
 # Tạo thư mục backup nếu chưa có
 os.makedirs("backups", exist_ok=True)
 
@@ -124,5 +202,19 @@ zip_and_upload_media(
     "tinnghia",
 )
 zip_and_upload_media(
-    "media_backup_tinnghia", "/home/minhthienk/django-gen8/mycenter/media", "gen8"
+    "media_backup_gen8", "/home/minhthienk/django-gen8/mycenter/media", "gen8"
 )
+
+# Ví dụ sử dụng function zip toàn bộ folder
+# Bỏ comment các dòng dưới đây để sử dụng
+# zip_and_upload_entire_folder(
+#     "full_backup_tinnghia",
+#     "/home/minhthienk/django-gen8/anh-hung-cons",
+#     "tinnghia"
+# )
+#
+# zip_and_upload_entire_folder(
+#     "full_backup_gen8",
+#     "/home/minhthienk/django-gen8/mycenter",
+#     "gen8"
+# )

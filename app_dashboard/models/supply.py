@@ -1109,3 +1109,25 @@ class SupplyPaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
+
+
+class SupplyOrderImage(BaseModel):
+    vietnamese_name = "Hình ảnh"
+    order = models.ForeignKey(
+        SupplyOrder,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Phiếu đặt vật tư",
+    )
+    image = models.ImageField(
+        upload_to="project_supply_order_images/",
+        verbose_name="Hình ảnh",
+        default="",
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Mã phiếu "{self.order}"'

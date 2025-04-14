@@ -496,3 +496,25 @@ class OperationPaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
+
+
+class OperationOrderImage(BaseModel):
+    vietnamese_name = "Hình ảnh"
+    order = models.ForeignKey(
+        OperationOrder,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Phiếu đề xuất",
+    )
+    image = models.ImageField(
+        upload_to="project_operation/",
+        verbose_name="Hình ảnh",
+        default="",
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Mã phiếu "{self.order}"'
