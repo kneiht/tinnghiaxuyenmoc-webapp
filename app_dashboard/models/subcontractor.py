@@ -84,9 +84,7 @@ class SubContractor(BaseModel):
         purchase_amount = 0
         for order_sub_job in order_sub_jobs:
             if order_sub_job:
-                purchase_amount += (
-                    order_sub_job.sub_job_price * order_sub_job.quantity 
-                )
+                purchase_amount += order_sub_job.sub_job_price * order_sub_job.quantity
 
         # Calculate total transferred amount from payment records
         transferred_amount = 0
@@ -149,13 +147,13 @@ class BaseSubJob(BaseModel):
     job_type = models.CharField(
         max_length=50,
         choices=JOB_TYPE_CHOICES,
-        default="Chưa phân loại",           
+        default="Chưa phân loại",
         verbose_name="Nhóm công việc",
     )
     job_number = models.CharField(
         max_length=255, verbose_name="Mã công việc", unique=True
     )
-    job_name = models.CharField(max_length=1000, verbose_name="Tên đầy đủ")
+    job_name = models.CharField(max_length=2000, verbose_name="Tên đầy đủ")
     unit = models.CharField(
         max_length=255,
         verbose_name="Đơn vị",
@@ -167,7 +165,11 @@ class BaseSubJob(BaseModel):
         verbose_name="Hình ảnh", default="", null=True, blank=True
     )
     reference = models.CharField(
-        max_length=255, verbose_name="Công trình tham khảo", default="", null=True, blank=True
+        max_length=2000,
+        verbose_name="Công trình tham khảo",
+        default="",
+        null=True,
+        blank=True,
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -177,7 +179,15 @@ class BaseSubJob(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ["job_number", "job_type", "job_name", "unit", "image", "reference", "note"]
+        fields = [
+            "job_number",
+            "job_type",
+            "job_name",
+            "unit",
+            "image",
+            "reference",
+            "note",
+        ]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -208,37 +218,32 @@ class BaseSubJob(BaseModel):
         detail_sub_jobs = DetailSubJob.objects.filter(base_sub_job=self)
         sub_contractors = []
         sub_contractor_ids = [job.sub_contractor.id for job in detail_sub_jobs]
-        sub_contractor_ids = set(sub_contractor_ids)    
+        sub_contractor_ids = set(sub_contractor_ids)
         for sub_contractor in sub_contractor_ids:
             sub_contractor = SubContractor.objects.get(pk=sub_contractor)
             sub_contractors.append(sub_contractor)
         return sub_contractors
 
-    def get_list_of_detail_sub_jobs_of_a_sub_contractor(
-        self, sub_contractor
-    ):
+    def get_list_of_detail_sub_jobs_of_a_sub_contractor(self, sub_contractor):
         """Get list of detail sub jobs that have this base sub job"""
         detail_sub_jobs = DetailSubJob.objects.filter(
-            base_sub_job=self,
-            sub_contractor=sub_contractor
+            base_sub_job=self, sub_contractor=sub_contractor
         ).order_by("-valid_from")
         return detail_sub_jobs
-    
-    def get_history(
-        self, sub_contractor
-    ):
+
+    def get_history(self, sub_contractor):
         """Get list of sub job order sub jobs that have this base sub job"""
         sub_job_order_sub_jobs = SubJobOrderSubJob.objects.filter(
-            base_sub_job=self,
-            detail_sub_job__sub_contractor=sub_contractor
+            base_sub_job=self, detail_sub_job__sub_contractor=sub_contractor
         ).order_by("-created_at")
 
         return [
             {
                 "price": sub_job_order_sub_job.sub_job_price,
                 "create_at": sub_job_order_sub_job.created_at,
-                "project": sub_job_order_sub_job.sub_job_order.project
-            } for sub_job_order_sub_job in sub_job_order_sub_jobs
+                "project": sub_job_order_sub_job.sub_job_order.project,
+            }
+            for sub_job_order_sub_job in sub_job_order_sub_jobs
         ]
 
     def get_dict_of_detail_sub_jobs(self):
@@ -289,7 +294,7 @@ class DetailSubJob(BaseModel):
         max_length=255, verbose_name="Mã công việc", null=True, blank=True
     )
     job_name = models.CharField(
-        max_length=255, verbose_name="Tên đầy đủ", null=True, blank=True
+        max_length=2000, verbose_name="Tên đầy đủ", null=True, blank=True
     )
     unit = models.CharField(
         max_length=255,
@@ -348,8 +353,6 @@ class DetailSubJob(BaseModel):
         super().save()
 
 
-
-
 class SubJobEstimation(BaseModel):
     allow_display = True
     excel_downloadable = True
@@ -375,7 +378,7 @@ class SubJobEstimation(BaseModel):
         max_length=255, verbose_name="Mã công việc", null=True, blank=True
     )
     job_name = models.CharField(
-        max_length=255, verbose_name="Tên đầy đủ", null=True, blank=True
+        max_length=2000, verbose_name="Tên đầy đủ", null=True, blank=True
     )
     unit = models.CharField(
         max_length=255,
@@ -509,7 +512,7 @@ class SubJobOrder(BaseModel):
 
     RECEIVED_STATUS_CHOICES = (
         ("received", "Đã H.Thành"),
-        ("not_received", "Chưa H.Thành"),    
+        ("not_received", "Chưa H.Thành"),
         ("partial_received", "H.Thành một phần"),
     )
 
@@ -580,9 +583,7 @@ class SubJobOrder(BaseModel):
         total_amount = 0
         for order_sub_job in order_sub_jobs:
             if order_sub_job:
-                subjob_amount = (
-                    order_sub_job.sub_job_price * order_sub_job.quantity
-                )
+                subjob_amount = order_sub_job.sub_job_price * order_sub_job.quantity
                 total_amount += subjob_amount
 
         self.order_amount = total_amount
@@ -722,9 +723,7 @@ class SubJobOrder(BaseModel):
             )
             for sub_job in provider_sub_jobs:
                 if sub_job:
-                    purchase_amount += (
-                        sub_job.sub_job_price * sub_job.quantity
-                    )
+                    purchase_amount += sub_job.sub_job_price * sub_job.quantity
 
             # Calculate transferred amount
             transferred_amount = 0

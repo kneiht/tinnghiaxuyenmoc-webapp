@@ -133,7 +133,11 @@
                     {% if record %}
                         up-target="#modal:maybe, #record_{{ record.pk }}:maybe"
                     {% else %}
-                        up-target="#modal:maybe, #display-table-records:before:maybe, #display-records:before:maybe"
+                        {% if model == 'CostEstimation' and model == 'SubJobEstimation' %}
+                            up-target="#modal:maybe, #display-records:maybe"
+                        {% else %}
+                            up-target="#modal:maybe, #display-table-records:before:maybe, #display-records:before:maybe"
+                        {% endif %}
                     {% endif %}>
 
                 {% if form.non_field_errors %}

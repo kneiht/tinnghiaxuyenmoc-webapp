@@ -45,9 +45,9 @@ def decide_permission(request, action, params):
         sub_page = "ConstructionReportPL"
 
     # FEATURES THAT ARE DEVELOPING
-    if sub_page in ("Task"):
-        message = "Không tìm thấy chức năng này. \n Có thể chức năng này đang được phát triển!"
-        return render(request, "components/message_page.html", {"message": message})
+    # if sub_page in ("Task"):
+    #     message = "Không tìm thấy chức năng này. \n Có thể chức năng này đang được phát triển!"
+    #     return render(request, "components/message_page.html", {"message": message})
 
     user = request.user
     permission = user.check_permission(sub_page)
@@ -849,9 +849,25 @@ def handle_form(request, model, pk=0):
         record = instance_form
         record.style = "just-updated"
         html_message = render_message(request, message="Cập nhật thành công")
-        html_record = render_display_records(
-            request, model=model, records=[record], update="True", project_id=project_id
-        )
+
+        if model == "CostEstimation":
+            html_record = form_cost_estimation_table(
+                request, project_id, just_render=True
+            )
+        elif model == "SubJobEstimation":
+            html_record = form_sub_job_cost_estimation_table(
+                request, project_id, just_render=True
+            )
+
+        else:
+            html_record = render_display_records(
+                request,
+                model=model,
+                records=[record],
+                update="True",
+                project_id=project_id,
+            )
+
         return HttpResponse(html_message + html_record)
     else:
         print(form.errors)
@@ -2040,8 +2056,8 @@ def form_base_sub_jobs(request):
 
 
 @login_required
-def form_cost_estimation_table(request, project_id):
-    def render_modal(project_id, message=None, message_type="green"):
+def form_cost_estimation_table(request, project_id, just_render=False):
+    def render_modal(project_id, message=None, message_type="green", just_render=False):
 
         # Get fields to be displayed by using record meta
         # If there is get_display_fields method, use that method
@@ -2062,8 +2078,20 @@ def form_cost_estimation_table(request, project_id):
             "project_id": project_id,
             "message": message,
             "message_type": message_type,
+            "model": "CostEstimation",
+            "project": Project.objects.filter(pk=project_id).first(),
         }
-        return render(request, "components/modal_cost_estimation_table.html", context)
+        if just_render:
+            return render_to_string(
+                "components/modal_cost_estimation_table.html", context, request
+            )
+        else:
+            return render(
+                request, "components/modal_cost_estimation_table.html", context
+            )
+
+    if just_render:
+        return render_modal(project_id, just_render=True)
 
     if request.method == "GET":
         forbit_html = decide_permission(request, "read", {"model": "CostEstimation"})
@@ -2207,8 +2235,8 @@ def form_cost_estimation_table(request, project_id):
 
 
 @login_required
-def form_sub_job_cost_estimation_table(request, project_id):
-    def render_modal(project_id, message=None, message_type="green"):
+def form_sub_job_cost_estimation_table(request, project_id, just_render=False):
+    def render_modal(project_id, message=None, message_type="green", just_render=False):
         # Get fields to be displayed by using record meta
         # If there is get_display_fields method, use that method
         fields = []
@@ -2227,11 +2255,21 @@ def form_sub_job_cost_estimation_table(request, project_id):
             "project_id": project_id,
             "message": message,
             "message_type": message_type,
+            "model": "SubJobEstimation",
+            "project": Project.objects.filter(pk=project_id).first(),
         }
 
-        return render(
-            request, "components/modal_sub_job_estimation_table.html", context
-        )
+        if just_render:
+            return render_to_string(
+                "components/modal_sub_job_estimation_table.html", context, request
+            )
+        else:
+            return render(
+                request, "components/modal_sub_job_estimation_table.html", context
+            )
+
+    if just_render:
+        return render_modal(project_id, just_render=True)
 
     if request.method == "GET":
         forbit_html = decide_permission(request, "read", {"model": "SubJobEstimation"})

@@ -139,17 +139,19 @@ class SupplyBrand(BaseModel):
                 fields.remove(field)
         return fields
 
+
 class DetailSupplyKey:
     provider: SupplyProvider
     brand: SupplyBrand
-    
+
     def __init__(self, provider: SupplyProvider, brand: SupplyBrand):
         self.provider = provider
         self.brand = brand
 
     def __str__(self):
         return f"{self.provider.name} - Thương hiệu: {self.brand.name}"
-    
+
+
 class BaseSupply(BaseModel):
     allow_display = True
     vietnamese_name = "Vật tư"
@@ -256,8 +258,10 @@ class BaseSupply(BaseModel):
 
         detail_supply_dict = {}
         for provider, brand in provider_and_brands:
-            detail_supplies = self.get_list_of_detail_supplies_of_a_provider_and_a_brand(
-                provider, brand
+            detail_supplies = (
+                self.get_list_of_detail_supplies_of_a_provider_and_a_brand(
+                    provider, brand
+                )
             )
             detail_supply_dict[DetailSupplyKey(provider, brand)] = detail_supplies
         # printdebug the dict
@@ -308,7 +312,7 @@ class DetailSupply(BaseModel):
         max_length=255, verbose_name="Mã vật tư", null=True, blank=True
     )
     supply_name = models.CharField(
-        max_length=1000, verbose_name="Tên đầy đủ", null=True, blank=True
+        max_length=2000, verbose_name="Tên đầy đủ", null=True, blank=True
     )
     unit = models.CharField(
         max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True
@@ -388,7 +392,7 @@ class CostEstimation(BaseModel):
         max_length=255, verbose_name="Mã vật tư", null=True, blank=True
     )
     supply_name = models.CharField(
-        max_length=255, verbose_name="Tên đầy đủ", null=True, blank=True
+        max_length=2000, verbose_name="Tên đầy đủ", null=True, blank=True
     )
     unit = models.CharField(
         max_length=255, verbose_name="Đơn vị", default="cái", null=True, blank=True
@@ -600,9 +604,16 @@ class SupplyOrder(BaseModel):
         self.order_amount = total_amount
 
         # Check received status
-        if order_supplies.count()>0 and order_supplies.count == order_supplies.filter(received_status="received").count():
+        if (
+            order_supplies.count() > 0
+            and order_supplies.count
+            == order_supplies.filter(received_status="received").count()
+        ):
             self.received_status = "received"
-        elif order_supplies.count()>0 and order_supplies.filter(received_status="partial_received").count() > 0:
+        elif (
+            order_supplies.count() > 0
+            and order_supplies.filter(received_status="partial_received").count() > 0
+        ):
             self.received_status = "partial_received"
         else:
             self.received_status = "not_received"
@@ -778,9 +789,6 @@ class SupplyOrder(BaseModel):
         return supply_order_supply_dict
 
 
-
-
-
 class SupplyOrderSupply(BaseModel):
     vietnamese_name = "Vật tư trong phiếu đặt"
     RECEIVED_STATUS_CHOICES = (
@@ -875,7 +883,6 @@ class SupplyOrderSupply(BaseModel):
             self.received_status = "not_received"
 
         super().save(*args, **kwargs)
-
 
     def estimate_quantity(self):
         cost_estimation = CostEstimation.objects.filter(

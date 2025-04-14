@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from django.db.models import Exists, OuterRef
 from .models.models import *
+from .models.supply import CostEstimation
 from django.core.exceptions import ValidationError
 
 
@@ -56,7 +57,7 @@ class PermissionForm(forms.ModelForm):
                 "created_at",
                 "last_saved",
                 "archived",
-                "lock"
+                "lock",
             ]:
                 self.fields[field_name].widget = forms.Select(
                     attrs={
@@ -1308,7 +1309,6 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 
 
 def validate_username_length(value, min_length=6):
@@ -1319,7 +1319,14 @@ def validate_username_length(value, min_length=6):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username", "first_name", "email", "department", "position", "is_superuser"]
+        fields = [
+            "username",
+            "first_name",
+            "email",
+            "department",
+            "position",
+            "is_superuser",
+        ]
         labels = {
             "username": "Tên tài khoản",
             "first_name": "Tên",
@@ -1327,7 +1334,6 @@ class UserForm(forms.ModelForm):
             "is_superuser": "Quyền admin",
             "department": "Bộ phận",
             "position": "Chức vụ",
-
         }
         widgets = {
             "username": forms.TextInput(
@@ -2467,6 +2473,7 @@ class SubJobPaymentRecordForm(forms.ModelForm):
             ),
         }
 
+
 class OperationReceiverForm(forms.ModelForm):
     class Meta:
         model = OperationReceiver
@@ -2532,6 +2539,7 @@ class OperationReceiverForm(forms.ModelForm):
                 }
             ),
         }
+
 
 class OperationOrderForm(forms.ModelForm):
     class Meta:
@@ -2821,5 +2829,65 @@ class AnnouncementForm(forms.ModelForm):
                 }
             ),
         }
-    
-    
+
+
+class CostEstimationForm(forms.ModelForm):
+    class Meta:
+        model = CostEstimation
+        fields = [
+            "project",
+            "base_supply",
+            "quantity",
+            "note",
+        ]
+
+        labels = {
+            "project": "Dự án",
+            "base_supply": "Vật tư",
+            "quantity": "Khối lượng dự toán",
+            "note": "Ghi chú",
+        }
+
+        widgets = {
+            "project": forms.Select(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "base_supply": forms.Select(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "quantity": forms.NumberInput(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "note": forms.Textarea(attrs={"class": "form-input h-20", "rows": 2}),
+        }
+
+
+class SubJobEstimationForm(forms.ModelForm):
+    class Meta:
+        model = SubJobEstimation
+        fields = [
+            "project",
+            "base_sub_job",
+            "quantity",
+            "note",
+        ]
+
+        labels = {
+            "project": "Dự án",
+            "base_sub_job": "Công việc",
+            "quantity": "Khối lượng dự toán",
+            "note": "Ghi chú",
+        }
+
+        widgets = {
+            "project": forms.Select(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "base_sub_job": forms.Select(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "quantity": forms.NumberInput(
+                attrs={"class": "form-input", "required": "required"}
+            ),
+            "note": forms.Textarea(attrs={"class": "form-input h-20", "rows": 2}),
+        }
