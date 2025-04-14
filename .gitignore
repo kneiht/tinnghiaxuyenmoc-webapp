@@ -22,3 +22,7 @@ get_api_multiple.py
 django_errors.log
 .qodo
 .vscode
+
+.DS_Store
+**/.DS_Store
+*DS_Store*

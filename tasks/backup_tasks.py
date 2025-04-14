@@ -4,8 +4,6 @@ from datetime import datetime
 import os
 import subprocess
 import zipfile
-from datetime import datetime
-
 
 
 # Lấy thời gian thực từ API (Asia/Bangkok)
@@ -20,12 +18,14 @@ from datetime import datetime
 
 import pytz
 
+
 def get_date_time():
     tz = pytz.timezone("Asia/Ho_Chi_Minh")
     vn_now = datetime.now(tz)
     date_str = vn_now.strftime("%Y-%m-%d")
     time_str = vn_now.strftime("%H-%M-%S")
     return f"{date_str}_{time_str}"
+
 
 # Backup database thành file .sql và upload lên Google Drive
 def backup_db(db, name, app_name):
@@ -47,7 +47,9 @@ def backup_db(db, name, app_name):
     # Upload to Google Drive using rclone
     upload_cmd = f"/home/minhthienk/.local/bin/rclone copy {backup_path} gdrive:/BACKUPS/{app_name}/db/"
     print(f"Uploading {backup_path} to Google Drive...")
-    upload_result = subprocess.run(upload_cmd, shell=True, capture_output=True, text=True)
+    upload_result = subprocess.run(
+        upload_cmd, shell=True, capture_output=True, text=True
+    )
 
     if upload_result.returncode == 0:
         print("✅ Upload thành công.")
@@ -61,16 +63,19 @@ def backup_db(db, name, app_name):
         print("❌ Upload thất bại:")
         print(upload_result.stderr)
 
+
 def zip_and_upload_media(filename_prefix, source_folder, app_name):
     date_time_str = get_date_time()
     date_today = date_time_str.split("_")[0]  # Get today's date (YYYY-MM-DD)
     zip_filename = f"{filename_prefix}_{date_time_str}.zip"
     zip_path = os.path.join("backups", zip_filename)
 
-    print(f"🔍 Zipping media files modified on {date_today} from {source_folder} into {zip_path}...")
+    print(
+        f"🔍 Zipping media files modified on {date_today} from {source_folder} into {zip_path}..."
+    )
 
     # Create the zip file
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk(source_folder):
             for file in files:
                 filepath = os.path.join(root, file)
@@ -85,7 +90,9 @@ def zip_and_upload_media(filename_prefix, source_folder, app_name):
     # Upload to Google Drive
     upload_cmd = f"/home/minhthienk/.local/bin/rclone copy {zip_path} gdrive:/BACKUPS/{app_name}/media/"
     print(f"☁️ Uploading media backup to Google Drive...")
-    upload_result = subprocess.run(upload_cmd, shell=True, capture_output=True, text=True)
+    upload_result = subprocess.run(
+        upload_cmd, shell=True, capture_output=True, text=True
+    )
 
     if upload_result.returncode == 0:
         print("✅ Media zip uploaded successfully.")
@@ -100,6 +107,8 @@ def zip_and_upload_media(filename_prefix, source_folder, app_name):
     else:
         print("❌ Failed to upload media zip:")
         print(upload_result.stderr)
+
+
 # Tạo thư mục backup nếu chưa có
 os.makedirs("backups", exist_ok=True)
 
@@ -109,5 +118,11 @@ backup_db("tinnghiaxuyenmoc_2025_02_18", "tinnghia", "tinnghia")
 backup_db("mycenter", "gen8", "gen8")
 
 # Backup media folder
-zip_and_upload_media("media_backup_tinnghia", "/home/minhthienk/django-gen8/anh-hung-cons/media", "tinnghia")
-zip_and_upload_media("media_backup_tinnghia", "/home/minhthienk/django-gen8/mycenter/media", "gen8")
+zip_and_upload_media(
+    "media_backup_tinnghia",
+    "/home/minhthienk/django-gen8/anh-hung-cons/media",
+    "tinnghia",
+)
+zip_and_upload_media(
+    "media_backup_tinnghia", "/home/minhthienk/django-gen8/mycenter/media", "gen8"
+)
