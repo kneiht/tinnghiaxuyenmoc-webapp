@@ -22,7 +22,7 @@
             <tbody id="record_{{ record.pk }}" record-id="{{ record.pk }}" class="{{ record.style }}">
                 <tr class="{{ record.style }} bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
                     {% for field in fields %}
-                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-xs text-gray-700 dark:text-gray-300 text-nowrap whitespace-pre-line">
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-xs text-gray-700 dark:text-gray-300 text-nowrap">
                             
                         {% if 'status' in field  %} 
                             <a class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"

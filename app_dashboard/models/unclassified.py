@@ -1220,3 +1220,13 @@ class Announcement(BaseModel):
             if old_instance.user:
                 self.user = old_instance.user
         super().save()
+
+
+class ConstructionDriverSalaryDummy(BaseModel):
+    allow_display = True
+    vietnamese_name = "Bảng lương"
+
+
+class ConstructionReportPLDummy(BaseModel):
+    allow_display = True
+    vietnamese_name = "Bảng P&L"

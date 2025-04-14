@@ -42,6 +42,11 @@ def get_display_fields(self):
 
 
 def check_permission(self, model):
+    if model == "ConstructionDriverSalary":
+        model = "ConstructionDriverSalaryDummy"
+    if model == "ConstructionReportPL":
+        model = "ConstructionReportPLDummy"
+
     # Create a class to return
     class ReturnPermission:  # pylint: disable=R0903, W0621
         read = False
@@ -132,7 +137,7 @@ User.add_to_class(
     models.BooleanField(
         verbose_name="Khóa sửa chữa",
         default=False,
-    )
+    ),
 )
 # Add verbose names for existing fields
 User._meta.get_field("username").verbose_name = "Tên đăng nhập"
