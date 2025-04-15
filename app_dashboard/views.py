@@ -223,6 +223,7 @@ def handle_form(request, model, pk=0):
                 model != "VehicleMaintenance"
                 and model != "SupplyOrder"
                 and model != "SubJobOrder"
+                and model != "OperationOrder"
             ):
                 record = instance
                 # Get related records

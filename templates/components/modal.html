@@ -402,7 +402,7 @@
                             onclick="if (confirm('Thao tác này sẽ xóa dữ liệu hoàn toàn, và không thể khôi phục.\n\nBạn có thực sự muốn xóa dữ liệu này không?')) { 
                                 // One more alert to confirm by type if modal = modal_VehicleMaintenance
                                 {% if modal == 'modal_VehicleMaintenance' or modal == 'modal_SupplyOrder' or modal == 'modal_SubJobOrder' or modal == "modal_OperationOrder" %}
-                                    if (confirm('Xác nhận xóa dữ liệu.\n\n Toàn bộ các dự liệu Thanh toán và hình ảnh liên quan sẽ bị xóa theo.')) {
+                                    if (confirm('Xác nhận xóa dữ liệu.\n\n Toàn bộ các dữ liệu Thanh toán và hình ảnh liên quan sẽ bị xóa theo.')) {
                                         document.getElementById('archived').value='true';
                                         document.getElementById('submit-form').click();
                                     }
