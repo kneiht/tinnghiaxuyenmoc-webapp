@@ -241,3 +241,56 @@ class ProjectPaymentRequest(BaseModel):
             "payment_method",
             "recipient_name",
         ]
+
+
+class ProjectFile(BaseModel):
+    allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
+    vietnamese_name = "Tài liệu dự án"
+
+    CATEGORY_CHOICES = (
+        ("legal_documents", "Hồ sơ pháp lý"),
+        ("bidding_documents", "Hồ sơ dự thầu"),
+        ("partial_acceptance", "Biên bản nghiệm thu từng phần"),
+        ("site_records", "Biên bản ghi nhận hiện trường"),
+        ("client_communications", "Các văn bản làm việc với chủ đầu tư"),
+        ("payment_documents", "Hồ sơ thanh toán"),
+        ("other", "Các vấn đề khác"),
+    )
+
+    name = models.CharField(max_length=2000, verbose_name="Tên tài liệu")
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="project_files",
+        verbose_name="Dự án",
+    )
+    category = models.CharField(
+        max_length=50, choices=CATEGORY_CHOICES, verbose_name="Danh mục"
+    )
+    file_url = models.URLField(verbose_name="Đường dẫn đến file")
+    note = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, verbose_name="Người tải lên"
+    )
+    upload_date = models.DateTimeField(
+        default=timezone.now, verbose_name="Ngày tải lên"
+    )
+
+    class Meta:
+        ordering = ["-upload_date"]
+
+    def __str__(self):
+        return f"{self.name} - {self.project.name}"
+
+    @classmethod
+    def get_display_fields(self):
+        return [
+            "category",
+            "name",
+            "file_url",
+            "user",
+            "upload_date",
+            "note",
+        ]

@@ -159,7 +159,7 @@ def handle_form(request, model, pk=0):
     if request.method != "POST":
         return HttpResponseForbidden()
 
-    print(request.POST)
+    # print(request.POST)
     # Todo: should have list of model that can be accessed
     # Convert model name to model class
     model_class = globals()[model]
@@ -179,7 +179,15 @@ def handle_form(request, model, pk=0):
             render_message(request, message=message, message_type=message_type)
         )
 
-    form = form_class(request.POST, request.FILES, instance=instance)
+    print("project_id 1", project_id)
+    if form_class == SupplyInventoryRecordForm:
+        print("project_id 2", project_id)
+        form = form_class(
+            request.POST, request.FILES, instance=instance, project_id=project_id
+        )
+    else:
+        form = form_class(request.POST, request.FILES, instance=instance)
+
     if form_class == AnnouncementForm:
         if instance and request.user != instance.user:
             message = "Bạn không có quyền chỉnh sửa thông báo này. \n\n Vui lòng liên hệ admin."
@@ -188,7 +196,6 @@ def handle_form(request, model, pk=0):
                 render_message(request, message=message, message_type=message_type)
             )
 
-    # Add missing data if there's an instance
     # Add missing data if there's an instance
     if instance:
         post_data = request.POST.copy()
@@ -858,7 +865,8 @@ def handle_form(request, model, pk=0):
             html_record = form_sub_job_cost_estimation_table(
                 request, project_id, just_render=True
             )
-
+        elif model == "SupplyInventoryRecord":
+            html_record = supply_inventory(request, project_id, just_render=True)
         else:
             html_record = render_display_records(
                 request,
@@ -2692,3 +2700,111 @@ def form_project_order_images(request, model, order_id):
             return JsonResponse({"success": True, "images": images})
         except:
             return JsonResponse({"success": False})
+
+
+@login_required
+def supply_inventory(request, project_id, just_render=False):
+    check_date = request.GET.get("check_date")
+    if not check_date:
+        check_date = timezone.now().date().strftime("%Y-%m-%d")
+
+    # costestimations
+    costestimations = CostEstimation.objects.filter(project_id=project_id)
+
+    inventory_list = []
+    for costestimation in costestimations:
+        # Lấy record cho ngày hiện tại
+        inventory_record = SupplyInventoryRecord.objects.filter(
+            project=costestimation.project,
+            supply=costestimation,
+            created_date=check_date,
+        ).first()
+
+        if inventory_record:
+            import_quantity = inventory_record.import_quantity
+            export_quantity = inventory_record.export_quantity
+        else:
+            import_quantity = 0
+            export_quantity = 0
+
+        # Tính tồn đầu: tổng (nhập - xuất) của tất cả các ngày trước đó
+        beginning_quantity = 0
+        previous_records = SupplyInventoryRecord.objects.filter(
+            project=costestimation.project,
+            supply=costestimation,
+            created_date__lt=check_date,
+        )
+
+        for record in previous_records:
+            beginning_quantity += record.import_quantity - record.export_quantity
+
+        # Tính tồn cuối = tồn đầu + nhập - xuất
+        ending_quantity = beginning_quantity + import_quantity - export_quantity
+
+        inventory_list.append(
+            {
+                "costestimation": costestimation,
+                "supply_number": costestimation.supply_number,
+                "supply_name": costestimation.supply_name,
+                "unit": costestimation.unit,
+                "beginning_quantity": beginning_quantity,
+                "import_quantity": import_quantity,
+                "export_quantity": export_quantity,
+                "ending_quantity": ending_quantity,
+                "inventory_record": inventory_record,
+            }
+        )
+
+    # Định nghĩa headers và fields cho template
+    headers = [
+        "Mã vật tư",
+        "Tên vật tư",
+        "Đơn vị",
+        "Tồn đầu",
+        "Nhập trong ngày",
+        "Xuất trong ngày",
+        "Tồn cuối",
+    ]
+
+    fields = [
+        "supply_number",
+        "supply_name",
+        "unit",
+        "beginning_quantity",
+        "import_quantity",
+        "export_quantity",
+        "ending_quantity",
+    ]
+
+    model_class = SupplyInventoryRecord
+    try:
+        excel_downloadable = (
+            model_class.excel_downloadable
+            if hasattr(model_class, "excel_downloadable")
+            else False
+        )
+        excel_uploadable = (
+            model_class.excel_uploadable
+            if hasattr(model_class, "excel_uploadable")
+            else False
+        )
+    except LookupError:
+        excel_downloadable = False
+        excel_uploadable = False
+
+    context = {
+        "inventory_list": inventory_list,
+        "check_date": check_date,
+        "headers": headers,
+        "fields": fields,
+        "model": "SupplyInventoryRecord",
+        "project_id": project_id,
+        "excel_downloadable": excel_downloadable,
+        "excel_uploadable": excel_uploadable,
+    }
+    if just_render:
+        return render_to_string(
+            "components/supply_inventory_record.html", context, request
+        )
+    else:
+        return render(request, "components/supply_inventory_record.html", context)

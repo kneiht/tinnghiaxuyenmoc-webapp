@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from django.db.models import Exists, OuterRef
 from .models.models import *
-from .models.supply import CostEstimation
+from .models.supply import CostEstimation, SupplyInventoryRecord
 from django.core.exceptions import ValidationError
 
 
@@ -2891,3 +2891,178 @@ class SubJobEstimationForm(forms.ModelForm):
             ),
             "note": forms.Textarea(attrs={"class": "form-input h-20", "rows": 2}),
         }
+
+
+class ProjectFileForm(forms.ModelForm):
+    class Meta:
+        model = ProjectFile
+        fields = [
+            "user",
+            "name",
+            "project",
+            "category",
+            "file_url",
+            "note",
+        ]
+
+        labels = {
+            "name": "Tên tài liệu",
+            "project": "Dự án",
+            "category": "Danh mục",
+            "file_url": "Đường dẫn đến file",
+            "note": "Ghi chú",
+        }
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "placeholder": "Nhập tên tài liệu",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "project": forms.Select(
+                attrs={
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "category": forms.Select(
+                attrs={
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "file_url": forms.URLInput(
+                attrs={
+                    "placeholder": "https://example.com/file.pdf",
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "note": forms.Textarea(
+                attrs={
+                    "placeholder": "Thêm ghi chú về tài liệu này",
+                    "class": "form-input h-20",
+                    "rows": 3,
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        project_id = kwargs.pop("project_id", None)
+        super().__init__(*args, **kwargs)
+
+        # Nếu có project_id, chỉ hiển thị project đó và đặt làm mặc định
+        if project_id:
+            self.fields["project"].queryset = Project.objects.filter(id=project_id)
+            self.fields["project"].initial = project_id
+            self.fields["project"].widget.attrs["readonly"] = True
+
+
+class SupplyInventoryRecordForm(forms.ModelForm):
+    class Meta:
+        model = SupplyInventoryRecord
+        fields = [
+            "project",
+            "supply",
+            "created_date",
+            "import_quantity",
+            "export_quantity",
+            "note",
+        ]
+
+        labels = {
+            "project": "Dự án",
+            "supply": "Vật tư trong dự toán",
+            "created_date": "Ngày nhập/xuất",
+            "import_quantity": "Nhập trong ngày",
+            "export_quantity": "Xuất trong ngày",
+            "note": "Ghi chú",
+        }
+
+        widgets = {
+            "project": forms.Select(
+                attrs={
+                    "class": "form-input",
+                    "required": "required",
+                }
+            ),
+            "supply": forms.Select(
+                attrs={
+                    "class": "form-input",
+                    "required": "required",
+                    "readonly": "readonly",
+                }
+            ),
+            "import_quantity": forms.NumberInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "Nhập số lượng vật tư nhập kho",
+                    "min": "0",
+                    "step": "0.01",
+                }
+            ),
+            "export_quantity": forms.NumberInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "Nhập số lượng vật tư xuất kho",
+                    "min": "0",
+                    "step": "0.01",
+                }
+            ),
+            "note": forms.Textarea(
+                attrs={
+                    "class": "form-input h-20",
+                    "placeholder": "Nhập ghi chú",
+                    "rows": 2,
+                }
+            ),
+            "created_date": forms.DateInput(
+                attrs={
+                    "class": "form-input",
+                    "type": "date",
+                    "required": "required",
+                    "readonly": "readonly",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        project_id = kwargs.pop("project_id", None)
+        supply_id = kwargs.pop("supply_id", None)
+        check_date = kwargs.pop("check_date", None)
+        print("Project ID:", project_id)
+        print("Supply ID:", supply_id)
+        print("Check Date:", check_date)
+        super().__init__(*args, **kwargs)
+
+        # Nếu có project_id, chỉ hiển thị project đó và đặt làm mặc định
+        if project_id:
+            self.fields["project"].queryset = Project.objects.filter(id=project_id)
+            self.fields["project"].initial = project_id
+
+            # Chỉ hiển thị các CostEstimation thuộc dự án đã chọn
+            self.fields["supply"].queryset = CostEstimation.objects.filter(
+                project_id=project_id
+            )
+
+            # Nếu có supply_id, đặt giá trị mặc định cho supply
+            if supply_id and not self.instance.pk:
+                supply = CostEstimation.objects.get(pk=supply_id)
+                self.fields["supply"].initial = supply
+
+            # Nếu có check_date, đặt giá trị mặc định cho created_date
+            if check_date and not self.instance.pk:
+                self.fields["created_date"].initial = check_date
+
+        else:
+            # Nếu form đã có dữ liệu (ví dụ: khi chỉnh sửa), lấy project_id từ instance
+            if self.instance and self.instance.pk and self.instance.project_id:
+                # Chỉ hiển thị các CostEstimation thuộc dự án của instance
+                self.fields["supply"].queryset = CostEstimation.objects.filter(
+                    project_id=self.instance.project_id
+                )
+            else:
+                # Mặc định không hiển thị CostEstimation nào cho đến khi chọn project
+                self.fields["supply"].queryset = CostEstimation.objects.none()

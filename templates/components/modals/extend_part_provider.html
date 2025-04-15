@@ -1,0 +1,62 @@
+{% load custom_tags %}
+
+<div class="flex justify-center">
+    <div class="w-full pt-4 px-6">
+        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800 dark:text-gray-100">
+            Danh sách phiếu sửa chữa liên quan
+        </h2>
+        
+        {% with maintenance_records=record.get_related_orders %}
+            {% if maintenance_records %}
+                <div class=" shadow-md rounded-lg relative" style="max-height: 400px; overflow: scroll;">
+                    <table class="min-w-full bg-white dark:bg-gray-800">
+                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-theme sticky top-0">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Mã phiếu</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Xe</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Phân loại</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Trạng thái</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Chi phí</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-600 h-[300px] overflow-scroll">
+                            {% for record in maintenance_records %}
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ record.repair_code }}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ record.vehicle }}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ record.get_maintenance_category_display }}</td>
+
+                                    <td class="py-3 px-4 text-sm">
+                                        <div class="flex flex-col space-y-1">
+                                            <span class="{% if record.approval_status == 'approved' %}text-green-600{% elif record.approval_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
+                                                {{ record.get_approval_status_display }}
+                                            </span>
+                                            <span class="{% if record.paid_status == 'paid' %}text-green-600{% elif record.paid_status == 'partial_paid' %}text-yellow-600{% else %}text-red-600{% endif %}">
+                                                {{ record.get_paid_status_display }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">
+                                        {{ record.maintenance_amount|format_money }} đ
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">
+                                        {{ record.created_at|date:"d/m/Y" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 text-right text-sm text-gray-600 dark:text-gray-300">
+                    Tổng số phiếu: {{ maintenance_records|length }}
+                </div>
+            {% else %}
+                <div class="text-theme">
+                    <p class="text-center">Không có phiếu sửa chữa nào liên quan đến nhà cung cấp này.</p>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>

@@ -418,6 +418,24 @@ class PartProvider(BaseModel):
         self.total_outstanding_debt = debt_amount
         super().save(*args, **kwargs)
 
+    def get_related_orders(self):
+        # Lấy tất cả các phụ tùng trong phiếu sửa chữa có nhà cung cấp là self
+        vehicle_maintenance_repair_parts = VehicleMaintenanceRepairPart.objects.filter(
+            repair_part__part_provider=self
+        )
+
+        # Lấy danh sách các phiếu sửa chữa từ các phụ tùng đã tìm được
+        vehicle_maintenance_ids = vehicle_maintenance_repair_parts.values_list(
+            "vehicle_maintenance", flat=True
+        ).distinct()
+
+        # Truy vấn tất cả các phiếu sửa chữa có ID trong danh sách
+        maintenance_records = VehicleMaintenance.objects.filter(
+            id__in=vehicle_maintenance_ids
+        ).order_by("-created_at")
+        print("hell")
+        return maintenance_records
+
 
 class RepairPart(BaseModel):
     allow_display = True
@@ -478,7 +496,6 @@ class RepairPart(BaseModel):
             if not hasattr(self, field):
                 fields.remove(field)
         return fields
-
 
 
 class VehicleMaintenanceRepairPart(BaseModel):
@@ -751,3 +768,16 @@ class PaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
+
+    def total_transfered_amount(self):
+        # Get all payment records with same vehicle_maintenance and provider and lock = True
+        payment_records = PaymentRecord.objects.filter(
+            vehicle_maintenance=self.vehicle_maintenance,
+            provider=self.provider,
+            lock=True,
+        )
+        # Calculate the sum of transferred_amount
+        total_transfered_amount = sum(
+            record.transferred_amount for record in payment_records
+        )
+        return total_transfered_amount

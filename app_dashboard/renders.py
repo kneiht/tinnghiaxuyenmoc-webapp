@@ -60,7 +60,6 @@ def render_tool_bar(request, **kwargs):
         start_date = get_valid_date(params.get("start_date", ""))
         end_date = get_valid_date(params.get("end_date", start_date))
 
-
     if check_month != "":
         check_month = get_valid_month(check_month)
         year, month = check_month.split("-")
@@ -77,19 +76,37 @@ def render_tool_bar(request, **kwargs):
 
     model_class = globals()[model]
     try:
-        excel_downloadable = model_class.excel_downloadable if hasattr(model_class, 'excel_downloadable') else False
-        excel_uploadable = model_class.excel_uploadable if hasattr(model_class, 'excel_uploadable') else False
+        excel_downloadable = (
+            model_class.excel_downloadable
+            if hasattr(model_class, "excel_downloadable")
+            else False
+        )
+        excel_uploadable = (
+            model_class.excel_uploadable
+            if hasattr(model_class, "excel_uploadable")
+            else False
+        )
     except LookupError:
         excel_downloadable = False
         excel_uploadable = False
 
     # Get all text fields (CharField and TextField) from the model
-    text_fields = [f.name for f in model_class._meta.fields if isinstance(f, (models.CharField, models.TextField))]
-    foreign_key_fields = [f.name for f in model_class._meta.fields if isinstance(f, models.ForeignKey)]
-    choice_fields = {f.name: dict(f.choices) for f in model_class._meta.fields if f.choices}
+    text_fields = [
+        f.name
+        for f in model_class._meta.fields
+        if isinstance(f, (models.CharField, models.TextField))
+    ]
+    foreign_key_fields = [
+        f.name for f in model_class._meta.fields if isinstance(f, models.ForeignKey)
+    ]
+    choice_fields = {
+        f.name: dict(f.choices) for f in model_class._meta.fields if f.choices
+    }
 
     # Create a dict for all choices fields, mapping field names to their choices
-    choice_fields_dict = {field_name: choices for field_name, choices in choice_fields.items()}
+    choice_fields_dict = {
+        field_name: choices for field_name, choices in choice_fields.items()
+    }
 
     filter_fields = text_fields + foreign_key_fields
 
@@ -229,13 +246,20 @@ def render_display_records(request, **kwargs):
     start_date = get_valid_date(params.get("start_date", ""))
     end_date = get_valid_date(params.get("end_date", start_date))
 
-
     # Get all search queries from request.GET
     search_queries = {}
     for key, value in request.GET.items():
-        if key not in ['q', 'sort', 'page', 'check_date', 'start_date', 'end_date', 'check_month']:
+        if key not in [
+            "q",
+            "sort",
+            "page",
+            "check_date",
+            "start_date",
+            "end_date",
+            "check_month",
+        ]:
             search_queries[key] = value
-    
+
     sort = request.GET.get("sort", "")
     filter_vehicle = params.get("filter_vehicle", None)
     current_page = 1
@@ -282,12 +306,11 @@ def render_display_records(request, **kwargs):
 
     requested_amount = 0
     # If the field requested_amount is in the model, calculate the total amount
-    
+
     if hasattr(model_class, "requested_amount"):
         requested_amount = sum(
             record.requested_amount for record in records if record.requested_amount
         )
-
 
     groups = []
     if group_by:
@@ -297,30 +320,34 @@ def render_display_records(request, **kwargs):
         if model_class == VehicleOperationRecord:
             if group_by == "vehicle":
                 current_page = max(1, get_valid_id(params.get("current_page", 1)))
-                
+
                 if not update:
                     group_names = get_unique_values(records, VehicleDetail, "gps_name")
 
-                    #remove vehicle with vehicle_type.allowed_to_display_in_revenue_table = True
+                    # remove vehicle with vehicle_type.allowed_to_display_in_revenue_table = True
                     group_names = [
                         group_name
                         for group_name in group_names
                         if VehicleDetail.objects.filter(gps_name=group_name)
-                        .first().vehicle_type
-                        .allowed_to_display_in_revenue_table
+                        .first()
+                        .vehicle_type.allowed_to_display_in_revenue_table
                     ]
                 else:
                     group_names = [records.first().vehicle]
 
                 # Calculate max page
                 total_groups = len(group_names)
-                max_page = max(1, (total_groups + GROUPS_PER_PAGE - 1) // GROUPS_PER_PAGE)
+                max_page = max(
+                    1, (total_groups + GROUPS_PER_PAGE - 1) // GROUPS_PER_PAGE
+                )
 
                 # Get groups for current page
                 page_group_names = group_names[
-                    (current_page - 1) * GROUPS_PER_PAGE : current_page * GROUPS_PER_PAGE
+                    (current_page - 1)
+                    * GROUPS_PER_PAGE : current_page
+                    * GROUPS_PER_PAGE
                 ]
-                
+
                 for group_name in page_group_names:
                     vehicle = VehicleDetail.objects.filter(gps_name=group_name).first()
                     group_records = records.filter(vehicle=vehicle.gps_name)
@@ -338,7 +365,7 @@ def render_display_records(request, **kwargs):
                             ).date(),
                             "drivers": StaffData.objects.filter(
                                 position__icontains="driver",
-                                status__in=["active", "on_leave"]
+                                status__in=["active", "on_leave"],
                             ),
                             "locations": Location.objects.all(),
                             "records": group_records,
@@ -346,7 +373,7 @@ def render_display_records(request, **kwargs):
                     )
             elif group_by == "driver":
                 current_page = max(1, get_valid_id(params.get("current_page", 1)))
-                
+
                 if not update:
                     group_names = get_unique_values(records, StaffData, "full_name")
                 else:
@@ -354,13 +381,17 @@ def render_display_records(request, **kwargs):
 
                 # Calculate max page
                 total_groups = len(group_names)
-                max_page = max(1, (total_groups + GROUPS_PER_PAGE - 1) // GROUPS_PER_PAGE)
+                max_page = max(
+                    1, (total_groups + GROUPS_PER_PAGE - 1) // GROUPS_PER_PAGE
+                )
 
                 # Get groups for current page
                 page_group_names = group_names[
-                    (current_page - 1) * GROUPS_PER_PAGE : current_page * GROUPS_PER_PAGE
+                    (current_page - 1)
+                    * GROUPS_PER_PAGE : current_page
+                    * GROUPS_PER_PAGE
                 ]
-                
+
                 for group_name in page_group_names:
                     driver = StaffData.objects.filter(full_name=group_name).first()
                     group_records = records.filter(driver=driver)
@@ -416,14 +447,12 @@ def render_display_records(request, **kwargs):
                 record.transferred_amount = "chưa thanh toán"
                 record.payment_date = ""
 
-
-
     # Add pagination logic for general records
     if not update and not group_by and model_class not in [VehicleOperationRecord, Job]:
         # Get pagination parameters
         items_per_page = 20  # Adjust this number as needed
         current_page = max(1, get_valid_id(params.get("current_page", 1)))
-            
+
         # Count total records
         total_records = records.count()
 
@@ -431,35 +460,40 @@ def render_display_records(request, **kwargs):
         max_page = max(1, (total_records + items_per_page - 1) // items_per_page)
 
         # Slice the records for the current page
-        records = records[(current_page-1) * items_per_page:current_page * items_per_page]
-        
+        records = records[
+            (current_page - 1) * items_per_page : current_page * items_per_page
+        ]
+
     if model_class == PartProvider:
+
         def get_total_purchase_amount(provider, start_date, end_date):
             # Get all VehicleMaintenanceRepairPart with date filter
             query = VehicleMaintenanceRepairPart.objects.filter(
                 repair_part__part_provider=provider
             )
-            
+
             if start_date:
                 query = query.filter(vehicle_maintenance__to_date__gte=start_date)
             if end_date:
                 query = query.filter(vehicle_maintenance__to_date__lte=end_date)
-            
+
             # Calculate the purchase amount
             purchase_amount = 0
             for repair_part in query:
-                purchase_amount += repair_part.repair_part.part_price * repair_part.quantity
+                purchase_amount += (
+                    repair_part.repair_part.part_price * repair_part.quantity
+                )
             return purchase_amount
 
         def get_total_transferred_amount(provider, start_date, end_date):
             # Get payment records with date filter
             query = PaymentRecord.objects.filter(provider=provider)
-            
+
             if start_date:
                 query = query.filter(payment_date__gte=start_date)
             if end_date:
                 query = query.filter(payment_date__lte=end_date)
-            
+
             # Calculate the transferred amount
             transferred_amount = 0
             for payment_record in query:
@@ -470,14 +504,18 @@ def render_display_records(request, **kwargs):
         end_date = get_valid_date(params.get("end_date", ""), "none")
         for record in records:
             purchase_amount = get_total_purchase_amount(record, start_date, end_date)
-            transferred_amount = get_total_transferred_amount(record, start_date, end_date)
+            transferred_amount = get_total_transferred_amount(
+                record, start_date, end_date
+            )
             record.total_purchase_amount = purchase_amount
             record.total_transferred_amount = transferred_amount
             record.total_outstanding_debt = purchase_amount - transferred_amount
-    
+
     elif model_class == VehicleMaintenanceAnalysis:
         for record in records:
-            maintenance_amount = VehicleMaintenanceRepairPart.get_maintenance_amount(record.vehicle, start_date, end_date)
+            maintenance_amount = VehicleMaintenanceRepairPart.get_maintenance_amount(
+                record.vehicle, start_date, end_date
+            )
             record.from_date = start_date if start_date else "Không xác định"
             record.to_date = end_date if end_date else "Không xác định"
             record.maintenance_amount = maintenance_amount
@@ -527,15 +565,35 @@ def render_form(request, **kwargs):
 
     # Get the instance if pk is provided, use None otherwise
     record = model_class.objects.filter(pk=pk).first()
+
+    # Xử lý trường hợp đặc biệt cho SupplyInventoryRecord
+    check_date = get_valid_date(kwargs.get("check_date", ""))
+    costestimation_id = get_valid_id(kwargs.get("costestimation_id", 0))
+
     # Get the form
     if not form:
-        form = form_class(instance=record) if record else form_class()
+        project = Project.objects.filter(pk=project_id).first()
+        if project and model_class == SupplyInventoryRecord:
+
+            form = (
+                form_class(
+                    instance=record,
+                    project_id=project_id,
+                )
+                if record
+                else form_class(
+                    project_id=project_id,
+                    supply_id=costestimation_id,
+                    check_date=check_date,
+                )
+            )
+
+        else:
+            form = form_class(instance=record) if record else form_class()
 
     context = {
         "submit_button_name": "Cập nhật" if record else "Tạo mới",
-        "title": (
-            "Cập nhật dữ liệu" if record else translate(f"Tạo dữ liệu mới")
-        ),
+        "title": ("Cập nhật dữ liệu" if record else translate(f"Tạo dữ liệu mới")),
         "form_url": reverse("handle_form", kwargs={"model": model, "pk": pk}),
         "model": model,
         "model_class": model_class,

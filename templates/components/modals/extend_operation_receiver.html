@@ -1,0 +1,65 @@
+{% load custom_tags %}
+
+<div class="flex justify-center">
+    <div class="w-full pt-4 px-6">
+        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800 dark:text-gray-100">
+            Danh sách phiếu đề xuất thanh toán liên quan
+        </h2>
+        
+        {% with operation_orders=record.get_related_orders %}
+            {% if operation_orders %}
+                <div class="shadow-md rounded-lg relative" style="max-height: 400px; overflow: scroll;">
+                    <table class="min-w-full bg-white dark:bg-gray-800">
+                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-theme sticky top-0">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Mã phiếu</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Dự án</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Người trình</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Tổng tiền</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Hình thức TT</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Trạng thái</th>
+                                <th class="py-3 px-4 text-left text-sm font-medium">Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-600 h-[300px] overflow-scroll">
+                            {% for order in operation_orders %}
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ order.order_code }}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ order.project.name }}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">{{ order.user.username }}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">
+                                        {{ order.order_amount|format_money }} đ
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">
+                                        {{ order.get_payment_method_display }}
+                                    </td>
+                                    <td class="py-3 px-4 text-sm">
+                                        <div class="flex flex-col space-y-1">
+                                            <span class="{% if order.approval_status == 'approved' %}text-green-600{% elif order.approval_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
+                                                {{ order.get_approval_status_display }}
+                                            </span>
+                                            <span class="{% if order.paid_status == 'paid' %}text-green-600{% elif order.paid_status == 'partial_paid' %}text-yellow-600{% else %}text-red-600{% endif %}">
+                                                {{ order.get_paid_status_display }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-100">
+                                        {{ order.created_at|date:"d/m/Y" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 text-right text-sm text-gray-600 dark:text-gray-300">
+                    Tổng số phiếu: {{ operation_orders|length }}
+                </div>
+            {% else %}
+                <div class="text-theme">
+                    <p class="text-center">Không có phiếu đề xuất thanh toán nào liên quan đến bên thụ hưởng này.</p>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>

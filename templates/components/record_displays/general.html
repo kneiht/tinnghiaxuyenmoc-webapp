@@ -36,6 +36,18 @@
                                 {{ record|format_display:field }}
                             </a>
                 
+                        {% elif field == 'file_url'  %} 
+                        <a  style="max-width: 20rem;
+                                    display: inline-block;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;"
+                            target="_blank"
+                            href="{{ record|get_value:field }}">
+                            {{ record|format_display:field }}
+                        </a>
+             
+
                         {% elif field == 'lock' %} 
                             <a class="{{ record|get_value:field }} cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"
                                up-target="#display-records, #load-more:maybe"

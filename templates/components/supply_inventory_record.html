@@ -1,0 +1,239 @@
+{% load custom_tags %}
+{% load humanize %}
+{% load static %}
+
+
+<div id="display-records" class="supply-inventory-record w-full overflow-scroll mt-4 z-0">
+    
+    <table id="display-table-records" class="relative table-auto w-full border border-slate-300 dark:border-slate-900 border-opacity-50 rounded-2xl shadow-md">
+        <thead class="sticky top-0 z-10">
+            <tr class="text-sm leading-normal text-theme rounded-2xl shadow-md bg-white dark:bg-slate-800
+            border border-slate-300 dark:border-slate-900 border-opacity-50">
+                {% for header in headers %}
+                    <th class="px-6 py-3 text-left font-semibold cursor-pointer">
+                        {{ header }}
+                    </th>
+                {% endfor %}
+                <th class="sticky right-0 bg-white dark:bg-slate-800 z-30">
+
+                </th>
+            </tr>
+        </thead>
+
+        
+        {% for record in inventory_list %}
+            <tbody id="record_{{ record.inventory_record.pk }}" record-id="{{ record.inventory_record.pk }}" class="">
+                <tr class="bg-gray-50 hover:bg-blue-100 dark:bg-gray-800 dark:even:bg-gray-700 dark:hover:bg-gray-600">
+                    {% for field in fields %}
+                    <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                        {% if field == 'supply_number' %}
+                            {{ record.supply_number }}
+                        {% elif field == 'supply_name' %}
+                            {{ record.supply_name }}
+                        {% elif field == 'unit' %}
+                            {{ record.unit }}
+                        {% elif field == 'beginning_quantity' %}
+                            {{ record.beginning_quantity }}
+                        {% elif field == 'import_quantity' %}
+                            {{ record.import_quantity }}
+                        {% elif field == 'export_quantity' %}
+                            {{ record.export_quantity }}
+                        {% elif field == 'ending_quantity' %}
+                            {{ record.ending_quantity }}
+                        {% else %}
+                            {{ record|get_value:field }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+    
+                    <td class="py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 text-right sticky right-0 bg-inherit me-5 z-0">
+                        <div class="flex flex-row gap-1 mr-3 justify-end z-0">
+                            <div class="w-10 h-10 flex justify-end items-center">
+                                <a id="record-edit" class="flex flex-row justify-end items-center" 
+                                up-preload="reveal" 
+                                up-cache="auto" 
+                                href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' pk=record.inventory_record.id costestimation_id=record.costestimation.id %}" 
+                                up-target="#modal">
+                                    <img src="{% static 'images/icons/edit.png' %}?v={{ STATIC_VERSION }}" alt="Edit Record" class="w-8 h-8">
+                      
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+</div>
+
+
+<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5 mt-3 z-30">
+    <!-- Toolbar for database interactions -->
+    <div class="flex flex-row items-end gap-5">
+        <div class="flex flex-row items-center gap-2">
+            <button type="button" 
+                   class="btn btn-secondary" 
+                   onclick="setCheckDateWithDelta(-1)">
+                <i class="fa fa-chevron-left me-2" aria-hidden="true"></i>
+                <span>Ngày trước</span>
+            </button>
+            
+            <div class="px-4 py-2 inline-flex items-center bg-green-100 text-green-700 rounded-lg font-medium border border-green-300">
+                <span class="font-semibold me-3">Ngày đang xem: </span>
+                <span>{{ check_date|format_display}}</span>
+            </div>
+            
+            <button type="button" 
+                   class="btn btn-secondary" 
+                   onclick="setCheckDateWithDelta(1)">
+                <span>Ngày kế tiếp</span>
+                <i class="fa fa-chevron-right ms-2" aria-hidden="true"></i>
+            </button>
+            <input id="check_date_inventory" type="date" name="check_date_inventory" class="form-input w-36">
+            <button type="button" 
+                   class="btn btn-primary ml-2" 
+                   onclick="setToday()">
+                <i class="fa fa-calendar-day me-3" aria-hidden="true"></i>
+                <span>Hôm nay</span>
+            </button>
+            
+            <!-- Thêm nút filter select -->
+            <div class="ml-4 flex items-center">
+                <select id="view_mode" class="form-input w-48 py-2 text-sm" onchange="filterInventoryRecords()">
+                    <option value="all">Xem toàn bộ</option>
+                    <option value="changes">Xem trong ngày</option>
+                </select>
+            </div>
+            
+            <script>
+                // Set mặc định ngày kiểm kê
+                document.getElementById('check_date_inventory').value = getCheckDate();
+                document.getElementById('check_date_inventory').addEventListener('change', function () {
+                    setCheckDate(this.value);
+                });
+            
+                // Cập nhật bảng theo chế độ lọc
+                function updateInventoryRecords({ filter = false } = {}) {
+                    const table = document.getElementById("display-table-records");
+                    const tbodyList = table.querySelectorAll("tbody");
+            
+                    tbodyList.forEach(tbody => {
+                        const tds = tbody.querySelectorAll("td");
+                        if (tds.length >= 6) {
+                            const nhap = parseFloat(tds[4].textContent.trim());
+                            const xuat = parseFloat(tds[5].textContent.trim());
+            
+                            const shouldHide = filter && nhap === 0 && xuat === 0;
+                            tbody.style.display = shouldHide ? "none" : "";
+                        }
+                    });
+                }
+            
+                // Hàm xử lý khi người dùng chọn chế độ từ dropdown
+                function filterInventoryRecords() {
+                    const viewMode = document.getElementById("view_mode").value;
+                    const filter = viewMode === "changes"; // chỉ lọc khi chọn "Xem trong ngày"
+                    updateInventoryRecords({ filter });
+                }
+        
+            </script>
+            
+
+        </div>
+    </div>
+    
+    <div class="flex flex-row items-end gap-5">
+
+        {% if excel_uploadable and request.user.is_superuser %}
+        <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
+            class="flex flex-row whitespace-nowrap gap-2"
+            up-cache="auto">
+            {% csrf_token %}
+            <input type="file" class="hidden" id="file" name="file"
+                accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
+            <input type="hidden" name="project_id" value="{{ project_id }}">
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('file').click()">
+                <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span> Upload </span>         
+            </button>
+            <button class="hidden" id="upload-button">
+                <span> Submit </span>         
+            </button>
+        </form> 
+
+        <script>
+            document.getElementById('file').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    document.getElementById('upload-button').click();
+                }
+            });
+        </script>
+        {% endif %}
+
+
+        <form action="{% url 'download_excel' model %}" method="post" enctype="multipart/form-data" id="download-form"
+            class="flex flex-row whitespace-nowrap gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="project_id" value="{{ project_id }}">
+            <button class="btn btn-primary" id="download-button">
+                <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span> Download </span>         
+            </button>
+        </form> 
+
+
+    </div>
+</div>
+
+<!-- Script để lọc dữ liệu theo chế độ xem -->
+<script>
+    function filterInventoryRecords() {
+        const viewMode = document.getElementById('view_mode').value;
+        const rows = document.querySelectorAll('#display-table-records tbody');
+        
+        rows.forEach(tbody => {
+            const row = tbody.querySelector('tr');
+            if (!row) return;
+            
+            if (viewMode === 'all') {
+                // Hiển thị tất cả các hàng
+                tbody.style.display = '';
+            } else if (viewMode === 'changes') {
+                // Tìm cột "Nhập trong ngày" và "Xuất trong ngày"
+                let importCell = null;
+                let exportCell = null;
+                
+                // Duyệt qua tất cả các ô trong hàng để tìm cột import_quantity và export_quantity
+                const cells = row.querySelectorAll('td');
+                
+                {% for field in fields %}
+                    {% if field == 'import_quantity' %}
+                        importCell = cells[{{ forloop.counter0 }}];
+                    {% endif %}
+                    {% if field == 'export_quantity' %}
+                        exportCell = cells[{{ forloop.counter0 }}];
+                    {% endif %}
+                {% endfor %}
+                
+                // Kiểm tra giá trị của cột "Nhập trong ngày" và "Xuất trong ngày"
+                if (importCell && exportCell) {
+                    const importValue = parseFloat(importCell.textContent.trim()) || 0;
+                    const exportValue = parseFloat(exportCell.textContent.trim()) || 0;
+                    
+                    // Hiển thị hàng nếu có phát sinh (nhập hoặc xuất khác 0)
+                    if (importValue !== 0 || exportValue !== 0) {
+                        tbody.style.display = '';
+                    } else {
+                        tbody.style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+    
+    // Thêm sự kiện khi trang đã tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo bộ lọc với giá trị mặc định
+        filterInventoryRecords();
+    });
+</script>

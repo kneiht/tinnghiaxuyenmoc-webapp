@@ -41,8 +41,6 @@ def download_excel(request, model_name):
             fields.remove("created_at")
         if "archived" in fields:
             fields.remove("archived")
-        if "project" in fields:
-            fields.remove("project")
         if "secondary_id" in fields:
             fields.remove("secondary_id")
 
@@ -54,15 +52,17 @@ def download_excel(request, model_name):
 
         # Get project_id and records
         project_id = request.POST.get("project_id", None)
+
         try:
             project_id = int(project_id)
-            if projet_id < 1:
+            if project_id < 1:
                 project_id = None
         except:
             project_id = None
 
         if project_id:
-            records = model_class.objects.filter(project=project_id).values(*fields)
+            project = Project.objects.get(id=project_id)
+            records = model_class.objects.filter(project=project).values(*fields)
         else:
             records = model_class.objects.all().values(*fields)
 

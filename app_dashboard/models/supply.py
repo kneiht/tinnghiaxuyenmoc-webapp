@@ -114,6 +114,18 @@ class SupplyProvider(BaseModel):
         self.total_outstanding_debt = debt_amount
         super().save(*args, **kwargs)
 
+    def get_related_orders(self):
+        # Tất cả phiếu đặt vật tư liên quan đến nhà cung cấp này
+        # Lấy các SupplyOrder có chứa vật tư từ nhà cung cấp này
+        order_ids = (
+            SupplyOrderSupply.objects.filter(detail_supply__supply_provider=self)
+            .values_list("supply_order", flat=True)
+            .distinct()
+        )
+
+        orders = SupplyOrder.objects.filter(id__in=order_ids)
+        return orders
+
 
 class SupplyBrand(BaseModel):
     allow_display = True
@@ -426,9 +438,7 @@ class CostEstimation(BaseModel):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return (
-            f"Dự án {self.project} - Vật tư {self.supply_number} - {self.supply_name}"
-        )
+        return f"{self.supply_number} - {self.supply_name}"
 
     @classmethod
     def get_display_fields(self):
@@ -606,7 +616,7 @@ class SupplyOrder(BaseModel):
         # Check received status
         if (
             order_supplies.count() > 0
-            and order_supplies.count
+            and order_supplies.count()
             == order_supplies.filter(received_status="received").count()
         ):
             self.received_status = "received"
@@ -1110,6 +1120,19 @@ class SupplyPaymentRecord(BaseModel):
         if errors:
             raise ValidationError(errors)
 
+    def total_transfered_amount(self):
+        # Get all payment records with same vehicle_maintenance and provider and lock = True
+        payment_records = SupplyPaymentRecord.objects.filter(
+            supply_order=self.supply_order,
+            provider=self.provider,
+            lock=True,
+        )
+        # Calculate the sum of transferred_amount
+        total_transfered_amount = sum(
+            record.transferred_amount for record in payment_records
+        )
+        return total_transfered_amount
+
 
 class SupplyOrderImage(BaseModel):
     vietnamese_name = "Hình ảnh"
@@ -1131,3 +1154,44 @@ class SupplyOrderImage(BaseModel):
 
     def __str__(self):
         return f'Mã phiếu "{self.order}"'
+
+
+class SupplyInventoryRecord(BaseModel):
+    allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
+    vietnamese_name = "Số lượng vật tư nhập/xuất"
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name="Dự án",
+    )
+
+    supply = models.ForeignKey(
+        CostEstimation,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Vật tư trong dự toán",
+    )
+
+    import_quantity = models.FloatField(
+        default=0.0,
+        validators=[MinValueValidator(0)],
+        verbose_name="Nhập trong ngày",
+    )
+
+    export_quantity = models.FloatField(
+        default=0.0,
+        validators=[MinValueValidator(0)],
+        verbose_name="Xuất trong ngày",
+    )
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
+
+    created_date = models.DateField(verbose_name="Ngày nhập/xuất", default=timezone.now)
+
+    created_at = models.DateTimeField(default=timezone.now)

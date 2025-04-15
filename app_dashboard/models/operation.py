@@ -96,6 +96,11 @@ class OperationReceiver(BaseModel):
         self.total_outstanding_debt = outstanding_debt
         super().save(*args, **kwargs)
 
+    def get_related_orders(self):
+        # Lấy tất cả các phiếu đề xuất thanh toán liên quan đến bên thụ hưởng này
+        orders = OperationOrder.objects.filter(operation_receiver=self)
+        return orders
+
 
 class OperationOrder(BaseModel):
     allow_display = True
@@ -496,6 +501,19 @@ class OperationPaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
+
+    def total_transfered_amount(self):
+        # Get all payment records with same vehicle_maintenance and provider and lock = True
+        payment_records = OperationPaymentRecord.objects.filter(
+            operation_order=self.operation_order,
+            operation_receiver=self.operation_receiver,
+            lock=True,
+        )
+        # Calculate the sum of transferred_amount
+        total_transfered_amount = sum(
+            record.transferred_amount for record in payment_records
+        )
+        return total_transfered_amount
 
 
 class OperationOrderImage(BaseModel):

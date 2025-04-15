@@ -121,6 +121,11 @@ urlpatterns = [
         views.upload_project,
         name="upload_project",
     ),
+    path(
+        "supply_inventory/<int:project_id>/",
+        views.supply_inventory,
+        name="supply_inventory",
+    ),
     # upload excel
     path(
         "api/upload-excel/<str:model_name>/",

@@ -11,24 +11,24 @@
             <div id="project-display-mode" class="flex gap-3">
                 <a id="show-gantt-jobs" class="btn btn-primary text-nowrap cursor-pointer">
                     <i class="fas fa-bar-chart px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Xem Gantt </span>
+                    <span class="ms-3 hidden md:block"> Gantt </span>
                 </a>
                 
                 <a id="show-table-jobs" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|tool_bar|infor_bar|display_records' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-table px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Xem Table </span>
+                    <span class="ms-3 hidden md:block"> Bảng </span>
                 </a>    
 
                 <a id="show-weekplan" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='Job' project_id=project_id check_date=check_date elements='title_bar|infor_bar|weekplan_table' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-bullseye px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Xem KH tuần </span>
+                    <span class="ms-3 hidden md:block"> KH tuần </span>
                 </a>
             </div>
 
             <div class="flex gap-3">
                 <a id="operationn-order" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe" up-preload href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='OperationOrder' project_id=project_id check_date=check_date elements='tool_bar|display_records' %}" class="btn btn-primary text-nowrap">
                     <i class="fas fa-usd px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Đề xuất thanh toán </span>
+                    <span class="ms-3 hidden md:block"> Đề xuất T.toán </span>
                 </a>
             </div>
 
@@ -46,24 +46,46 @@
                     <i class="fas fa-clipboard-list   px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
                     <span class="ms-3 hidden md:block">  Dự toán vật tư </span>
                 </a>
+
+                <a id="inventory-button" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe"
+                    href="{% url 'supply_inventory' project_id=project_id %}?check_date={{ check_date }}" class="btn text-nowrap" style="background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%); color: white;">
+                    <i class="fas fa-archive px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Kho </span>
+                </a>
+
             </div>
             <div class="flex gap-3">
                 <a up-preload="insert" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' project_id=project_id model='SubJobOrder' elements='tool_bar|display_records' %}"
                     id="sub-job-order" class="btn btn-primary text-nowrap"
                     up-target="#modal:maybe, #display-records:maybe, #tool-bar:maybe">
                     <i class="fas fa-hard-hat px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Nghiệm thu công việc </span>
+                    <span class="ms-3 hidden md:block"> Nghiệm thu CV </span>
                 </a>
                 <a href="{% url 'form_sub_job_cost_estimation_table' project_id=project_id %}"
                     id="cost-estimation" class="btn btn-primary text-nowrap"
                     up-preload="insert" up-target="#modal:maybe, #display-records, #tool-bar">
                     <i class="fas fa-clipboard-list   px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
-                    <span class="ms-3 hidden md:block"> Dự toán công việc </span>
+                    <span class="ms-3 hidden md:block"> Dự toán CV </span>
                  </a>
 
             </div>
 
             <input id="check_date" type="date" name="check_date" class="form-input w-36">
+
+            <div class="flex gap-3">
+                <a id="project-files" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='ProjectFile' project_id=project_id elements='tool_bar|display_records' %}" class="btn text-nowrap" style="background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%); color: white;">
+                    <i class="fas fa-file px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Tài liệu </span>
+                </a>
+                
+
+                {% comment %} <a id="inventory-record" up-preload="insert" up-target="#display-records:maybe, #tool-bar:maybe" href="{% url 'load_elements' %}?q={% encode_params page='page_each_project' model='SupplyInventoryRecord' project_id=project_id elements='tool_bar|display_records' %}" class="btn text-nowrap" style="background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%); color: white;">
+                    <i class="fas fa-file px-2 md:px-0" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span class="ms-3 hidden md:block"> Nhập xuất kho </span>
+                </a> {% endcomment %}
+
+
+            </div>
         </div>
     </div>
 </div>

@@ -101,6 +101,17 @@ class SubContractor(BaseModel):
         self.total_outstanding_debt = debt_amount
         super().save(*args, **kwargs)
 
+    def get_related_orders(self):
+        # Lấy tất cả các phiếu đặt công việc liên quan đến nhà thầu phụ này
+        order_ids = (
+            SubJobOrderSubJob.objects.filter(detail_sub_job__sub_contractor=self)
+            .values_list("sub_job_order", flat=True)
+            .distinct()
+        )
+
+        orders = SubJobOrder.objects.filter(id__in=order_ids)
+        return orders
+
 
 class SubJobBrand(BaseModel):
     allow_display = True
@@ -591,7 +602,7 @@ class SubJobOrder(BaseModel):
         # Check received status
         if (
             order_sub_jobs.count() > 0
-            and order_sub_jobs.count
+            and order_sub_jobs.count()
             == order_sub_jobs.filter(received_status="received").count()
         ):
             self.received_status = "received"
@@ -1085,6 +1096,19 @@ class SubJobPaymentRecord(BaseModel):
 
         if errors:
             raise ValidationError(errors)
+
+    def total_transfered_amount(self):
+        # Get all payment records with same vehicle_maintenance and provider and lock = True
+        payment_records = SubJobPaymentRecord.objects.filter(
+            sub_job_order=self.sub_job_order,
+            sub_contractor=self.sub_contractor,
+            lock=True,
+        )
+        # Calculate the sum of transferred_amount
+        total_transfered_amount = sum(
+            record.transferred_amount for record in payment_records
+        )
+        return total_transfered_amount
 
 
 class SubJobOrderImage(BaseModel):

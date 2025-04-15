@@ -191,8 +191,7 @@ function drawGanttChart(tasks) {
         .html(
           `<strong>${d.name}</strong><br>Start: ${d3.timeFormat("%d-%m-%Y")(
             d.start
-          )}<br>End: ${d3.timeFormat("%d-%m-%Y")(d.end)}<br>Progress: ${
-            d.progress
+          )}<br>End: ${d3.timeFormat("%d-%m-%Y")(d.end)}<br>Progress: ${d.progress
           }%`
         )
         .style("left", `${event.pageX + 5}px`)
@@ -275,6 +274,16 @@ function drawGanttChart(tasks) {
 }
 
 // Add this to trigger change event when value is set programmatically
+
+function getCheckDate() {
+  // Get the input element by its ID
+  let checkDate = document.getElementById("check_date");
+  // Set the value of the input
+  if (checkDate) {
+    return checkDate.value;
+  }
+}
+
 function setCheckDate(value) {
   // Get the input element by its ID
   let checkDate = document.getElementById("check_date");
@@ -285,6 +294,22 @@ function setCheckDate(value) {
     checkDate.dispatchEvent(event);
   }
 }
+
+function setCheckDateWithDelta(delta) {
+  // Get the input element by its ID
+  let checkDate = document.getElementById("check_date");
+  // Add delta then call setCheckDate
+  const newDate = new Date(checkDate.value);
+  newDate.setDate(newDate.getDate() + delta);
+  setCheckDate(newDate.toISOString().split('T')[0]);
+}
+
+function setToday() {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-CA"); // 'en-CA' gives the ISO-like format (YYYY-MM-DD)
+  setCheckDate(formattedDate);
+}
+
 
 up.compiler("#check_date", function (element) {
   let checkDate = element;
@@ -320,6 +345,13 @@ up.compiler("#check_date", function (element) {
       check_date: checkDate,
     });
 
+    let inventory_button = document.getElementById("inventory-button");
+    let inventoryUrl = inventory_button.href;
+    inventory_button.href = updateUrlParams(inventoryUrl, {
+      check_date: checkDate,
+    });
+
+
     // hide ganttChart
     document.getElementById("gantt-chart-container").classList.add("hidden");
     let weekplanTable = document.getElementById("weekplan-table");
@@ -330,7 +362,16 @@ up.compiler("#check_date", function (element) {
         target: "#display-records:maybe, #tool-bar:maybe, #infor-bar:maybe",
         url: url,
       });
-    } else {
+    } else if (document.getElementById("display-records").classList.contains("supply-inventory-record")) {
+      // Case inventory is present
+      let url = inventory_button.href;
+      up.render({
+        target: "#display-records:maybe, #tool-bar:maybe",
+        url: url,
+      });
+    }
+
+    else {
       // Case 2: weekplan-table is not present
       let url = showAllJobs.href;
       up.render({
@@ -512,3 +553,10 @@ up.compiler("#sub-job-estimation-table", function (table) {
   // Initialize with "All" filter
   document.querySelector('.job-type-tab[data-filter="all"]').click();
 });
+
+
+
+
+
+
+

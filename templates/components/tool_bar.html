@@ -122,7 +122,7 @@
                             </script>
                         </div>
 
-                        {% if page == 'page_each_project' %}
+                        {% if page == 'page_each_project' and model == "Job" %}
                         <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
                             <option value="" selected>Sắp xếp ...</option>
                             <option value="name">Tên công việc - (A → Z)</option>
@@ -277,6 +277,20 @@
                                         });
                                     </script>
 
+                            {% else %}
+                                <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                                    <option value="" selected>Mặc định</option>
+                                    {% for option in model|get_sorts %}
+                                    <option value="{{ option.sort }}">{{ option.display_name }}</option>
+                                {% endfor %}
+                                </select>
+        
+                                <script>
+                                    document.getElementById('sort-select').addEventListener('change', function() {
+                                        // Press search-button
+                                        document.getElementById('search-button').click();
+                                    });
+                                </script>
                         {% endif %}
 
                         
