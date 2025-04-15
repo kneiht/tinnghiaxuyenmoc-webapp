@@ -237,13 +237,17 @@
                     {% if model != "OperationOrder" %}
                         {% if record.provider or record.sub_contractor or record.operation_receiver %}  
                         <p class="col-span-full text-theme text-center"> Lưu ý: Thông tin thanh toán được cập nhật sau khi lưu </p>
-                        <div class="col-span-full w-full rounded-xl overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
+                        <div class="col-span-full w-full rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
                             <div class="bg-blue-500 dark:bg-blue-600 p-2 flex flex-col items-center justify-items-center">
                                 <h3 class="text-white font-bold text-lg text-center">
                                     Thông tin thanh toán
                                 </h3>
                             </div>
-                            <div class="px-2 py-3">
+                            {% if model == "SupplyPaymentRecord" or model == "SubJobPaymentRecord" or model == "OperationPaymentRecord" %}  
+                                
+                                <p class="font-bold text-green-600 dark:text-green-400 break-words text-center pt-3 text-md uppercase">Thuộc dự án: {{  record.project }}</p>
+                            {% endif %}
+                            <div class="px-2 py-3"
                                 <!-- Chia thành 2 cột -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <!-- CỘT 1 -->

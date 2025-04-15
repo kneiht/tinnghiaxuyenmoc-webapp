@@ -248,6 +248,7 @@ class OperationOrder(BaseModel):
                     operation_receiver=self.operation_receiver,
                     previous_debt=operation_receiver_state["debt_amount"],
                     purchase_amount=operation_receiver_state["purchase_amount"],
+                    note=self.note,
                 )
             else:
                 total_transferred_amount = 0
@@ -477,6 +478,7 @@ class OperationPaymentRecord(BaseModel):
                 previous_debt=self.debt,
                 purchase_amount=self.purchase_amount,
                 debt=self.debt,
+                note=operation_order.note,
             )
 
         # Update supply order payment status
