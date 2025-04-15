@@ -236,6 +236,7 @@
 
                     {% if model != "OperationOrder" %}
                         {% if record.provider or record.sub_contractor or record.operation_receiver %}  
+                        <p class="col-span-full text-theme text-center"> Lưu ý: Thông tin thanh toán được cập nhật sau khi lưu </p>
                         <div class="col-span-full w-full rounded-xl overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
                             <div class="bg-blue-500 dark:bg-blue-600 p-2 flex flex-col items-center justify-items-center">
                                 <h3 class="text-white font-bold text-lg text-center">
@@ -315,7 +316,7 @@
                                             </div>
                                             <div class="flex-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">Số tiền cần chuyển:</p>
-                                                <p class="font-bold text-green-600 dark:text-green-400 break-words text-lg">{{ record.transferred_amount|format_money }} VNĐ</p>
+                                                <p class="font-bold text-green-600 dark:text-green-400 break-words text-lg">{{ record.requested_amount|format_money }} VNĐ</p>
                                             </div>
                                         </div>
                                         

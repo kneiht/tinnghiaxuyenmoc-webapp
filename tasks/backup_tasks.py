@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import subprocess
 import zipfile
@@ -74,22 +74,27 @@ def backup_db(db, name, app_name):
 
 def zip_and_upload_media(filename_prefix, source_folder, app_name):
     date_time_str = get_date_time()
-    date_today = date_time_str.split("_")[0]  # Get today's date (YYYY-MM-DD)
+    # Lấy ngày hôm qua thay vì ngày hôm nay
+    tz = pytz.timezone("Asia/Ho_Chi_Minh")
+    vn_now = datetime.now(tz)
+    yesterday = vn_now - timedelta(days=1)
+    date_yesterday = yesterday.strftime("%Y-%m-%d")  # Ngày hôm qua (YYYY-MM-DD)
+
     zip_filename = f"{filename_prefix}_{date_time_str}.zip"
     zip_path = os.path.join("backups", zip_filename)
 
     print(
-        f"🔍 Zipping media files modified on {date_today} from {source_folder} into {zip_path}..."
+        f"🔍 Đang nén các file media được chỉnh sửa vào ngày {date_yesterday} từ {source_folder} vào {zip_path}..."
     )
 
-    # Create the zip file
+    # Tạo file zip
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk(source_folder):
             for file in files:
                 filepath = os.path.join(root, file)
                 mod_time = datetime.fromtimestamp(os.path.getmtime(filepath))
                 mod_date = mod_time.strftime("%Y-%m-%d")
-                if mod_date == date_today:
+                if mod_date == date_yesterday:
                     arcname = os.path.relpath(filepath, source_folder)
                     zipf.write(filepath, arcname=arcname)
 
