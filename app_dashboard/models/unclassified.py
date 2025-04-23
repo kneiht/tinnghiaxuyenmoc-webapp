@@ -174,7 +174,7 @@ class VehicleRevenueInputs(BaseModel):
     allow_display = True
     excel_downloadable = True
     excel_uploadable = True
-    vietnamese_name = "DL tính doanh thu"
+    vietnamese_name = "DL tính doanh thu theo loại xe cơ giới"
 
     class Meta:
         ordering = ["vehicle_type"]
@@ -617,7 +617,7 @@ class NormalWorkingTime(BaseModel):
     allow_display = True
     excel_downloadable = True
     excel_uploadable = True
-    vietnamese_name = "Thời gian làm việc"
+    vietnamese_name = "Thời gian làm việc xe cơ giới"
 
     # gotta get valid normal working time based on the valid date so that old data can be updated (from a button click manually)
     class Meta:

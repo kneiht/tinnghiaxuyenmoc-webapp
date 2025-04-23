@@ -309,7 +309,7 @@ def handle_form(request, model, pk=0):
             model == "VehicleMaintenance"
             or model == "SupplyOrder"
             or model == "SubJobOrder"
-            or model == "ProjectPaymentRequest"
+            or model == "OperationOrder"
         ):
             # set approval status to make sure there no injection hacking
             form.instance.approval_status = "scratch"
@@ -344,7 +344,7 @@ def handle_form(request, model, pk=0):
             model == "VehicleMaintenance"
             or model == "SupplyOrder"
             or model == "SubJobOrder"
-            or model == "ProjectPaymentRequest"
+            or model == "OperationOrder"
         ):
             current_approval_status = (
                 model_class.objects.filter(pk=pk).first().approval_status

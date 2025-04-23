@@ -107,8 +107,6 @@ up.compiler('.transport-table', function (transportTable) {
 });
 
 
-
-
 up.compiler('#start_date', function (element) {
     let startDate = element;
     startDate.addEventListener('change', function () {
@@ -116,7 +114,10 @@ up.compiler('#start_date', function (element) {
         let newStartDate = startDate.value;
 
         // Find all <a> tags in database-selection
-        let databaseSelection = document.getElementById('#nav_menu');
+        let databaseSelection = document.getElementById('nav_menu');
+        if (!databaseSelection) {
+            return;
+        }
         let aTags = databaseSelection.querySelectorAll('a');
 
         // For each <a> tag
@@ -147,9 +148,15 @@ up.compiler('#end_date', function (element) {
         let newendDate = endDate.value;
 
         // Find all <a> tags in database-selection
-        let databaseSelection = document.getElementById('database-selection');
+        let databaseSelection = document.getElementById('nav_menu');
+        if (!databaseSelection) {
+            return;
+        }
         let aTags = databaseSelection.querySelectorAll('#driver_salary, #vehicle_revenue');
-
+        
+        if (!aTags) {
+            return;
+        }
         // For each <a> tag
         aTags.forEach(function (aTag) {
             let currentUrl = new URL(aTag.href); // Convert href to URL object
@@ -166,6 +173,8 @@ up.compiler('#end_date', function (element) {
             // Update the href with the modified URL
             aTag.href = currentUrl.toString();
         });
+
+
     });
 });
 

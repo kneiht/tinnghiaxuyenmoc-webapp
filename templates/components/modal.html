@@ -279,25 +279,12 @@
                                         </div>
                                         
 
-                                        <!-- Nợ kì trước -->
-                                        <div class="flex items-center p-2">
-                                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                            </div>
-                                            <div class="flex-1">
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">Nợ kì trước:</p>
-                                                <p class="font-semibold text-theme break-words">{{ record.previous_debt|format_money }} VNĐ</p>
-                                            </div>
-                                        </div>
                                     </div>
                                     
                                     <!-- CỘT 2 -->
                                     <div class="space-y-4">
-
                                         <!-- Ngân hàng -->
-                                        <div class="flex items-center p-2">
+                                        <div class="flex items-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-400">
                                             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -324,6 +311,42 @@
                                             </div>
                                         </div>
                                         
+                                    </div>
+                                </div>
+                                
+                                <!-- Nội dung - Hàng ngang cuối -->
+                                <div class="mt-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3 mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Nội dung chuyển khoản:</p>
+                                            <p class="font-semibold text-theme break-words">{{ record.content|default:record.note|default:"Thanh toán cho dự án" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- CỘT 1 -->
+                                    <div class="space-y-4">
+
+                                        <!-- Tổng số tiền trên phiếu -->
+                                        <div class="flex items-center p-2">
+                                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Tổng số tiền trên phiếu:</p>
+                                                <p class="font-semibold text-theme break-words">{{ record.purchase_amount|format_money }} VND</p>
+                                            </div>
+                                        </div>
+
+
                                         <!-- Tổng số tiền lũy kế -->
                                         <div class="flex items-center p-2">
                                             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3">
@@ -337,22 +360,29 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Nội dung - Hàng ngang cuối -->
-                                <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <div class="flex items-start">
-                                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3 mt-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                            </svg>
+                                    
+                                    <!-- CỘT 2 -->
+                                    <div class="space-y-4">
+
+
+                                        <!-- Nợ kì trước -->
+                                        <div class="flex items-center p-2">
+                                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-500 dark:text-blue-300 me-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Nợ còn lại kì trước:</p>
+                                                <p class="font-semibold text-theme break-words">{{ record.previous_debt|format_money }} VNĐ</p>
+                                            </div>
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Nội dung chuyển khoản:</p>
-                                            <p class="font-semibold text-theme break-words">{{ record.content|default:record.note|default:"Thanh toán cho dự án" }}</p>
-                                        </div>
+
+                                        
                                     </div>
                                 </div>
+
+
                             </div>
                         </div>
                         {% endif %}

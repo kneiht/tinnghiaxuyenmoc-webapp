@@ -139,7 +139,7 @@ class ProjectUser(BaseModel):
 
 
 class ProjectPaymentRequest(BaseModel):
-    allow_display = True
+    # allow_display = True
     excel_downloadable = True
     excel_uploadable = True
     vietnamese_name = "Đề xuất thanh toán"
