@@ -1,268 +1,182 @@
 {% load custom_tags %}
 
-<div id="tool-bar" class="flex flex-row justify-between items-end w-full gap-5 mt-3 z-30">
-    <!-- Toolbar for database interactions -->
-    <div class="flex flex-row items-end gap-5">
-       
-        <form action="{% url 'load_elements' %}" up-target="#display-records, #lazy-load:maybe">
-            <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id start_date=start_date group_by=group_by tab=tab  elements='display_records|tool_bar' %}" />
-            <input type="hidden" name="check_date" value="{{ check_date }}" />
-            <!-- Separate 2 sections of controls -->
-            <div class="flex flex-wrap justify-between gap-4">
-                <!-- Left controls for filtering and sorting -->
-                <div id='left-controls' class="flex justify-start gap-4 h-10 w-fit">
+<div id="tool-bar" class="flex flex-col justify-between items-center w-full gap-5 mt-3 z-30">
+    <div class="flex flex-row  justify-between  items-center gap-5 w-full ">
+        <!-- Toolbar for database interactions -->
+        <div class="flex flex-row items-end gap-5">
+        
+            <form action="{% url 'load_elements' %}" up-target="#display-records, #lazy-load:maybe">
+                <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id start_date=start_date group_by=group_by tab=tab  elements='display_records|tool_bar' %}" />
+                <input type="hidden" name="check_date" value="{{ check_date }}" />
+                <!-- Separate 2 sections of controls -->
+                <div class="flex flex-wrap justify-between gap-4">
+                    <!-- Left controls for filtering and sorting -->
+                    <div id='left-controls' class="flex justify-start gap-4 h-10 w-fit">
 
-                    <!-- Controls to manage search and filter options -->
-                    <div id="search-control" class="z-30 w-full flex flex-row justify-between items-center gap-4">
+                        <!-- Controls to manage search and filter options -->
+                        <div id="search-control" class="z-30 w-full flex flex-row justify-between items-center gap-4">
 
-                        <!-- Toggle search bar in small screen
-                        <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
-                            <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
-                        </button> -->
+                            <!-- Toggle search bar in small screen
+                            <button id="toggle-search" type="button" class="btn btn-outline h-full w-11 sm:hidden">
+                                <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
+                            </button> -->
 
-                        <!-- Search bar and filter options -->
-                        <div id="search-bar" class="flex h-10 w-[500px] z-30">
-                            <!-- Input field for filter values -->
-                            <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..."
-                                class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme"
-                                autocomplete="off"/>
+                            <!-- Search bar and filter options -->
+                            <div id="search-bar" class="flex h-10 w-[500px] z-30">
+                                <!-- Input field for filter values -->
+                                <input id="filter-input" type="text" placeholder="Nhập để tìm kiếm ..."
+                                    class="form-input rounded-l-lg rounded-r-none h-full border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme"
+                                    autocomplete="off"/>
+                                
+                                <!-- List of select input for choice field with specific id to switch -->
+                                <div id="choice-selects" class="flex-1 hidden">
+                                    {% for field, choices in choice_fields.items %}
+                                        <select id="{{ field }}-select" class="form-input h-full rounded-l-lg rounded-r-none border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme w-full hidden">
+                                            {% for value, label in choices.items %}
+                                                <option value="{{ label }}">{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Field select for filtering -->
+                                <select id="field-select" class="form-input h-full rounded-none border-theme dark:border-gray-600 border-opacity-50 text-theme w-[200px]">
+                                    <option value="all" selected>Tất cả</option>
+                                    {% for field in filter_fields %}
+                                        <option value="{{ field }}">{{ model|get_verbose_name:field }}</option>
+                                    {% endfor %}
+                                </select>
                             
-                            <!-- List of select input for choice field with specific id to switch -->
-                            <div id="choice-selects" class="flex-1 hidden">
-                                {% for field, choices in choice_fields.items %}
-                                    <select id="{{ field }}-select" class="form-input h-full rounded-l-lg rounded-r-none border-r-0 border-theme dark:border-gray-600 border-opacity-50 text-theme w-full hidden">
-                                        {% for value, label in choices.items %}
-                                            <option value="{{ label }}">{{ label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                {% endfor %}
+                                <!-- Button to submit search -->
+                                <button id="search-button"
+                                    class="btn btn-outline rounded-l-none h-full shadow-none">
+                                    <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
+                                </button>
+                                <!-- Button to submit search -->
+                                <button id="submit-search-button" class="hidden"></button>
+                                <script>
+                                    // Function to handle field selection change
+                                    document.getElementById('field-select').addEventListener('change', function() {
+                                        const selectedField = this.value;
+                                        const filterInput = document.getElementById('filter-input');
+                                        const choiceSelects = document.getElementById('choice-selects');
+                                        
+                                        // Hide all choice selects first
+                                        choiceSelects.querySelectorAll('select').forEach(select => {
+                                            select.classList.add('hidden');
+                                        });
+                                        
+                                        // Show/hide appropriate input based on field selection
+                                        const fieldSelect = document.getElementById(`${selectedField}-select`);
+                                        if (fieldSelect) {
+                                            filterInput.classList.add('hidden');
+                                            choiceSelects.classList.remove('hidden');
+                                            fieldSelect.classList.remove('hidden');
+                                        } else {
+                                            filterInput.classList.remove('hidden');
+                                            choiceSelects.classList.add('hidden');
+                                        }
+                                    });
+
+                                    function removeFilter(field) {
+                                        // Remove the hidden input if it exists
+                                        const input = document.querySelector(`input[name="${field}"]`);
+                                        if (input) {
+                                            input.remove();
+                                        }
+                                        // Click the search button to trigger the search
+                                        document.getElementById('submit-search-button').click();
+                                    }
+
+                                    document.getElementById('search-button').addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        const filterInput = document.getElementById('filter-input');
+                                        const fieldSelect = document.getElementById('field-select');
+                                        const form = this.closest('form');
+                                        const selectedField = fieldSelect.value;
+
+                                        // Remove any existing hidden input with the same name
+                                        const existingInput = form.querySelector(`input[name="${selectedField}"]`);
+                                        if (existingInput) {
+                                            existingInput.remove();
+                                        }
+
+                                        // Check if there's a visible choice select for the current field
+                                        const choiceSelect = document.getElementById(`${selectedField}-select`);
+                                        let inputValue;
+                                        if (choiceSelect && !choiceSelect.classList.contains('hidden')) {
+                                            inputValue = choiceSelect.value;
+                                        } else {
+                                            inputValue = filterInput.value;
+                                        }
+
+                                        // Create and add new hidden input
+                                        const hiddenInput = document.createElement('input');
+                                        hiddenInput.type = 'hidden';
+                                        hiddenInput.name = selectedField;
+                                        hiddenInput.value = inputValue;
+                                        form.appendChild(hiddenInput);
+
+                                        // Submit the form
+                                        document.getElementById('submit-search-button').click();
+                                    });
+                                </script>
                             </div>
 
-                            <!-- Field select for filtering -->
-                            <select id="field-select" class="form-input h-full rounded-none border-theme dark:border-gray-600 border-opacity-50 text-theme w-[200px]">
-                                <option value="all" selected>Tất cả</option>
-                                {% for field in filter_fields %}
-                                    <option value="{{ field }}">{{ model|get_verbose_name:field }}</option>
-                                {% endfor %}
+                            {% if page == 'page_each_project' and model == "Job" %}
+                            <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                                <option value="" selected>Sắp xếp ...</option>
+                                <option value="name">Tên công việc - (A → Z)</option>
+                                <option value="-name">Tên công việc - (Z → A)</option>
+                                <option value="category">Danh mục - (A → Z)</option>
+                                <option value="-category">Danh mục - (Z → A)</option>
+                                <option value="status">Trạng thái</option>
+                                <option value="unit">Đơn vị - (A → Z)</option>
+                                <option value="-unit">Đơn vị - (Z → A)</option>
+                                <option value="quantity">Khối lượng - (Tăng)</option>
+                                <option value="-quantity">Khối lượng - (Giảm)</option>
+                                <option value="unit_price">Đơn giá - (Tăng)</option>
+                                <option value="-unit_price">Đơn giá - (Giảm)</option>
+                                <option value="total_amount">Thành tiền - (Tăng)</option>
+                                <option value="-total_amount">Thành tiền - (Giảm)</option>
+                                <option value="start_date">Ngày bắt đầu - (Tăng)</option>
+                                <option value="-start_date">Ngày bắt đầu - (Giảm)</option>
+                                <option value="end_date">Ngày kết thúc - (Tăng)</option>
+                                <option value="-end_date">Ngày kết thúc - (Giảm)</option>
                             </select>
-                        
-                            <!-- Button to submit search -->
-                            <button id="search-button"
-                                class="btn btn-outline rounded-l-none h-full shadow-none">
-                                <i class="fas fa-search text-theme" style="font-size: 18px;"></i>
-                            </button>
-                            <!-- Button to submit search -->
-                            <button id="submit-search-button" class="hidden"></button>
+                            
                             <script>
-                                // Function to handle field selection change
-                                document.getElementById('field-select').addEventListener('change', function() {
-                                    const selectedField = this.value;
-                                    const filterInput = document.getElementById('filter-input');
-                                    const choiceSelects = document.getElementById('choice-selects');
-                                    
-                                    // Hide all choice selects first
-                                    choiceSelects.querySelectorAll('select').forEach(select => {
-                                        select.classList.add('hidden');
-                                    });
-                                    
-                                    // Show/hide appropriate input based on field selection
-                                    const fieldSelect = document.getElementById(`${selectedField}-select`);
-                                    if (fieldSelect) {
-                                        filterInput.classList.add('hidden');
-                                        choiceSelects.classList.remove('hidden');
-                                        fieldSelect.classList.remove('hidden');
-                                    } else {
-                                        filterInput.classList.remove('hidden');
-                                        choiceSelects.classList.add('hidden');
-                                    }
-                                });
-
-                                function removeFilter(field) {
-                                    // Remove the hidden input if it exists
-                                    const input = document.querySelector(`input[name="${field}"]`);
-                                    if (input) {
-                                        input.remove();
-                                    }
-                                    // Click the search button to trigger the search
-                                    document.getElementById('submit-search-button').click();
-                                }
-
-                                document.getElementById('search-button').addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    const filterInput = document.getElementById('filter-input');
-                                    const fieldSelect = document.getElementById('field-select');
-                                    const form = this.closest('form');
-                                    const selectedField = fieldSelect.value;
-
-                                    // Remove any existing hidden input with the same name
-                                    const existingInput = form.querySelector(`input[name="${selectedField}"]`);
-                                    if (existingInput) {
-                                        existingInput.remove();
-                                    }
-
-                                    // Check if there's a visible choice select for the current field
-                                    const choiceSelect = document.getElementById(`${selectedField}-select`);
-                                    let inputValue;
-                                    if (choiceSelect && !choiceSelect.classList.contains('hidden')) {
-                                        inputValue = choiceSelect.value;
-                                    } else {
-                                        inputValue = filterInput.value;
-                                    }
-
-                                    // Create and add new hidden input
-                                    const hiddenInput = document.createElement('input');
-                                    hiddenInput.type = 'hidden';
-                                    hiddenInput.name = selectedField;
-                                    hiddenInput.value = inputValue;
-                                    form.appendChild(hiddenInput);
-
-                                    // Submit the form
-                                    document.getElementById('submit-search-button').click();
-                                });
-                            </script>
-                        </div>
-
-                        {% if page == 'page_each_project' and model == "Job" %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                            <option value="" selected>Sắp xếp ...</option>
-                            <option value="name">Tên công việc - (A → Z)</option>
-                            <option value="-name">Tên công việc - (Z → A)</option>
-                            <option value="category">Danh mục - (A → Z)</option>
-                            <option value="-category">Danh mục - (Z → A)</option>
-                            <option value="status">Trạng thái</option>
-                            <option value="unit">Đơn vị - (A → Z)</option>
-                            <option value="-unit">Đơn vị - (Z → A)</option>
-                            <option value="quantity">Khối lượng - (Tăng)</option>
-                            <option value="-quantity">Khối lượng - (Giảm)</option>
-                            <option value="unit_price">Đơn giá - (Tăng)</option>
-                            <option value="-unit_price">Đơn giá - (Giảm)</option>
-                            <option value="total_amount">Thành tiền - (Tăng)</option>
-                            <option value="-total_amount">Thành tiền - (Giảm)</option>
-                            <option value="start_date">Ngày bắt đầu - (Tăng)</option>
-                            <option value="-start_date">Ngày bắt đầu - (Giảm)</option>
-                            <option value="end_date">Ngày kết thúc - (Tăng)</option>
-                            <option value="-end_date">Ngày kết thúc - (Giảm)</option>
-                        </select>
-                        
-                        <script>
-                            document.getElementById('sort-select').addEventListener('change', function() {
-                                // Press search-button
-                                document.getElementById('search-button').click();
-                            });
-                        </script>
-
-                        {% elif page == 'page_transport_department' and model == 'VehicleMaintenance' %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                            <option value="-created_at" selected>Ngày tạo phiếu (gần nhất trước)</option>
-                            <option value="repair_code">Mã phiếu - (A → Z)</option>
-                            <option value="-repair_code">Mã phiếu - (Z → A)</option>
-                            <option value="from_date">Ngày nhận sửa chữa - (xa nhất trước)</option>
-                            <option value="-from_date">Ngày nhận sửa chữa - (gần nhất trước)</option>
-                        </select>
-                        
-                        <script>
-                            document.getElementById('sort-select').addEventListener('change', function() {
-                                // Press search-button
-                                document.getElementById('search-button').click();
-                            });
-                        </script>
-
-                        {% elif model == 'FuelFillingRecord' or model == 'LubeFillingRecord' or model == 'FillingRecord' %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                            <option value="-fill_date" selected>Ngày đổ (gần nhất trước)</option>
-                            <option value="fill_date">Ngày đổ (xa nhất trước)</option>
-                        </select>
-
-                        <script>
-                            document.getElementById('sort-select').addEventListener('change', function() {
-                                // Press search-button
-                                document.getElementById('search-button').click();
-                            });
-                        </script>
-
-                        {% elif model == 'PaymentRecord' %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                            <option value="" selected>Mặc định - (Mã sửa chữa)</option>
-                            <option value="status">Trạng thái thanh toán  - (A → Z)</option>
-                            <option value="-status">Trạng thái thanh toán  - (Z → A)</option>
-                            <option value="provider">Nhà cung cấp  - (A → Z)</option>
-                            <option value="-provider">Nhà cung cấp  - (Z → A)</option>
-                            <option value="-requested_date">Ngày đề nghị  - (gần nhất trước)</option>
-                            <option value="requested_date">Nhà cung cấp  - (xa nhất trước)</option>
-                            <option value="-payment_date">Ngày thanh toán  - (gần nhất trước)</option>
-                            <option value="payment_date">Nhà thanh toán  - (xa nhất trước)</option>
-
-                        </select>
-
-                        <script>
-                            document.getElementById('sort-select').addEventListener('change', function() {
-                                // Press search-button
-                                document.getElementById('search-button').click();
-                            });
-                        </script>
-
-
-                        {% elif model == 'PaymentRecord' %}
-                        <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                            <option value="" selected>Mặc định - (Mã sửa chữa)</option>
-                            <option value="status">Trạng thái thanh toán  - (A → Z)</option>
-                            <option value="-status">Trạng thái thanh toán  - (Z → A)</option>
-                            <option value="provider">Nhà cung cấp  - (A → Z)</option>
-                            <option value="-provider">Nhà cung cấp  - (Z → A)</option>
-                            <option value="-requested_date">Ngày đề nghị  - (gần nhất trước)</option>
-                            <option value="requested_date">Nhà cung cấp  - (xa nhất trước)</option>
-                            <option value="-payment_date">Ngày thanh toán  - (gần nhất trước)</option>
-                            <option value="payment_date">Nhà thanh toán  - (xa nhất trước)</option>
-
-                        </select>
-
-                        <script>
-                            document.getElementById('sort-select').addEventListener('change', function() {
-                                // Press search-button
-                                document.getElementById('search-button').click();
-                            });
-                        </script>
-
-
-
-
-                        {% elif page == 'page_transport_department' and tab == 'vehicle_operation_data_by_date' %}
-                            <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
-                            <script>
-                                document.getElementById('start_date').addEventListener('change', function() {
-                                    // Change inner html in the element display_records
-                                    document.getElementById('display-records').innerHTML = '<p class="text-green-600 text-center text-2xl my-10">Đang tải dữ liệu ...</p>';   
+                                document.getElementById('sort-select').addEventListener('change', function() {
                                     // Press search-button
                                     document.getElementById('search-button').click();
                                 });
                             </script>
-                        {% elif page == 'page_transport_department' and tab == 'driver_salary' %}
-                                <input id="check_month" type="month" name="check_month" value="{{ check_month }}" class="form-input w-fit">
+
+
+
+
+                            {% elif page == 'page_transport_department' and tab == 'vehicle_operation_data_by_date' %}
+                                <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
                                 <script>
-                                    document.getElementById('check_month').addEventListener('change', function() {
+                                    document.getElementById('start_date').addEventListener('change', function() {
                                         // Change inner html in the element display_records
                                         document.getElementById('display-records').innerHTML = '<p class="text-green-600 text-center text-2xl my-10">Đang tải dữ liệu ...</p>';   
                                         // Press search-button
                                         document.getElementById('search-button').click();
                                     });
                                 </script>
+                            {% elif page == 'page_transport_department' and tab == 'driver_salary' %}
+                                    <input id="check_month" type="month" name="check_month" value="{{ check_month }}" class="form-input w-fit">
+                                    <script>
+                                        document.getElementById('check_month').addEventListener('change', function() {
+                                            // Change inner html in the element display_records
+                                            document.getElementById('display-records').innerHTML = '<p class="text-green-600 text-center text-2xl my-10">Đang tải dữ liệu ...</p>';   
+                                            // Press search-button
+                                            document.getElementById('search-button').click();
+                                        });
+                                    </script>
 
-                        {% elif page == 'page_transport_department' and tab == 'vehicle_revenue' %}
-                            <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
-                            <span class="text-lg text-theme">➡️</span>
-                            <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
-                                <script>
-                                    document.getElementById('start_date').addEventListener('change', function() {
-                                        // Press search-button
-                                        document.getElementById('search-button').click();
-                                    });
-                                    document.getElementById('end_date').addEventListener('change', function() {
-                                        // Press search-button
-                                        document.getElementById('search-button').click();
-                                    });
-                                </script>
-
-                            {% elif model == "PartProvider" or model == "VehicleMaintenanceAnalysis" %}
+                            {% elif page == 'page_transport_department' and tab == 'vehicle_revenue' %}
                                 <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
                                 <span class="text-lg text-theme">➡️</span>
                                 <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
@@ -277,132 +191,165 @@
                                         });
                                     </script>
 
-                            {% else %}
-                                <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
-                                    <option value="" selected>Mặc định</option>
-                                    {% for option in model|get_sorts %}
-                                    <option value="{{ option.sort }}">{{ option.display_name }}</option>
-                                {% endfor %}
-                                </select>
-        
-                                <script>
-                                    document.getElementById('sort-select').addEventListener('change', function() {
-                                        // Press search-button
-                                        document.getElementById('search-button').click();
-                                    });
-                                </script>
-                        {% endif %}
+                                {% elif model == "PartProvider" or model == "VehicleMaintenanceAnalysis" %}
+                                    <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
+                                    <span class="text-lg text-theme">➡️</span>
+                                    <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
+                                        <script>
+                                            document.getElementById('start_date').addEventListener('change', function() {
+                                                // Press search-button
+                                                document.getElementById('search-button').click();
+                                            });
+                                            document.getElementById('end_date').addEventListener('change', function() {
+                                                // Press search-button
+                                                document.getElementById('search-button').click();
+                                            });
+                                        </script>
 
-                        
-                    </div>
+                                {% else %}
+                                    <input id="start_date" type="date" name="start_date" value="{{ start_date }}" class="form-input w-fit">
+                                    <span class="text-lg text-theme">➡️</span>
+                                    <input id="end_date" type="date" name="end_date" value="{{ end_date }}" class="form-input w-fit">
+                                        <script>
+                                            document.getElementById('start_date').addEventListener('change', function() {
+                                                // Press search-button
+                                                document.getElementById('search-button').click();
+                                            });
+                                            document.getElementById('end_date').addEventListener('change', function() {
+                                                // Press search-button
+                                                document.getElementById('search-button').click();
+                                            });
+                                        </script>
 
-                    <!-- Filter options -->
-                    <div id="search-queries" class="flex flex-nowrap items-center justify-center gap-2 h-full mx-3 hidden">
-                        <div class="filter-tag bg-green-100 text-green-800 px-3 rounded-md flex items-center gap-2 text-sm text-nowrap h-full border border-green-300">
-                            {% comment %} <span></span>
-                            <button onclick="removeFilter('{{ field }}')" class="text-green-600 hover:text-green-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button> {% endcomment %}
+
+                                    <select id="sort-select" name="sort" class="form-input w-fit border-theme dark:border-gray-600 border-opacity-50">
+                                        <option value="" selected>Mặc định</option>
+                                        {% for option in model|get_sorts %}
+                                        <option value="{{ option.sort }}">{{ option.display_name }}</option>
+                                    {% endfor %}
+                                    </select>
+            
+                                    <script>
+                                        document.getElementById('sort-select').addEventListener('change', function() {
+                                            // Press search-button
+                                            document.getElementById('search-button').click();
+                                        });
+                                    </script>
+                            {% endif %}
+
+                            
                         </div>
+
+
+                        <div id="extra-info" class="hidden extra-info flex flex-nowrap items-center gap-2 text-nowrap"></div>
+
+
                     </div>
-
-
-                    <div id="extra-info" class="hidden extra-info flex flex-nowrap items-center gap-2 text-nowrap"></div>
-
-
+                    {% if page == 'page_transport_department' and tab == 'vehicle_revenue' %}
+                    <div class="flex justify-items-center gap-2 items-center h-10 text-center">
+                        <div id="total-revenue-toolbar" class="inline-flex items-center h-full px-4 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-nowrap">Tổng Doanh thu:</div>
+                        <div id="total-interest-toolbar" class="inline-flex items-center h-full px-4 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium text-nowrap">Tổng lợi nhuận:</div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% if page == 'page_transport_department' and tab == 'vehicle_revenue' %}
-                <div class="flex justify-items-center gap-2 items-center h-10 text-center">
-                    <div id="total-revenue-toolbar" class="inline-flex items-center h-full px-4 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-nowrap">Tổng Doanh thu:</div>
-                    <div id="total-interest-toolbar" class="inline-flex items-center h-full px-4 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium text-nowrap">Tổng lợi nhuận:</div>
+            </form>
+            <!-- Right controls for view toggle and information display -->
+            {% if page == 'page_each_project' and model == "Job" %}
+            <form action="{% url 'load_elements' %}" up-target="#display-records">
+                <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id elements='display_records' %}" />
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <input type="hidden" name="check_date" value="{{ check_date }}" />
+                    <button class="btn btn-outline">
+                        <input type="submit" name="all" value=""/>
+                        Tất cả công việc
+                    </button>
+                    <!-- Separate 2 sections of controls -->
                 </div>
-                {% endif %}
-            </div>
-        </form>
-        <!-- Right controls for view toggle and information display -->
-        {% if page == 'page_each_project' and model == "Job" %}
-        <form action="{% url 'load_elements' %}" up-target="#display-records">
-            <input type="hidden" name="q" value="{% encode_params model=model check_date=check_date project_id=project_id elements='display_records' %}" />
-            <div class="flex flex-wrap items-end justify-between gap-4">
-                <input type="hidden" name="check_date" value="{{ check_date }}" />
-                <button class="btn btn-outline">
-                    <input type="submit" name="all" value=""/>
-                    Tất cả công việc
-                </button>
-                <!-- Separate 2 sections of controls -->
-            </div>
-            <input name="archived" id="archived" value="false" class="hidden">
-        </form> 
-        {% endif %}
-    </div>
-    
-    <div class="flex flex-row items-end gap-5">
-
-        {% comment %} {% if page == 'page_each_project' and model == "Job" %}
-        <button id="excel-button" class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
-            <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
-            <span class="me-3"> Excel </span>
-        </button>
-        {% endif %} {% endcomment %}
-
-
-        {% if excel_uploadable and request.user.is_superuser %}
-        <form up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
-            class="flex flex-row whitespace-nowrap gap-2"
-            up-cache="auto">
-            {% csrf_token %}
-            <input type="file" class="hidden" id="file" name="file"
-                accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
-            <input type="hidden" name="project_id" value="{{ project_id }}">
-            <button type="button" class="btn btn-primary" onclick="document.getElementById('file').click()">
-                <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span> Upload </span>         
-            </button>
-            <button class="hidden" id="upload-button">
-                <span> Submit </span>         
-            </button>
-        </form> 
-
-        <script>
-            document.getElementById('file').addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    document.getElementById('upload-button').click();
-                }
-            });
-        </script>
-        {% endif %}
-
-        {% if excel_downloadable %}
-        <form action="{% url 'download_excel' model %}" method="post" enctype="multipart/form-data" id="download-form"
-            class="flex flex-row whitespace-nowrap gap-2">
-            {% csrf_token %}
-            <input type="hidden" name="project_id" value="{{ project_id }}">
-            <button class="btn btn-primary" id="download-button">
-                <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                <span> Download </span>         
-            </button>
-        </form> 
-
-        {% endif %} 
-
-        {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "OperationPaymentRecord"  %}
-        <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
-            <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
-            <span class="me-3"> {{ create_new_button_name }} </span>
-        </a>
-        {% endif %} 
-        
-        <!-- Add download button and SheetJS library -->
-         {% if tab == "vehicle_revenue" %}
-        <div>
-            <button onclick="downloadPLTableAsExcel()" class="btn btn-primary text-nowrap">
-                <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
-                Tải xuống báo cáo
-            </button>
+                <input name="archived" id="archived" value="false" class="hidden">
+            </form> 
+            {% endif %}
         </div>
-        {% endif %}
+        
+        <div class="flex flex-row items-end gap-5">
+
+            {% comment %} {% if page == 'page_each_project' and model == "Job" %}
+            <button id="excel-button" class="btn btn-primary text-nowrap" id="toggle-extra-tool-bar" onclick="var x = document.getElementById('extra-tool-bar'); x.classList.toggle('hidden');">
+                <i class="fas fa-file-excel me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                <span class="me-3"> Excel </span>
+            </button>
+            {% endif %} {% endcomment %}
+
+
+            {% if excel_uploadable and request.user.is_superuser %}
+            <form  up-target="#display-records:maybe, #modal:maybe" action="{% url 'upload_excel' model %}" method="post" enctype="multipart/form-data" id="upload-form"
+                class="flex flex-row whitespace-nowrap gap-2"
+                up-cache="auto">
+                {% csrf_token %}
+                <input type="file" class="hidden" id="file" name="file"
+                    accept=".xlsx" required onchange="checkFileSize(this.files[0])" />
+                <input type="hidden" name="project_id" value="{{ project_id }}">
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('file').click()">
+                    <i class="fa fa-upload me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span> Upload </span>         
+                </button>
+                <button class="hidden" id="upload-button">
+                    <span> Submit </span>         
+                </button>
+            </form> 
+
+            <script>
+                document.getElementById('file').addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        document.getElementById('upload-button').click();
+                    }
+                });
+            </script>
+            {% endif %}
+
+            {% if excel_downloadable %}
+            <form action="{% url 'download_excel' model %}" method="post" enctype="multipart/form-data" id="download-form"
+                class="flex flex-row whitespace-nowrap gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="project_id" value="{{ project_id }}">
+                <input type="hidden" name="start_date" value="{{ start_date }}">
+                <input type="hidden" name="end_date" value="{{ end_date }}">
+
+                <button class="btn btn-primary" id="download-button">
+                    <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                    <span> Download </span>         
+                </button>
+            </form> 
+
+            {% endif %} 
+
+            {% if create_new_button_name and model != "PaymentRecord" and model != "SupplyPaymentRecord" and model != "SubJobPaymentRecord" and model != "OperationPaymentRecord"  %}
+            <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
+                <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
+                <span class="me-3"> {{ create_new_button_name }} </span>
+            </a>
+            {% endif %} 
+            
+            <!-- Add download button and SheetJS library -->
+            {% if tab == "vehicle_revenue" %}
+            <div>
+                <button onclick="downloadPLTableAsExcel()" class="btn btn-primary text-nowrap">
+                    <i class="fa fa-download me-3" style="font-size: 16px;" aria-hidden="true"></i>
+                    Tải xuống báo cáo
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Filter options -->
+    <div id="search-queries" class="flex flex-nowrap items-center justify-center gap-2 h-10 mx-3 hidden">
+        <div class="filter-tag bg-green-100 text-green-800 px-3 rounded-md flex items-center gap-2 text-sm text-nowrap h-full border border-green-300">
+            {% comment %} <span></span>
+            <button onclick="removeFilter('{{ field }}')" class="text-green-600 hover:text-green-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button> {% endcomment %}
+        </div>
     </div>
 </div>
 

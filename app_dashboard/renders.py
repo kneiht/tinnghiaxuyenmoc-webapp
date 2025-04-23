@@ -53,12 +53,12 @@ def render_tool_bar(request, **kwargs):
     check_date = get_valid_date(params.get("check_date", ""))
     check_month = params.get("check_month", "")
 
-    if model == "PartProvider":
-        start_date = get_valid_date(params.get("start_date", ""), "none")
-        end_date = get_valid_date(params.get("end_date", ""), "none")
-    else:
+    if model == "VehicleOperationRecord" and model == "Job":
         start_date = get_valid_date(params.get("start_date", ""))
         end_date = get_valid_date(params.get("end_date", start_date))
+    else:
+        start_date = get_valid_date(params.get("start_date", ""), "none")
+        end_date = get_valid_date(params.get("end_date", ""), "none")
 
     if check_month != "":
         check_month = get_valid_month(check_month)

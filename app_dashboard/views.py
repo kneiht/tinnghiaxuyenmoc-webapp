@@ -440,6 +440,14 @@ def handle_form(request, model, pk=0):
                                 if received_quantity:
                                     order_supply.received_quantity = received_quantity
 
+                                # update note
+
+                                note = request.POST.get(
+                                    f"note_{order_supply.base_supply.id}", ""
+                                )
+                                print(">>>> note: ", note)
+                                if note:
+                                    order_supply.note = note
                                 order_supply.save()
                         elif model == "SubJobOrder":
                             order = instance
@@ -540,7 +548,13 @@ def handle_form(request, model, pk=0):
                                     )
                                 )
                                 order_supply.received_quantity = received_quantity
-
+                                # update note
+                                note = request.POST.get(
+                                    f"note_{order_supply.base_supply.id}", ""
+                                )
+                                print(">>>> note: ", note)
+                                if note:
+                                    order_supply.note = note
                                 order_supply.save()
 
                         elif model == "SubJobOrder":

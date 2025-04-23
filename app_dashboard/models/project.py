@@ -123,14 +123,14 @@ class ProjectUser(BaseModel):
     )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.project.name} - {self.user.username} - {self.role}"
 
     @classmethod
     def get_display_fields(self):
-        fields = ["user", "project", "role", "note"]
+        fields = ["user", "project", "role", "note", "created_at"]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -274,12 +274,10 @@ class ProjectFile(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, verbose_name="Người tải lên"
     )
-    upload_date = models.DateTimeField(
-        default=timezone.now, verbose_name="Ngày tải lên"
-    )
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tải lên")
 
     class Meta:
-        ordering = ["-upload_date"]
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.name} - {self.project.name}"
@@ -293,4 +291,5 @@ class ProjectFile(BaseModel):
             "user",
             "upload_date",
             "note",
+            "created_at",
         ]

@@ -58,7 +58,7 @@ class SupplyProvider(BaseModel):
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"
@@ -76,6 +76,7 @@ class SupplyProvider(BaseModel):
             "total_transferred_amount",
             "total_outstanding_debt",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -134,7 +135,7 @@ class SupplyBrand(BaseModel):
     vietnamese_name = "Thương hiệu vật tư"
     name = models.CharField(max_length=255, verbose_name="Tên thương hiệu", unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return self.name
@@ -144,6 +145,7 @@ class SupplyBrand(BaseModel):
         fields = [
             "name",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -205,7 +207,7 @@ class BaseSupply(BaseModel):
         verbose_name="Hình ảnh vật tư", default="", null=True, blank=True
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.supply_number} - {self.supply_name}"
@@ -219,6 +221,7 @@ class BaseSupply(BaseModel):
             "unit",
             "image",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -316,7 +319,7 @@ class DetailSupply(BaseModel):
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     # From BaseSupply
     material_type = models.CharField(max_length=50, verbose_name="Nhóm vật tư")
@@ -360,6 +363,7 @@ class DetailSupply(BaseModel):
             "image_prove",
             "note",
             "valid_from",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -435,7 +439,7 @@ class CostEstimation(BaseModel):
         verbose_name="Khối lượng đã nhận",
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.supply_number} - {self.supply_name}"
@@ -453,6 +457,7 @@ class CostEstimation(BaseModel):
             "paid_quantity",
             "received_quantity",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -845,6 +850,7 @@ class SupplyOrderSupply(BaseModel):
         default="not_received",
         verbose_name="Trạng thái nhận hàng",
     )
+    note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
 
     def __str__(self):
         return f"{self.supply_order.order_code} - {self.base_supply}"
@@ -1018,7 +1024,7 @@ class SupplyPaymentRecord(BaseModel):
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return (
@@ -1044,6 +1050,7 @@ class SupplyPaymentRecord(BaseModel):
             "note",
             "image1",
             "user",
+            "created_at",
         ]
         return [field for field in fields if hasattr(self, field)]
 

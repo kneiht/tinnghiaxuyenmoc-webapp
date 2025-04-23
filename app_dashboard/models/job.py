@@ -52,7 +52,7 @@ class Job(SecondaryIDMixin, BaseModel):
     )
     start_date = models.DateField(default=timezone.now, verbose_name="Bắt đầu")
     end_date = models.DateField(default=timezone.now, verbose_name="Kết thúc")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     class Meta:
         ordering = ["category", "secondary_id"]
@@ -141,6 +141,7 @@ class Job(SecondaryIDMixin, BaseModel):
             "total_amount",
             "start_date",
             "end_date",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:

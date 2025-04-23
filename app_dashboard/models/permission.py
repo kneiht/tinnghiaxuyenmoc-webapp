@@ -186,7 +186,9 @@ def create_dynamic_permission_model(model_name="Permission"):
         "note": models.TextField(
             verbose_name="Ghi chú", default="", null=True, blank=True
         ),
-        "created_at": models.DateTimeField(default=timezone.now),
+        "created_at": models.DateTimeField(
+            default=timezone.now, verbose_name="Ngày tạo"
+        ),
         "Meta": type("Meta", (), {"ordering": ["user", "created_at"]}),
     }
 

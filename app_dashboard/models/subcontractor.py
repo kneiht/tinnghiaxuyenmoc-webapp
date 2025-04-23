@@ -47,7 +47,7 @@ class SubContractor(BaseModel):
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"
@@ -65,6 +65,7 @@ class SubContractor(BaseModel):
             "total_transferred_amount",
             "total_outstanding_debt",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -119,7 +120,7 @@ class SubJobBrand(BaseModel):
     vietnamese_name = "Thương hiệu công việc"
     name = models.CharField(max_length=255, verbose_name="Tên thương hiệu", unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return self.name
@@ -129,6 +130,7 @@ class SubJobBrand(BaseModel):
         fields = [
             "name",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -183,7 +185,7 @@ class BaseSubJob(BaseModel):
         blank=True,
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.job_number} - {self.job_name}"
@@ -198,6 +200,7 @@ class BaseSubJob(BaseModel):
             "image",
             "reference",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -297,7 +300,7 @@ class DetailSubJob(BaseModel):
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
     valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     # From BaseSubJob
     job_type = models.CharField(max_length=50, verbose_name="Nhóm công việc")
@@ -344,6 +347,7 @@ class DetailSubJob(BaseModel):
             "image_prove",
             "note",
             "valid_from",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -423,7 +427,7 @@ class SubJobEstimation(BaseModel):
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return (
@@ -443,6 +447,7 @@ class SubJobEstimation(BaseModel):
             "paid_quantity",
             "received_quantity",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -998,7 +1003,7 @@ class SubJobPaymentRecord(BaseModel):
         null=True,
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"Mã phiếu {self.sub_job_order} - Ngày tạo thanh toán {self.created_at}"
@@ -1022,6 +1027,7 @@ class SubJobPaymentRecord(BaseModel):
             "note",
             "image1",
             "user",
+            "created_at",
         ]
         return [field for field in fields if hasattr(self, field)]
 

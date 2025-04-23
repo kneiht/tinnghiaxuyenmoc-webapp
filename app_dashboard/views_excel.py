@@ -37,8 +37,6 @@ def download_excel(request, model_name):
         # Remove fields if they exist
         if "last_saved" in fields:
             fields.remove("last_saved")
-        if "created_at" in fields:
-            fields.remove("created_at")
         if "archived" in fields:
             fields.remove("archived")
         if "secondary_id" in fields:
@@ -60,11 +58,38 @@ def download_excel(request, model_name):
         except:
             project_id = None
 
+        # Get start_date and end_date from POST data
+        start_date_str = request.POST.get("start_date", None)
+        end_date_str = request.POST.get("end_date", None)
+
+        # Validate and parse dates
+        try:
+            start_date = get_valid_date(start_date_str, "none")
+            end_date = get_valid_date(end_date_str, "none")
+        except ValueError:
+            start_date = None
+            end_date = None
+
         if project_id:
             project = Project.objects.get(id=project_id)
-            records = model_class.objects.filter(project=project).values(*fields)
+            records = model_class.objects.filter(project=project)
         else:
-            records = model_class.objects.all().values(*fields)
+            records = model_class.objects.all()
+
+        print("project_id", project_id)
+        print("records", records.count())
+        print("start_date", start_date)
+        print("end_date", end_date)
+
+        # Apply date filtering if valid dates are provided
+        if start_date and end_date:
+            records = records.filter(created_at__date__range=[start_date, end_date])
+        elif start_date:
+            records = records.filter(created_at__date__gte=start_date)
+        elif end_date:
+            records = records.filter(created_at__date__lte=end_date)
+
+        records = records.values(*fields).order_by(pk_field)
 
         # order by id
         records = records.order_by(pk_field)
@@ -172,8 +197,6 @@ def download_excel(request, model_name):
         return response
 
     except Exception as e:
-        # return HttpResponse(f"Error: {str(e)}", status=500)
-        # panic
         raise e
 
 

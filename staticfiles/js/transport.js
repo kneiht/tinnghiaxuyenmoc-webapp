@@ -113,6 +113,20 @@ up.compiler('#start_date', function (element) {
         // Get the selected start date value
         let newStartDate = startDate.value;
 
+        // Update the hidden input field in the download form
+        let downloadForm = document.getElementById('download-form');
+        if (downloadForm) {
+            let startDateInput = downloadForm.querySelector('input[name="start_date"]');
+            if (!startDateInput) {
+                // Create the hidden input if it doesn't exist
+                startDateInput = document.createElement('input');
+                startDateInput.type = 'hidden';
+                startDateInput.name = 'start_date';
+                downloadForm.appendChild(startDateInput);
+            }
+            startDateInput.value = newStartDate;
+        }
+
         // Find all <a> tags in database-selection
         let databaseSelection = document.getElementById('nav_menu');
         if (!databaseSelection) {
@@ -146,6 +160,21 @@ up.compiler('#end_date', function (element) {
     endDate.addEventListener('change', function () {
         // Get the selected start date value
         let newendDate = endDate.value;
+
+        // Update the hidden input field in the download form
+        let downloadForm = document.getElementById('download-form');
+        if (downloadForm) {
+            let endDateInput = downloadForm.querySelector('input[name="end_date"]');
+            if (!endDateInput) {
+                // Create the hidden input if it doesn't exist
+                endDateInput = document.createElement('input');
+                endDateInput.type = 'hidden';
+                endDateInput.name = 'end_date';
+                downloadForm.appendChild(endDateInput);
+            }
+            endDateInput.value = newendDate;
+        }
+
 
         // Find all <a> tags in database-selection
         let databaseSelection = document.getElementById('nav_menu');

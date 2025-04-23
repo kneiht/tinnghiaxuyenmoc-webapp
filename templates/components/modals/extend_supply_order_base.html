@@ -106,6 +106,7 @@
             <span class="w-28 text-center"> SL đặt </span>
             <span class="w-28 text-center"> SL T.toán </span>
             <span class="w-28 text-center"> SL đã nhận </span>
+            <span class="w-52 text-center"> Ghi chú </span>
             <span class="w-28 text-center"> Ngày thêm </span>
         </div> 
         <div id="order-supplies" class="overflow-y-auto w-fit">
@@ -217,6 +218,23 @@
                                min="0"
                                max="{{ order_supply.quantity }}">
                     </div>
+                    <div class="w-52 text-center">
+                        {% if order_supply.note %} 
+                            <span class=" approve-hidable">{{ order_supply.note }}</span>
+                        {% else %}
+                            <span class=" approve-hidable"> Chưa có ghi chú </span>
+                        {% endif %}
+                        <textarea name="note_{{ order_supply.base_supply.pk }}"
+                        class="form-input  approve-hidable hidden no-readable h-fit" 
+                        placeholder="Nhập ghi chú"
+                        value="{{ order_supply.note }}"
+                        class="form-input h-20"
+                        id="id_note">{{ order_supply.note }}</textarea>
+
+
+                    </div>
+
+
                     {% else %}
                     <div class="w-28 text-center">
                         <span>{{ order_supply.paid_quantity }}</span>

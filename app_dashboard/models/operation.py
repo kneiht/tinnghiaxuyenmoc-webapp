@@ -47,7 +47,7 @@ class OperationReceiver(BaseModel):
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"
@@ -65,6 +65,7 @@ class OperationReceiver(BaseModel):
             "total_transferred_amount",
             "total_outstanding_debt",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -402,7 +403,7 @@ class OperationPaymentRecord(BaseModel):
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"Mã phiếu {self.operation_receiver} - Ngày tạo thanh toán {self.created_at}"
@@ -426,6 +427,7 @@ class OperationPaymentRecord(BaseModel):
             "note",
             "image1",
             "user",
+            "created_at",
         ]
         return [field for field in fields if hasattr(self, field)]
 

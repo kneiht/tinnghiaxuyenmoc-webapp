@@ -42,12 +42,12 @@ class Location(BaseModel):
     type_of_location = models.CharField(
         max_length=255, choices=TYPE_OF_LOCATION_CHOICES, verbose_name="Loại hình"
     )
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
     note = models.TextField(blank=True, null=True, default="", verbose_name="Ghi chú")
 
     @classmethod
     def get_display_fields(self):
-        fields = ["name", "address", "type_of_location", "note"]
+        fields = ["name", "address", "type_of_location", "note", "created_at"]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -86,7 +86,12 @@ class VehicleType(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ["vehicle_type", "allowed_to_display_in_revenue_table", "note"]
+        fields = [
+            "vehicle_type",
+            "allowed_to_display_in_revenue_table",
+            "note",
+            "created_at",
+        ]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -143,7 +148,7 @@ class StaffData(BaseModel):
         max_length=15, verbose_name="Số điện thoại", default=""
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.full_name} - {self.phone_number}"
@@ -162,6 +167,7 @@ class StaffData(BaseModel):
             "account_holder_name",
             "phone_number",
             "address",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -231,7 +237,7 @@ class VehicleRevenueInputs(BaseModel):
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.vehicle_type} - hiệu lực từ {self.valid_from}"
@@ -251,6 +257,7 @@ class VehicleRevenueInputs(BaseModel):
             "police_fee",
             "valid_from",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -346,7 +353,7 @@ class DriverSalaryInputs(BaseModel):
     )
 
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.driver} - hiệu lực từ {self.valid_from}"
@@ -369,6 +376,7 @@ class DriverSalaryInputs(BaseModel):
             "fixed_allowance",
             "insurance_amount",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -400,7 +408,7 @@ class VehicleDetail(BaseModel):
     vehicle_inspection_due_date = models.DateField(
         verbose_name="Thời hạn đăng kiểm", default=timezone.now, null=True
     )
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return (
@@ -416,6 +424,7 @@ class VehicleDetail(BaseModel):
             "gps_name",
             "vehicle_inspection_number",
             "vehicle_inspection_due_date",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -464,6 +473,7 @@ class VehicleMaintenanceAnalysis(BaseModel):
             "maintenance_amount",
             "from_date",
             "to_date",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -503,6 +513,7 @@ class DumbTruckPayRate(BaseModel):
     chay_nhua = models.PositiveIntegerField(verbose_name="Chạy nhựa")
     chay_nhua_dem = models.PositiveIntegerField(verbose_name="Chạy nhựa đêm")
     keo_xe_dem = models.PositiveIntegerField(verbose_name="Kéo xe đêm")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return str(self.xe)
@@ -530,6 +541,7 @@ class DumbTruckPayRate(BaseModel):
             "chay_nhua",
             "chay_nhua_dem",
             "keo_xe_dem",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -592,6 +604,7 @@ class DumbTruckRevenueData(BaseModel):
         max_length=255, choices=KICH_CO_XE_CHOICES, verbose_name="Kích cỡ xe"
     )
     don_gia = models.PositiveIntegerField(verbose_name="Đơn giá")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.loai_chay} - {self.kich_co_xe}"
@@ -605,6 +618,7 @@ class DumbTruckRevenueData(BaseModel):
             "moc",
             "kich_co_xe",
             "don_gia",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -638,7 +652,7 @@ class NormalWorkingTime(BaseModel):
     # Valid from
     valid_from = models.DateField(verbose_name="Ngày bắt đầu áp dụng")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.morning_start} đến {self.morning_end} - {self.afternoon_start} đến {self.afternoon_end} - hiệu lực từ {self.valid_from}"
@@ -652,6 +666,7 @@ class NormalWorkingTime(BaseModel):
             "afternoon_end",
             "valid_from",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -706,14 +721,14 @@ class Holiday(BaseModel):
 
     date = models.DateField(verbose_name="Ngày lễ", unique=True)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.date} - {self.note}"
 
     @classmethod
     def get_display_fields(self):
-        fields = ["date", "note"]
+        fields = ["date", "note", "created_at"]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -970,14 +985,21 @@ class LiquidUnitPrice(BaseModel):
         verbose_name="Ngày bắt đầu áp dụng", default=timezone.now
     )
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.liquid_type} - {self.unit_price} - {self.valid_from}"
 
     @classmethod
     def get_display_fields(self):
-        fields = ["liquid_type", "unit_price", "unit", "valid_from", "note"]
+        fields = [
+            "liquid_type",
+            "unit_price",
+            "unit",
+            "valid_from",
+            "note",
+            "created_at",
+        ]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1040,7 +1062,7 @@ class FillingRecord(BaseModel):
     )
     fill_date = models.DateField(verbose_name="Ngày đổ", default=timezone.now)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.liquid_type} - {self.vehicle} - {self.quantity} - {self.total_amount} - {self.fill_date}"
@@ -1058,6 +1080,7 @@ class FillingRecord(BaseModel):
             "total_amount",
             "fill_date",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -1092,7 +1115,7 @@ class VehicleDepreciation(BaseModel):
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
     to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     @classmethod
     def get_vehicle_depreciation(cls, vehicle, date):
@@ -1108,7 +1131,14 @@ class VehicleDepreciation(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ["vehicle", "depreciation_amount", "from_date", "to_date", "note"]
+        fields = [
+            "vehicle",
+            "depreciation_amount",
+            "from_date",
+            "to_date",
+            "note",
+            "created_at",
+        ]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1137,7 +1167,7 @@ class VehicleBankInterest(BaseModel):
     from_date = models.DateField(verbose_name="Ngày bắt đầu", default=timezone.now)
     to_date = models.DateField(verbose_name="Ngày kết thúc", default=timezone.now)
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     @classmethod
     def get_vehicle_bank_interest(cls, vehicle, date):
@@ -1153,7 +1183,14 @@ class VehicleBankInterest(BaseModel):
 
     @classmethod
     def get_display_fields(self):
-        fields = ["vehicle", "interest_amount", "from_date", "to_date", "note"]
+        fields = [
+            "vehicle",
+            "interest_amount",
+            "from_date",
+            "to_date",
+            "note",
+            "created_at",
+        ]
         # Check if the field is in the model
         for field in fields:
             if not hasattr(self, field):
@@ -1187,7 +1224,7 @@ class Announcement(BaseModel):
         upload_to="announcements/", verbose_name="Tệp đính kèm", null=True, blank=True
     )
     is_pinned = models.BooleanField(default=False, verbose_name="Ghim thông báo")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
 
     class Meta:
@@ -1206,6 +1243,7 @@ class Announcement(BaseModel):
             "expiry_date",
             "attachment",
             "is_pinned",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:

@@ -368,7 +368,7 @@ class PartProvider(BaseModel):
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
     note = models.TextField(verbose_name="Ghi chú", default="", null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"
@@ -386,6 +386,7 @@ class PartProvider(BaseModel):
             "total_transferred_amount",
             "total_outstanding_debt",
             "note",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -475,7 +476,7 @@ class RepairPart(BaseModel):
     )
     note = models.TextField(verbose_name="Mô tả", default="", null=True, blank=True)
     valid_from = models.DateField(verbose_name="Ngày áp dụng", default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
         return f"{self.part_number} - {self.part_name} - Áp dụng từ {self.valid_from}"
@@ -490,6 +491,7 @@ class RepairPart(BaseModel):
             "image",
             "note",
             "valid_from",
+            "created_at",
         ]
         # Check if the field is in the model
         for field in fields:
