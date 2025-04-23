@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer components {
     .extra-css {
         @apply bg-red-600 bg-blue-600 bg-green-600;
@@ -21,7 +20,7 @@
     }
 
     .btn {
-        @apply flex items-center justify-center px-3 pb-2 pt-2.5 rounded-lg text-center text-sm font-medium leading-normal text-neutral-100 shadow-[0_4px_9px_-4px_rgba(51, 45, 45, 0.7)] hover:shadow-[0_8px_9px_-4px_rgba(51, 45, 45, 0.2), 0_4px_18px_0_rgba(51, 45, 45, 0.1)] active:shadow-[0_8px_9px_-4px_rgba(51, 45, 45, 0.2), 0_4px_18px_0_rgba(51, 45, 45, 0.1)] focus:shadow-[0_8px_9px_-4px_rgba(51, 45, 45, 0.2), 0_4px_18px_0_rgba(51, 45, 45, 0.1)] focus:outline-none;
+        @apply flex items-center justify-center px-3 pb-2 pt-2.5 rounded-lg text-center text-sm font-medium leading-normal text-neutral-100 focus:outline-none shadow-md;
     }
 
     .btn-primary {
