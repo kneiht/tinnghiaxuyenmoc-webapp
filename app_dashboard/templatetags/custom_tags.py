@@ -663,14 +663,27 @@ def calculate_driver_salary(
         select_start_date,
         select_end_date,
     )
-    total_fixed_allowance = driver_salary_input.fixed_allowance * min(
-        1,
-        data_monthly_salary["count_working_days"]
-        / (
-            data_monthly_salary["count_days_of_month"]
-            - data_monthly_salary["count_sundays_of_month"]
-        ),
-    )
+
+    if driver_salary_input.calculation_method == "type_1":
+        total_fixed_allowance = driver_salary_input.fixed_allowance * min(
+            1,
+            data_monthly_salary["count_working_days"]
+            / (
+                data_monthly_salary["count_days_of_month"]
+                - data_monthly_salary["count_sundays_of_month"]
+            ),
+        )
+
+    elif driver_salary_input.calculation_method == "type_2":
+        total_fixed_allowance = driver_salary_input.fixed_allowance * min(
+            1,
+            data_monthly_salary["count_working_days"]
+            / (
+                data_monthly_salary["count_days_of_month"]
+                - data_monthly_salary["count_sundays_of_month"]
+            ),
+        )
+
     total_fuel_allowance = calculate_fuel_allowance(vehicle_operation_records)
 
     total_salary = (

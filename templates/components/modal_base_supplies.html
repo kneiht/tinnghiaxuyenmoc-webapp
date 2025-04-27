@@ -61,7 +61,7 @@
                                         <input type="hidden" name="supply_id" value="{{ estimation.base_supply.id }}">
                                         <input type="hidden" name="supply_number" value="{{ estimation.base_supply.supply_number }}">
                                         <input type="hidden" name="supply_name" value="{{ estimation.base_supply.supply_name }}">
-                                        <input type="number" name="supply_quantity" value="0" min="0" max="{{ estimation.get_orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
+                                        <input type="number" name="supply_quantity" value="0" step="0.1" min="0" max="{{ estimation.get_orderable_quantity }}" class="form-input no-readable bg-transparent outline-none" style="width: 100px; height: 30px;">
                                         <input type="hidden" name="estimate_quantity" value="{{ estimation.get_estimate_quantity }}">
                                         <input type="hidden" name="orderable_quantity" value="{{ estimation.get_orderable_quantity }}">
                                         <script>

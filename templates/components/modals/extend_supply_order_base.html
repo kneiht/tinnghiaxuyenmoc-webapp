@@ -208,7 +208,8 @@
                                class="form-input approve-hidable hidden no-readable" 
                                value="{{ order_supply.paid_quantity }}"
                                min="0"
-                               max="{{ order_supply.quantity }}">
+                               max="{{ order_supply.quantity }}",
+                               step="0.1">
                     </div>
                     <div class="w-28 text-center">
                         <span class=" approve-hidable">{{ order_supply.received_quantity }}</span>
@@ -216,7 +217,8 @@
                                class="form-input  approve-hidable hidden no-readable" 
                                value="{{ order_supply.received_quantity }}"
                                min="0"
-                               max="{{ order_supply.quantity }}">
+                               max="{{ order_supply.quantity }}",
+                               step="0.1">
                     </div>
                     <div class="w-52 text-center">
                         {% if order_supply.note %} 

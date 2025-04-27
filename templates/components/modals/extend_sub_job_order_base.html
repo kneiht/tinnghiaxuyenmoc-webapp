@@ -210,6 +210,7 @@
                         <input type="number" name="paid_quantity_{{ order_sub_job.base_sub_job.pk }}" 
                                class="form-input approve-hidable hidden no-readable" 
                                value="{{ order_sub_job.paid_quantity }}"
+                               step="0.1"
                                min="0"
                                max="{{ order_sub_job.quantity }}">
                     </div>
@@ -218,6 +219,7 @@
                         <input type="number" name="received_quantity_{{ order_sub_job.base_sub_job.pk }}" 
                                class="form-input  approve-hidable hidden no-readable" 
                                value="{{ order_sub_job.received_quantity }}"
+                               step="0.1"
                                min="0"
                                max="{{ order_sub_job.quantity }}">
                     </div>

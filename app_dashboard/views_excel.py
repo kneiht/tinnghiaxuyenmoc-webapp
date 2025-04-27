@@ -168,6 +168,269 @@ def download_excel(request, model_name):
             )
             instructions.to_excel(writer, index=False, sheet_name="Instructions")
 
+            # Add extra sheet for SupplyOrderSupply if model_name is SupplyOrder
+            if model_name == "SupplyOrder":
+                # Import the SupplyOrderSupply model
+                from .models.supply import SupplyOrderSupply
+
+                # Get all SupplyOrderSupply records related to the SupplyOrder records
+                supply_order_ids = list(records.values_list("id", flat=True))
+
+                if supply_order_ids:
+                    # Get all related SupplyOrderSupply records
+                    supply_items = SupplyOrderSupply.objects.filter(
+                        supply_order_id__in=supply_order_ids
+                    )
+
+                    # Get fields for SupplyOrderSupply
+                    supply_fields = [
+                        field.name
+                        for field in SupplyOrderSupply._meta.fields
+                        if field.name not in ["last_saved", "archived", "secondary_id"]
+                    ]
+
+                    # Get verbose names for headers
+                    supply_headers = []
+                    for field_name in supply_fields:
+                        field = SupplyOrderSupply._meta.get_field(field_name)
+                        supply_headers.append(
+                            getattr(field, "verbose_name", field_name)
+                        )
+
+                    # Get the data
+                    supply_records = supply_items.values(*supply_fields)
+
+                    # Create DataFrame
+                    supply_df = pd.DataFrame(list(supply_records))
+
+                    # If DataFrame is empty, create one with just the headers
+                    if supply_df.empty and supply_fields:
+                        supply_df = pd.DataFrame(columns=supply_fields)
+
+                    # Convert choice fields to their display values and handle foreign keys
+                    for field_name in supply_fields:
+                        field = SupplyOrderSupply._meta.get_field(field_name)
+                        if hasattr(field, "choices") and field.choices:
+                            choices_dict = dict(field.choices)
+                            supply_df[field_name] = supply_df[field_name].map(
+                                lambda x: choices_dict.get(x, x)
+                            )
+                        elif field.is_relation and field.many_to_one:
+                            # This checks if it's a ForeignKey
+                            # Get the related model
+                            related_model = field.related_model
+                            # Create a dictionary of id to string representation
+                            related_objects = related_model.objects.in_bulk()
+                            supply_df[field_name] = supply_df[field_name].map(
+                                lambda x: (
+                                    f"ID={x}:{related_objects[x]}"
+                                    if x in related_objects
+                                    else x
+                                )
+                            )
+
+                    # Rename columns to use verbose names
+                    supply_column_mapping = {
+                        supply_fields[i]: supply_headers[i]
+                        for i in range(len(supply_fields))
+                    }
+                    supply_df = supply_df.rename(columns=supply_column_mapping)
+
+                    # Write to Excel
+                    supply_df.to_excel(writer, index=False, sheet_name="Extra")
+
+                    # Style extra sheet
+                    worksheet_extra = writer.sheets["Extra"]
+
+                    # Format header row
+                    for col_num, column in enumerate(supply_df.columns, 1):
+                        cell = worksheet_extra.cell(row=1, column=col_num)
+                        cell.font = Font(bold=True)
+                        cell.fill = PatternFill(
+                            start_color="FFFFD4", end_color="FFFFD4", fill_type="solid"
+                        )
+
+                    # Adjust column widths
+                    for col_num, column in enumerate(supply_df.columns, 1):
+                        column_letter = get_column_letter(col_num)
+                        worksheet_extra.column_dimensions[column_letter].width = 15
+
+            # Add extra sheet for SubJobOrderSubJob if model_name is SubJobOrder
+            elif model_name == "SubJobOrder":
+                # Import the SubJobOrderSubJob model
+                from .models.subcontractor import SubJobOrderSubJob
+
+                # Get all SubJobOrder IDs from the records
+                sub_job_order_ids = list(records.values_list("id", flat=True))
+
+                if sub_job_order_ids:
+                    # Get all related SubJobOrderSubJob records
+                    sub_job_items = SubJobOrderSubJob.objects.filter(
+                        sub_job_order_id__in=sub_job_order_ids
+                    )
+
+                    # Get fields for SubJobOrderSubJob
+                    sub_job_fields = [
+                        field.name
+                        for field in SubJobOrderSubJob._meta.fields
+                        if field.name not in ["last_saved", "archived", "secondary_id"]
+                    ]
+
+                    # Get verbose names for headers
+                    sub_job_headers = []
+                    for field_name in sub_job_fields:
+                        field = SubJobOrderSubJob._meta.get_field(field_name)
+                        sub_job_headers.append(
+                            getattr(field, "verbose_name", field_name)
+                        )
+
+                    # Get the data
+                    sub_job_records = sub_job_items.values(*sub_job_fields)
+
+                    # Create DataFrame
+                    sub_job_df = pd.DataFrame(list(sub_job_records))
+
+                    # If DataFrame is empty, create one with just the headers
+                    if sub_job_df.empty and sub_job_fields:
+                        sub_job_df = pd.DataFrame(columns=sub_job_fields)
+
+                    # Convert choice fields to their display values and handle foreign keys
+                    for field_name in sub_job_fields:
+                        field = SubJobOrderSubJob._meta.get_field(field_name)
+                        if hasattr(field, "choices") and field.choices:
+                            choices_dict = dict(field.choices)
+                            sub_job_df[field_name] = sub_job_df[field_name].map(
+                                lambda x: choices_dict.get(x, x)
+                            )
+                        elif field.is_relation and field.many_to_one:
+                            # This checks if it's a ForeignKey
+                            # Get the related model
+                            related_model = field.related_model
+                            # Create a dictionary of id to string representation
+                            related_objects = related_model.objects.in_bulk()
+                            sub_job_df[field_name] = sub_job_df[field_name].map(
+                                lambda x: (
+                                    f"ID={x}:{related_objects[x]}"
+                                    if x in related_objects
+                                    else x
+                                )
+                            )
+
+                    # Rename columns to use verbose names
+                    sub_job_column_mapping = {
+                        sub_job_fields[i]: sub_job_headers[i]
+                        for i in range(len(sub_job_fields))
+                    }
+                    sub_job_df = sub_job_df.rename(columns=sub_job_column_mapping)
+
+                    # Write to Excel
+                    sub_job_df.to_excel(writer, index=False, sheet_name="Extra")
+
+                    # Style extra sheet
+                    worksheet_extra = writer.sheets["Extra"]
+
+                    # Format header row
+                    for col_num, column in enumerate(sub_job_df.columns, 1):
+                        cell = worksheet_extra.cell(row=1, column=col_num)
+                        cell.font = Font(bold=True)
+                        cell.fill = PatternFill(
+                            start_color="FFFFD4", end_color="FFFFD4", fill_type="solid"
+                        )
+
+                    # Adjust column widths
+                    for col_num, column in enumerate(sub_job_df.columns, 1):
+                        column_letter = get_column_letter(col_num)
+                        worksheet_extra.column_dimensions[column_letter].width = 15
+
+            # Add extra sheet for VehicleMaintenanceRepairPart if model_name is VehicleMaintenance
+            elif model_name == "VehicleMaintenance":
+                # Import the VehicleMaintenanceRepairPart model
+                from .models.maintenance import VehicleMaintenanceRepairPart
+
+                # Get all VehicleMaintenance IDs from the records
+                vehicle_maintenance_ids = list(records.values_list("id", flat=True))
+
+                if vehicle_maintenance_ids:
+                    # Get all related VehicleMaintenanceRepairPart records
+                    repair_part_items = VehicleMaintenanceRepairPart.objects.filter(
+                        vehicle_maintenance_id__in=vehicle_maintenance_ids
+                    )
+
+                    # Get fields for VehicleMaintenanceRepairPart
+                    repair_part_fields = [
+                        field.name
+                        for field in VehicleMaintenanceRepairPart._meta.fields
+                        if field.name not in ["last_saved", "archived", "secondary_id"]
+                    ]
+
+                    # Get verbose names for headers
+                    repair_part_headers = []
+                    for field_name in repair_part_fields:
+                        field = VehicleMaintenanceRepairPart._meta.get_field(field_name)
+                        repair_part_headers.append(
+                            getattr(field, "verbose_name", field_name)
+                        )
+
+                    # Get the data
+                    repair_part_records = repair_part_items.values(*repair_part_fields)
+
+                    # Create DataFrame
+                    repair_part_df = pd.DataFrame(list(repair_part_records))
+
+                    # If DataFrame is empty, create one with just the headers
+                    if repair_part_df.empty and repair_part_fields:
+                        repair_part_df = pd.DataFrame(columns=repair_part_fields)
+
+                    # Convert choice fields to their display values and handle foreign keys
+                    for field_name in repair_part_fields:
+                        field = VehicleMaintenanceRepairPart._meta.get_field(field_name)
+                        if hasattr(field, "choices") and field.choices:
+                            choices_dict = dict(field.choices)
+                            repair_part_df[field_name] = repair_part_df[field_name].map(
+                                lambda x: choices_dict.get(x, x)
+                            )
+                        elif field.is_relation and field.many_to_one:
+                            # This checks if it's a ForeignKey
+                            # Get the related model
+                            related_model = field.related_model
+                            # Create a dictionary of id to string representation
+                            related_objects = related_model.objects.in_bulk()
+                            repair_part_df[field_name] = repair_part_df[field_name].map(
+                                lambda x: (
+                                    f"ID={x}:{related_objects[x]}"
+                                    if x in related_objects
+                                    else x
+                                )
+                            )
+
+                    # Rename columns to use verbose names
+                    repair_part_column_mapping = {
+                        repair_part_fields[i]: repair_part_headers[i]
+                        for i in range(len(repair_part_fields))
+                    }
+                    repair_part_df = repair_part_df.rename(
+                        columns=repair_part_column_mapping
+                    )
+
+                    # Write to Excel
+                    repair_part_df.to_excel(writer, index=False, sheet_name="Extra")
+
+                    # Style extra sheet
+                    worksheet_extra = writer.sheets["Extra"]
+
+                    # Format header row
+                    for col_num, column in enumerate(repair_part_df.columns, 1):
+                        cell = worksheet_extra.cell(row=1, column=col_num)
+                        cell.font = Font(bold=True)
+                        cell.fill = PatternFill(
+                            start_color="FFFFD4", end_color="FFFFD4", fill_type="solid"
+                        )
+
+                    # Adjust column widths
+                    for col_num, column in enumerate(repair_part_df.columns, 1):
+                        column_letter = get_column_letter(col_num)
+                        worksheet_extra.column_dimensions[column_letter].width = 15
+
             # Style data sheet
             workbook = writer.book
             worksheet = writer.sheets["Data"]
