@@ -26,6 +26,26 @@ urlpatterns = [
         views.delete_attendance_record,
         name="delete_attendance_record",
     ),
+    path(
+        "api/attendance-records/date/",
+        views.get_attendance_records_by_date,
+        name="get_attendance_records_by_date",
+    ),
+    path(
+        "api/attendance-records/batch-save/",
+        views.batch_save_attendance_records,
+        name="batch_save_attendance_records",
+    ),
+    path(
+        "api/attendance-summary/",
+        views.get_attendance_summary,
+        name="get_attendance_summary",
+    ),
+    path(
+        "api/staff/",
+        views.get_staff_list,
+        name="get_staff_list",
+    ),
     # DATABASE UPLOAD AND DOWNLOAD
     path("db-backup/", views_backup.db_backup, name="db_backup"),
     path(
