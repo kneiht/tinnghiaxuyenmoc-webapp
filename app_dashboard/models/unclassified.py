@@ -1268,3 +1268,68 @@ class ConstructionDriverSalaryDummy(BaseModel):
 class ConstructionReportPLDummy(BaseModel):
     allow_display = True
     vietnamese_name = "Bảng P&L"
+
+
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
+
+
+class AttendanceRecord(BaseModel):
+    allow_display = True
+    excel_downloadable = False
+    excel_uploadable = False
+    vietnamese_name = "Chấm công"
+
+    worker = models.ForeignKey(
+        StaffData,
+        on_delete=models.CASCADE,
+        verbose_name="Nhân viên",
+        related_name="attendance_records",
+    )
+    date = models.DateField(verbose_name="Ngày làm việc")
+
+    WORK_DAY_CHOICES = [
+        (Decimal("0.0"), "0.0"),
+        (Decimal("0.5"), "0.5"),
+        (Decimal("1.0"), "1.0"),
+        (Decimal("1.5"), "1.5"),
+        (Decimal("2.0"), "2.0"),
+    ]
+    work_day_count = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        choices=WORK_DAY_CHOICES,
+        default=Decimal("1.0"),
+        verbose_name="Công nhật",
+        validators=[
+            MinValueValidator(Decimal("0.0")),
+            MaxValueValidator(Decimal("2.0")),
+        ],
+        help_text="Number of work days (e.g. 0.5, 1.0, 1.5, 2.0)",
+    )
+
+    ATTENDANCE_STATUS_CHOICES = [
+        ("present", "Có mặt"),
+        ("excused_absence", "Vắng có phép"),
+        ("unexcused_absence", "Vắng không phép"),
+    ]
+    attendance_status = models.CharField(
+        max_length=20,
+        choices=ATTENDANCE_STATUS_CHOICES,
+        default="present",
+        verbose_name="Trạng thái",
+    )
+
+    note = models.TextField(
+        blank=True,
+        null=True,
+        default="",
+        verbose_name="Note",
+        help_text="Ghi chú",
+    )
+
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
+
+    def __str__(self):
+        return f"{self.worker.full_name} - {self.date} - {self.attendance_status}"

@@ -1,0 +1,143 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+
+{% block title %}
+    {{ page_name }}
+{% endblock %}
+
+
+
+{% block extra_head %}
+    {% csrf_token %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+
+{% block content %}
+    <!-- Attendance Record Modal -->
+    <div id="attendanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Attendance Record</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="attendanceForm" class="space-y-4">
+                <input type="hidden" id="recordId" name="record_id">
+                <input type="hidden" id="recordDate" name="date">
+                <input type="hidden" id="staffId" name="staff_id">
+                
+                <div class="mb-4">
+                    <label for="staffName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Staff</label>
+                    <input type="text" id="staffName" class="form-input w-full mt-1" disabled>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="displayDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                    <input type="text" id="displayDate" class="form-input w-full mt-1" disabled>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="workDayCount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Work Day Count</label>
+                    <select id="workDayCount" name="work_day_count" class="form-input w-full mt-1">
+                        <option value="0.0">0.0</option>
+                        <option value="0.5">0.5</option>
+                        <option value="1.0" selected>1.0</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2.0">2.0</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="attendanceStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="attendanceStatus" name="attendance_status" class="form-input w-full mt-1">
+                        <option value="present">Có mặt</option>
+                        <option value="excused_absence">Vắng có phép</option>
+                        <option value="unexcused_absence">Vắng không phép</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
+                    <textarea id="note" name="note" rows="3" class="form-input h-20"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="deleteRecord" class="btn btn-danger hidden">Delete</button>
+                    <button type="button" id="cancelForm" class="btn btn-outline">Cancel</button>
+                    <button class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal"></div>
+    <main>
+        {% include 'components/nav_bar.html' %}
+        <div up-hungry id="tool-bar" class="flex flex-col w-full gap-5 mt-3 z-30">
+            <div class="flex flex-row gap-5 w-full">
+                <form id="attendanceFilterForm" method="get" class="flex flex-row items-end gap-5 w-full">
+                    <div class="flex flex-col">
+                        <select id="staffSelect" name="staff_id" class="new-select form-input w-[300px]">
+                            <option value="all">All Staff</option>
+                            {% for staff in staff_members %}
+                                <option value="{{ staff.id }}" {% if staff.id|stringformat:"s" == request.GET.staff_id %}selected{% endif %}>{{ staff.full_name }}</option>
+                            {% endfor %}
+                        </select>   
+                    </div>
+                    <div class="flex flex-col">
+                        <input type="month" id="monthSelect" name="attendance_month" class="form-input w-40" value="{{ request.GET.attendance_month|default_if_none:'' }}">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" id="todayButton" class="btn btn-outline">Hôm nay</button>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                    <div up-hungry id="message" class="text-nowrap text-center h-full"></div>
+                </form>
+                
+            </div>
+        </div>
+        <div up-hungry id="message-page"></div>
+
+
+        <div id="display-records" class="display-calendar w-full pt-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
+                <div class="flex items-center justify-between mb-4">
+                    <button id="prevMonth" class="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <
+                    </button>
+                    <h2 id="monthYear" class="text-xl font-semibold text-gray-900 dark:text-gray-100"></h2>
+                    <button id="nextMonth" class="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                        >
+                    </button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 text-center text-gray-600 dark:text-gray-300 font-medium mb-2">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div id="calendarDays" class="grid grid-cols-7 gap-2 text-center"></div>
+            </div>
+        </div>
+
+        <div up-hungry id="load-more"></div>
+
+    </main>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    const select = document.getElementById('staffSelect');
+    handleNewSelectElement(select)
+</script>
+{% endblock %}

@@ -1,10 +1,31 @@
 from . import views, views_backup, views_excel
-from django.urls import re_path, path
+from django.urls import path
 
 
 # If pk==0 -> create new record
 
 urlpatterns = [
+    # Calendar
+    path(
+        "attendance-calendar/<str:sub_page>/",
+        views.page_attendance_calendar,
+        name="page_attendance_calendar",
+    ),
+    path(
+        "api/attendance-records/",
+        views.get_staff_attendance_records,
+        name="get_staff_attendance_records",
+    ),
+    path(
+        "api/attendance-records/save/",
+        views.save_attendance_record,
+        name="save_attendance_record",
+    ),
+    path(
+        "api/attendance-records/delete/<int:record_id>/",
+        views.delete_attendance_record,
+        name="delete_attendance_record",
+    ),
     # DATABASE UPLOAD AND DOWNLOAD
     path("db-backup/", views_backup.db_backup, name="db_backup"),
     path(

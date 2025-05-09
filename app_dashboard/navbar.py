@@ -59,4 +59,10 @@ NAV_ITEMS = {
             "ConstructionReportPL": "Bảng BC P&L xe cơ giới",
         },
     },
+    "page_attendance_calendar": {
+        "page_name": "Văn phòng",
+        "sub_pages": {
+            "Attendance": "Chấm công",
+        },
+    },
 }

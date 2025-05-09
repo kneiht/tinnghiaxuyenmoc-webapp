@@ -2823,3 +2823,220 @@ def supply_inventory(request, project_id, just_render=False):
         )
     else:
         return render(request, "components/supply_inventory_record.html", context)
+
+
+@login_required
+def page_attendance_calendar(request, sub_page=None):
+    from datetime import datetime, date
+    import calendar
+
+    if sub_page is None:
+        return redirect("page_attendance_calendar", sub_page="Attendance")
+
+    # Get all active staff members for the dropdown
+    staff_members = StaffData.objects.filter(status__in=["active", "on_leave"])
+    # Filter manager and staff
+    staff_members = staff_members.filter(position__in=["manager", "staff"])
+
+    context = {
+        "nav_items": NAV_ITEMS,
+        "current_url": request.path,
+        "page_name": NAV_ITEMS.get("page_attendance_calendar")
+        .get("sub_pages")
+        .get(sub_page),
+        "staff_members": staff_members,
+    }
+    return render(request, "pages/page_attendance_calendar.html", context)
+
+
+@login_required
+def get_staff_attendance_records(request):
+    from datetime import datetime, date
+    import calendar
+
+    # Get staff_id from request
+    staff_id = request.GET.get("staff_id")
+    if not staff_id:
+        return JsonResponse({"error": "Staff ID is required"}, status=400)
+
+    # Get the staff member
+    current_staff = StaffData.objects.filter(pk=staff_id).first()
+    if not current_staff:
+        return JsonResponse({"error": "Staff member not found"}, status=404)
+
+    # Get month from params (format: YYYY-MM)
+    attendance_month = request.GET.get("month")
+
+    # If month not provided, use current month
+    if not attendance_month:
+        today = timezone.now().date()
+        attendance_month = f"{today.year}-{today.month:02d}"
+
+    try:
+        year, month = map(int, attendance_month.split("-"))
+        first_day = date(year, month, 1)
+        last_day = date(year, month, calendar.monthrange(year, month)[1])
+    except Exception as e:
+        return JsonResponse(
+            {"error": f"Invalid month format. Use YYYY-MM. Error: {str(e)}"}, status=400
+        )
+
+    # Get attendance records for the staff member in the specified month
+    attendance_records = AttendanceRecord.objects.filter(
+        date__range=(first_day, last_day), worker=current_staff
+    )
+
+    # Create a dictionary of existing records keyed by date
+    existing_records = {}
+    for record in attendance_records:
+        date_str = record.date.strftime("%Y-%m-%d")
+        existing_records[date_str] = {
+            "id": record.id,
+            "date": date_str,
+            "work_day_count": float(record.work_day_count),
+            "attendance_status": record.attendance_status,
+            "note": record.note or "",
+        }
+
+    # Format the records for JSON response, including all days of the month
+    records = []
+    days_in_month = calendar.monthrange(year, month)[1]
+
+    # Log for debugging
+    print(
+        f"Month: {year}-{month}, Days: {days_in_month}, Existing records: {len(existing_records)}"
+    )
+
+    for day in range(1, days_in_month + 1):
+        date_str = f"{year}-{month:02d}-{day:02d}"
+        if date_str in existing_records:
+            records.append(existing_records[date_str])
+        else:
+            pass
+
+    json = {
+        "staff": {
+            "id": current_staff.id,
+            "name": current_staff.full_name,
+        },
+        "month": attendance_month,
+        "records": records,
+    }
+    print(json)
+    return JsonResponse(json)
+
+
+@login_required
+def save_attendance_record(request):
+    from datetime import datetime
+    import json
+    from decimal import Decimal
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+
+    print("\n\n>>>>>>>>>>>>>>>>> request.body:", request.body)
+
+    try:
+        data = json.loads(request.body)
+        staff_id = data.get("staff_id")
+        date_str = data.get("date")
+        record_id = data.get("record_id")
+        work_day_count = data.get("work_day_count")
+        attendance_status = data.get("attendance_status")
+        note = data.get("note", "")
+
+        # Validate required fields
+        if not staff_id or not date_str:
+            return JsonResponse({"error": "Staff ID and date are required"}, status=400)
+
+        # Get the staff member
+        staff = StaffData.objects.filter(pk=staff_id).first()
+        if not staff:
+            return JsonResponse({"error": "Staff member not found"}, status=404)
+
+        # Parse date
+        try:
+            record_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return JsonResponse(
+                {"error": "Invalid date format. Use YYYY-MM-DD"}, status=400
+            )
+
+        # Convert work_day_count to Decimal
+        try:
+            work_day_count = Decimal(str(work_day_count))
+        except:
+            return JsonResponse({"error": "Invalid work day count"}, status=400)
+
+        # Create or update record
+        if record_id:
+            # Update existing record
+            record = AttendanceRecord.objects.filter(pk=record_id).first()
+            if not record:
+                return JsonResponse({"error": "Record not found"}, status=404)
+
+            record.work_day_count = work_day_count
+            record.attendance_status = attendance_status
+            record.note = note
+            record.save()
+            message = "Record updated successfully"
+        else:
+            # Check if record already exists for this date and staff
+            existing_record = AttendanceRecord.objects.filter(
+                worker=staff, date=record_date
+            ).first()
+            if existing_record:
+                return JsonResponse(
+                    {
+                        "error": "Record already exists for this date and staff",
+                        "record": {
+                            "id": existing_record.id,
+                            "date": existing_record.date.strftime("%Y-%m-%d"),
+                            "work_day_count": float(existing_record.work_day_count),
+                            "attendance_status": existing_record.attendance_status,
+                            "note": existing_record.note or "",
+                        },
+                    },
+                    status=409,
+                )
+
+            # Create new record
+            record = AttendanceRecord.objects.create(
+                worker=staff,
+                date=record_date,
+                work_day_count=work_day_count,
+                attendance_status=attendance_status,
+                note=note,
+            )
+            message = "Record created successfully"
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": message,
+                "record": {
+                    "id": record.id,
+                    "date": record.date.strftime("%Y-%m-%d"),
+                    "work_day_count": float(record.work_day_count),
+                    "attendance_status": record.attendance_status,
+                    "note": record.note or "",
+                },
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@login_required
+def delete_attendance_record(request, record_id):
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Only DELETE method is allowed"}, status=405)
+
+    record = AttendanceRecord.objects.filter(pk=record_id).first()
+    if not record:
+        return JsonResponse({"error": "Record not found"}, status=404)
+
+    record.delete()
+    return JsonResponse({"success": True, "message": "Record deleted successfully"})
