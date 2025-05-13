@@ -6,6 +6,24 @@ up.compiler('.display-calendar', function (modalForm) {
     const staffSelect = document.getElementById('staffSelect');
     const monthSelect = document.getElementById('monthSelect');
 
+    const ATTENDANCE_STATUS_OPTIONS = [
+        { value: "not_marked", text: "Chưa chấm công" },
+        { value: "full_day", text: "Làm đủ ngày" },
+        { value: "leave_day", text: "Nghỉ phép" },
+        { value: "unpaid_leave", text: "Nghỉ không lương" },
+        { value: "half_day_leave", text: "Làm nửa ngày, nghỉ phép nửa ngày" },
+        { value: "half_day_unpaid", text: "Làm nửa ngày, nghỉ không lương nửa ngày" },
+    ];
+
+    const STATUS_COLORS = {
+        "not_marked": "bg-gray-400",
+        "full_day": "bg-green-500",
+        "leave_day": "bg-yellow-500",
+        "unpaid_leave": "bg-red-500",
+        "half_day_leave": "bg-yellow-500", // Using same as leave_day
+        "half_day_unpaid": "bg-orange-500"
+    };
+
     let currentDate = new Date();
     let attendanceData = [];
 
@@ -32,10 +50,30 @@ up.compiler('.display-calendar', function (modalForm) {
                 throw new Error('Failed to fetch attendance data');
             }
             const data = await response.json();
-            return data.records || [];
+            return data; // Return the whole object { records, holidays, salary_summary }
         } catch (error) {
             console.error('Error fetching attendance data:', error);
-            return [];
+            return { records: [], holidays: {}, salary_summary: null }; // Return default structure on error
+        }
+    }
+
+    // Function to update salary summary section
+    async function updateSalarySummary(year, month, staffId) {
+        const formattedMonth = `${year}-${month.toString().padStart(2, '0')}`;
+        try {
+            const response = await fetch(`/api/attendance-records/salary-summary/?staff_id=${staffId}&month=${formattedMonth}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch salary summary');
+            }
+            const salaryData = await response.json();
+
+            // Update the salary summary section in the DOM
+            const summarySection = document.getElementById('monthlySalarySummary');
+            if (summarySection && salaryData.success === 'true') {
+                summarySection.innerHTML = salaryData.html;
+            }
+        } catch (error) {
+            console.error('Error fetching salary summary:', error);
         }
     }
 
@@ -51,10 +89,10 @@ up.compiler('.display-calendar', function (modalForm) {
                 throw new Error('Failed to fetch attendance summary data');
             }
             const data = await response.json();
-            return data.summary || {};
+            return data; // Return the whole object { summary, holidays }
         } catch (error) {
             console.error('Error fetching attendance summary data:', error);
-            return {};
+            return { summary: {}, holidays: {} }; // Return default structure on error
         }
     }
 
@@ -86,12 +124,25 @@ up.compiler('.display-calendar', function (modalForm) {
 
         // Fetch appropriate data
         let summaryData = {};
+        let holidaysData = {}; // To store holiday information
+        let salarySummaryData = null; // To store salary summary for a single staff
+
         if (isAllStaff) {
-            summaryData = await fetchAttendanceSummaryData();
-            console.log('Fetched summary data:', summaryData);
+            const apiResponse = await fetchAttendanceSummaryData();
+            summaryData = apiResponse.summary || {};
+            holidaysData = apiResponse.holidays || {};
         } else {
-            attendanceData = await fetchAttendanceData();
-            console.log('Fetched attendance data:', attendanceData);
+            const apiResponse = await fetchAttendanceData();
+            console.log('API Response:', apiResponse); // Log the API response
+            attendanceData = apiResponse.records || [];
+            holidaysData = apiResponse.holidays || {};
+            salarySummaryData = apiResponse.salary_summary || null; // Get salary summary
+            console.log('Salary Summary Data:', salarySummaryData); // Log the salary summary data
+
+            // Trigger salary calculation if viewing individual staff
+            if (staffSelect.value !== 'all') {
+                updateSalarySummary(year, month + 1, staffSelect.value);
+            }
         }
 
         // Get first day of the month
@@ -110,26 +161,47 @@ up.compiler('.display-calendar', function (modalForm) {
         // Fill in days of the month
         for (let day = 1; day <= daysInMonth; day++) {
             const dayCell = document.createElement('div');
-            dayCell.classList.add('py-2', 'rounded', 'cursor-pointer', 'border', 'border-gray-300', 'dark:border-gray-600', 'min-h-[100px]', 'flex', 'flex-col');
-
-            // Add day number
-            const dayNumber = document.createElement('div');
-            dayNumber.textContent = day;
-            dayNumber.classList.add('font-semibold', 'mb-1');
-            dayCell.appendChild(dayNumber);
-
-            // Highlight today
-            const today = new Date();
-            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                dayCell.classList.add('bg-blue-100', 'dark:bg-blue-500');
-            } else {
-                dayCell.classList.add('hover:bg-blue-100', 'dark:hover:bg-blue-500');
-            }
+            dayCell.classList.add('py-2', 'px-1', 'rounded', 'cursor-pointer', 'border', 'border-gray-300', 'dark:border-gray-600', 'min-h-[100px]', 'flex', 'flex-col');
 
             // Format date string
             const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            const isHoliday = holidaysData && holidaysData[dateStr];
 
-            // Add double-click event to open appropriate modal
+            // Container for day number and holiday name
+            const dayLabelContainer = document.createElement('div');
+            dayLabelContainer.classList.add('mb-1', 'text-center'); // Changed to text-center
+
+            const dayNumberDiv = document.createElement('div');
+            dayNumberDiv.textContent = day;
+            // Make day number inline to allow holiday name next to it
+            dayNumberDiv.classList.add('font-semibold', 'text-sm', 'inline');
+            dayLabelContainer.appendChild(dayNumberDiv);
+
+            if (isHoliday) {
+                dayCell.classList.add('bg-purple-100', 'dark:bg-purple-600');
+                const holidayNameSpan = document.createElement('span'); // Changed to span for inline display
+                holidayNameSpan.classList.add('text-xs', 'text-purple-700', 'dark:text-purple-200', 'font-medium', 'leading-tight', 'ml-1'); // Removed mt-0.5, added ml-1
+                holidayNameSpan.textContent = `(${holidaysData[dateStr]})`; // Added parentheses
+                dayLabelContainer.appendChild(holidayNameSpan);
+            }
+            dayCell.appendChild(dayLabelContainer);
+
+            // Highlight today & Hover effects
+            const today = new Date();
+            const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+            if (isToday) {
+                if (isHoliday) {
+                    dayNumberDiv.classList.add('ring-2', 'ring-blue-500', 'dark:ring-blue-300', 'rounded-full', 'px-1.5', 'py-0.5', 'inline-block'); // Added inline-block for ring to fit properly
+                } else {
+                    dayCell.classList.add('bg-blue-100', 'dark:bg-blue-800');
+                }
+            }
+
+            // Simplified hover: if it's a holiday, it has purple bg, otherwise, it's normal/today.
+            // Hover will apply on top of these.
+            dayCell.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+
             if (isAllStaff) {
                 // For "All Staff" view, open batch attendance modal
                 dayCell.addEventListener('dblclick', () => {
@@ -137,45 +209,27 @@ up.compiler('.display-calendar', function (modalForm) {
                 });
 
                 // Add summary data if available for this date
-                if (summaryData[dateStr]) {
+                if (summaryData && summaryData[dateStr]) {
                     const summary = summaryData[dateStr];
 
                     // Create summary info container
                     const summaryInfo = document.createElement('div');
                     summaryInfo.classList.add('text-xs', 'mt-1');
 
-                    // Add present count with badge
-                    if (summary.present_count > 0) {
-                        const presentBadge = document.createElement('div');
-                        presentBadge.className = 'inline-block px-2 py-1 bg-green-500 text-white rounded-full text-xs font-semibold mb-1';
-                        presentBadge.textContent = `Có mặt: ${summary.present_count}`;
-                        summaryInfo.appendChild(presentBadge);
-                        summaryInfo.appendChild(document.createElement('br'));
-                    }
+                    ATTENDANCE_STATUS_OPTIONS.forEach(statusOption => {
+                        const countKey = `${statusOption.value}_count`; // e.g., full_day_count
+                        const count = summary[countKey];
 
-                    // Add excused absence count with badge
-                    if (summary.excused_absence_count > 0) {
-                        const excusedBadge = document.createElement('div');
-                        excusedBadge.className = 'inline-block px-2 py-1 bg-yellow-500 text-white rounded-full text-xs font-semibold mb-1';
-                        excusedBadge.textContent = `Vắng có phép: ${summary.excused_absence_count}`;
-                        summaryInfo.appendChild(excusedBadge);
-                        summaryInfo.appendChild(document.createElement('br'));
-                    }
-
-                    // Add unexcused absence count with badge
-                    if (summary.unexcused_absence_count > 0) {
-                        const unexcusedBadge = document.createElement('div');
-                        unexcusedBadge.className = 'inline-block px-2 py-1 bg-red-500 text-white rounded-full text-xs font-semibold mb-1';
-                        unexcusedBadge.textContent = `Vắng không phép: ${summary.unexcused_absence_count}`;
-                        summaryInfo.appendChild(unexcusedBadge);
-                        summaryInfo.appendChild(document.createElement('br'));
-                    }
-
-                    // Add total staff count
-                    // const totalBadge = document.createElement('div');
-                    // totalBadge.className = 'inline-block px-2 py-1 bg-blue-500 text-white rounded-full text-xs font-semibold';
-                    // totalBadge.textContent = `Tổng: ${summary.total_staff}`;
-                    // summaryInfo.appendChild(totalBadge);
+                        if (count > 0) {
+                            const statusBadge = document.createElement('div');
+                            const colorClass = STATUS_COLORS[statusOption.value] || 'bg-gray-500'; // Fallback color
+                            statusBadge.className = `inline-block px-2 py-0.5 ${colorClass} text-white rounded-full text-xs font-semibold mb-1`; // py-0.5 for smaller badge
+                            statusBadge.textContent = `${statusOption.text}: ${count}`;
+                            summaryInfo.appendChild(statusBadge);
+                            // Add a line break if you want each status on a new line, otherwise they will flow inline
+                            summaryInfo.appendChild(document.createElement('br'));
+                        }
+                    });
 
                     dayCell.appendChild(summaryInfo);
                 }
@@ -189,22 +243,9 @@ up.compiler('.display-calendar', function (modalForm) {
                 // Add attendance data if available
                 const record = findAttendanceRecord(day, year, month);
                 if (record) {
-                    // Apply background color based on attendance status
-                    let bgColorClass = '';
-                    switch (record.attendance_status) {
-                        case 'present':
-                            bgColorClass = ['bg-green-100', 'dark:bg-green-900'];
-                            break;
-                        case 'excused_absence':
-                            bgColorClass = ['bg-yellow-100', 'dark:bg-yellow-900'];
-                            break;
-                        case 'unexcused_absence':
-                            bgColorClass = ['bg-red-100', 'dark:bg-red-900'];
-                            break;
-                    }
-
-                    // Apply background color to the cell
-                    dayCell.classList.add(bgColorClass);
+                    // Background color for holidays is handled above.
+                    // For individual attendance, we might want to show status colors more prominently.
+                    // However, to avoid color clashing with holiday, we'll primarily use badges.
 
                     // Create attendance info container
                     const attendanceInfo = document.createElement('div');
@@ -215,14 +256,20 @@ up.compiler('.display-calendar', function (modalForm) {
                     let badgeClass = 'inline-block px-2 py-1 rounded-full text-xs font-semibold mb-1 ';
 
                     switch (record.attendance_status) {
-                        case 'present':
+                        case 'full_day':
                             badgeClass += 'bg-green-500 text-white';
                             break;
-                        case 'excused_absence':
+                        case 'leave_day':
                             badgeClass += 'bg-yellow-500 text-white';
                             break;
-                        case 'unexcused_absence':
+                        case 'unpaid_leave':
                             badgeClass += 'bg-red-500 text-white';
+                            break;
+                        case 'half_day_leave':
+                            badgeClass += 'bg-yellow-500 text-white';
+                            break;
+                        case 'half_day_unpaid':
+                            badgeClass += 'bg-orange-500 text-white';
                             break;
                     }
 
@@ -231,14 +278,20 @@ up.compiler('.display-calendar', function (modalForm) {
                     // Map status to Vietnamese
                     let statusText = '';
                     switch (record.attendance_status) {
-                        case 'present':
-                            statusText = 'Có mặt';
+                        case 'full_day':
+                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'full_day').text;
                             break;
-                        case 'excused_absence':
-                            statusText = 'Vắng có phép';
+                        case 'leave_day':
+                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'leave_day').text;
                             break;
-                        case 'unexcused_absence':
-                            statusText = 'Vắng không phép';
+                        case 'unpaid_leave':
+                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'unpaid_leave').text;
+                            break;
+                        case 'half_day_leave':
+                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'half_day_leave').text;
+                            break;
+                        case 'half_day_unpaid':
+                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'half_day_unpaid').text;
                             break;
                     }
                     statusBadge.textContent = statusText;
@@ -246,9 +299,17 @@ up.compiler('.display-calendar', function (modalForm) {
 
                     // Add work day count with badge
                     const workDayBadge = document.createElement('div');
-                    workDayBadge.className = 'inline-block px-2 py-1 bg-blue-500 text-white rounded-full text-xs font-semibold ml-1';
-                    workDayBadge.textContent = `${record.work_day_count}`;
+                    workDayBadge.className = 'inline-block px-2 py-1 bg-blue-500 text-white rounded-full text-xs font-semibold mt-1';
+                    workDayBadge.textContent = `Công: ${record.work_day_count}`;
                     attendanceInfo.appendChild(workDayBadge);
+
+                    // Add leave day count with badge if applicable
+                    if (record.leave_day_count && record.leave_day_count > 0) {
+                        const leaveDayBadge = document.createElement('div');
+                        leaveDayBadge.className = 'inline-block px-2 py-1 bg-indigo-500 text-white rounded-full text-xs font-semibold ml-1 mt-1';
+                        leaveDayBadge.textContent = `Phép: ${record.leave_day_count}`;
+                        attendanceInfo.appendChild(leaveDayBadge);
+                    }
 
                     // Add a line break
                     attendanceInfo.appendChild(document.createElement('br'));
@@ -256,7 +317,7 @@ up.compiler('.display-calendar', function (modalForm) {
                     // Add note if available
                     if (record.note) {
                         const noteDiv = document.createElement('div');
-                        noteDiv.textContent = record.note;
+                        noteDiv.textContent = `Ghi chú: ${record.note}`;
                         noteDiv.className = 'text-gray-600 dark:text-gray-400 italic mt-1 text-xs overflow-hidden';
                         noteDiv.style.display = '-webkit-box';
                         noteDiv.style.webkitLineClamp = '2';
@@ -270,6 +331,9 @@ up.compiler('.display-calendar', function (modalForm) {
 
             calendarDays.appendChild(dayCell);
         }
+        // Render salary summary table
+        console.log('About to render salary summary with data:', salarySummaryData);
+        renderSalarySummary(salarySummaryData);
     }
 
     prevMonthBtn.addEventListener('click', () => {
@@ -312,6 +376,66 @@ up.compiler('.display-calendar', function (modalForm) {
         });
     }
 
+    function renderSalarySummary(summary) {
+        console.log('Rendering Salary Summary:', summary); // Log the summary data
+        const salarySummaryContainer = document.getElementById('monthlySalarySummary');
+        console.log('Salary Summary Container:', salarySummaryContainer); // Log the container element
+
+        if (!salarySummaryContainer) {
+            console.error('Salary Summary Container not found!');
+            return;
+        }
+
+        salarySummaryContainer.innerHTML = ''; // Clear previous content
+
+        if (summary && staffSelect.value !== 'all') {
+            console.log('Staff selected, rendering summary'); // Log that we're rendering the summary
+            const staffName = staffSelect.options[staffSelect.selectedIndex].text;
+
+            // Check if summary has all required fields
+            const requiredFields = ['num_days_in_month', 'sundays_in_month_count', 'total_leave_days',
+                'total_unpaid_days', 'work_days_normal', 'work_days_sunday',
+                'work_days_holiday', 'overtime_hours_normal', 'overtime_hours_sunday',
+                'overtime_hours_holiday'];
+
+            const missingFields = requiredFields.filter(field => summary[field] === undefined);
+            if (missingFields.length > 0) {
+                console.warn('Missing fields in summary:', missingFields);
+                // Initialize missing fields with 0
+                missingFields.forEach(field => {
+                    summary[field] = 0;
+                });
+            }
+            let summaryHtml = `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Bảng tổng hợp công tháng cho: ${staffName}</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày trong tháng:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.num_days_in_month}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày Chủ Nhật trong tháng:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.sundays_in_month_count}</td></tr>
+                                <tr class="bg-gray-50 dark:bg-gray-750"><td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT CÔNG</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ phép:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.total_leave_days}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ không lương:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.total_unpaid_days}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công thường:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_normal}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công Chủ Nhật:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_sunday}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công ngày Lễ:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_holiday}</td></tr>
+                                <tr class="bg-gray-50 dark:bg-gray-750"><td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT TĂNG CA</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca thường:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_normal}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Chủ Nhật:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_sunday}</td></tr>
+                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Lễ:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_holiday}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            salarySummaryContainer.innerHTML = summaryHtml;
+        } else {
+            salarySummaryContainer.innerHTML = ''; // Clear if no specific staff selected or no summary data
+        }
+        adjustDisplayRecordsHeight();
+    }
+
     // Individual Attendance Modal Functions
     const attendanceModal = document.getElementById('attendanceModal');
     const attendanceForm = document.getElementById('attendanceForm');
@@ -323,8 +447,8 @@ up.compiler('.display-calendar', function (modalForm) {
     const staffIdInput = document.getElementById('staffId');
     const staffNameInput = document.getElementById('staffName');
     const displayDateInput = document.getElementById('displayDate');
-    const workDayCountSelect = document.getElementById('workDayCount');
     const attendanceStatusSelect = document.getElementById('attendanceStatus');
+    const overtimeHoursInput = document.getElementById('overtimeHours');
     const noteInput = document.getElementById('note');
 
     // Function to open the attendance modal
@@ -345,20 +469,20 @@ up.compiler('.display-calendar', function (modalForm) {
         staffIdInput.value = staffId;
         staffNameInput.value = staffName;
         displayDateInput.value = formattedDate;
+        overtimeHoursInput.value = '0'; // Default to 0 overtime hours
 
         // If editing existing record
         if (record) {
             recordIdInput.value = record.id;
-            workDayCountSelect.value = parseFloat(record.work_day_count).toFixed(1);
             attendanceStatusSelect.value = record.attendance_status;
+            overtimeHoursInput.value = (record.overtime_hours !== undefined && record.overtime_hours !== null) ? record.overtime_hours : '0';
             noteInput.value = record.note || '';
             deleteRecordBtn.classList.remove('hidden');
             console.log(record);
 
         } else {
             recordIdInput.value = '';
-            workDayCountSelect.value = '1.0';
-            attendanceStatusSelect.value = 'present';
+            attendanceStatusSelect.value = 'not_marked'; // Default to "Chưa chấm công"
             noteInput.value = '';
             deleteRecordBtn.classList.add('hidden');
         }
@@ -437,6 +561,8 @@ up.compiler('.display-calendar', function (modalForm) {
         // Fetch attendance records for this date
         const dateAttendance = await fetchAttendanceForDate(dateStr);
 
+        console.log('Attendance records for date:', dateAttendance);
+
         // Create a map of staff ID to attendance record
         const attendanceMap = {};
         dateAttendance.forEach(record => {
@@ -479,52 +605,18 @@ up.compiler('.display-calendar', function (modalForm) {
             statusSelect.className = 'form-input w-full';
             statusSelect.name = `attendance_status_${staff.id}`;
 
-            const presentOption = document.createElement('option');
-            presentOption.value = 'present';
-            presentOption.textContent = 'Có mặt';
-            statusSelect.appendChild(presentOption);
-
-            const excusedOption = document.createElement('option');
-            excusedOption.value = 'excused_absence';
-            excusedOption.textContent = 'Vắng có phép';
-            statusSelect.appendChild(excusedOption);
-
-            const unexcusedOption = document.createElement('option');
-            unexcusedOption.value = 'unexcused_absence';
-            unexcusedOption.textContent = 'Vắng không phép';
-            statusSelect.appendChild(unexcusedOption);
-
+            ATTENDANCE_STATUS_OPTIONS.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.text;
+                statusSelect.appendChild(option);
+            });
             // Set selected value if record exists
             if (record) {
                 statusSelect.value = record.attendance_status;
             }
 
             statusCell.appendChild(statusSelect);
-
-            // Work day count cell
-            const workDayCell = document.createElement('td');
-            workDayCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300';
-
-            const workDaySelect = document.createElement('select');
-            workDaySelect.className = 'form-input w-full';
-            workDaySelect.name = `work_day_count_${staff.id}`;
-
-            const options = ['0.0', '0.5', '1.0', '1.5', '2.0'];
-            options.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                workDaySelect.appendChild(option);
-            });
-
-            // Set selected value if record exists
-            if (record) {
-                workDaySelect.value = parseFloat(record.work_day_count).toFixed(1);
-            } else {
-                workDaySelect.value = '1.0'; // Default
-            }
-
-            workDayCell.appendChild(workDaySelect);
 
             // Note cell
             const noteCell = document.createElement('td');
@@ -543,10 +635,31 @@ up.compiler('.display-calendar', function (modalForm) {
 
             noteCell.appendChild(noteInput);
 
+            // Create overtime hours cell
+            const overtimeCell = document.createElement('td');
+            overtimeCell.className = 'px-6 py-4 whitespace-nowrap';
+
+            const overtimeInput = document.createElement('input');
+            overtimeInput.type = 'number';
+            overtimeInput.className = 'form-input w-full';
+            overtimeInput.name = `overtime_hours_${staff.id}`;
+            overtimeInput.placeholder = 'Số giờ tăng ca';
+            overtimeInput.min = '0';
+            overtimeInput.step = '0.1';
+
+            // Set value if record exists
+            if (record && record.overtime_hours !== undefined && record.overtime_hours !== null) {
+                overtimeInput.value = record.overtime_hours;
+            } else {
+                overtimeInput.value = '0';
+            }
+
+            overtimeCell.appendChild(overtimeInput);
+
             // Add cells to row
             row.appendChild(nameCell);
             row.appendChild(statusCell);
-            row.appendChild(workDayCell);
+            row.appendChild(overtimeCell);
             row.appendChild(noteCell);
 
             // Add row to table
@@ -570,7 +683,7 @@ up.compiler('.display-calendar', function (modalForm) {
     markAllPresentBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
         statusSelects.forEach(select => {
-            select.value = 'present';
+            select.value = 'full_day'; // Mark all as "Làm đủ ngày"
         });
     });
 
@@ -578,22 +691,22 @@ up.compiler('.display-calendar', function (modalForm) {
     markAllAbsentBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
         statusSelects.forEach(select => {
-            select.value = 'unexcused_absence';
+            select.value = 'unpaid_leave'; // Mark all as "Nghỉ không lương"
         });
     });
 
     // Reset all button
     resetAllAttendanceBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
-        const workDaySelects = batchAttendanceTableBody.querySelectorAll('select[name^="work_day_count_"]');
+        const overtimeInputs = batchAttendanceTableBody.querySelectorAll('input[name^="overtime_hours_"]');
         const noteInputs = batchAttendanceTableBody.querySelectorAll('input[name^="note_"]');
 
         statusSelects.forEach(select => {
-            select.value = 'present';
+            select.value = 'full_day'; // Reset to "Làm đủ ngày"
         });
 
-        workDaySelects.forEach(select => {
-            select.value = '1.0';
+        overtimeInputs.forEach(input => {
+            input.value = '0'; // Reset overtime hours to 0
         });
 
         noteInputs.forEach(input => {
@@ -609,8 +722,8 @@ up.compiler('.display-calendar', function (modalForm) {
             record_id: recordIdInput.value || null,
             staff_id: staffIdInput.value,
             date: recordDateInput.value,
-            work_day_count: workDayCountSelect.value,
             attendance_status: attendanceStatusSelect.value,
+            overtime_hours: overtimeHoursInput.value,
             note: noteInput.value
         };
 
@@ -640,7 +753,6 @@ up.compiler('.display-calendar', function (modalForm) {
                 // If record already exists, update form with existing record
                 if (response.status === 409 && data.record) {
                     recordIdInput.value = data.record.id;
-                    workDayCountSelect.value = parseFloat(data.record.work_day_count).toFixed(1);
                     attendanceStatusSelect.value = data.record.attendance_status;
                     noteInput.value = data.record.note || '';
                     deleteRecordBtn.classList.remove('hidden');
@@ -671,14 +783,14 @@ up.compiler('.display-calendar', function (modalForm) {
         staffIds.forEach(staffId => {
             const recordIdInput = batchAttendanceTableBody.querySelector(`input[name="record_id_${staffId}"]`);
             const statusSelect = batchAttendanceTableBody.querySelector(`select[name="attendance_status_${staffId}"]`);
-            const workDaySelect = batchAttendanceTableBody.querySelector(`select[name="work_day_count_${staffId}"]`);
+            const overtimeInput = batchAttendanceTableBody.querySelector(`input[name="overtime_hours_${staffId}"]`);
             const noteInput = batchAttendanceTableBody.querySelector(`input[name="note_${staffId}"]`);
 
             formData.records.push({
                 record_id: recordIdInput ? recordIdInput.value : null,
                 staff_id: staffId,
                 attendance_status: statusSelect.value,
-                work_day_count: workDaySelect.value,
+                overtime_hours: overtimeInput ? overtimeInput.value : '0',
                 note: noteInput.value
             });
         });

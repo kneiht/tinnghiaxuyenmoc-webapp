@@ -1,0 +1,119 @@
+{% if success == "true" %}
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
+    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Bảng tính lương cho: {{ staff_name }}</h3>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tr class="bg-gray-50 dark:bg-gray-750">
+                    <td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">THÔNG TIN CHUNG</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương cơ bản:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.basic_month_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương ngày thường:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.daily_rate|floatformat:0|intcomma }} VND</td>
+                </tr>
+                
+                <tr class="bg-gray-50 dark:bg-gray-750">
+                    <td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT CÔNG</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày trong tháng:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.days_in_month }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày Chủ Nhật:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.sundays_in_month_count }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ phép:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.total_leave_days }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ không lương:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.total_unpaid_days }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công thường:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.work_days_normal }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công Chủ Nhật:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.work_days_sunday }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công ngày Lễ:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.work_days_holiday }}</td>
+                </tr>
+                
+                <tr class="bg-gray-50 dark:bg-gray-750">
+                    <td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT TĂNG CA</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca thường:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.overtime_hours_normal }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Chủ Nhật:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.overtime_hours_sunday }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Lễ:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.overtime_hours_holiday }}</td>
+                </tr>
+                
+                <tr class="bg-gray-50 dark:bg-gray-750">
+                    <td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">TÍNH LƯƠNG</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương ngày thường:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.normal_days_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương ngày Chủ Nhật:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.sunday_days_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương ngày Lễ:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.holiday_days_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Tổng lương ngày công:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ data.total_work_days_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương tăng ca thường:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.normal_overtime_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương tăng ca Chủ Nhật:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.sunday_overtime_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lương tăng ca Lễ:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ data.holiday_overtime_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Tổng lương tăng ca:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ data.total_overtime_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+                
+                <tr class="bg-gray-50 dark:bg-gray-750">
+                    <td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">TỔNG LƯƠNG:</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 font-bold text-lg">{{ data.total_salary|floatformat:0|intcomma }} VND</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
+    <div class="text-center text-red-500 dark:text-red-400">
+        <p>{{ message }}</p>
+    </div>
+</div>
+{% endif %}

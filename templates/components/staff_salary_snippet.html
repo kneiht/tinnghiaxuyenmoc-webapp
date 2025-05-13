@@ -1,0 +1,16 @@
+{% load staff_salary %}
+{% load custom_tags %} {# Make sure your split filter is loaded if not globally available #}
+
+{# These parameters come from the context of staff_salary_component_view #}
+{% if staff_id_param and staff_id_param != 'all' and attendance_month_param %}
+    {% with year_month_parts=attendance_month_param|split:"-" %}
+        {% if year_month_parts|length == 2 %}
+            {% calculate_staff_salary staff_id_param year_month_parts.0 year_month_parts.1 %}
+        {% else %}
+            <p class="text-sm text-red-500 p-2">Salary cannot be calculated: selected month format is incorrect.</p>
+        {% endif %}
+    {% endwith %}
+{% else %}
+    {# This part should ideally not be reached if the view returns HttpResponse("") #}
+    {# but as a fallback, it ensures nothing is shown if params are missing. #}
+{% endif %}

@@ -27,6 +27,7 @@ from .forms import *
 from .models.models import *
 from .renders import *
 from .utils import *
+from .models.unclassified import AttendanceRecord  # Đảm bảo import AttendanceRecord
 from .navbar import NAV_ITEMS
 
 
@@ -2886,6 +2887,12 @@ def get_staff_attendance_records(request):
         date__range=(first_day, last_day), worker=current_staff
     )
 
+    # Get holidays for the month
+    holidays_in_month = Holiday.objects.filter(date__year=year, date__month=month)
+    holidays_dict = {
+        holiday.date.strftime("%Y-%m-%d"): holiday.note for holiday in holidays_in_month
+    }
+
     # Create a dictionary of existing records keyed by date
     existing_records = {}
     for record in attendance_records:
@@ -2895,6 +2902,9 @@ def get_staff_attendance_records(request):
             "date": date_str,
             "work_day_count": float(record.work_day_count),
             "attendance_status": record.attendance_status,
+            "overtime_hours": (
+                float(record.overtime_hours) if record.overtime_hours else 0
+            ),
             "note": record.note or "",
         }
 
@@ -2914,6 +2924,74 @@ def get_staff_attendance_records(request):
         else:
             pass
 
+    # Calculate monthly salary summary
+    # Count Sundays in the month
+    sundays_in_month_count = sum(
+        1
+        for day in range(1, days_in_month + 1)
+        if date(year, month, day).weekday() == 6
+    )
+
+    # Initialize counters
+    total_leave_days = 0
+    total_unpaid_days = 0
+    work_days_normal = 0
+    work_days_sunday = 0
+    work_days_holiday = 0
+    overtime_hours_normal = 0
+    overtime_hours_sunday = 0
+    overtime_hours_holiday = 0
+
+    # Process each attendance record
+    for record in attendance_records:
+        date_str = record.date.strftime("%Y-%m-%d")
+        is_sunday = record.date.weekday() == 6
+        is_holiday = date_str in holidays_dict
+
+        # Count leave days
+        if record.attendance_status in ["leave_day", "half_day_leave"]:
+            total_leave_days += float(record.leave_day_count)
+
+        # Count unpaid leave days
+        if record.attendance_status in ["unpaid_leave", "half_day_unpaid"]:
+            total_unpaid_days += (
+                1 if record.attendance_status == "unpaid_leave" else 0.5
+            )
+
+        # Count work days by type
+        if float(record.work_day_count) > 0:
+            if is_holiday:
+                work_days_holiday += float(record.work_day_count)
+            elif is_sunday:
+                work_days_sunday += float(record.work_day_count)
+            else:
+                work_days_normal += float(record.work_day_count)
+
+        # Count overtime hours by type
+        if hasattr(record, "overtime_hours") and record.overtime_hours:
+            overtime_hours = float(record.overtime_hours)
+            if overtime_hours > 0:
+                if is_holiday:
+                    overtime_hours_holiday += overtime_hours
+                elif is_sunday:
+                    overtime_hours_sunday += overtime_hours
+                else:
+                    overtime_hours_normal += overtime_hours
+
+    # Create salary summary
+    salary_summary = {
+        "num_days_in_month": days_in_month,
+        "sundays_in_month_count": sundays_in_month_count,
+        "total_leave_days": total_leave_days,
+        "total_unpaid_days": total_unpaid_days,
+        "work_days_normal": work_days_normal,
+        "work_days_sunday": work_days_sunday,
+        "work_days_holiday": work_days_holiday,
+        "overtime_hours_normal": overtime_hours_normal,
+        "overtime_hours_sunday": overtime_hours_sunday,
+        "overtime_hours_holiday": overtime_hours_holiday,
+    }
+
     json = {
         "staff": {
             "id": current_staff.id,
@@ -2921,6 +2999,8 @@ def get_staff_attendance_records(request):
         },
         "month": attendance_month,
         "records": records,
+        "holidays": holidays_dict,
+        "salary_summary": salary_summary,
     }
     print(json)
     return JsonResponse(json)
@@ -2942,8 +3022,8 @@ def save_attendance_record(request):
         staff_id = data.get("staff_id")
         date_str = data.get("date")
         record_id = data.get("record_id")
-        work_day_count = data.get("work_day_count")
         attendance_status = data.get("attendance_status")
+        overtime_hours = data.get("overtime_hours", "0")
         note = data.get("note", "")
 
         # Validate required fields
@@ -2963,22 +3043,19 @@ def save_attendance_record(request):
                 {"error": "Invalid date format. Use YYYY-MM-DD"}, status=400
             )
 
-        # Convert work_day_count to Decimal
-        try:
-            work_day_count = Decimal(str(work_day_count))
-        except:
-            return JsonResponse({"error": "Invalid work day count"}, status=400)
-
         # Create or update record
         if record_id:
             # Update existing record
             record = AttendanceRecord.objects.filter(pk=record_id).first()
             if not record:
                 return JsonResponse({"error": "Record not found"}, status=404)
-
-            record.work_day_count = work_day_count
             record.attendance_status = attendance_status
             record.note = note
+            # Convert overtime_hours to Decimal
+            try:
+                record.overtime_hours = Decimal(overtime_hours)
+            except:
+                record.overtime_hours = Decimal("0.00")
             record.save()
             message = "Record updated successfully"
         else:
@@ -2994,6 +3071,7 @@ def save_attendance_record(request):
                             "id": existing_record.id,
                             "date": existing_record.date.strftime("%Y-%m-%d"),
                             "work_day_count": float(existing_record.work_day_count),
+                            "leave_day_count": float(existing_record.leave_day_count),
                             "attendance_status": existing_record.attendance_status,
                             "note": existing_record.note or "",
                         },
@@ -3005,7 +3083,6 @@ def save_attendance_record(request):
             record = AttendanceRecord.objects.create(
                 worker=staff,
                 date=record_date,
-                work_day_count=work_day_count,
                 attendance_status=attendance_status,
                 note=note,
             )
@@ -3073,6 +3150,9 @@ def get_attendance_records_by_date(request):
                 "date": record.date.strftime("%Y-%m-%d"),
                 "work_day_count": float(record.work_day_count),
                 "attendance_status": record.attendance_status,
+                "overtime_hours": (
+                    float(record.overtime_hours) if record.overtime_hours else 0
+                ),
                 "note": record.note or "",
             }
         )
@@ -3115,8 +3195,8 @@ def batch_save_attendance_records(request):
         for record_data in records:
             staff_id = record_data.get("staff_id")
             record_id = record_data.get("record_id")
-            work_day_count = record_data.get("work_day_count")
             attendance_status = record_data.get("attendance_status")
+            overtime_hours = record_data.get("overtime_hours", "0")
             note = record_data.get("note", "")
 
             # Skip if no staff ID
@@ -3129,13 +3209,6 @@ def batch_save_attendance_records(request):
                 errors.append(f"Staff member with ID {staff_id} not found")
                 continue
 
-            # Convert work_day_count to Decimal
-            try:
-                work_day_count = Decimal(str(work_day_count))
-            except:
-                errors.append(f"Invalid work day count for staff {staff.full_name}")
-                continue
-
             # Create or update record
             if record_id:
                 # Update existing record
@@ -3143,10 +3216,13 @@ def batch_save_attendance_records(request):
                 if not record:
                     errors.append(f"Record with ID {record_id} not found")
                     continue
-
-                record.work_day_count = work_day_count
                 record.attendance_status = attendance_status
                 record.note = note
+                # Convert overtime_hours to Decimal
+                try:
+                    record.overtime_hours = Decimal(overtime_hours)
+                except:
+                    record.overtime_hours = Decimal("0.00")
                 record.save()
                 updated_count += 1
             else:
@@ -3157,18 +3233,28 @@ def batch_save_attendance_records(request):
 
                 if existing_record:
                     # Update existing record
-                    existing_record.work_day_count = work_day_count
                     existing_record.attendance_status = attendance_status
                     existing_record.note = note
+                    # Convert overtime_hours to Decimal
+                    try:
+                        existing_record.overtime_hours = Decimal(overtime_hours)
+                    except:
+                        existing_record.overtime_hours = Decimal("0.00")
                     existing_record.save()
                     updated_count += 1
                 else:
                     # Create new record
+                    # Convert overtime_hours to Decimal
+                    try:
+                        overtime_hours_decimal = Decimal(overtime_hours)
+                    except:
+                        overtime_hours_decimal = Decimal("0.00")
+
                     AttendanceRecord.objects.create(
                         worker=staff,
                         date=record_date,
-                        work_day_count=work_day_count,
                         attendance_status=attendance_status,
+                        overtime_hours=overtime_hours_decimal,
                         note=note,
                     )
                     created_count += 1
@@ -3198,10 +3284,11 @@ def batch_save_attendance_records(request):
 @login_required
 def get_attendance_summary(request):
     from datetime import datetime, date
+    from django.db.models import Count, Case, When, IntegerField
     import calendar
 
     # Get month from params (format: YYYY-MM)
-    attendance_month = request.GET.get("month")
+    attendance_month = request.GET.get("month", None)
 
     # If month not provided, use current month
     if not attendance_month:
@@ -3211,56 +3298,61 @@ def get_attendance_summary(request):
     try:
         year, month = map(int, attendance_month.split("-"))
         first_day = date(year, month, 1)
-        last_day = date(year, month, calendar.monthrange(year, month)[1])
+        # last_day is not strictly needed for the new query logic but good for validation
+        num_days_in_month = calendar.monthrange(year, month)[1]
     except Exception as e:
-        return JsonResponse(
-            {"error": f"Invalid month format. Use YYYY-MM. Error: {str(e)}"}, status=400
-        )
+        return JsonResponse({"error": "Invalid month format. Use YYYY-MM."}, status=400)
+    except calendar.IllegalMonthError:
+        return JsonResponse({"error": "Invalid month value."}, status=400)
 
-    # Get all attendance records for the month
-    attendance_records = AttendanceRecord.objects.filter(
-        date__range=(first_day, last_day)
-    )
-
-    # Get all staff
-    # Get all active staff members for the dropdown
-    all_staff = StaffData.objects.filter(status__in=["active", "on_leave"])
-    # Filter manager and staff
-    all_staff = all_staff.filter(position__in=["manager", "staff"])
-
-    total_staff_count = all_staff.count()
+    # Get holidays for the month
+    holidays_in_month = Holiday.objects.filter(date__year=year, date__month=month)
+    holidays_dict = {
+        holiday.date.strftime("%Y-%m-%d"): holiday.note for holiday in holidays_in_month
+    }
 
     # Create a dictionary to store summary by date
     summary_by_date = {}
 
     # Initialize summary for each day of the month
-    days_in_month = calendar.monthrange(year, month)[1]
-    for day in range(1, days_in_month + 1):
+    for day in range(1, num_days_in_month + 1):
         date_str = f"{year}-{month:02d}-{day:02d}"
-        summary_by_date[date_str] = {
-            "date": date_str,
-            "present_count": 0,
-            "excused_absence_count": 0,
-            "unexcused_absence_count": 0,
-            "total_staff": total_staff_count,
-        }
+        daily_counts = {}
+        for status_value, _ in AttendanceRecord.ATTENDANCE_STATUS_CHOICES:
+            daily_counts[f"{status_value}_count"] = 0
+        summary_by_date[date_str] = daily_counts
 
-    # Count attendance by date and status
-    for record in attendance_records:
-        date_str = record.date.strftime("%Y-%m-%d")
+    # Build dynamic aggregation expressions
+    status_aggregates = {}
+    for status_value, _ in AttendanceRecord.ATTENDANCE_STATUS_CHOICES:
+        status_aggregates[f"{status_value}_count"] = Count(
+            Case(
+                When(attendance_status=status_value, then=1),
+                output_field=IntegerField(),
+            )
+        )
 
-        if date_str in summary_by_date:
-            if record.attendance_status == "present":
-                summary_by_date[date_str]["present_count"] += 1
-            elif record.attendance_status == "excused_absence":
-                summary_by_date[date_str]["excused_absence_count"] += 1
-            elif record.attendance_status == "unexcused_absence":
-                summary_by_date[date_str]["unexcused_absence_count"] += 1
+    # Query database for aggregated counts
+    daily_summary_from_db = (
+        AttendanceRecord.objects.filter(date__year=year, date__month=month)
+        .values("date")
+        .annotate(**status_aggregates)
+        .order_by("date")
+    )
+
+    # Populate summary_by_date with data from the database
+    for daily_item in daily_summary_from_db:
+        date_key = daily_item["date"].strftime("%Y-%m-%d")
+        if date_key in summary_by_date:  # Should always be true
+            for status_value, _ in AttendanceRecord.ATTENDANCE_STATUS_CHOICES:
+                count_key = f"{status_value}_count"
+                summary_by_date[date_key][count_key] = daily_item.get(count_key, 0)
 
     return JsonResponse(
         {
             "month": attendance_month,
             "summary": summary_by_date,
+            "holidays": holidays_dict,
         }
     )
 
@@ -3285,3 +3377,22 @@ def get_staff_list(request):
         )
 
     return JsonResponse({"staff": staff_list})
+
+
+def staff_salary_component_view(request):
+    staff_id = request.GET.get("staff_id")
+    attendance_month_str = request.GET.get("attendance_month")  # Use 'attendance_month'
+
+    # Only proceed if a specific staff member and month are provided
+    if staff_id and staff_id != "all" and attendance_month_str:
+        # You can add more validation for staff_id and attendance_month_str if needed
+        context = {
+            "staff_id_param": staff_id,  # Use a distinct name to avoid context clashes
+            "attendance_month_param": attendance_month_str,
+            # Pass any other context your calculate_staff_salary tag might need
+        }
+        return render(request, "components/staff_salary_snippet.html", context)
+    else:
+        # Return an empty response if conditions aren't met,
+        # so the Unpoly fragment becomes empty.
+        return HttpResponse("")

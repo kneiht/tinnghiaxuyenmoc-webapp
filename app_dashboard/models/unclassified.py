@@ -148,6 +148,12 @@ class StaffData(BaseModel):
         max_length=15, verbose_name="Số điện thoại", default=""
     )
     address = models.CharField(max_length=255, verbose_name="Địa chỉ", default="")
+    # Leave Information
+    starting_leave_day_balance = models.FloatField(
+        verbose_name="Bù trừ ngày phép",
+        default=0.0,
+        help_text="Số ngày phép khi bắt đầu dùng phần mềm",
+    )
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
 
     def __str__(self):
@@ -167,6 +173,7 @@ class StaffData(BaseModel):
             "account_holder_name",
             "phone_number",
             "address",
+            "leave_day_balance",
             "created_at",
         ]
         # Check if the field is in the model
@@ -1310,15 +1317,44 @@ class AttendanceRecord(BaseModel):
     )
 
     ATTENDANCE_STATUS_CHOICES = [
-        ("present", "Có mặt"),
-        ("excused_absence", "Vắng có phép"),
-        ("unexcused_absence", "Vắng không phép"),
+        ("not_marked", "Chưa chấm công"),
+        ("full_day", "Làm đủ ngày"),
+        ("leave_day", "Nghỉ phép"),
+        ("unpaid_leave", "Nghỉ không lương"),
+        ("half_day_leave", "Làm nửa ngày, nghỉ phép nửa ngày"),
+        ("half_day_unpaid", "Làm nửa ngày, nghỉ không lương nửa ngày"),
     ]
     attendance_status = models.CharField(
         max_length=20,
         choices=ATTENDANCE_STATUS_CHOICES,
-        default="present",
+        default="not_marked",
         verbose_name="Trạng thái",
+    )
+
+    LEAVE_DAY_CHOICES = [
+        (Decimal("0.0"), "0.0"),
+        (Decimal("0.5"), "0.5"),
+        (Decimal("1.0"), "1.0"),
+    ]
+    leave_day_count = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        choices=LEAVE_DAY_CHOICES,
+        default=Decimal("0.0"),
+        verbose_name="Ngày phép",
+        validators=[
+            MinValueValidator(Decimal("0.0")),
+            MaxValueValidator(Decimal("1.0")),
+        ],
+        help_text="Số ngày phép được tính (0.0, 0.5, 1.0)",
+    )
+
+    overtime_hours = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name="Số giờ tăng ca",
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
 
     note = models.TextField(
@@ -1333,3 +1369,44 @@ class AttendanceRecord(BaseModel):
 
     def __str__(self):
         return f"{self.worker.full_name} - {self.date} - {self.attendance_status}"
+
+    def save(self, *args, **kwargs):
+        # Set work_day_count and leave_day_count based on attendance_status
+        if self.attendance_status == "not_marked":
+            self.work_day_count = Decimal("0.0")
+            self.leave_day_count = Decimal("0.0")
+        elif self.attendance_status == "full_day":
+            self.work_day_count = Decimal("1.0")
+            self.leave_day_count = Decimal("0.0")
+        elif self.attendance_status == "leave_day":
+            self.work_day_count = Decimal("1.0")
+            self.leave_day_count = Decimal("1.0")
+        elif self.attendance_status == "unpaid_leave":
+            self.work_day_count = Decimal("0.0")
+            self.leave_day_count = Decimal("0.0")
+        elif self.attendance_status == "half_day_leave":
+            self.work_day_count = Decimal("1.0")
+            self.leave_day_count = Decimal("0.5")
+        elif self.attendance_status == "half_day_unpaid":
+            self.work_day_count = Decimal("0.5")
+            self.leave_day_count = Decimal("0.0")
+
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_display_fields(self):
+        fields = [
+            "worker",
+            "date",
+            "attendance_status",
+            "work_day_count",
+            "leave_day_count",
+            "overtime_hours",
+            "note",
+            "created_at",
+        ]
+        # Check if the field is in the model
+        for field in fields:
+            if not hasattr(self, field):
+                fields.remove(field)
+        return fields

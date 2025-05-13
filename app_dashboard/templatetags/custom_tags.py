@@ -15,6 +15,22 @@ from ..utils import *
 from django.shortcuts import render
 
 
+@register.filter(name="split")
+def split_string(value, arg):
+    """
+    Splits a string by the given delimiter.
+    Usage: {{ some_string|split:":" }}
+    Example:
+        If value is "foo-bar-baz" and arg is "-",
+        the output will be ['foo', 'bar', 'baz'].
+    If the value is not a string, it returns an empty list
+    to prevent errors in the template.
+    """
+    if isinstance(value, str):
+        return value.split(str(arg))  # Ensure delimiter is a string
+    return []  # Return empty list for non-string inputs
+
+
 @register.simple_tag
 def get_static_version():
     return settings.STATIC_VERSION

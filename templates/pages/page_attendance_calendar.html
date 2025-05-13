@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% load custom_tags %}
+{% load staff_salary %}
 
 
 {% block title %}
@@ -15,121 +16,13 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Individual Attendance Record Modal -->
-    <div id="attendanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Attendance Record</h3>
-                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <form id="attendanceForm" class="space-y-4">
-                <input type="hidden" id="recordId" name="record_id">
-                <input type="hidden" id="recordDate" name="date">
-                <input type="hidden" id="staffId" name="staff_id">
-                
-                <div class="mb-4">
-                    <label for="staffName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Staff</label>
-                    <input type="text" id="staffName" class="form-input w-full mt-1" disabled>
-                </div>
-                
-                <div class="mb-4">
-                    <label for="displayDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                    <input type="text" id="displayDate" class="form-input w-full mt-1" disabled>
-                </div>
-                
-                <div class="mb-4">
-                    <label for="workDayCount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Work Day Count</label>
-                    <select id="workDayCount" name="work_day_count" class="form-input w-full mt-1">
-                        <option value="0.0">0.0</option>
-                        <option value="0.5">0.5</option>
-                        <option value="1.0" selected>1.0</option>
-                        <option value="1.5">1.5</option>
-                        <option value="2.0">2.0</option>
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label for="attendanceStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                    <select id="attendanceStatus" name="attendance_status" class="form-input w-full mt-1">
-                        <option value="present">Có mặt</option>
-                        <option value="excused_absence">Vắng có phép</option>
-                        <option value="unexcused_absence">Vắng không phép</option>
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
-                    <textarea id="note" name="note" rows="3" class="form-input h-20"></textarea>
-                </div>
-                
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="deleteRecord" class="btn btn-danger hidden">Delete</button>
-                    <button type="button" id="cancelForm" class="btn btn-outline">Cancel</button>
-                    <button class="btn btn-primary">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Batch Attendance Modal for All Staff -->
-    <div id="batchAttendanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Cập nhật chấm công cho tất cả nhân viên</h3>
-                <button id="closeBatchModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="mb-4">
-                <label for="batchDisplayDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                <input type="text" id="batchDisplayDate" class="form-input w-full mt-1" disabled>
-                <input type="hidden" id="batchRecordDate" name="date">
-            </div>
-            
-            <div class="mb-4 flex items-center space-x-2">
-                <button id="markAllPresent" class="btn btn-success text-sm">Mark All Present</button>
-                <button id="markAllAbsent" class="btn btn-danger text-sm">Mark All Absent</button>
-                <button id="resetAllAttendance" class="btn btn-outline text-sm">Reset All</button>
-            </div>
-            
-            <form id="batchAttendanceForm" class="space-y-4">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Staff</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Work Day Count</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
-                            </tr>
-                        </thead>
-                        <tbody id="batchAttendanceTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            <!-- Staff attendance rows will be added here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" id="cancelBatchForm" class="btn btn-outline">Cancel</button>
-                    <button class="btn btn-primary">Save All</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <div id="modal"></div>
+
     <main>
         {% include 'components/nav_bar.html' %}
         <div up-hungry id="tool-bar" class="flex flex-col w-full gap-5 mt-3 z-30">
             <div class="flex flex-row gap-5 w-full">
-                <form id="attendanceFilterForm" method="get" class="flex flex-row items-end gap-5 w-full">
+                <form id="attendanceFilterForm" method="get" class="flex flex-row items-end gap-5 w-full">  
                     <div class="flex flex-col">
                         <select id="staffSelect" name="staff_id" class="new-select form-input w-[300px]">
                             <option value="all">Tất cả nhân viên</option>
@@ -155,7 +48,114 @@
         <div up-hungry id="message-page"></div>
 
 
-        <div id="display-records" class="display-calendar w-full pt-4">
+        <div id="display-records" class="display-calendar w-full pt-4 overflow-y-auto">
+        <!-- Individual Attendance Record Modal -->
+        <div up-hungry id="attendanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Attendance Record</h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="attendanceForm" class="space-y-4">
+                    <input type="hidden" id="recordId" name="record_id">
+                    <input type="hidden" id="recordDate" name="date">
+                    <input type="hidden" id="staffId" name="staff_id">
+                    
+                    <div class="mb-4">
+                        <label for="staffName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Staff</label>
+                        <input type="text" id="staffName" class="form-input w-full mt-1" disabled>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="displayDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                        <input type="text" id="displayDate" class="form-input w-full mt-1" disabled>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="attendanceStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <select id="attendanceStatus" name="attendance_status" class="form-input w-full mt-1">
+                            <option value="not_marked">Chưa chấm công</option>
+                            <option value="full_day">Làm đủ ngày</option> 
+                            <option value="leave_day">Nghỉ phép</option> 
+                            <option value="unpaid_leave">Nghỉ không lương</option> 
+                            <option value="half_day_leave">Làm nửa ngày, nghỉ phép nửa ngày</option> 
+                            <option value="half_day_unpaid">Làm nửa ngày, nghỉ không lương nửa ngày</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="overtimeHours" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Số giờ tăng ca</label>
+                        <input type="number" id="overtimeHours" name="overtime_hours" min="0" step="0.1" class="no-readable form-input w-full mt-1" value="0">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Note</label>
+                        <textarea id="note" name="note" rows="3" class="form-input h-20"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="deleteRecord" class="btn btn-danger hidden">Delete</button>
+                        <button type="button" id="cancelForm" class="btn btn-outline">Cancel</button>
+                        <button class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Batch Attendance Modal for All Staff -->
+        <div up-hungry id="batchAttendanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Cập nhật chấm công cho tất cả nhân viên</h3>
+                    <button id="closeBatchModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="batchDisplayDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                    <input type="text" id="batchDisplayDate" class="form-input w-full mt-1" disabled>
+                    <input type="hidden" id="batchRecordDate" name="date">
+                </div>
+                
+                <div class="mb-4 flex items-center space-x-2">
+                    <button id="markAllPresent" class="btn btn-success text-sm">Mark All Present</button>
+                    <button id="markAllAbsent" class="btn btn-danger text-sm">Mark All Absent</button>
+                    <button id="resetAllAttendance" class="btn btn-outline text-sm">Reset All</button>
+                </div>
+                
+                <form id="batchAttendanceForm" class="space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Staff</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Số giờ tăng ca</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batchAttendanceTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Staff attendance rows will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" id="cancelBatchForm" class="btn btn-outline">Cancel</button>
+                        <button class="btn btn-primary">Save All</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
                 <div class="flex items-center justify-between mb-4">
                     <button id="prevMonth" class="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -177,8 +177,23 @@
                 </div>
                 <div id="calendarDays" class="grid grid-cols-7 gap-2 text-center"></div>
             </div>
+            
+            <!-- Monthly Salary Summary Section -->
+            <div id="monthlySalarySummary" class="w-full pt-6 mb-6 mt-4 border-t border-gray-200 dark:border-gray-700">
+                <!-- Salary summary table will be rendered here by JavaScript -->
+            </div>
+            
+            <!-- Staff Salary Calculation Section -->
+             {{ request.GET.staff_id }}
+             {{ request.GET }}
+            {% if request.GET.staff_id and request.GET.staff_id != 'all' and request.GET.month %}
+                {% with staff_id=request.GET.staff_id|safe %}
+                    {% with year_month=request.GET.month|safe|split:"-" %}
+                        {% calculate_staff_salary staff_id year_month.0 year_month.1 %}
+                    {% endwith %}
+                {% endwith %}
+            {% endif %}
         </div>
-
         <div up-hungry id="load-more"></div>
 
     </main>
