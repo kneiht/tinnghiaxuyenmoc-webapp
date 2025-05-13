@@ -57,26 +57,6 @@ up.compiler('.display-calendar', function (modalForm) {
         }
     }
 
-    // Function to update salary summary section
-    async function updateSalarySummary(year, month, staffId) {
-        const formattedMonth = `${year}-${month.toString().padStart(2, '0')}`;
-        try {
-            const response = await fetch(`/api/attendance-records/salary-summary/?staff_id=${staffId}&month=${formattedMonth}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch salary summary');
-            }
-            const salaryData = await response.json();
-
-            // Update the salary summary section in the DOM
-            const summarySection = document.getElementById('monthlySalarySummary');
-            if (summarySection && salaryData.success === 'true') {
-                summarySection.innerHTML = salaryData.html;
-            }
-        } catch (error) {
-            console.error('Error fetching salary summary:', error);
-        }
-    }
-
     // Function to fetch attendance summary data for all staff
     async function fetchAttendanceSummaryData() {
         const year = currentDate.getFullYear();
@@ -138,11 +118,6 @@ up.compiler('.display-calendar', function (modalForm) {
             holidaysData = apiResponse.holidays || {};
             salarySummaryData = apiResponse.salary_summary || null; // Get salary summary
             console.log('Salary Summary Data:', salarySummaryData); // Log the salary summary data
-
-            // Trigger salary calculation if viewing individual staff
-            if (staffSelect.value !== 'all') {
-                updateSalarySummary(year, month + 1, staffSelect.value);
-            }
         }
 
         // Get first day of the month
@@ -339,16 +314,19 @@ up.compiler('.display-calendar', function (modalForm) {
     prevMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar(currentDate);
+        calculateSalary(); // Add this line to recalculate salary when changing to previous month
     });
 
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar(currentDate);
+        calculateSalary(); // Add this line to recalculate salary when changing to next month
     });
 
     // Listen for staff selection changes
     staffSelect.addEventListener('change', () => {
         renderCalendar(currentDate);
+        calculateSalary(); // Add this line to recalculate salary when staff changes
     });
 
     // Listen for month select input changes
@@ -357,6 +335,7 @@ up.compiler('.display-calendar', function (modalForm) {
             const [year, month] = monthSelect.value.split('-').map(Number);
             currentDate = new Date(year, month - 1, 1);
             renderCalendar(currentDate);
+            calculateSalary(); // Add this line to recalculate salary when month changes
         }
     });
 
@@ -373,6 +352,7 @@ up.compiler('.display-calendar', function (modalForm) {
         todayButton.addEventListener('click', () => {
             currentDate = new Date();
             renderCalendar(currentDate);
+            calculateSalary(); // Add this line to recalculate salary when going to today
         });
     }
 
@@ -890,4 +870,201 @@ up.compiler('.display-calendar', function (modalForm) {
             }
         }, 5000);
     }
+
+    // Salary calculation functionality
+    function initSalaryCalculation() {
+        // Calculate salary automatically when the page loads
+        calculateSalary();
+    }
+
+    // Calculate salary for the current month shown in the calendar
+    function calculateSalary() {
+        // Get the current month and year from the calendar
+        const monthYearText = document.getElementById('monthYear').textContent;
+        const [monthName, year] = monthYearText.split(' ');
+        
+        // Convert month name to month number (0-based)
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const month = monthNames.indexOf(monthName);
+        
+        if (month === -1) {
+            showSalaryError('Không thể xác định tháng hiện tại.');
+            return;
+        }
+        
+        // Create date objects for first and last day of the month
+        const firstDay = new Date(parseInt(year), month, 1);
+        const lastDay = new Date(parseInt(year), month + 1, 0);
+        
+        // Format dates as YYYY-MM-DD
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        
+        const startDate = formatDate(firstDay);
+        const endDate = formatDate(lastDay);
+        const staffId = staffSelect.value;
+        
+        // Only calculate salary for individual staff members, not for "all staff"
+        if (staffId === 'all') {
+            document.getElementById('salaryCalculationSection').classList.add('hidden');
+            return;
+        } else {
+            document.getElementById('salaryCalculationSection').classList.remove('hidden');
+        }
+        
+        // Show loading indicator
+        document.getElementById('salary-results-container').classList.add('hidden');
+        document.getElementById('salary-error').classList.add('hidden');
+        document.getElementById('salary-no-data').classList.add('hidden');
+        document.getElementById('salary-loading').classList.remove('hidden');
+        
+        // Build API URL
+        let apiUrl = `/api/calculate-staff-salary/?start_date=${startDate}&end_date=${endDate}&staff_id=${staffId}`;
+        
+        // Make API request
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('salary-loading').classList.add('hidden');
+                
+                if (data.success) {
+                    if (data.results && data.results.length > 0) {
+                        displaySalaryResults(data.results);
+                    } else {
+                        document.getElementById('salary-no-data').classList.remove('hidden');
+                    }
+                } else {
+                    showSalaryError(data.message || 'Có lỗi xảy ra khi tính lương.');
+                }
+            })
+            .catch(error => {
+                document.getElementById('salary-loading').classList.add('hidden');
+                showSalaryError('Có lỗi xảy ra khi tính lương: ' + error.message);
+                console.error('Error calculating salary:', error);
+            });
+    }
+
+    // Display salary calculation results in the table
+    function displaySalaryResults(results) {
+        const tableBody = document.getElementById('salary-results-table');
+        tableBody.innerHTML = '';
+        
+        // Format currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('vi-VN', { 
+                style: 'currency', 
+                currency: 'VND',
+                maximumFractionDigits: 0
+            }).format(amount);
+        };
+        
+        // Add rows for each staff member
+        results.forEach(staff => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-100 dark:hover:bg-gray-700';
+            
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.staff_id}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.staff_name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.full_days}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.half_days}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.leave_days}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.unpaid_leave_days}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.normal_working_time}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.overtime}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.base_salary)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.daily_rate)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_rate)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.allowances)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_salary)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_salary)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.total_salary)}</td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+        
+        // Show the results container
+        document.getElementById('salary-results-container').classList.remove('hidden');
+    }
+
+    // Show error message
+    function showSalaryError(message) {
+        const errorElement = document.getElementById('salary-error');
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+    }
+
+    // Export salary data to Excel
+    function exportSalaryToExcel() {
+        // Get the current month and year from the calendar
+        const monthYearText = document.getElementById('monthYear').textContent;
+        const [monthName, year] = monthYearText.split(' ');
+        
+        // Convert month name to month number (0-based)
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const month = monthNames.indexOf(monthName);
+        
+        if (month === -1) {
+            showSalaryError('Không thể xác định tháng hiện tại.');
+            return;
+        }
+        
+        // Create date objects for first and last day of the month
+        const firstDay = new Date(parseInt(year), month, 1);
+        const lastDay = new Date(parseInt(year), month + 1, 0);
+        
+        // Format dates as YYYY-MM-DD
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        
+        const startDate = formatDate(firstDay);
+        const endDate = formatDate(lastDay);
+        const staffId = staffSelect.value;
+        
+        // Build export URL
+        let exportUrl = `/excel/export-staff-salary/?start_date=${startDate}&end_date=${endDate}`;
+        if (staffId && staffId !== 'all') {
+            exportUrl += `&staff_id=${staffId}`;
+        }
+        
+        // Open the export URL in a new tab/window
+        window.open(exportUrl, '_blank');
+    }
+
+    // Initialize salary calculation
+    initSalaryCalculation();
+
+    // Function to adjust display records height
+    function adjustDisplayRecordsHeight() {
+        const displayRecords = document.getElementById('display-records');
+        if (displayRecords) {
+            // Adjust height based on content
+            const windowHeight = window.innerHeight;
+            const navBarHeight = document.getElementById('tool-bar').offsetHeight;
+            const footerHeight = 60; // Estimated footer height
+            const padding = 40; // Additional padding
+            
+            displayRecords.style.maxHeight = `${windowHeight - navBarHeight - footerHeight - padding}px`;
+        }
+    }
+
+    // Call adjust height on window resize
+    window.addEventListener('resize', adjustDisplayRecordsHeight);
+    
+    // Initial adjustment
+    adjustDisplayRecordsHeight();
 });

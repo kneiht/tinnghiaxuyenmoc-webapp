@@ -658,3 +658,4 @@ def upload_excel(request, model_name):
     except Exception as e:
         message = f"Error: {str(e)}"
         return HttpResponse(render_message(request, message, message_type="red"))
+

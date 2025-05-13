@@ -3377,22 +3377,3 @@ def get_staff_list(request):
         )
 
     return JsonResponse({"staff": staff_list})
-
-
-def staff_salary_component_view(request):
-    staff_id = request.GET.get("staff_id")
-    attendance_month_str = request.GET.get("attendance_month")  # Use 'attendance_month'
-
-    # Only proceed if a specific staff member and month are provided
-    if staff_id and staff_id != "all" and attendance_month_str:
-        # You can add more validation for staff_id and attendance_month_str if needed
-        context = {
-            "staff_id_param": staff_id,  # Use a distinct name to avoid context clashes
-            "attendance_month_param": attendance_month_str,
-            # Pass any other context your calculate_staff_salary tag might need
-        }
-        return render(request, "components/staff_salary_snippet.html", context)
-    else:
-        # Return an empty response if conditions aren't met,
-        # so the Unpoly fragment becomes empty.
-        return HttpResponse("")

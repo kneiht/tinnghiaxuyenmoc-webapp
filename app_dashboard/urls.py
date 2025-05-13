@@ -1,4 +1,4 @@
-from . import views, views_backup, views_excel
+from . import views, views_api, views_backup, views_excel
 from django.urls import path
 
 
@@ -182,4 +182,5 @@ urlpatterns = [
     path("api/lock/<str:model_name>/<int:pk>/", views.lock, name="lock"),
     path("api/db_table/", views_backup.db_table, name="db_table"),
     path("gps", views.gps, name="gps"),
+    path('api/calculate-staff-salary/', views_api.calculate_staff_salary, name='api_calculate_staff_salary'),
 ]
