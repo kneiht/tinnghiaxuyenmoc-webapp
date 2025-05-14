@@ -131,12 +131,12 @@ def calculate_staff_salary(request):
             
             # Get salary configuration
             # Use the first record's date to determine the month
+            staff_salary_inputs = None # Initialize
             if staff_records.exists():
                 first_record_date = staff_records.first().date
-                start_date_of_month = datetime(first_record_date.year, first_record_date.month, 1)
                 
                 if first_record_date.month == 12:
-                    end_date_of_month = datetime(first_record_date.year + 1, 1, 1) - timedelta(days=1)
+                    end_date_of_month = datetime(first_record_date.year + 1, 1, 1).date() - timedelta(days=1)
                 else:
                     end_date_of_month = datetime(
                         first_record_date.year, first_record_date.month + 1, 1
@@ -146,8 +146,6 @@ def calculate_staff_salary(request):
                     staff_id=staff_id,
                     target_date=end_date_of_month
                 )
-            else:
-                staff_salary_inputs = None
             
             # Calculate salary components
             base_salary = 0
@@ -169,20 +167,16 @@ def calculate_staff_salary(request):
                 fixed_allowance = staff_salary_inputs.fixed_allowance or 0
                 insurance_amount = staff_salary_inputs.insurance_amount or 0
             
-            # Calculate hours (convert seconds to hours)
-            normal_hours = total_normal_working_time / 3600
-            # Calculate overtime hours based on working hours per day divided by 8, then multiplied by multiplier
-            # We need to calculate overtime hours accordingly
-            # So we will calculate overtime hours as (overtime_seconds / 3600) * (working_hours_per_day / 8)
-            # But since overtime_seconds is already in seconds, we need to adjust accordingly
-            
-            # Calculate working hours per day (normal working time in hours divided by number of working days)
-            total_working_days = normal_working_days + sunday_working_days + holiday_working_days
-            working_hours_per_day = normal_hours / total_working_days if total_working_days > 0 else 0
-            
-            overtime_normal_hours = (total_overtime_normal / 3600) * (working_hours_per_day / 8) * overtime_normal_rate_multiplier
-            overtime_sunday_hours = (total_overtime_sunday / 3600) * (working_hours_per_day / 8) * overtime_sunday_rate_multiplier
-            overtime_holiday_hours = (total_overtime_holiday / 3600) * (working_hours_per_day / 8) * overtime_holiday_rate_multiplier
+            # Calculate actual normal and overtime hours
+            actual_normal_hours = total_normal_working_time / 3600
+            actual_overtime_normal_hours = total_overtime_normal / 3600
+            actual_overtime_sunday_hours = total_overtime_sunday / 3600
+            actual_overtime_holiday_hours = total_overtime_holiday / 3600
+
+            # The variable `working_hours_per_day` is no longer needed for the new OT calculation
+            # total_working_days = normal_working_days + sunday_working_days + holiday_working_days
+            # working_hours_per_day = actual_normal_hours / total_working_days if total_working_days > 0 else 0
+
 
             # Calculate working days in the period
             total_days = (end_date - start_date).days + 1
@@ -214,30 +208,27 @@ def calculate_staff_salary(request):
             # Calculate daily rate
             working_days_in_month = days_in_month - sundays_in_month
             daily_rate = base_salary / working_days_in_month if working_days_in_month > 0 else 0
-            
-            # Calculate salary based on attendance using the driver salary calculation method
-            if staff_salary_inputs and staff_salary_inputs.calculation_method == "type_1":
-                # Type 1: Rest on Sundays and holidays, extra pay if working
-                normal_salary = base_salary * (normal_working_days / working_days_in_month)
-                sunday_salary = base_salary * sunday_salary_percentage * (sunday_working_days / days_in_month)
-                holiday_salary = base_salary * holiday_salary_percentage * (holiday_working_days / days_in_month)
-            else:
-                # Type 2: No rest on Sundays and holidays (default)
-                normal_salary = base_salary * (normal_working_days / days_in_month)
-                sunday_salary = base_salary * sunday_salary_percentage * (sunday_working_days / days_in_month)
-                holiday_salary = base_salary * holiday_salary_percentage * (holiday_working_days / days_in_month)
-            
+            daily_rate_decimal = Decimal(str(daily_rate))
+
+            # Calculate salary components for normal work days, Sundays, and holidays (excluding overtime)
+            normal_days_salary_component = daily_rate_decimal * Decimal(str(normal_working_days))
+            sunday_days_salary_component = daily_rate_decimal * Decimal(str(sunday_working_days)) * Decimal(str(sunday_work_day_multiplier))
+            holiday_days_salary_component = daily_rate_decimal * Decimal(str(holiday_working_days)) * Decimal(str(holiday_work_day_multiplier))
+
             # Calculate overtime salary
-            overtime_normal_salary = Decimal(str(overtime_normal_hours)) * Decimal(str(normal_overtime_rate))
-            overtime_sunday_salary = Decimal(str(overtime_sunday_hours)) * Decimal(str(sunday_overtime_rate))
-            overtime_holiday_salary = Decimal(str(overtime_holiday_hours)) * Decimal(str(holiday_overtime_rate))
+            # OT Salary = Actual_OT_Hours * (Daily_Rate / 8) * OT_Multiplier
+            hourly_rate_for_ot_calc = daily_rate_decimal / Decimal('8.0') if daily_rate_decimal > 0 else Decimal('0.0')
+
+            overtime_normal_salary = Decimal(str(actual_overtime_normal_hours)) * hourly_rate_for_ot_calc * Decimal(str(overtime_normal_rate_multiplier))
+            overtime_sunday_salary = Decimal(str(actual_overtime_sunday_hours)) * hourly_rate_for_ot_calc * Decimal(str(overtime_sunday_rate_multiplier))
+            overtime_holiday_salary = Decimal(str(actual_overtime_holiday_hours)) * hourly_rate_for_ot_calc * Decimal(str(overtime_holiday_rate_multiplier))
             total_overtime_salary = overtime_normal_salary + overtime_sunday_salary + overtime_holiday_salary
             
             # Calculate total salary
             total_salary = (
-                Decimal(str(normal_salary)) +
-                Decimal(str(sunday_salary)) +
-                Decimal(str(holiday_salary)) +
+                normal_days_salary_component +
+                sunday_days_salary_component +
+                holiday_days_salary_component +
                 total_overtime_salary +
                 Decimal(str(fixed_allowance)) -
                 Decimal(str(insurance_amount))
@@ -269,22 +260,22 @@ def calculate_staff_salary(request):
                 'normal_working_time': format_time(total_normal_working_time),
                 'total_overtime': format_time(total_overtime),
                 # Hours for calculations
-                'normal_hours': round(normal_hours, 2),
-                'overtime_hours_normal': round(overtime_normal_hours, 2),
-                'overtime_hours_sunday': round(overtime_sunday_hours, 2),
-                'overtime_hours_holiday': round(overtime_holiday_hours, 2),
+                'normal_hours': round(actual_normal_hours, 2),
+                'overtime_hours_normal': round(actual_overtime_normal_hours, 2),
+                'overtime_hours_sunday': round(actual_overtime_sunday_hours, 2),
+                'overtime_hours_holiday': round(actual_overtime_holiday_hours, 2),
                 # Salary rates
                 'base_salary': base_salary,
                 'daily_rate': round(daily_rate, 2),
-                'sunday_salary_percentage': sunday_salary_percentage,
-                'holiday_salary_percentage': holiday_salary_percentage,
-                'normal_overtime_rate': normal_overtime_rate,
-                'sunday_overtime_rate': sunday_overtime_rate,
-                'holiday_overtime_rate': holiday_overtime_rate,
+                'sunday_work_day_multiplier': sunday_work_day_multiplier,
+                'holiday_work_day_multiplier': holiday_work_day_multiplier,
+                'overtime_normal_rate_multiplier': overtime_normal_rate_multiplier,
+                'overtime_sunday_rate_multiplier': overtime_sunday_rate_multiplier,
+                'overtime_holiday_rate_multiplier': overtime_holiday_rate_multiplier,
                 # Salary components
-                'normal_salary': round(normal_salary, 2),
-                'sunday_salary': round(sunday_salary, 2),
-                'holiday_salary': round(holiday_salary, 2),
+                'normal_days_salary_component': round(normal_days_salary_component, 2),
+                'sunday_days_salary_component': round(sunday_days_salary_component, 2),
+                'holiday_days_salary_component': round(holiday_days_salary_component, 2),
                 'overtime_normal_salary': round(overtime_normal_salary, 2),
                 'overtime_sunday_salary': round(overtime_sunday_salary, 2),
                 'overtime_holiday_salary': round(overtime_holiday_salary, 2),
@@ -303,7 +294,7 @@ def calculate_staff_salary(request):
         })
         
     except Exception as e:
-        raise e
+        # Log the exception here if needed, e.g., logger.error(f"Error: {str(e)}", exc_info=True)
         return JsonResponse({
             'success': False,
             'message': f'Lỗi: {str(e)}'
