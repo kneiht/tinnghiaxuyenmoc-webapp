@@ -248,21 +248,21 @@ def calculate_staff_salary(request):
                 'leave_days': leave_day_count,
                 'unpaid_leave_days': unpaid_leave_count,
                 'not_marked_days': not_marked_count,
+                # Month info
+                'num_days_in_month': days_in_month,
+                'sundays_in_month_count': sundays_in_month,
                 # Working days by type
-                'normal_working_days': round(normal_working_days, 2),
-                'sunday_working_days': round(sunday_working_days, 2),
-                'holiday_working_days': round(holiday_working_days, 2),
+                'work_days_normal': round(normal_working_days, 2),
+                'work_days_sunday': round(sunday_working_days, 2),
+                'work_days_holiday': round(holiday_working_days, 2),
                 # Working times
                 'normal_working_time': format_time(total_normal_working_time),
-                'overtime_normal': format_time(total_overtime_normal),
-                'overtime_sunday': format_time(total_overtime_sunday),
-                'overtime_holiday': format_time(total_overtime_holiday),
                 'total_overtime': format_time(total_overtime),
                 # Hours for calculations
                 'normal_hours': round(normal_hours, 2),
-                'overtime_normal_hours': round(overtime_normal_hours, 2),
-                'overtime_sunday_hours': round(overtime_sunday_hours, 2),
-                'overtime_holiday_hours': round(overtime_holiday_hours, 2),
+                'overtime_hours_normal': round(overtime_normal_hours, 2),
+                'overtime_hours_sunday': round(overtime_sunday_hours, 2),
+                'overtime_hours_holiday': round(overtime_holiday_hours, 2),
                 # Salary rates
                 'base_salary': base_salary,
                 'daily_rate': round(daily_rate, 2),
