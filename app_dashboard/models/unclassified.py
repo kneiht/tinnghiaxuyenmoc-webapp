@@ -909,7 +909,7 @@ class VehicleOperationRecord(BaseModel):
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(
         upload_to="images/vehicle_operations/",
-        verbose_name="Hình ảnh",
+        verbose_name="Hình ảnh",
         default="",
         null=True,
         blank=True,
@@ -1428,6 +1428,7 @@ class AttendanceRecord(BaseModel):
 
     ATTENDANCE_STATUS_CHOICES = [
         ("not_marked", "Chưa chấm công"),
+        ("holiday_leave", "Nghỉ lễ"),
         ("hours_only", "Chỉ tính giờ"),
         ("full_day", "Làm đủ ngày"),
         ("leave_day", "Nghỉ phép"),
@@ -1503,6 +1504,9 @@ class AttendanceRecord(BaseModel):
             self.leave_day_count = Decimal("0.0")
         elif self.attendance_status == "hours_only":
             self.work_day_count = Decimal("0.0")
+            self.leave_day_count = Decimal("0.0")
+        elif self.attendance_status == "holiday_leave":
+            self.work_day_count = Decimal("1.0")
             self.leave_day_count = Decimal("0.0")
 
         super().save(*args, **kwargs)

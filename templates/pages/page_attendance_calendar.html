@@ -1,7 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% load custom_tags %}
-{% load staff_salary %}
 
 
 {% block title %}
@@ -77,8 +76,9 @@
                     
                     <div class="mb-4">
                         <label for="attendanceStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                        <select id="attendanceStatus" name="attendance_status" class="form-input w-full mt-1">
+                        <select id="attendanceStatus" name="attendance_status" class="form-input w-full mt-1 no-new-select">
                             <option value="not_marked">Chưa chấm công</option>
+                            <option value="holiday_leave">Nghỉ lễ</option>
                             <option value="full_day">Làm đủ ngày</option> 
                             <option value="hours_only">Chỉ tính giờ</option>
                             <option value="leave_day">Nghỉ phép</option> 

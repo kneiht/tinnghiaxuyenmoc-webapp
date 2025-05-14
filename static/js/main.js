@@ -454,6 +454,11 @@ function handleNewSelectElement(select) {
         return;
     }
 
+    // If there are only about 5 options, don't create the wrapper
+    if (select.classList.contains('no-new-select')) {
+        return;
+    }
+
     // id =sort-select
     if (select.id === 'sort-select') {
         return;
