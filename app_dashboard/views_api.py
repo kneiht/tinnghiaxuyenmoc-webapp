@@ -90,7 +90,7 @@ def calculate_staff_salary(request):
                 is_sunday = record_date.weekday() == 6  # Sunday is 6 in Python's weekday
                 is_holiday = Holiday.is_holiday(record_date)
                 
-                if record.attendance_status == 'full_day':
+                if record.attendance_status in ['full_day', 'hours_only']:
                     # Full day work
                     normal_working_time = standard_day_seconds
                     overtime = record.overtime_hours * 3600 if record.overtime_hours else 0

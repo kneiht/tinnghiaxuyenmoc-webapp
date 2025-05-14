@@ -9,6 +9,7 @@ up.compiler('.display-calendar', function (modalForm) {
     const ATTENDANCE_STATUS_OPTIONS = [
         { value: "not_marked", text: "Chưa chấm công" },
         { value: "full_day", text: "Làm đủ ngày" },
+        { value: "hours_only", text: "Chỉ tính giờ" }, // Trạng thái mới
         { value: "leave_day", text: "Nghỉ phép" },
         { value: "unpaid_leave", text: "Nghỉ không lương" },
         { value: "half_day_leave", text: "Làm nửa ngày, nghỉ phép nửa ngày" },
@@ -18,14 +19,16 @@ up.compiler('.display-calendar', function (modalForm) {
     const STATUS_COLORS = {
         "not_marked": "bg-gray-400",
         "full_day": "bg-green-500",
+        "hours_only": "bg-sky-500", // Màu cho trạng thái mới (ví dụ: xanh da trời)
         "leave_day": "bg-yellow-500",
         "unpaid_leave": "bg-red-500",
         "half_day_leave": "bg-yellow-500", // Using same as leave_day
-        "half_day_unpaid": "bg-orange-500"
+        "half_day_unpaid": "bg-orange-500",
     };
 
     let currentDate = new Date();
     let attendanceData = [];
+    let holidaysData = {}; // Make holidaysData accessible in openAttendanceModal
 
     // Function to update month select input to match current date
     function updateMonthSelectInput() {
@@ -104,7 +107,7 @@ up.compiler('.display-calendar', function (modalForm) {
 
         // Fetch appropriate data
         let summaryData = {};
-        let holidaysData = {}; // To store holiday information
+        // holidaysData is now a global variable within this up.compiler scope
 
         if (isAllStaff) {
             const apiResponse = await fetchAttendanceSummaryData();
@@ -224,49 +227,15 @@ up.compiler('.display-calendar', function (modalForm) {
 
                     // Add status badge
                     const statusBadge = document.createElement('div');
-                    let badgeClass = 'inline-block px-2 py-1 rounded-full text-xs font-semibold mb-1 ';
+                    const statusOption = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === record.attendance_status);
+                    const statusText = statusOption ? statusOption.text : record.attendance_status; // Fallback to raw status if not found
+                    const badgeColor = STATUS_COLORS[record.attendance_status] || 'bg-gray-500'; // Fallback color
 
-                    switch (record.attendance_status) {
-                        case 'full_day':
-                            badgeClass += 'bg-green-500 text-white';
-                            break;
-                        case 'leave_day':
-                            badgeClass += 'bg-yellow-500 text-white';
-                            break;
-                        case 'unpaid_leave':
-                            badgeClass += 'bg-red-500 text-white';
-                            break;
-                        case 'half_day_leave':
-                            badgeClass += 'bg-yellow-500 text-white';
-                            break;
-                        case 'half_day_unpaid':
-                            badgeClass += 'bg-orange-500 text-white';
-                            break;
-                    }
-
-                    statusBadge.className = badgeClass;
-
-                    // Map status to Vietnamese
-                    let statusText = '';
-                    switch (record.attendance_status) {
-                        case 'full_day':
-                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'full_day').text;
-                            break;
-                        case 'leave_day':
-                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'leave_day').text;
-                            break;
-                        case 'unpaid_leave':
-                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'unpaid_leave').text;
-                            break;
-                        case 'half_day_leave':
-                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'half_day_leave').text;
-                            break;
-                        case 'half_day_unpaid':
-                            statusText = ATTENDANCE_STATUS_OPTIONS.find(opt => opt.value === 'half_day_unpaid').text;
-                            break;
-                    }
+                    statusBadge.className = `inline-block px-2 py-1 rounded-full text-xs font-semibold mb-1 ${badgeColor} text-white`;
                     statusBadge.textContent = statusText;
                     attendanceInfo.appendChild(statusBadge);
+
+                    attendanceInfo.appendChild(document.createElement('br'));
 
                     // Add work day count with badge
                     const workDayBadge = document.createElement('div');
@@ -285,6 +254,13 @@ up.compiler('.display-calendar', function (modalForm) {
                     // Add a line break
                     attendanceInfo.appendChild(document.createElement('br'));
 
+                    // Add overtime hours if available and greater than 0
+                    if (record.overtime_hours && parseFloat(record.overtime_hours) > 0) {
+                        const overtimeDiv = document.createElement('div');
+                        overtimeDiv.className = 'inline-block px-2 py-1 bg-cyan-500 text-white rounded-full text-xs font-semibold mt-1';
+                        overtimeDiv.textContent = `TC: ${record.overtime_hours}h`;
+                        attendanceInfo.appendChild(overtimeDiv);
+                    }
                     // Add note if available
                     if (record.note) {
                         const noteDiv = document.createElement('div');
@@ -361,7 +337,7 @@ up.compiler('.display-calendar', function (modalForm) {
     const staffIdInput = document.getElementById('staffId');
     const staffNameInput = document.getElementById('staffName');
     const displayDateInput = document.getElementById('displayDate');
-    const attendanceStatusSelect = document.getElementById('attendanceStatus');
+    let attendanceStatusSelect = document.getElementById('attendanceStatus'); // Changed const to let
     const overtimeHoursInput = document.getElementById('overtimeHours');
     const noteInput = document.getElementById('note');
 
@@ -376,6 +352,16 @@ up.compiler('.display-calendar', function (modalForm) {
         const staffName = staffSelect.options[staffSelect.selectedIndex].text;
 
         // Reset form
+        // First, remove any existing event listener to prevent duplicates if modal is reopened
+        const newAttendanceStatusSelect = attendanceStatusSelect.cloneNode(true);
+        attendanceStatusSelect.parentNode.replaceChild(newAttendanceStatusSelect, attendanceStatusSelect);
+        attendanceStatusSelect = newAttendanceStatusSelect; // Re-assign to the new element
+
+        // Also re-assign overtimeHoursInput if it's cloned or needs fresh reference, though typically not necessary unless form is complexly rebuilt
+        // overtimeHoursInput = document.getElementById('overtimeHours'); // If needed
+
+
+
         attendanceForm.reset();
 
         // Set form values
@@ -385,6 +371,16 @@ up.compiler('.display-calendar', function (modalForm) {
         displayDateInput.value = formattedDate;
         overtimeHoursInput.value = '0'; // Default to 0 overtime hours
 
+        // Function to toggle overtime input based on status
+        const toggleOvertimeInput = (status) => {
+            if (status === 'full_day' || status === 'hours_only') {
+                overtimeHoursInput.disabled = false;
+            } else {
+                overtimeHoursInput.disabled = true;
+                overtimeHoursInput.value = '0'; // Reset overtime if disabled
+            }
+        };
+
         // If editing existing record
         if (record) {
             recordIdInput.value = record.id;
@@ -392,14 +388,45 @@ up.compiler('.display-calendar', function (modalForm) {
             overtimeHoursInput.value = (record.overtime_hours !== undefined && record.overtime_hours !== null) ? record.overtime_hours : '0';
             noteInput.value = record.note || '';
             deleteRecordBtn.classList.remove('hidden');
-            console.log(record);
+            toggleOvertimeInput(record.attendance_status); // Set initial state for overtime input
 
         } else {
             recordIdInput.value = '';
             attendanceStatusSelect.value = 'not_marked'; // Default to "Chưa chấm công"
             noteInput.value = '';
             deleteRecordBtn.classList.add('hidden');
+            toggleOvertimeInput('not_marked'); // Set initial state for overtime input
         }
+        
+        // Restrict status options if it's a holiday
+        const isHoliday = holidaysData && holidaysData[dateStr];
+        // Check if it's a Sunday
+        const dateObj = new Date(dateStr);
+        const isSunday = dateObj.getDay() === 0; // 0 represents Sunday
+        const applyRestriction = isHoliday || isSunday; // Combine holiday and Sunday check
+
+        const allowedHolidayStatuses = ["full_day", "hours_only", "half_day_unpaid", "not_marked"];
+
+        Array.from(attendanceStatusSelect.options).forEach(option => {
+            if (applyRestriction) { // Apply restriction if it's a holiday OR a Sunday
+                if (allowedHolidayStatuses.includes(option.value)) {
+                    option.style.display = ''; // Show allowed options
+                } else {
+                    option.style.display = 'none'; // Hide disallowed options
+                }
+            } else { // If not a holiday and not a Sunday (i.e., a normal weekday)
+                option.style.display = ''; // Show all options
+            }
+        });
+        // Ensure the selected value is visible, or reset to a default visible one
+        if (applyRestriction && attendanceStatusSelect.options[attendanceStatusSelect.selectedIndex].style.display === 'none') {
+            attendanceStatusSelect.value = 'not_marked'; // Or another default visible status
+        }
+
+        // Add event listener for status change to toggle overtime input
+        attendanceStatusSelect.addEventListener('change', (event) => {
+            toggleOvertimeInput(event.target.value);
+        });
 
         // Show modal
         attendanceModal.classList.remove('hidden');
@@ -632,11 +659,42 @@ up.compiler('.display-calendar', function (modalForm) {
     attendanceForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const currentStatus = attendanceStatusSelect.value;
+        const currentRecordId = recordIdInput.value;
+
+        if (currentStatus === 'not_marked') {
+            if (currentRecordId) { // If there's an existing record, delete it
+                try {
+                    const response = await fetch(`/api/attendance-records/delete/${currentRecordId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': getCsrfToken()
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        closeAttendanceModal();
+                        renderCalendar(currentDate);
+                        showMessage(data.message || 'Đã xóa chấm công.', 'success');
+                    } else {
+                        showMessage(data.error || 'Lỗi khi xóa chấm công.', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Lỗi khi xóa chấm công: ' + error.message, 'error');
+                    console.error('Error deleting attendance record:', error);
+                }
+            } else { // No existing record, and "not_marked" is selected - just close
+                closeAttendanceModal();
+            }
+            return; // Stop further execution
+        }
+
+        // Proceed with saving if status is not 'not_marked'
         const formData = {
-            record_id: recordIdInput.value || null,
+            record_id: currentRecordId || null,
             staff_id: staffIdInput.value,
             date: recordDateInput.value,
-            attendance_status: attendanceStatusSelect.value,
+            attendance_status: currentStatus,
             overtime_hours: overtimeHoursInput.value,
             note: noteInput.value
         };

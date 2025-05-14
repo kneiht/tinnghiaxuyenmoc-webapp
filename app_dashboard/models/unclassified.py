@@ -1318,6 +1318,7 @@ class AttendanceRecord(BaseModel):
 
     ATTENDANCE_STATUS_CHOICES = [
         ("not_marked", "Chưa chấm công"),
+        ("hours_only", "Chỉ tính giờ"),
         ("full_day", "Làm đủ ngày"),
         ("leave_day", "Nghỉ phép"),
         ("unpaid_leave", "Nghỉ không lương"),
@@ -1389,6 +1390,9 @@ class AttendanceRecord(BaseModel):
             self.leave_day_count = Decimal("0.5")
         elif self.attendance_status == "half_day_unpaid":
             self.work_day_count = Decimal("0.5")
+            self.leave_day_count = Decimal("0.0")
+        elif self.attendance_status == "hours_only":
+            self.work_day_count = Decimal("0.0")
             self.leave_day_count = Decimal("0.0")
 
         super().save(*args, **kwargs)
