@@ -13,8 +13,8 @@ up.compiler('.display-calendar', function (modalForm) {
         { value: "hours_only", text: "Chỉ tính giờ" }, // Trạng thái mới
         { value: "leave_day", text: "Nghỉ phép" },
         { value: "unpaid_leave", text: "Nghỉ không lương" },
-        { value: "half_day_leave", text: "Làm nửa ngày, nghỉ phép nửa ngày" },
-        { value: "half_day_unpaid", text: "Làm nửa ngày, nghỉ không lương nửa ngày" },
+        { value: "half_day_leave", text: "Nghỉ phép nửa ngày" },
+        { value: "half_day_unpaid", text: "Nghỉ không lương nửa ngày" },
     ];
 
     const STATUS_COLORS = {
@@ -55,6 +55,7 @@ up.compiler('.display-calendar', function (modalForm) {
                 throw new Error('Failed to fetch attendance data');
             }
             const data = await response.json();
+            console.log(data);
             return data; // Return the whole object { records, holidays, salary_summary }
         } catch (error) {
             console.error('Error fetching attendance data:', error);
@@ -142,6 +143,9 @@ up.compiler('.display-calendar', function (modalForm) {
             // Format date string
             const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             const isHoliday = holidaysData && holidaysData[dateStr];
+
+            const currentDateObjForLoop = new Date(year, month, day);
+            const isCurrentDaySunday = currentDateObjForLoop.getDay() === 0; // 0 for Sunday
 
             // Container for day number and holiday name
             const dayLabelContainer = document.createElement('div');
@@ -242,25 +246,49 @@ up.compiler('.display-calendar', function (modalForm) {
                     // Add work day count with badge
                     const workDayBadge = document.createElement('div');
                     workDayBadge.className = 'inline-block px-2 py-1 bg-blue-500 text-white rounded-full text-xs font-semibold mt-1';
-                    workDayBadge.textContent = `Công: ${record.work_day_count}`;
+
+                    let prefix;
+                    if (isHoliday) {
+                        prefix = "Công lễ";
+                    } else if (isCurrentDaySunday) {
+                        prefix = "Công chủ nhật";
+                    } else {
+                        prefix = "Công thường";
+                    }
+                    let work_day_count_display = record.work_day_count;
+                    if (isHoliday && record.attendance_status === 'holiday_leave' || record.attendance_status === 'hours_only') {
+                        work_day_count_display = 1;
+                        prefix = "Công thường";
+                    }
+                    workDayBadge.textContent = `${prefix}: ${work_day_count_display}`;
                     attendanceInfo.appendChild(workDayBadge);
 
                     // Add leave day count with badge if applicable
-                    if (record.leave_day_count && record.leave_day_count > 0) {
+                    if (record.leave_day_count && parseFloat(record.leave_day_count) > 0) {
                         const leaveDayBadge = document.createElement('div');
                         leaveDayBadge.className = 'inline-block px-2 py-1 bg-indigo-500 text-white rounded-full text-xs font-semibold ml-1 mt-1';
-                        leaveDayBadge.textContent = `Phép: ${record.leave_day_count}`;
+                        attendanceInfo.appendChild(document.createElement('br'));
+                        leaveDayBadge.textContent = `Phép trừ: ${record.leave_day_count}`;
                         attendanceInfo.appendChild(leaveDayBadge);
                     }
-
+                    
                     // Add a line break
                     attendanceInfo.appendChild(document.createElement('br'));
+
+                    let tc_prefix;
+                    if (isHoliday) {
+                        tc_prefix = "TC lễ";
+                    } else if (isCurrentDaySunday) {
+                        tc_prefix = "TC chủ nhật";
+                    } else {
+                        tc_prefix = "TC thường";
+                    }
 
                     // Add overtime hours if available and greater than 0
                     if (record.overtime_hours && parseFloat(record.overtime_hours) > 0) {
                         const overtimeDiv = document.createElement('div');
                         overtimeDiv.className = 'inline-block px-2 py-1 bg-cyan-500 text-white rounded-full text-xs font-semibold mt-1';
-                        overtimeDiv.textContent = `TC: ${record.overtime_hours}h`;
+                        overtimeDiv.textContent = `${tc_prefix}: ${record.overtime_hours}h`;
                         attendanceInfo.appendChild(overtimeDiv);
                     }
                     // Add note if available
@@ -317,6 +345,7 @@ up.compiler('.display-calendar', function (modalForm) {
         currentDate = new Date(year, month - 1, 1);
     }
     renderCalendar(currentDate);
+    calculateSalary();
 
     // Add today button functionality
     const todayButton = document.getElementById('todayButton');
@@ -405,24 +434,25 @@ up.compiler('.display-calendar', function (modalForm) {
         // Check if it's a Sunday
         const dateObj = new Date(dateStr);
         const isSunday = dateObj.getDay() === 0; // 0 represents Sunday
+
         const allowedHolidayStatuses = ["holiday_leave", "full_day", "hours_only", "not_marked"];
         const allowedSundayStatuses = ["full_day", "hours_only", "not_marked"];
-        const allowedWeekdayStatuses = ["full_day", "hours_only", "half_day_unpaid", "leave_day", "unpaid_leave", "not_marked"];
-        Array.from(attendanceStatusSelect.options).forEach(option => { 
+        const allowedWeekdayStatuses =  ["full_day", "hours_only", "leave_day", "unpaid_leave", "half_day_leave", "half_day_unpaid", "not_marked"];
+
+        Array.from(attendanceStatusSelect.options).forEach(option => {
             if (isHoliday) { // Apply restriction if it's a holiday OR a Sunday
                 if (allowedHolidayStatuses.includes(option.value)) {
                     option.style.display = ''; // Show allowed options
                 } else {
                     option.style.display = 'none'; // Hide disallowed options
                 }
-            }  else if (isSunday) {
+            } else if (isSunday) { // Apply restriction if it's a Sunday
                 if (allowedSundayStatuses.includes(option.value)) {
                     option.style.display = ''; // Show allowed options
                 } else {
                     option.style.display = 'none'; // Hide disallowed options
                 }
-            }
-            else { // If not a holiday and not a Sunday (i.e., a normal weekday)
+            }   else { // If not a holiday and not a Sunday (i.e., a normal weekday)
                 if (allowedWeekdayStatuses.includes(option.value)) {
                     option.style.display = ''; // Show allowed options
                 } else {
@@ -526,7 +556,9 @@ up.compiler('.display-calendar', function (modalForm) {
         const isSunday = dateObj.getDay() === 0;
         const allowedHolidayStatuses = ["holiday_leave", "full_day", "hours_only", "not_marked"];
         const allowedSundayStatuses = ["full_day", "hours_only", "not_marked"];
-        const allowedWeekdayStatuses = ["full_day", "hours_only", "half_day_unpaid", "leave_day", "unpaid_leave", "not_marked"];
+        const allowedWeekdayStatuses =  ["full_day", "hours_only", "leave_day", "unpaid_leave", "half_day_leave", "half_day_unpaid", "not_marked"];
+
+        
 
         // Function to toggle overtime input based on status for a specific row
         const toggleBatchOvertimeInput = (statusSelectElement, overtimeInputElement) => {
@@ -571,26 +603,25 @@ up.compiler('.display-calendar', function (modalForm) {
             statusCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300';
 
             const statusSelect = document.createElement('select');
-            statusSelect.className = 'form-input w-full';
+            statusSelect.className = 'form-input w-full no-new-select';
             statusSelect.name = `attendance_status_${staff.id}`;
 
             ATTENDANCE_STATUS_OPTIONS.forEach(opt => {
-                if (isHoliday) {
+                if (isHoliday) { // Apply restriction if it's a holiday OR a Sunday
                     if (allowedHolidayStatuses.includes(opt.value)) {
                         const option = document.createElement('option');
                         option.value = opt.value;
                         option.textContent = opt.text;
                         statusSelect.appendChild(option);
                     }
-                }  else if (isSunday) {
+                } else if (isSunday) { // Apply restriction if it's a Sunday
                     if (allowedSundayStatuses.includes(opt.value)) {
                         const option = document.createElement('option');
                         option.value = opt.value;
                         option.textContent = opt.text;
                         statusSelect.appendChild(option);
                     }
-                }
-                else { // If not a holiday and not a Sunday (i.e., a normal weekday)
+                }   else { // If not a holiday and not a Sunday (i.e., a normal weekday)
                     if (allowedWeekdayStatuses.includes(opt.value)) {
                         const option = document.createElement('option');
                         option.value = opt.value;
@@ -680,6 +711,7 @@ up.compiler('.display-calendar', function (modalForm) {
     closeBatchModalBtn.addEventListener('click', closeBatchAttendanceModal);
     cancelBatchFormBtn.addEventListener('click', closeBatchAttendanceModal);
 
+
     // Handle individual form submission
     attendanceForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -700,6 +732,8 @@ up.compiler('.display-calendar', function (modalForm) {
                     if (response.ok) {
                         closeAttendanceModal();
                         renderCalendar(currentDate);
+                        calculateSalary();
+                        
                         showMessage(data.message || 'Đã xóa chấm công.', 'success');
                     } else {
                         showMessage(data.error || 'Lỗi khi xóa chấm công.', 'error');
@@ -740,6 +774,8 @@ up.compiler('.display-calendar', function (modalForm) {
                 // Success - refresh calendar
                 closeAttendanceModal();
                 renderCalendar(currentDate);
+                calculateSalary();
+
 
                 // Show success message
                 showMessage(data.message, 'success');
@@ -814,6 +850,7 @@ up.compiler('.display-calendar', function (modalForm) {
                 // Success - refresh calendar and close modal
                 closeBatchAttendanceModal();
                 renderCalendar(currentDate);
+                calculateSalary();
 
                 // Show success message
                 showMessage(data.message, 'success');
@@ -849,6 +886,7 @@ up.compiler('.display-calendar', function (modalForm) {
                 // Success - refresh calendar
                 closeAttendanceModal();
                 renderCalendar(currentDate);
+                calculateSalary();
 
                 // Show success message
                 showMessage(data.message, 'success');
@@ -1034,21 +1072,21 @@ up.compiler('.display-calendar', function (modalForm) {
                     </div>
                     ${staff.work_days_sunday !== undefined ? `
                     <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded p-2 text-center">
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">Công Chủ Nhật</span>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Công Chủ Nhật (hệ số: ${staff.sunday_work_day_multiplier})</span>
                         <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.work_days_sunday}</span>
                     </div>` : (hasDetailedWorkDays ? `<div class="bg-indigo-50 dark:bg-indigo-900/20 rounded p-2 text-center"><span class="block text-xs text-gray-500 dark:text-gray-400">Công Chủ Nhật</span><span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">0</span></div>` : '')}
                     ${staff.work_days_holiday !== undefined ? `
                     <div class="bg-purple-50 dark:bg-purple-900/20 rounded p-2 text-center">
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">Công ngày Lễ</span>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Công ngày Lễ (hệ số: ${staff.holiday_work_day_multiplier})</span>
                         <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.work_days_holiday}</span>
                     </div>` : (hasDetailedWorkDays ? `<div class="bg-purple-50 dark:bg-purple-900/20 rounded p-2 text-center"><span class="block text-xs text-gray-500 dark:text-gray-400">Công ngày Lễ</span><span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">0</span></div>` : '')}
                     ${ staff.half_days !== undefined ? `
                     <div class="bg-blue-50 dark:bg-blue-900/20 rounded p-2 text-center">
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày làm nửa buổi</span>
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.half_days || 0}</span>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép tăng thêm</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">Todo</span>
                     </div>` : ''}
                     <div class="bg-amber-50 dark:bg-amber-900/20 rounded p-2 text-center">
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày nghỉ phép</span>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép bị trừ</span>
                         <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_days || 0}</span>
                     </div>
                     <div class="bg-red-50 dark:bg-red-900/20 rounded p-2 text-center">
@@ -1120,35 +1158,22 @@ up.compiler('.display-calendar', function (modalForm) {
                             <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.fixed_allowance)}</span>
                         </div>
                     </div>
-                    
-                    <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 rounded-full bg-indigo-400 mr-2"></div>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Hệ số CN:</span>
-                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${staff.sunday_salary_percentage}x</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 rounded-full bg-purple-400 mr-2"></div>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Hệ số lễ:</span>
-                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${staff.holiday_salary_percentage}x</span>
-                        </div>
-                    </div>
-                    
+
                     <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
                             <span class="text-xs text-gray-500 dark:text-gray-400">TC thường:</span>
-                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_overtime_rate)}</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_hours_normal_rate)}</span>
                         </div>
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-amber-400 mr-2"></div>
                             <span class="text-xs text-gray-500 dark:text-gray-400">TC CN:</span>
-                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.sunday_overtime_rate)}</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_hours_sunday_rate)}</span>
                         </div>
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
                             <span class="text-xs text-gray-500 dark:text-gray-400">TC lễ:</span>
-                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.holiday_overtime_rate)}</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_hours_holiday_rate)}</span>
                         </div>
                     </div>
                 </div>
@@ -1163,7 +1188,7 @@ up.compiler('.display-calendar', function (modalForm) {
                                 <div class="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Lương thường:</span>
                             </div>
-                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_salary)}</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_days_salary_component)}</span>
                         </div>
                         
                         <div class="flex justify-between items-center p-2 bg-indigo-50 dark:bg-indigo-900/10 rounded">
@@ -1171,7 +1196,7 @@ up.compiler('.display-calendar', function (modalForm) {
                                 <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Lương CN:</span>
                             </div>
-                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.sunday_salary)}</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.sunday_days_salary_component)}</span>
                         </div>
                         
                         <div class="flex justify-between items-center p-2 bg-purple-50 dark:bg-purple-900/10 rounded">
@@ -1179,7 +1204,7 @@ up.compiler('.display-calendar', function (modalForm) {
                                 <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Lương lễ:</span>
                             </div>
-                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.holiday_salary)}</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.holiday_days_salary_component)}</span>
                         </div>
                     </div>
                     
@@ -1317,4 +1342,3 @@ up.compiler('.display-calendar', function (modalForm) {
     // Initial adjustment
     adjustDisplayRecordsHeight();
 });
-

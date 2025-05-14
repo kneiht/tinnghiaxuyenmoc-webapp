@@ -909,7 +909,7 @@ class VehicleOperationRecord(BaseModel):
     fuel_allowance = models.IntegerField(verbose_name="Phụ cấp xăng", default=0)
     image = models.ImageField(
         upload_to="images/vehicle_operations/",
-        verbose_name="Hình ảnh",
+        verbose_name="Hình ảnh",
         default="",
         null=True,
         blank=True,
@@ -1430,11 +1430,12 @@ class AttendanceRecord(BaseModel):
         ("not_marked", "Chưa chấm công"),
         ("holiday_leave", "Nghỉ lễ"),
         ("hours_only", "Chỉ tính giờ"),
+        ("holiday_leave", "Nghỉ lễ"),
         ("full_day", "Làm đủ ngày"),
         ("leave_day", "Nghỉ phép"),
         ("unpaid_leave", "Nghỉ không lương"),
-        ("half_day_leave", "Làm nửa ngày, nghỉ phép nửa ngày"),
-        ("half_day_unpaid", "Làm nửa ngày, nghỉ không lương nửa ngày"),
+        ("half_day_leave", "Nghỉ phép nửa ngày"),
+        ("half_day_unpaid", "Nghỉ không lương nửa ngày"),
     ]
     attendance_status = models.CharField(
         max_length=20,
@@ -1487,27 +1488,33 @@ class AttendanceRecord(BaseModel):
         if self.attendance_status == "not_marked":
             self.work_day_count = Decimal("0.0")
             self.leave_day_count = Decimal("0.0")
+            self.overtime_hours = Decimal("0.00")
         elif self.attendance_status == "full_day":
             self.work_day_count = Decimal("1.0")
             self.leave_day_count = Decimal("0.0")
         elif self.attendance_status == "leave_day":
             self.work_day_count = Decimal("1.0")
             self.leave_day_count = Decimal("1.0")
+            self.overtime_hours = Decimal("0.00")
         elif self.attendance_status == "unpaid_leave":
             self.work_day_count = Decimal("0.0")
             self.leave_day_count = Decimal("0.0")
+            self.overtime_hours = Decimal("0.00")
         elif self.attendance_status == "half_day_leave":
             self.work_day_count = Decimal("1.0")
             self.leave_day_count = Decimal("0.5")
+            self.overtime_hours = Decimal("0.00")
         elif self.attendance_status == "half_day_unpaid":
             self.work_day_count = Decimal("0.5")
             self.leave_day_count = Decimal("0.0")
+            self.overtime_hours = Decimal("0.00")
         elif self.attendance_status == "hours_only":
             self.work_day_count = Decimal("0.0")
             self.leave_day_count = Decimal("0.0")
         elif self.attendance_status == "holiday_leave":
             self.work_day_count = Decimal("1.0")
             self.leave_day_count = Decimal("0.0")
+            self.overtime_hours = Decimal("0.00")
 
         super().save(*args, **kwargs)
 

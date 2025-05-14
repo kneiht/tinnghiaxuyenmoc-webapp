@@ -71,7 +71,6 @@ def calculate_staff_salary(request):
             full_day_count = staff_records.filter(attendance_status='full_day').count()
             half_day_leave_count = staff_records.filter(attendance_status='half_day_leave').count()
             half_day_unpaid_count = staff_records.filter(attendance_status='half_day_unpaid').count()
-            leave_day_count = staff_records.filter(attendance_status='leave_day').count()
             unpaid_leave_count = staff_records.filter(attendance_status='unpaid_leave').count()
             not_marked_count = staff_records.filter(attendance_status='not_marked').count()
             
@@ -82,55 +81,59 @@ def calculate_staff_salary(request):
             normal_working_days = 0
             sunday_working_days = 0
             holiday_working_days = 0
+            leave_day_count = 0
             
-            # Calculate total working time
+            # Calculate total working time and days using work_day_count from records
             for record in staff_records:
+                # Calcualte leave days
+                leave_day_count += record.leave_day_count
+
                 # Determine day type (normal, Sunday, or holiday)
                 record_date = record.date
                 is_sunday = record_date.weekday() == 6  # Sunday is 6 in Python's weekday
                 is_holiday = Holiday.is_holiday(record_date)
                 
-                if record.attendance_status in ['full_day', 'hours_only']:
-                    # Full day work
-                    normal_working_time = standard_day_seconds
-                    overtime = record.overtime_hours * 3600 if record.overtime_hours else 0
-                    
-                    # Count by day type
-                    if is_holiday:
-                        holiday_working_days += 1
-                        total_overtime_holiday += overtime
-                    elif is_sunday:
-                        sunday_working_days += 1
-                        total_overtime_sunday += overtime
+                # Use pre-calculated work_day_count (Decimal) from the record
+                # This represents the number of standard days to be paid
+                current_work_day_count_decimal = record.work_day_count
+                current_work_day_count_float = float(current_work_day_count_decimal)
+
+                # Accumulate working days based on day type
+                # Special case: If 'hours_only' on a holiday, count as 1 normal working day for base pay calculation
+                if is_holiday and record.attendance_status == 'hours_only':
+                    normal_working_days += 1.0  # Add 1 day to normal working days
+                    total_normal_working_time += 1.0 * standard_day_seconds # Add standard day's worth of time
+                # Standard logic for other cases based on work_day_count
+                elif current_work_day_count_decimal > Decimal('0.0'):  # Only count if there's actual work day credit
+                    if record.attendance_status == 'holiday_leave':
+                        # If it's a paid holiday leave, count it as a normal working day for pay purposes.
+                        # This assumes 'holiday_leave' means the employee gets their standard day's pay.
+                        normal_working_days += current_work_day_count_float
+                    elif is_holiday: # For actual work done on a holiday (and not 'hours_only' or 'holiday_leave')
+                        holiday_working_days += current_work_day_count_float
+                    elif is_sunday: # For actual work done on a Sunday (and not 'hours_only' on a holiday)
+                        sunday_working_days += current_work_day_count_float
                     else:
-                        normal_working_days += 1
-                        total_overtime_normal += overtime
-                
-                elif record.attendance_status in ['half_day_leave', 'half_day_unpaid']:
-                    # Half day work (4 hours = 14400 seconds)
-                    normal_working_time = standard_day_seconds / 2
-                    overtime = 0
+                        normal_working_days += current_work_day_count_float # For actual work on a normal day or other statuses contributing work_day_count
                     
-                    # Count half days by type (as 0.5)
+                    # Add to total_normal_working_time if not handled by the special 'hours_only' on holiday case
+                    total_normal_working_time += current_work_day_count_float * standard_day_seconds
+                # If work_day_count is 0 and not the special (is_holiday and hours_only) case, 
+                # total_normal_working_time does not increase from this record's work_day_count.
+
+                # Overtime calculation remains based on overtime_hours (Decimal)
+                overtime_seconds = float(record.overtime_hours) * 3600 if record.overtime_hours else 0
+                if overtime_seconds > 0:
                     if is_holiday:
-                        holiday_working_days += 0.5
+                        total_overtime_holiday += overtime_seconds
                     elif is_sunday:
-                        sunday_working_days += 0.5
+                        total_overtime_sunday += overtime_seconds
                     else:
-                        normal_working_days += 0.5
-                
-                else:
-                    # Absent or leave
-                    normal_working_time = 0
-                    overtime = 0
-                
-                total_normal_working_time += normal_working_time
+                        total_overtime_normal += overtime_seconds
                 
             # Total overtime (sum of all types)
             total_overtime = total_overtime_normal + total_overtime_sunday + total_overtime_holiday
             
-            # Get salary configuration
-            # Use the first record's date to determine the month
             staff_salary_inputs = None # Initialize
             if staff_records.exists():
                 first_record_date = staff_records.first().date
@@ -272,6 +275,9 @@ def calculate_staff_salary(request):
                 'overtime_normal_rate_multiplier': overtime_normal_rate_multiplier,
                 'overtime_sunday_rate_multiplier': overtime_sunday_rate_multiplier,
                 'overtime_holiday_rate_multiplier': overtime_holiday_rate_multiplier,
+                'overtime_hours_normal_rate': overtime_normal_rate_multiplier * (round(daily_rate, 2)/8),
+                'overtime_hours_sunday_rate': overtime_sunday_rate_multiplier * (round(daily_rate, 2)/8),
+                'overtime_hours_holiday_rate': overtime_holiday_rate_multiplier * (round(daily_rate, 2)/8),
                 # Salary components
                 'normal_days_salary_component': round(normal_days_salary_component, 2),
                 'sunday_days_salary_component': round(sunday_days_salary_component, 2),

@@ -2901,6 +2901,7 @@ def get_staff_attendance_records(request):
             "id": record.id,
             "date": date_str,
             "work_day_count": float(record.work_day_count),
+            "leave_day_count": float(record.leave_day_count),
             "attendance_status": record.attendance_status,
             "overtime_hours": (
                 float(record.overtime_hours) if record.overtime_hours else 0
@@ -3002,7 +3003,6 @@ def get_staff_attendance_records(request):
         "holidays": holidays_dict,
         "salary_summary": salary_summary,
     }
-    print(json)
     return JsonResponse(json)
 
 
@@ -3015,10 +3015,9 @@ def save_attendance_record(request):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
-    print("\n\n>>>>>>>>>>>>>>>>> request.body:", request.body)
-
     try:
         data = json.loads(request.body)
+        print("\n\n>>>>>>>>>>>>>>>>> data:", data)
         staff_id = data.get("staff_id")
         date_str = data.get("date")
         record_id = data.get("record_id")
@@ -3056,6 +3055,7 @@ def save_attendance_record(request):
                 record.overtime_hours = Decimal(overtime_hours)
             except:
                 record.overtime_hours = Decimal("0.00")
+            
             record.save()
             message = "Record updated successfully"
         else:
@@ -3072,6 +3072,7 @@ def save_attendance_record(request):
                             "date": existing_record.date.strftime("%Y-%m-%d"),
                             "work_day_count": float(existing_record.work_day_count),
                             "leave_day_count": float(existing_record.leave_day_count),
+                            "overtime_hours": Decimal(existing_record.overtime_hours),
                             "attendance_status": existing_record.attendance_status,
                             "note": existing_record.note or "",
                         },
@@ -3084,6 +3085,7 @@ def save_attendance_record(request):
                 worker=staff,
                 date=record_date,
                 attendance_status=attendance_status,
+                overtime_hours=Decimal(overtime_hours),
                 note=note,
             )
             message = "Record created successfully"
