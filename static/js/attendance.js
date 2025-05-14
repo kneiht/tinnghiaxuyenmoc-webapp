@@ -387,25 +387,76 @@ up.compiler('.display-calendar', function (modalForm) {
                 });
             }
             let summaryHtml = `
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-theme">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Bảng tổng hợp công tháng cho: ${staffName}</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày trong tháng:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.num_days_in_month}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày Chủ Nhật trong tháng:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.sundays_in_month_count}</td></tr>
-                                <tr class="bg-gray-50 dark:bg-gray-750"><td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT CÔNG</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ phép:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.total_leave_days}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày nghỉ không lương:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.total_unpaid_days}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công thường:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_normal}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công Chủ Nhật:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_sunday}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số ngày công ngày Lễ:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.work_days_holiday}</td></tr>
-                                <tr class="bg-gray-50 dark:bg-gray-750"><td colspan="2" class="px-4 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">CHI TIẾT TĂNG CA</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca thường:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_normal}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Chủ Nhật:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_sunday}</td></tr>
-                                <tr><td class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Số giờ tăng ca Lễ:</td><td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${summary.overtime_hours_holiday}</td></tr>
-                            </tbody>
-                        </table>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-theme">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Tổng hợp công tháng: ${staffName}</h3>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="text-gray-500 dark:text-gray-400">Tháng ${new Date().getMonth() + 1}/${new Date().getFullYear()}</span>
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+                                ${summary.num_days_in_month} ngày (${summary.sundays_in_month_count} CN)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Work Details -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
+                        <div class="flex items-center p-2 bg-green-50 dark:bg-green-900/10 rounded border border-green-100 dark:border-green-900/20">
+                            <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Ngày thường</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">${summary.work_days_normal}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-indigo-50 dark:bg-indigo-900/10 rounded border border-indigo-100 dark:border-indigo-900/20">
+                            <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Chủ nhật</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">${summary.work_days_sunday}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-purple-50 dark:bg-purple-900/10 rounded border border-purple-100 dark:border-purple-900/20">
+                            <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Ngày lễ</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">${summary.work_days_holiday}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-amber-50 dark:bg-amber-900/10 rounded border border-amber-100 dark:border-amber-900/20">
+                            <div class="w-2 h-2 rounded-full bg-amber-500 mr-2"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Nghỉ phép</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">${summary.total_leave_days}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-red-50 dark:bg-red-900/10 rounded border border-red-100 dark:border-red-900/20">
+                            <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Không lương</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">${summary.total_unpaid_days}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Overtime Details -->
+                    <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-2">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Tăng ca (giờ)
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/10 rounded border border-blue-100 dark:border-blue-900/20">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Thường:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${summary.overtime_hours_normal}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-teal-50 dark:bg-teal-900/10 rounded border border-teal-100 dark:border-teal-900/20">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">CN:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${summary.overtime_hours_sunday}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-cyan-50 dark:bg-cyan-900/10 rounded border border-cyan-100 dark:border-cyan-900/20">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Lễ:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${summary.overtime_hours_holiday}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -953,10 +1004,10 @@ up.compiler('.display-calendar', function (modalForm) {
             });
     }
 
-    // Display salary calculation results in the table
+    // Display salary calculation results as cards
     function displaySalaryResults(results) {
-        const tableBody = document.getElementById('salary-results-table');
-        tableBody.innerHTML = '';
+        const cardsContainer = document.getElementById('salary-results-cards');
+        cardsContainer.innerHTML = '';
         
         // Format currency
         const formatCurrency = (amount) => {
@@ -967,30 +1018,212 @@ up.compiler('.display-calendar', function (modalForm) {
             }).format(amount);
         };
         
-        // Add rows for each staff member
+        // Add cards for each staff member
         results.forEach(staff => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-100 dark:hover:bg-gray-700';
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700';
             
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.staff_id}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.staff_name}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.full_days}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.half_days}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.leave_days}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.unpaid_leave_days}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.normal_working_time}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${staff.overtime}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.base_salary)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.daily_rate)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_rate)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.allowances)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_salary)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_salary)}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.total_salary)}</td>
+            // Create card header with staff info
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white';
+            cardHeader.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold">${staff.staff_name}</h3>
+                        <p class="text-sm opacity-80">Mã NV: ${staff.staff_id}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold">${formatCurrency(staff.total_salary)}</p>
+                        <p class="text-sm opacity-80">Tổng lương</p>
+                    </div>
+                </div>
             `;
             
-            tableBody.appendChild(row);
+            // Create card body with attendance details
+            const attendanceSection = document.createElement('div');
+            attendanceSection.className = 'p-4 border-b border-gray-200 dark:border-gray-700';
+            attendanceSection.innerHTML = `
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Chi tiết chấm công</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày làm đủ</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.full_days}</span>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày làm nửa buổi</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.half_days}</span>
+                    </div>
+                    <div class="bg-amber-50 dark:bg-amber-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày nghỉ phép</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_days}</span>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày nghỉ không lương</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.unpaid_leave_days}</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Thời gian làm việc</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.normal_working_time}</span>
+                    </div>
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Thời gian tăng ca</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.overtime}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Create card section with salary details
+            const salarySection = document.createElement('div');
+            salarySection.className = 'p-4';
+            
+            // Create a more compact salary section
+            const salaryDetailsSection = document.createElement('div');
+            salaryDetailsSection.className = 'mb-4';
+            salaryDetailsSection.innerHTML = `
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Thông tin lương cơ bản</h4>
+                        <span class="text-xs text-blue-600 dark:text-blue-400 font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-full">
+                            ${staff_salary_inputs ? staff_salary_inputs.calculation_method === "type_1" ? "Loại 1" : "Loại 2" : "Mặc định"}
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Lương cơ bản</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.base_salary)}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Lương ngày</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.daily_rate)}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Phụ cấp</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.fixed_allowance)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-indigo-400 mr-2"></div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Hệ số CN:</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${staff.sunday_salary_percentage}x</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-purple-400 mr-2"></div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Hệ số lễ:</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${staff.holiday_salary_percentage}x</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">TC thường:</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_overtime_rate)}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-amber-400 mr-2"></div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">TC CN:</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.sunday_overtime_rate)}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">TC lễ:</span>
+                            <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.holiday_overtime_rate)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Kết quả tính lương</h4>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Left column: Regular salary -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2 bg-blue-50 dark:bg-blue-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Lương thường:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.normal_salary)}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-2 bg-indigo-50 dark:bg-indigo-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Lương CN:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.sunday_salary)}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-2 bg-purple-50 dark:bg-purple-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Lương lễ:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.holiday_salary)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column: Overtime -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2 bg-green-50 dark:bg-green-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">TC thường:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_normal_salary)}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-2 bg-amber-50 dark:bg-amber-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-amber-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">TC CN:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_sunday_salary)}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-2 bg-red-50 dark:bg-red-900/10 rounded">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">TC lễ:</span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.overtime_holiday_salary)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary section -->
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Phụ cấp:</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.fixed_allowance)}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">BHXH:</span>
+                            <span class="text-sm font-medium text-red-600 dark:text-red-400">-${formatCurrency(staff.insurance_amount)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded text-white flex flex-col justify-center">
+                        <div class="text-xs opacity-80">Tổng lương:</div>
+                        <div class="text-base font-bold">${formatCurrency(staff.total_salary)}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add the details section to the salary section
+            salarySection.appendChild(salaryDetailsSection);
+            
+            // Assemble the card
+            card.appendChild(cardHeader);
+            card.appendChild(attendanceSection);
+            card.appendChild(salarySection);
+            
+            cardsContainer.appendChild(card);
         });
         
         // Show the results container
