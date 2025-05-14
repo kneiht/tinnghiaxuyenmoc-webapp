@@ -7,7 +7,7 @@ from django.db.models import Exists, OuterRef
 from .models.models import *
 from .models.supply import CostEstimation, SupplyInventoryRecord
 from django.core.exceptions import ValidationError
-
+from django.db.models import Q
 
 class PermissionForm(forms.ModelForm):
     class Meta:
@@ -510,10 +510,6 @@ class StaffDataForm(forms.ModelForm):
                 }
             ),
         }
-
-
-from django import forms
-from .models.models import DriverSalaryInputs
 
 
 class DriverSalaryInputsForm(forms.ModelForm):
@@ -3066,3 +3062,43 @@ class SupplyInventoryRecordForm(forms.ModelForm):
             else:
                 # Mặc định không hiển thị CostEstimation nào cho đến khi chọn project
                 self.fields["supply"].queryset = CostEstimation.objects.none()
+
+
+
+class StaffSalaryInputsForm(forms.ModelForm):
+    class Meta:
+        model = StaffSalaryInputs
+        fields = [
+            'staff',
+            'valid_from',
+            'basic_month_salary',
+            'sunday_work_day_multiplier',
+            'holiday_work_day_multiplier',
+            'overtime_normal_rate_multiplier',
+            'overtime_sunday_rate_multiplier',
+            'overtime_holiday_rate_multiplier',
+            'fixed_allowance',
+            'insurance_amount',
+            'note',
+        ]
+        widgets = {
+            'valid_from': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
+            'note': forms.Textarea(attrs={'rows': 3, 'class': 'form-input h-20'}),
+            'staff': forms.Select(attrs={'class': 'new-select form-input w-full'}),
+            'basic_month_salary': forms.NumberInput(attrs={'class': 'form-input'}),
+            'sunday_work_day_multiplier': forms.NumberInput(attrs={'class': 'form-input no-readable', 'step': '0.01'}),
+            'holiday_work_day_multiplier': forms.NumberInput(attrs={'class': 'form-input no-readable', 'step': '0.01'}),
+            'overtime_normal_rate_multiplier': forms.NumberInput(attrs={'class': 'form-input no-readable', 'step': '0.01'}),
+            'overtime_sunday_rate_multiplier': forms.NumberInput(attrs={'class': 'form-input no-readable', 'step': '0.01'}),
+            'overtime_holiday_rate_multiplier': forms.NumberInput(attrs={'class': 'form-input no-readable', 'step': '0.01'}),
+            'fixed_allowance': forms.NumberInput(attrs={'class': 'form-input'}),
+            'insurance_amount': forms.NumberInput(attrs={'class': 'form-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Giới hạn lựa chọn nhân viên cho trường 'staff' nếu chưa dùng limit_choices_to trong model
+        # Hoặc nếu muốn tùy chỉnh thêm
+        self.fields['staff'].queryset = StaffData.objects.filter(
+            Q(position='manager') | Q(position='staff') # Điều chỉnh các position nếu cần
+        ).order_by('full_name')

@@ -484,7 +484,7 @@ up.compiler('.display-calendar', function (modalForm) {
     }
 
     // Function to open the batch attendance modal
-    async function openBatchAttendanceModal(dateStr, summary = null) {
+    async function openBatchAttendanceModal(dateStr, summary = null) { // holidaysData is globally available
         // Format date for display (YYYY-MM-DD to DD/MM/YYYY)
         const [year, month, day] = dateStr.split('-');
         const formattedDate = `${day}/${month}/${year}`;
@@ -502,13 +502,28 @@ up.compiler('.display-calendar', function (modalForm) {
         // Fetch attendance records for this date
         const dateAttendance = await fetchAttendanceForDate(dateStr);
 
-        console.log('Attendance records for date:', dateAttendance);
-
         // Create a map of staff ID to attendance record
         const attendanceMap = {};
         dateAttendance.forEach(record => {
             attendanceMap[record.staff_id] = record;
         });
+
+        // Determine if restrictions apply (Holiday or Sunday)
+        const isHoliday = holidaysData && holidaysData[dateStr];
+        const dateObj = new Date(dateStr);
+        const isSunday = dateObj.getDay() === 0;
+        const applyRestriction = isHoliday || isSunday;
+        const allowedSpecialDayStatuses = ["full_day", "hours_only", "half_day_unpaid", "not_marked"];
+
+        // Function to toggle overtime input based on status for a specific row
+        const toggleBatchOvertimeInput = (statusSelectElement, overtimeInputElement) => {
+            if (statusSelectElement.value === 'full_day' || statusSelectElement.value === 'hours_only') {
+                overtimeInputElement.disabled = false;
+            } else {
+                overtimeInputElement.disabled = true;
+                overtimeInputElement.value = '0';
+            }
+        };
 
         // Add a row for each staff member
         allStaff.forEach((staff, index) => {
@@ -547,14 +562,28 @@ up.compiler('.display-calendar', function (modalForm) {
             statusSelect.name = `attendance_status_${staff.id}`;
 
             ATTENDANCE_STATUS_OPTIONS.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.text;
-                statusSelect.appendChild(option);
+                if (applyRestriction) {
+                    if (allowedSpecialDayStatuses.includes(opt.value)) {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.text;
+                        statusSelect.appendChild(option);
+                    }
+                } else {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    statusSelect.appendChild(option);
+                }
             });
             // Set selected value if record exists
             if (record) {
                 statusSelect.value = record.attendance_status;
+            } else {
+                // If new record and restrictions apply, set to a default allowed status
+                if (applyRestriction && !allowedSpecialDayStatuses.includes(statusSelect.value)) {
+                    statusSelect.value = 'not_marked';
+                }
             }
 
             statusCell.appendChild(statusSelect);
@@ -591,12 +620,20 @@ up.compiler('.display-calendar', function (modalForm) {
             // Set value if record exists
             if (record && record.overtime_hours !== undefined && record.overtime_hours !== null) {
                 overtimeInput.value = record.overtime_hours;
-            } else {
-                overtimeInput.value = '0';
             }
-
             overtimeCell.appendChild(overtimeInput);
 
+            // Initial state for overtime input
+            toggleBatchOvertimeInput(statusSelect, overtimeInput);
+
+            // Add event listener for status change to toggle overtime input for this row
+            statusSelect.addEventListener('change', () => {
+                toggleBatchOvertimeInput(statusSelect, overtimeInput);
+            });
+             // Ensure the selected value is visible, or reset to a default visible one
+            if (applyRestriction && statusSelect.options[statusSelect.selectedIndex] && statusSelect.options[statusSelect.selectedIndex].style.display === 'none') {
+                statusSelect.value = 'not_marked'; // Or another default visible status
+            }
             // Add cells to row
             row.appendChild(nameCell);
             row.appendChild(statusCell);
@@ -623,29 +660,55 @@ up.compiler('.display-calendar', function (modalForm) {
     // Mark all present button
     markAllPresentBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
-        statusSelects.forEach(select => {
-            select.value = 'full_day'; // Mark all as "Làm đủ ngày"
+        const overtimeInputs = batchAttendanceTableBody.querySelectorAll('input[name^="overtime_hours_"]');
+        const dateStr = batchRecordDateInput.value;
+        const isHoliday = holidaysData && holidaysData[dateStr];
+        const dateObj = new Date(dateStr);
+        const isSunday = dateObj.getDay() === 0;
+        const applyRestriction = isHoliday || isSunday;
+        const allowedSpecialDayStatuses = ["full_day", "hours_only", "half_day_unpaid", "not_marked"];
+
+        statusSelects.forEach((select, index) => {
+            let newStatus = 'full_day';
+            if (applyRestriction && !allowedSpecialDayStatuses.includes(newStatus)) {
+                newStatus = 'not_marked'; // Or another default allowed status like 'hours_only' if 'full_day' is not allowed
+            }
+            select.value = newStatus;
+            toggleBatchOvertimeInput(select, overtimeInputs[index]);
         });
     });
 
     // Mark all absent button
     markAllAbsentBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
-        statusSelects.forEach(select => {
-            select.value = 'unpaid_leave'; // Mark all as "Nghỉ không lương"
+        const overtimeInputs = batchAttendanceTableBody.querySelectorAll('input[name^="overtime_hours_"]');
+        const dateStr = batchRecordDateInput.value;
+        const isHoliday = holidaysData && holidaysData[dateStr];
+        const dateObj = new Date(dateStr);
+        const isSunday = dateObj.getDay() === 0;
+        const applyRestriction = isHoliday || isSunday;
+        const allowedSpecialDayStatuses = ["full_day", "hours_only", "half_day_unpaid", "not_marked"];
+
+        statusSelects.forEach((select, index) => {
+            let newStatus = 'unpaid_leave';
+            if (applyRestriction && !allowedSpecialDayStatuses.includes(newStatus)) {
+                newStatus = 'not_marked'; // This is an allowed status
+            }
+            select.value = newStatus;
+            toggleBatchOvertimeInput(select, overtimeInputs[index]);
         });
     });
 
     // Reset all button
     resetAllAttendanceBtn.addEventListener('click', () => {
         const statusSelects = batchAttendanceTableBody.querySelectorAll('select[name^="attendance_status_"]');
-        const overtimeInputs = batchAttendanceTableBody.querySelectorAll('input[name^="overtime_hours_"]');
         const noteInputs = batchAttendanceTableBody.querySelectorAll('input[name^="note_"]');
+        const overtimeInputs = batchAttendanceTableBody.querySelectorAll('input[name^="overtime_hours_"]');
 
-        statusSelects.forEach(select => {
-            select.value = 'full_day'; // Reset to "Làm đủ ngày"
+        statusSelects.forEach((select, index) => {
+            select.value = 'not_marked'; // Reset to "Chưa chấm công"
+            toggleBatchOvertimeInput(select, overtimeInputs[index]);
         });
-
         overtimeInputs.forEach(input => {
             input.value = '0'; // Reset overtime hours to 0
         });
@@ -757,14 +820,20 @@ up.compiler('.display-calendar', function (modalForm) {
             const statusSelect = batchAttendanceTableBody.querySelector(`select[name="attendance_status_${staffId}"]`);
             const overtimeInput = batchAttendanceTableBody.querySelector(`input[name="overtime_hours_${staffId}"]`);
             const noteInput = batchAttendanceTableBody.querySelector(`input[name="note_${staffId}"]`);
-
-            formData.records.push({
-                record_id: recordIdInput ? recordIdInput.value : null,
-                staff_id: staffId,
-                attendance_status: statusSelect.value,
-                overtime_hours: overtimeInput ? overtimeInput.value : '0',
-                note: noteInput.value
-            });
+            
+            // Only add to records if status is not "not_marked" OR 
+            // if it is "not_marked" but an existing record_id needs to be deleted (backend should handle this).
+            // If status is "not_marked" for a new entry (no recordIdInput), we can skip it.
+            // However, to allow deletion via "not_marked", we send it if recordIdInput exists.
+            if (statusSelect.value !== 'not_marked' || (recordIdInput && recordIdInput.value)) {
+                formData.records.push({
+                    record_id: recordIdInput ? recordIdInput.value : null,
+                    staff_id: staffId,
+                    attendance_status: statusSelect.value,
+                    overtime_hours: overtimeInput && !overtimeInput.disabled ? overtimeInput.value : '0',
+                    note: noteInput.value
+                });
+            }
         });
 
         try {
@@ -1286,3 +1355,4 @@ up.compiler('.display-calendar', function (modalForm) {
     // Initial adjustment
     adjustDisplayRecordsHeight();
 });
+

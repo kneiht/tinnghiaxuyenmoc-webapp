@@ -35,6 +35,7 @@ NAV_ITEMS = {
             "VehicleDetail": "DL xe chi tiết",
             "StaffData": "DL nhân viên, tài xế phòng vận tải",
             "DriverSalaryInputs": "DL mức lương tài xế cơ giới",
+            "StaffSalaryInputs": "DL mức lương nhân viên văn phòng",
             "DumbTruckPayRate": "DL mức lương tài xế xe ben",
             "DumbTruckRevenueData": "DL tính DT xe ben",
             "Location": "DL địa điểm",

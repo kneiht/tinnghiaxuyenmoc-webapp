@@ -142,37 +142,47 @@ def calculate_staff_salary(request):
                         first_record_date.year, first_record_date.month + 1, 1
                     ) - timedelta(days=1)
                 
-                staff_salary_inputs = DriverSalaryInputs.objects.filter(
-                    driver=staff_id, valid_from__lte=end_date_of_month
-                ).order_by('-valid_from').first()
+                staff_salary_inputs = StaffSalaryInputs.get_valid_record(
+                    staff_id=staff_id,
+                    target_date=end_date_of_month
+                )
             else:
                 staff_salary_inputs = None
             
             # Calculate salary components
             base_salary = 0
-            sunday_salary_percentage = 0
-            holiday_salary_percentage = 0
-            normal_overtime_rate = 0
-            sunday_overtime_rate = 0
-            holiday_overtime_rate = 0
+            sunday_work_day_multiplier = 1.0
+            holiday_work_day_multiplier = 1.0
+            overtime_normal_rate_multiplier = 1.5
+            overtime_sunday_rate_multiplier = 2.0
+            overtime_holiday_rate_multiplier = 3.0
             fixed_allowance = 0
             insurance_amount = 0
             
             if staff_salary_inputs:
                 base_salary = staff_salary_inputs.basic_month_salary or 0
-                sunday_salary_percentage = staff_salary_inputs.sunday_month_salary_percentage or 0
-                holiday_salary_percentage = staff_salary_inputs.holiday_month_salary_percentage or 0
-                normal_overtime_rate = staff_salary_inputs.normal_overtime_hourly_salary or 0
-                sunday_overtime_rate = staff_salary_inputs.sunday_overtime_hourly_salary or 0
-                holiday_overtime_rate = staff_salary_inputs.holiday_overtime_hourly_salary or 0
+                sunday_work_day_multiplier = staff_salary_inputs.sunday_work_day_multiplier or 1.0
+                holiday_work_day_multiplier = staff_salary_inputs.holiday_work_day_multiplier or 1.0
+                overtime_normal_rate_multiplier = staff_salary_inputs.overtime_normal_rate_multiplier or 1.5
+                overtime_sunday_rate_multiplier = staff_salary_inputs.overtime_sunday_rate_multiplier or 2.0
+                overtime_holiday_rate_multiplier = staff_salary_inputs.overtime_holiday_rate_multiplier or 3.0
                 fixed_allowance = staff_salary_inputs.fixed_allowance or 0
                 insurance_amount = staff_salary_inputs.insurance_amount or 0
             
             # Calculate hours (convert seconds to hours)
             normal_hours = total_normal_working_time / 3600
-            overtime_normal_hours = total_overtime_normal / 3600
-            overtime_sunday_hours = total_overtime_sunday / 3600
-            overtime_holiday_hours = total_overtime_holiday / 3600
+            # Calculate overtime hours based on working hours per day divided by 8, then multiplied by multiplier
+            # We need to calculate overtime hours accordingly
+            # So we will calculate overtime hours as (overtime_seconds / 3600) * (working_hours_per_day / 8)
+            # But since overtime_seconds is already in seconds, we need to adjust accordingly
+            
+            # Calculate working hours per day (normal working time in hours divided by number of working days)
+            total_working_days = normal_working_days + sunday_working_days + holiday_working_days
+            working_hours_per_day = normal_hours / total_working_days if total_working_days > 0 else 0
+            
+            overtime_normal_hours = (total_overtime_normal / 3600) * (working_hours_per_day / 8) * overtime_normal_rate_multiplier
+            overtime_sunday_hours = (total_overtime_sunday / 3600) * (working_hours_per_day / 8) * overtime_sunday_rate_multiplier
+            overtime_holiday_hours = (total_overtime_holiday / 3600) * (working_hours_per_day / 8) * overtime_holiday_rate_multiplier
 
             # Calculate working days in the period
             total_days = (end_date - start_date).days + 1

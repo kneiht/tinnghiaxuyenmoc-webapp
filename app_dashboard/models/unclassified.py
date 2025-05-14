@@ -392,6 +392,116 @@ class DriverSalaryInputs(BaseModel):
         return fields
 
 
+class StaffSalaryInputs(BaseModel):
+    allow_display = True
+    excel_downloadable = True
+    excel_uploadable = True
+    vietnamese_name = "DL tính lương nhân viên" # Đã sửa tên
+
+    class Meta:
+        ordering = ["staff", "-valid_from"] # Sửa ordering
+        verbose_name = "Dữ liệu tính lương nhân viên"
+        verbose_name_plural = "Dữ liệu tính lương nhân viên"
+
+    staff = models.ForeignKey(
+        StaffData,
+        on_delete=models.CASCADE,
+        verbose_name="Nhân viên",
+        limit_choices_to={'position__in': ['manager', 'staff']},
+        null=True,
+        # blank=True # Cân nhắc thêm blank=True nếu bạn muốn form admin cho phép để trống
+    )
+    # Salary Fields
+    basic_month_salary = models.PositiveIntegerField(
+        verbose_name="Lương cơ bản tháng", default=0
+    )
+    # Hệ số lương cho ngày làm việc Chủ Nhật/Lễ (nếu nhân viên được tính thêm khi làm những ngày này)
+    # Nếu không, có thể bỏ các trường này và chỉ dựa vào overtime_rate_multiplier
+    sunday_work_day_multiplier = models.FloatField( # Đổi tên cho rõ nghĩa hơn
+        verbose_name="Hệ số ngày làm việc Chủ Nhật", default=1.0, help_text="Mặc định 1.0 (100% lương ngày). Nếu làm CN được x2 lương ngày thì nhập 2.0"
+    )
+    holiday_work_day_multiplier = models.FloatField( # Đổi tên
+        verbose_name="Hệ số ngày làm việc Lễ", default=1.0, help_text="Mặc định 1.0 (100% lương ngày). Nếu làm Lễ được x3 lương ngày thì nhập 3.0"
+    )
+
+    # Hệ số lương tăng ca (Overtime multipliers)
+    overtime_normal_rate_multiplier = models.FloatField(
+        verbose_name="Hệ số tăng ca ngày thường", default=1.5, help_text="Mặc định 1.5 (150%)"
+    )
+    overtime_sunday_rate_multiplier = models.FloatField(
+        verbose_name="Hệ số tăng ca Chủ Nhật", default=2.0, help_text="Mặc định 2.0 (200%)"
+    )
+    overtime_holiday_rate_multiplier = models.FloatField(
+        verbose_name="Hệ số tăng ca ngày Lễ", default=3.0, help_text="Mặc định 3.0 (300%)"
+    )
+    
+    # Other Information
+    fixed_allowance = models.PositiveIntegerField( # Các phụ cấp cố định khác không theo ngày
+        verbose_name="Phụ cấp cố định", default=0
+    )
+    insurance_amount = models.PositiveIntegerField( # Mức lương đóng BHXH
+        verbose_name="Mức lương đóng BHXH", default=0 
+    )
+
+    valid_from = models.DateField(
+        verbose_name="Ngày bắt đầu áp dụng", default=timezone.now
+    )
+
+    note = models.TextField(
+        verbose_name="Ghi chú", 
+        default="", 
+        null=True, 
+        blank=True
+    )
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Ngày tạo")
+
+    def __str__(self):
+        return f"{self.staff} - hiệu lực từ {self.valid_from}" # Sửa __str__
+
+    @classmethod
+    def get_display_fields(self):
+        fields = [
+            "staff",
+            "valid_from",
+            "basic_month_salary",
+            "sunday_work_day_multiplier",
+            "holiday_work_day_multiplier",
+            "overtime_normal_rate_multiplier",
+            "overtime_sunday_rate_multiplier",
+            "overtime_holiday_rate_multiplier",
+            "fixed_allowance",
+            "insurance_amount",
+            "note",
+            "created_at",
+        ]
+        # Check if the field is in the model
+        model_fields = [f.name for f in self._meta.get_fields()]
+        return [field for field in fields if field in model_fields]
+
+    @classmethod
+    def get_valid_record(cls, staff_id, target_date):
+        """
+        Lấy bản ghi StaffSalaryInputs hợp lệ cho một nhân viên tại một ngày cụ thể.
+        """
+        # Chuyển đổi target_date sang đối tượng date nếu nó là string
+        if isinstance(target_date, str):
+            try:
+                target_date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
+            except ValueError:
+                target_date_obj = timezone.now().date() 
+        elif isinstance(target_date, datetime):
+            target_date_obj = target_date.date()
+        elif isinstance(target_date, date):
+            target_date_obj = target_date
+        else:
+            return None
+
+        return cls.objects.filter(
+            staff_id=staff_id,
+            valid_from__lte=target_date_obj
+        ).order_by('-valid_from').first()
+
+
 class VehicleDetail(BaseModel):
     allow_display = True
     excel_downloadable = True
