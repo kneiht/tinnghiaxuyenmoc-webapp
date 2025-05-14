@@ -1085,9 +1085,7 @@ up.compiler('.display-calendar', function (modalForm) {
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Thông tin lương cơ bản</h4>
-                        <span class="text-xs text-blue-600 dark:text-blue-400 font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-full">
-                            ${staff_salary_inputs ? staff_salary_inputs.calculation_method === "type_1" ? "Loại 1" : "Loại 2" : "Mặc định"}
-                        </span>
+
                     </div>
                     
                     <div class="grid grid-cols-3 gap-2 text-sm">

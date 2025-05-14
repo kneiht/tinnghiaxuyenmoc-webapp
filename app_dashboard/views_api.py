@@ -224,7 +224,14 @@ def calculate_staff_salary(request):
             total_overtime_salary = overtime_normal_salary + overtime_sunday_salary + overtime_holiday_salary
             
             # Calculate total salary
-            total_salary = normal_salary + sunday_salary + holiday_salary + total_overtime_salary + fixed_allowance - insurance_amount
+            total_salary = (
+                Decimal(str(normal_salary)) +
+                Decimal(str(sunday_salary)) +
+                Decimal(str(holiday_salary)) +
+                total_overtime_salary +
+                Decimal(str(fixed_allowance)) -
+                Decimal(str(insurance_amount))
+            )
             
             # Format times for display
             def format_time(seconds):
