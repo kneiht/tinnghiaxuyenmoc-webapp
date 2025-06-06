@@ -574,8 +574,8 @@ class VehicleMaintenanceAnalysis(BaseModel):
         validators=[MinValueValidator(0)],
     )
 
-    from_date = models.DateField(verbose_name="Từ ngày", default=timezone.now)
-    to_date = models.DateField(verbose_name="Đến ngày", default=timezone.now)
+    start_date = models.DateField(verbose_name="Từ ngày", default=timezone.now)
+    end_date = models.DateField(verbose_name="Đến ngày", default=timezone.now)
     created_at = models.DateTimeField(
         default=timezone.now, verbose_name="Ngày tạo phiếu"
     )
@@ -588,9 +588,8 @@ class VehicleMaintenanceAnalysis(BaseModel):
         fields = [
             "vehicle",
             "maintenance_amount",
-            "from_date",
-            "to_date",
-            "created_at",
+            "start_date",
+            "end_date",
         ]
         # Check if the field is in the model
         for field in fields:
@@ -1461,6 +1460,28 @@ class AttendanceRecord(BaseModel):
         ],
         help_text="Số ngày phép được tính (0.0, 0.5, 1.0)",
     )
+    
+    LEAVE_COUNT_BALANCE_INCREASE_CHOICES = [
+        (Decimal("0.0"), "0.0"),
+        (Decimal("0.5"), "0.5"),
+        (Decimal("1.0"), "1.0"),
+        (Decimal("1.5"), "1.5"),
+        (Decimal("2.0"), "2.0"),
+        (Decimal("2.5"), "2.5"),
+        (Decimal("3.0"), "3.0"),
+    ]
+    leave_count_balance_increase = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        choices=LEAVE_COUNT_BALANCE_INCREASE_CHOICES,
+        default=Decimal("0.0"),
+        verbose_name="Tăng ngày phép",
+        validators=[
+            MinValueValidator(Decimal("0.0")),
+            MaxValueValidator(Decimal("3.0")),
+        ],
+        help_text="Số ngày phép được tăng thêm vào cuối tháng (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)",
+    )
 
     overtime_hours = models.DecimalField(
         max_digits=4,
@@ -1526,6 +1547,7 @@ class AttendanceRecord(BaseModel):
             "attendance_status",
             "work_day_count",
             "leave_day_count",
+            "leave_count_balance_increase",
             "overtime_hours",
             "note",
             "created_at",

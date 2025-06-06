@@ -462,6 +462,13 @@ def filter_records(request, records, model_class, **kwargs):
         else:
             end_date = None
 
+        # If model is VehicleMaintenanceAnalysis, set start_date and end_date to None,
+        # because this model does not need to filter by created_at
+        if model_class == VehicleMaintenanceAnalysis:
+            start_date = None
+            end_date = None
+
+
         # Apply date range filter only if both start_date and end_date are provided
         if start_date and end_date:
             records = records.filter(created_at__date__range=[start_date, end_date])
@@ -469,6 +476,8 @@ def filter_records(request, records, model_class, **kwargs):
             records = records.filter(created_at__date__gte=start_date)
         elif end_date:
             records = records.filter(created_at__date__lte=end_date)
+
+
 
     # Get all text fields (CharField and TextField) from the model
     text_fields = [

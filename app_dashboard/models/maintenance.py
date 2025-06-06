@@ -557,6 +557,7 @@ class VehicleMaintenanceRepairPart(BaseModel):
 
     @classmethod
     def get_maintenance_amount(cls, vehicle, from_date, to_date):
+        print("\n\n>>>>>>>>from_date", from_date, "to_date", to_date)
         total_amount = 0
         vehicle_maintenances = VehicleMaintenance.objects.filter(
             vehicle=vehicle, from_date__gte=from_date, from_date__lte=to_date

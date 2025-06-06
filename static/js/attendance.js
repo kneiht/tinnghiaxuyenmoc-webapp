@@ -370,6 +370,8 @@ up.compiler('.display-calendar', function (modalForm) {
     const displayDateInput = document.getElementById('displayDate');
     let attendanceStatusSelect = document.getElementById('attendanceStatus'); // Changed const to let
     const overtimeHoursInput = document.getElementById('overtimeHours');
+    const leaveBalanceIncreaseContainer = document.getElementById('leaveBalanceIncreaseContainer');
+    const leaveCountBalanceIncreaseSelect = document.getElementById('leaveCountBalanceIncrease');
     const noteInput = document.getElementById('note');
 
     // Function to open the attendance modal
@@ -391,7 +393,17 @@ up.compiler('.display-calendar', function (modalForm) {
         // Also re-assign overtimeHoursInput if it's cloned or needs fresh reference, though typically not necessary unless form is complexly rebuilt
         // overtimeHoursInput = document.getElementById('overtimeHours'); // If needed
 
-
+        // Check if it's the last day of the month to show leave_count_balance_increase field
+        let dateObj = new Date(dateStr);
+        const lastDayOfMonth = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate();
+        const isLastDayOfMonth = parseInt(day) === lastDayOfMonth;
+        
+        if (isLastDayOfMonth) {
+            leaveBalanceIncreaseContainer.classList.remove('hidden');
+        } else {
+            leaveBalanceIncreaseContainer.classList.add('hidden');
+            leaveCountBalanceIncreaseSelect.value = '0.0'; // Reset to 0 if not last day
+        }
 
         attendanceForm.reset();
 
@@ -417,6 +429,14 @@ up.compiler('.display-calendar', function (modalForm) {
             recordIdInput.value = record.id;
             attendanceStatusSelect.value = record.attendance_status;
             overtimeHoursInput.value = (record.overtime_hours !== undefined && record.overtime_hours !== null) ? record.overtime_hours : '0';
+            
+            // Set leave_count_balance_increase if it's available and it's the last day of the month
+            if (isLastDayOfMonth && record.leave_count_balance_increase !== undefined) {
+                leaveCountBalanceIncreaseSelect.value = record.leave_count_balance_increase.toString();
+            } else {
+                leaveCountBalanceIncreaseSelect.value = '0.0';
+            }
+            
             noteInput.value = record.note || '';
             deleteRecordBtn.classList.remove('hidden');
             toggleOvertimeInput(record.attendance_status); // Set initial state for overtime input
@@ -424,6 +444,7 @@ up.compiler('.display-calendar', function (modalForm) {
         } else {
             recordIdInput.value = '';
             attendanceStatusSelect.value = 'not_marked'; // Default to "Chưa chấm công"
+            leaveCountBalanceIncreaseSelect.value = '0.0';
             noteInput.value = '';
             deleteRecordBtn.classList.add('hidden');
             toggleOvertimeInput('not_marked'); // Set initial state for overtime input
@@ -432,7 +453,7 @@ up.compiler('.display-calendar', function (modalForm) {
         // Restrict status options if it's a holiday
         const isHoliday = holidaysData && holidaysData[dateStr];
         // Check if it's a Sunday
-        const dateObj = new Date(dateStr);
+        dateObj = new Date(dateStr);
         const isSunday = dateObj.getDay() === 0; // 0 represents Sunday
 
         const allowedHolidayStatuses = ["holiday_leave", "full_day", "hours_only", "not_marked"];
@@ -494,6 +515,7 @@ up.compiler('.display-calendar', function (modalForm) {
     const markAllPresentBtn = document.getElementById('markAllPresent');
     const markAllAbsentBtn = document.getElementById('markAllAbsent');
     const resetAllAttendanceBtn = document.getElementById('resetAllAttendance');
+    const leaveBalanceIncreaseHeader = document.getElementById('leaveBalanceIncreaseHeader');
 
     // Function to fetch all staff members
     async function fetchAllStaff() {
@@ -535,6 +557,17 @@ up.compiler('.display-calendar', function (modalForm) {
         batchRecordDateInput.value = dateStr;
         batchDisplayDateInput.value = formattedDate;
 
+        // Check if it's the last day of the month to show leave_count_balance_increase field
+        const dateObj2 = new Date(dateStr);
+        const lastDayOfMonth = new Date(dateObj2.getFullYear(), dateObj2.getMonth() + 1, 0).getDate();
+        const isLastDayOfMonth = parseInt(day) === lastDayOfMonth;
+        
+        if (isLastDayOfMonth) {
+            leaveBalanceIncreaseHeader.classList.remove('hidden');
+        } else {
+            leaveBalanceIncreaseHeader.classList.add('hidden');
+        }
+
         // Clear the table body
         batchAttendanceTableBody.innerHTML = '';
 
@@ -552,8 +585,8 @@ up.compiler('.display-calendar', function (modalForm) {
 
         // Determine if restrictions apply (Holiday or Sunday)
         const isHoliday = holidaysData && holidaysData[dateStr];
-        const dateObj = new Date(dateStr);
-        const isSunday = dateObj.getDay() === 0;
+        const dateObj3 = new Date(dateStr);
+        const isSunday = dateObj3.getDay() === 0;
         const allowedHolidayStatuses = ["holiday_leave", "full_day", "hours_only", "not_marked"];
         const allowedSundayStatuses = ["full_day", "hours_only", "not_marked"];
         const allowedWeekdayStatuses =  ["full_day", "hours_only", "leave_day", "unpaid_leave", "half_day_leave", "half_day_unpaid", "not_marked"];
@@ -688,11 +721,43 @@ up.compiler('.display-calendar', function (modalForm) {
             // if (applyRestriction && statusSelect.options[statusSelect.selectedIndex] && statusSelect.options[statusSelect.selectedIndex].style.display === 'none') {
             //     statusSelect.value = 'not_marked'; // Or another default visible status
             // }
-            // Add cells to row
-            row.appendChild(nameCell);
-            row.appendChild(statusCell);
-            row.appendChild(overtimeCell);
-            row.appendChild(noteCell);
+            // Create leave balance increase cell if it's the last day of the month
+            if (isLastDayOfMonth) {
+                const leaveBalanceCell = document.createElement('td');
+                leaveBalanceCell.className = 'px-6 py-4 whitespace-nowrap';
+                
+                const leaveBalanceSelect = document.createElement('select');
+                leaveBalanceSelect.className = 'form-input w-full no-new-select';
+                leaveBalanceSelect.name = `leave_count_balance_increase_${staff.id}`;
+                
+                // Add options for leave balance increase
+                [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0].forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value.toFixed(1);
+                    option.textContent = value.toFixed(1);
+                    leaveBalanceSelect.appendChild(option);
+                });
+                
+                // Set value if record exists
+                if (record && record.leave_count_balance_increase !== undefined) {
+                    leaveBalanceSelect.value = record.leave_count_balance_increase.toFixed(1);
+                }
+                
+                leaveBalanceCell.appendChild(leaveBalanceSelect);
+                
+                // Add cells to row
+                row.appendChild(nameCell);
+                row.appendChild(statusCell);
+                row.appendChild(overtimeCell);
+                row.appendChild(leaveBalanceCell);
+                row.appendChild(noteCell);
+            } else {
+                // Add cells to row without leave balance increase
+                row.appendChild(nameCell);
+                row.appendChild(statusCell);
+                row.appendChild(overtimeCell);
+                row.appendChild(noteCell);
+            }
 
             // Add row to table
             batchAttendanceTableBody.appendChild(row);
@@ -757,6 +822,17 @@ up.compiler('.display-calendar', function (modalForm) {
             overtime_hours: overtimeHoursInput.value,
             note: noteInput.value
         };
+        
+        // Check if it's the last day of the month to include leave_count_balance_increase
+        const dateStr = recordDateInput.value;
+        const [year, month, day] = dateStr.split('-');
+        const dateObj = new Date(dateStr);
+        const lastDayOfMonth = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate();
+        const isLastDayOfMonth = parseInt(day) === lastDayOfMonth;
+        
+        if (isLastDayOfMonth) {
+            formData.leave_count_balance_increase = leaveCountBalanceIncreaseSelect.value;
+        }
 
         try {
             const response = await fetch('/api/attendance-records/save/', {
@@ -1083,15 +1159,15 @@ up.compiler('.display-calendar', function (modalForm) {
                     ${ staff.half_days !== undefined ? `
                     <div class="bg-blue-50 dark:bg-blue-900/20 rounded p-2 text-center">
                         <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép tăng thêm</span>
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">Todo</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_count_balance_increase || 0}</span>
                     </div>` : ''}
                     <div class="bg-amber-50 dark:bg-amber-900/20 rounded p-2 text-center">
                         <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép bị trừ</span>
                         <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_days || 0}</span>
                     </div>
-                    <div class="bg-red-50 dark:bg-red-900/20 rounded p-2 text-center">
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày nghỉ không lương</span>
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.unpaid_leave_days || 0}</span>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded p-2 text-center">
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép còn lại</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_day_balance || 0}</span>
                     </div>
                 </div>`;
 

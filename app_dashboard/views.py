@@ -2902,6 +2902,7 @@ def get_staff_attendance_records(request):
             "date": date_str,
             "work_day_count": float(record.work_day_count),
             "leave_day_count": float(record.leave_day_count),
+            "leave_count_balance_increase": float(record.leave_count_balance_increase),
             "attendance_status": record.attendance_status,
             "overtime_hours": (
                 float(record.overtime_hours) if record.overtime_hours else 0
@@ -2942,6 +2943,7 @@ def get_staff_attendance_records(request):
     overtime_hours_normal = 0
     overtime_hours_sunday = 0
     overtime_hours_holiday = 0
+    total_leave_count_balance_increase = 0
 
     # Process each attendance record
     for record in attendance_records:
@@ -2978,7 +2980,17 @@ def get_staff_attendance_records(request):
                     overtime_hours_sunday += overtime_hours
                 else:
                     overtime_hours_normal += overtime_hours
+                    
+        # Count leave_count_balance_increase
+        if hasattr(record, "leave_count_balance_increase") and record.leave_count_balance_increase:
+            leave_increase = float(record.leave_count_balance_increase)
+            if leave_increase > 0:
+                total_leave_count_balance_increase += leave_increase
 
+    # Calculate leave day balance
+    starting_leave_day_balance = current_staff.starting_leave_day_balance
+    leave_day_balance = starting_leave_day_balance + total_leave_count_balance_increase - total_leave_days
+    
     # Create salary summary
     salary_summary = {
         "num_days_in_month": days_in_month,
@@ -2991,6 +3003,9 @@ def get_staff_attendance_records(request):
         "overtime_hours_normal": overtime_hours_normal,
         "overtime_hours_sunday": overtime_hours_sunday,
         "overtime_hours_holiday": overtime_hours_holiday,
+        "leave_count_balance_increase": total_leave_count_balance_increase,
+        "starting_leave_day_balance": starting_leave_day_balance,
+        "leave_day_balance": leave_day_balance,
     }
 
     json = {
@@ -3023,6 +3038,7 @@ def save_attendance_record(request):
         record_id = data.get("record_id")
         attendance_status = data.get("attendance_status")
         overtime_hours = data.get("overtime_hours", "0")
+        leave_count_balance_increase = data.get("leave_count_balance_increase", "0")
         note = data.get("note", "")
 
         # Validate required fields
@@ -3055,6 +3071,19 @@ def save_attendance_record(request):
                 record.overtime_hours = Decimal(overtime_hours)
             except:
                 record.overtime_hours = Decimal("0.00")
+                
+            # Check if it's the end of the month to allow leave_count_balance_increase
+            record_date_month_end = record_date.replace(day=1)
+            import calendar
+            _, last_day = calendar.monthrange(record_date.year, record_date.month)
+            record_date_month_end = record_date_month_end.replace(day=last_day)
+            
+            # Only allow setting leave_count_balance_increase if it's the last day of the month
+            if record_date == record_date_month_end:
+                try:
+                    record.leave_count_balance_increase = Decimal(leave_count_balance_increase)
+                except:
+                    record.leave_count_balance_increase = Decimal("0.00")
             
             record.save()
             message = "Record updated successfully"
@@ -3081,11 +3110,26 @@ def save_attendance_record(request):
                 )
 
             # Create new record
+            # Check if it's the end of the month to allow leave_count_balance_increase
+            record_date_month_end = record_date.replace(day=1)
+            import calendar
+            _, last_day = calendar.monthrange(record_date.year, record_date.month)
+            record_date_month_end = record_date_month_end.replace(day=last_day)
+            
+            # Only allow setting leave_count_balance_increase if it's the last day of the month
+            leave_count_balance_increase_value = Decimal("0.00")
+            if record_date == record_date_month_end:
+                try:
+                    leave_count_balance_increase_value = Decimal(leave_count_balance_increase)
+                except:
+                    leave_count_balance_increase_value = Decimal("0.00")
+                    
             record = AttendanceRecord.objects.create(
                 worker=staff,
                 date=record_date,
                 attendance_status=attendance_status,
                 overtime_hours=Decimal(overtime_hours),
+                leave_count_balance_increase=leave_count_balance_increase_value,
                 note=note,
             )
             message = "Record created successfully"
@@ -3098,7 +3142,10 @@ def save_attendance_record(request):
                     "id": record.id,
                     "date": record.date.strftime("%Y-%m-%d"),
                     "work_day_count": float(record.work_day_count),
+                    "leave_day_count": float(record.leave_day_count),
+                    "leave_count_balance_increase": float(record.leave_count_balance_increase),
                     "attendance_status": record.attendance_status,
+                    "overtime_hours": float(record.overtime_hours),
                     "note": record.note or "",
                 },
             }

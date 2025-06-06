@@ -284,7 +284,9 @@ def render_display_records(request, **kwargs):
     model_class = globals()[model]
     project = Project.objects.filter(pk=project_id).first()
 
+    
     if not records:
+
         # Get the records
         if not project_id:
             records = model_class.objects.all()
@@ -294,6 +296,7 @@ def render_display_records(request, **kwargs):
         if tab == "vehicle_revenue" and update == "true":
             records = records.filter(vehicle=filter_vehicle)
 
+        print("\n\n>>>>>>>>dates", start_date, end_date)
         records = filter_records(
             request,
             records,
@@ -303,7 +306,7 @@ def render_display_records(request, **kwargs):
             check_date=check_date,
             check_month=check_month,
         )
-
+        print("\n\n>>>>>>>>records", records)
     requested_amount = 0
     # If the field requested_amount is in the model, calculate the total amount
 
@@ -512,12 +515,14 @@ def render_display_records(request, **kwargs):
             record.total_outstanding_debt = purchase_amount - transferred_amount
 
     elif model_class == VehicleMaintenanceAnalysis:
+        print("\n\n>>>>>>>>from_date", start_date, "to_date", end_date)
         for record in records:
+            print("\n\n>>>>>>>>vehicle", record)
             maintenance_amount = VehicleMaintenanceRepairPart.get_maintenance_amount(
                 record.vehicle, start_date, end_date
             )
-            record.from_date = start_date if start_date else "Không xác định"
-            record.to_date = end_date if end_date else "Không xác định"
+            record.start_date = start_date if start_date else "Không xác định"
+            record.end_date = end_date if end_date else "Không xác định"
             record.maintenance_amount = maintenance_amount
 
     template = "components/display_records.html"
