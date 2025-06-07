@@ -527,7 +527,7 @@ def upload_excel(request, model_name):
         fields = [
             field.name
             for field in model_class._meta.fields
-            if field.name not in ["last_saved", "created_at", "archived"]
+            if field.name not in ["last_saved", "archived"]
         ]
         field_mapping = {}
         for field_name in fields:

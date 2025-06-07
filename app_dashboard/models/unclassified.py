@@ -1347,7 +1347,7 @@ class Announcement(BaseModel):
         ordering = ["-is_pinned", "-publish_date"]
 
     def __str__(self):
-        return self.title + "- " + self.user + " - " + str(self.publish_date)
+        return str(self.title) + "- " + str(self.user) + " - " + str(self.publish_date)
 
     @classmethod
     def get_display_fields(self):
