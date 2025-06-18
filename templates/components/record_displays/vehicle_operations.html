@@ -51,7 +51,19 @@
                                 <tr class="text-sm leading-normal text-theme shadow-md bg-white dark:bg-slate-800
                                 border border-slate-300 dark:border-slate-900 border-opacity-50">
                                     {% for header in headers %}
-                                        <th class="px-6 py-3 text-left font-semibold">{{ header }}</th>
+                                        <th class="px-6 py-3 text-left font-semibold cursor-pointer">
+                                            {% if header == 'Thời gian hoạt động'  or header == 'Thời gian làm hành chính' %}
+                                                <div style="white-space: nowrap;">
+                                                    {{ header }}
+                                                </div>
+                                            {% else %}
+                                                <div style="width: 130px;">
+                                                    {{ header }}
+                                                </div>
+                                            {% endif %}
+                                        </th>
+
+
                                     {% endfor %}
 
                                 </tr>

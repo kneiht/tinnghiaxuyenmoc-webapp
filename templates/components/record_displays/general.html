@@ -12,7 +12,19 @@
             border border-slate-300 dark:border-slate-900 border-opacity-50">
                 {% for header in headers %}
                     <th class="px-6 py-3 text-left font-semibold cursor-pointer">
-                        {{ header }}
+                        {% if header == 'Dự án' or header == 'Ghi chú' or header == 'Địa chỉ' or header == 'Nhà cung cấp' or header == 'Tài xế' or header == 'Nhân viên' or header == 'Phiếu sửa chữa' %}
+                            <div style="width: 250px;">
+                                {{ header }}
+                            </div>
+                        {% elif header == 'Loại xe' or header == 'Họ và tên' or header == 'Tài xế' %}
+                            <div style="width: 150px;">
+                                {{ header }}
+                            </div> 
+                        {% else %}
+                            <div style="white-space: nowrap;">
+                                {{ header }}
+                            </div>
+                        {% endif %}
                     </th>
                 {% endfor %}
                 <th class="sticky right-0 bg-white dark:bg-slate-800 z-30">
@@ -97,17 +109,25 @@
                         
                         
                         {% elif field == 'vehicle_maintenance' %}
-                        <a class="underline text-blue-600" href="{% url 'load_elements' %}?q={% encode_params model='VehicleMaintenance' project_id=project_id elements='modal_form' pk=record.vehicle_maintenance.pk %}" 
-                        up-target="#modal">
-                            {{ record|format_display:field }}
-                        </a>
+                            <a class="underline text-blue-600" href="{% url 'load_elements' %}?q={% encode_params model='VehicleMaintenance' project_id=project_id elements='modal_form' pk=record.vehicle_maintenance.pk %}" 
+                            up-target="#modal">
+                                {{ record|format_display:field }}
+                            </a>
                         
+                        {% elif field == 'supply_order' %}
+                            <a class="underline text-blue-600" href="{% url 'load_elements' %}?q={% encode_params model='SupplyOrder' project_id=project_id elements='modal_form' pk=record.supply_order.pk %}" 
+                            up-target="#modal">
+                                {{ record|format_display:field }}
+                            </a>
                         
+                        {% elif field == 'sub_job_order' %}
+                            <a class="underline text-blue-600" href="{% url 'load_elements' %}?q={% encode_params model='SubJobOrder' project_id=project_id elements='modal_form' pk=record.sub_job_order.pk %}" 
+                            up-target="#modal">
+                                {{ record|format_display:field }}
+                            </a>
+
                         
-                        
-                        
-                        
-                            {% else %}
+                        {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 
 
