@@ -434,6 +434,7 @@ class StaffDataForm(forms.ModelForm):
             "account_holder_name",
             "phone_number",
             "address",
+            "starting_leave_day_balance",
         ]
 
         labels = {
@@ -448,6 +449,7 @@ class StaffDataForm(forms.ModelForm):
             "account_holder_name": "Tên chủ tài khoản",
             "phone_number": "Số điện thoại",
             "address": "Địa chỉ",
+            "starting_leave_day_balance": "Số ngày phép khi bắt đầu dùng phần mềm",
         }
 
         widgets = {
@@ -506,6 +508,12 @@ class StaffDataForm(forms.ModelForm):
             "address": forms.TextInput(
                 attrs={
                     "placeholder": "Nhập địa chỉ",
+                    "class": "form-input",
+                }
+            ),
+            "starting_leave_day_balance": forms.NumberInput(
+                attrs={
+                    "placeholder": "Nhập số ngày phép khi bắt đầu dùng phần mềm",
                     "class": "form-input",
                 }
             ),

@@ -173,7 +173,7 @@ class StaffData(BaseModel):
             "account_holder_name",
             "phone_number",
             "address",
-            "leave_day_balance",
+            "starting_leave_day_balance",
             "created_at",
         ]
         # Check if the field is in the model

@@ -66,6 +66,7 @@ def calculate_staff_salary(request):
             total_overtime_normal = 0
             total_overtime_sunday = 0
             total_overtime_holiday = 0
+            total_leave_count_balance_increase = 0
             
             # Count attendance types
             full_day_count = staff_records.filter(attendance_status='full_day').count()
@@ -130,7 +131,34 @@ def calculate_staff_salary(request):
                         total_overtime_sunday += overtime_seconds
                     else:
                         total_overtime_normal += overtime_seconds
-                
+
+                # Count leave_count_balance_increase
+                if hasattr(record, "leave_count_balance_increase") and record.leave_count_balance_increase:
+                        total_leave_count_balance_increase += float(record.leave_count_balance_increase)
+
+            # Calculate leave day balance efficiently using aggregation
+            starting_leave_day_balance = float(staff.starting_leave_day_balance or 0)
+            
+            # Aggregate leave days and balance increases in single queries
+            leave_days_summary = AttendanceRecord.objects.filter(
+                worker=staff_id, 
+                date__lte=end_date
+            ).aggregate(
+                total_leave_days=Sum('leave_day_count', filter=Q(attendance_status__in=['leave_day', 'half_day_leave'])),
+                total_balance_increase=Sum('leave_count_balance_increase')
+            )
+            
+            total_leave_days_all_time = float(leave_days_summary['total_leave_days'] or 0)
+            total_leave_count_balance_increase_all_time = float(leave_days_summary['total_balance_increase'] or 0)
+            
+            final_leave_day_balance = starting_leave_day_balance + total_leave_count_balance_increase_all_time - total_leave_days_all_time
+
+
+
+
+
+
+
             # Total overtime (sum of all types)
             total_overtime = total_overtime_normal + total_overtime_sunday + total_overtime_holiday
             
@@ -157,7 +185,7 @@ def calculate_staff_salary(request):
             overtime_normal_rate_multiplier = 1.5
             overtime_sunday_rate_multiplier = 2.0
             overtime_holiday_rate_multiplier = 3.0
-            fixed_allowance = 0
+            base_fixed_allowance = 0
             insurance_amount = 0
             
             if staff_salary_inputs:
@@ -167,7 +195,7 @@ def calculate_staff_salary(request):
                 overtime_normal_rate_multiplier = staff_salary_inputs.overtime_normal_rate_multiplier or 1.5
                 overtime_sunday_rate_multiplier = staff_salary_inputs.overtime_sunday_rate_multiplier or 2.0
                 overtime_holiday_rate_multiplier = staff_salary_inputs.overtime_holiday_rate_multiplier or 3.0
-                fixed_allowance = staff_salary_inputs.fixed_allowance or 0
+                base_fixed_allowance = staff_salary_inputs.fixed_allowance or 0
                 insurance_amount = staff_salary_inputs.insurance_amount or 0
             
             # Calculate actual normal and overtime hours
@@ -218,6 +246,14 @@ def calculate_staff_salary(request):
             sunday_days_salary_component = daily_rate_decimal * Decimal(str(sunday_working_days)) * Decimal(str(sunday_work_day_multiplier))
             holiday_days_salary_component = daily_rate_decimal * Decimal(str(holiday_working_days)) * Decimal(str(holiday_work_day_multiplier))
 
+            # calculate fixed allowance
+            fixed_allowance_per_day = base_fixed_allowance / Decimal(str(working_days_in_month))
+            # calculate fixed allowance
+            fixed_allowance = fixed_allowance_per_day * Decimal(str(normal_working_days))
+
+
+
+
             # Calculate overtime salary
             # OT Salary = Actual_OT_Hours * (Daily_Rate / 8) * OT_Multiplier
             hourly_rate_for_ot_calc = daily_rate_decimal / Decimal('8.0') if daily_rate_decimal > 0 else Decimal('0.0')
@@ -252,6 +288,8 @@ def calculate_staff_salary(request):
                 'leave_days': leave_day_count,
                 'unpaid_leave_days': unpaid_leave_count,
                 'not_marked_days': not_marked_count,
+                'leave_count_balance_increase': total_leave_count_balance_increase,
+                'final_leave_day_balance': final_leave_day_balance,
                 # Month info
                 'num_days_in_month': days_in_month,
                 'sundays_in_month_count': sundays_in_month,

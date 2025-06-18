@@ -1167,7 +1167,7 @@ up.compiler('.display-calendar', function (modalForm) {
                     </div>
                     <div class="bg-green-50 dark:bg-green-900/20 rounded p-2 text-center">
                         <span class="block text-xs text-gray-500 dark:text-gray-400">Ngày phép còn lại</span>
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.leave_day_balance || 0}</span>
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-gray-100">${staff.final_leave_day_balance || 0}</span>
                     </div>
                 </div>`;
 

@@ -29,6 +29,8 @@
                     {% for field in fields %}
                     <td class="px-6 py-3 border-b border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                             
+
+
                         {% if 'status' in field  %} 
                             <a  class="{{ record|get_value:field }}  cursor-pointer text-white p-1 rounded-md shadow-2xl top-5 right-5 px-2 text-nowrap"
                                 up-target="#display-records, #load-more:maybe"
@@ -91,7 +93,21 @@
                         </div>
                         {% elif field == 'part_providers' or field == 'maintenance_category' or field == 'user' or field == 'vehicle' %}
                             <div class="flex flex-row gap-2 whitespace-pre-line text-nowrap">{{ record|format_display:field }}</div>
-                        {% else %}
+                        
+                        
+                        
+                        {% elif field == 'vehicle_maintenance' %}
+                        <a class="underline text-blue-600" href="{% url 'load_elements' %}?q={% encode_params model='VehicleMaintenance' project_id=project_id elements='modal_form' pk=record.vehicle_maintenance.pk %}" 
+                        up-target="#modal">
+                            {{ record|format_display:field }}
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                            {% else %}
                             {{ record|format_display:field }}
                         {% endif %} 
 
