@@ -39,16 +39,6 @@
                             </button>
                         </a>
 
-                        <a href="{% url 'download_excel_template' 'cost_estimation_table' %}?project_id={{ project_id }}"
-                            class="whitespace-nowrap">
-                            {% csrf_token %}
-                            <button class="btn btn-primary nowrap">
-                                <i class="fas fa-file-excel me-3" style="font-size: 16px;"
-                                    aria-hidden="true"></i>
-                                <span class="me-3"> Tải mẫu excel </span>
-                            </button>
-                        </a>
-                     
                         <a id="create-new" href="{% url 'load_elements' %}?q={% encode_params model=model check_date=check_date project_id=project_id elements='modal_form' %}" up-preload="insert" up-target="#modal" class="btn btn-primary text-nowrap">
                             <i class="fas fa-plus me-3" style="font-size: 16px;"></i>
                             <span class="me-3"> Thêm dự toán </span>

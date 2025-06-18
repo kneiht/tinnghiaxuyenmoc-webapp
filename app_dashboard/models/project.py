@@ -289,7 +289,6 @@ class ProjectFile(BaseModel):
             "name",
             "file_url",
             "user",
-            "upload_date",
             "note",
             "created_at",
         ]

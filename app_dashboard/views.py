@@ -1472,6 +1472,42 @@ def download_excel_template(request, template_name):
         for row in supplies:
             sheet.append(row)
 
+
+        # ADD CURRENT ESTIMATION TABLE TO THE SHEET "bảng dự toán"
+        # project_id
+        project_id = request.GET.get("project_id")
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            html_message = render_message(
+                request, message="Dự án này không tồn tại", message_type="red"
+            )
+            return HttpResponse(html_message)
+
+        # get estimation table
+        estimations = CostEstimation.objects.filter(project=project)
+
+        if estimations:
+            # Modify or create the "data" sheet
+            if "bảng dự toán" in wb.sheetnames:
+                sheet_estimation = wb["bảng dự toán"]
+            else:
+                html_message = render_message(
+                    request, message="Lỗi template excel", message_type="red"
+                )
+                return HttpResponse(html_message)
+
+
+            # Append new data to the "data" sheet
+            row_count = 3
+            for estimation in estimations:
+                # Only write to cell B3 , C3 , D3
+                sheet_estimation.cell(row=row_count, column=2).value = estimation.base_supply.supply_number + " - " + estimation.base_supply.supply_name
+                sheet_estimation.cell(row=row_count, column=3).value = estimation.quantity
+                sheet_estimation.cell(row=row_count, column=7).value = estimation.note
+                row_count += 1
+
+
+
         # Save modifications to the temporary file
         wb.save(temp_excel_path)
 
@@ -1524,6 +1560,44 @@ def download_excel_template(request, template_name):
         # Write data to the sheet
         for row in sub_jobs:
             sheet.append(row)
+
+
+
+        # ADD CURRENT JOB ESTIMATION TABLE TO THE SHEET "bảng dự toán"
+        # project_id
+        project_id = request.GET.get("project_id")
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            html_message = render_message(
+                request, message="Dự án này không tồn tại", message_type="red"
+            )
+            return HttpResponse(html_message)
+
+        # get job estimation table
+        job_estimations = SubJobEstimation.objects.filter(project=project)
+        if job_estimations:
+
+            # Modify or create the "data" sheet
+            if "bảng dự toán" in wb.sheetnames:
+                sheet_estimation = wb["bảng dự toán"]
+            else:
+                html_message = render_message(
+                    request, message="Lỗi template excel", message_type="red"
+                )
+                return HttpResponse(html_message)
+
+            # Append new data to the "data" sheet
+            row_count = 3
+            for job_estimation in job_estimations:
+                # Only write to cell B3 , C3 , D3
+                print(job_estimation.base_sub_job.job_number)
+                print(job_estimation.base_sub_job.job_name)
+                print(job_estimation.quantity)
+                print(job_estimation.note)
+                sheet_estimation.cell(row=row_count, column=2).value = job_estimation.base_sub_job.job_number + " " + job_estimation.base_sub_job.job_name
+                sheet_estimation.cell(row=row_count, column=3).value = job_estimation.quantity
+                sheet_estimation.cell(row=row_count, column=7).value = job_estimation.note
+                row_count += 1
 
         # Save modifications to the temporary file
         wb.save(temp_excel_path)
