@@ -80,6 +80,7 @@ def calculate_staff_salary(request):
             
             # Count working days by type
             normal_working_days = 0
+            actual_normal_working_days = 0
             sunday_working_days = 0
             holiday_working_days = 0
             leave_day_count = 0
@@ -116,7 +117,13 @@ def calculate_staff_salary(request):
                         sunday_working_days += current_work_day_count_float
                     else:
                         normal_working_days += current_work_day_count_float # For actual work on a normal day or other statuses contributing work_day_count
-                    
+                        if record.attendance_status == 'full_day':
+                            actual_normal_working_days += 1
+                        elif record.attendance_status == 'half_day_leave':
+                            actual_normal_working_days += 0.5
+                        elif record.attendance_status == 'half_day_unpaid':
+                            actual_normal_working_days += 0.5
+                            
                     # Add to total_normal_working_time if not handled by the special 'hours_only' on holiday case
                     total_normal_working_time += current_work_day_count_float * standard_day_seconds
                 # If work_day_count is 0 and not the special (is_holiday and hours_only) case, 
@@ -249,7 +256,7 @@ def calculate_staff_salary(request):
             # calculate fixed allowance
             fixed_allowance_per_day = base_fixed_allowance / Decimal(str(working_days_in_month))
             # calculate fixed allowance
-            fixed_allowance = fixed_allowance_per_day * Decimal(str(normal_working_days))
+            fixed_allowance = fixed_allowance_per_day * Decimal(str(actual_normal_working_days))
 
 
 
@@ -293,6 +300,7 @@ def calculate_staff_salary(request):
                 # Month info
                 'num_days_in_month': days_in_month,
                 'sundays_in_month_count': sundays_in_month,
+                'working_days_in_month': working_days_in_month,
                 # Working days by type
                 'work_days_normal': round(normal_working_days, 2),
                 'work_days_sunday': round(sunday_working_days, 2),
@@ -323,6 +331,7 @@ def calculate_staff_salary(request):
                 'overtime_normal_salary': round(overtime_normal_salary, 2),
                 'overtime_sunday_salary': round(overtime_sunday_salary, 2),
                 'overtime_holiday_salary': round(overtime_holiday_salary, 2),
+                'base_fixed_allowance': base_fixed_allowance,
                 'fixed_allowance': fixed_allowance,
                 'insurance_amount': insurance_amount,
                 # Totals

@@ -1231,7 +1231,7 @@ up.compiler('.display-calendar', function (modalForm) {
                         </div>
                         <div class="flex flex-col">
                             <span class="text-xs text-gray-500 dark:text-gray-400">Phụ cấp</span>
-                            <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.fixed_allowance)}</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(staff.base_fixed_allowance)} / ${staff.working_days_in_month} ngày công trong tháng</span>
                         </div>
                     </div>
 
