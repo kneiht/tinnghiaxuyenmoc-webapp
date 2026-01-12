@@ -318,7 +318,7 @@ def render_display_records(request, **kwargs):
     groups = []
     if group_by:
         GROUPS_PER_PAGE = 3  # Increased from 1 to show more groups per page
-        if records.count() == 0:
+        if records.count() == 0 and not request.GET.get("all"):
             return '<div id="display-records" class="w-full overflow-scroll"><p class="text-red-600 text-center text-2xl my-10">Không tìm thấy dữ liệu, vui lòng chọn ngày khác</p></div><div up-hungry id="load-more" class="hidden"></div>'
         if model_class == VehicleOperationRecord:
             if group_by == "vehicle":
